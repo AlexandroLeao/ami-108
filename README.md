@@ -23,10 +23,12 @@ The game must remain playable using authored fallbacks when the AI provider is u
 
 The repository is currently private. Environment setup and executable instructions will be added with the bootstrap implementation. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
 
-The canonical narrative sources are Documento Mestre v1.7 and Roteiro Interativo v1.5 (private backup). The project name AMI-108 was selected during planning; the source documents will be revised after the production plan is approved.
+The canonical narrative sources are Documento Mestre v1.8 and Roteiro Interativo v1.6 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
 
 ## Collaboration
 
 Short-lived branches, reviewable pull requests, explicit acceptance criteria and reproducible tests. The project owner approves changes before merge. New services must respect the R$ 0 mandatory-cost constraint.
+
+Repository documentation, issue and PR text, commits, code identifiers and comments are written in English. Official private documents and owner-facing reports are in Portuguese; in-game content remains PT-BR/EN.
 
 License and asset distribution terms are not yet decided.
