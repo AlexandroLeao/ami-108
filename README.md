@@ -21,7 +21,7 @@ The game must remain playable using authored fallbacks when the AI provider is u
 
 ## Development
 
-The repository is currently private. Environment setup and executable instructions will be added with the bootstrap implementation. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
+The repository is currently private. See [development setup](docs/development.md) for environment setup, initial dependency resolution, tests and Compose instructions. The bootstrap remains under review until runtime verification passes. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
 
 The canonical narrative sources are Documento Mestre v1.8 and Roteiro Interativo v1.6 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
 
