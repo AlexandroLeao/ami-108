@@ -45,3 +45,6 @@ Thumbs.db
 !.vscode/settings.json
 playwright-report/
 test-results/
+
+# Generated framework files
+next-env.d.ts
