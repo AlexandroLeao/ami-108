@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import { sameOriginMutation } from './origin';
 
 export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ path: string[] }> };
@@ -7,8 +8,6 @@ const methods: Readonly<Record<string, string>> = {
 };
 const noStore = { 'Cache-Control': 'private, no-store' };
 const unavailable = () => Response.json({ code: 'SERVICE_UNAVAILABLE', message: 'SERVICE_UNAVAILABLE', requestId: crypto.randomUUID() }, { status: 503, headers: noStore });
-
-import { sameOriginMutation } from './origin';
 
 async function proxy(request: NextRequest, context: Context) {
   if (process.env.AMI_DEV_PREVIEW !== '1') return new Response(null, { status: 404, headers: noStore });
