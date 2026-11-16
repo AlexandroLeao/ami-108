@@ -20,12 +20,12 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
 
   useEffect(() => {
     if (stage !== 'chapter' || overlay !== 'none') return;
-    const timer = window.setTimeout(() => dispatch({ type: 'ADVANCE' }), CHAPTER_DURATION_MS);
+    const timer = window.setTimeout(() => dispatch({ type: 'CHAPTER_FINISH' }), CHAPTER_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [stage, overlay]);
 
   useEffect(() => {
-    panelRef.current?.querySelector<HTMLElement>('button:not(:disabled), [tabindex="0"]')?.focus();
+    (panelRef.current?.querySelector<HTMLElement>('[data-primary]') ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
   }, [stage, overlay]);
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
               <button className="small-control" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>
             </header>
             <SceneViewer imageAvailable={imageAvailable} locale={locale} reveal={visual.reveal} cue={visual.cue} />
-            <DialogueBox key={line} speaker={labels.speaker} text={labels.lines[line]} locale={locale}
+            <DialogueBox speaker={labels.speaker} text={labels.lines[line]} locale={locale}
               cue={visual.cue} onAdvance={() => dispatch({ type: 'ADVANCE' })} />
           </section>
         )}
