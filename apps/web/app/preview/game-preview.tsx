@@ -30,6 +30,18 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
 
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab' && overlay !== 'none') {
+        const controls = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled)') ?? []);
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (first && last && event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (first && last && !event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
       if (event.key === 'Escape') {
         if (overlay !== 'none') dispatch({ type: 'BACK' });
         else if (stage === 'scene' || stage === 'chapter') dispatch({ type: 'PAUSE' });
@@ -66,7 +78,7 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
           <section className="chapter-screen">
             <button className="small-control top-menu" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>
             <h1 className="chapter-title">{labels.chapter}</h1>
-            <button className="advance-control chapter-advance" aria-label={labels.continue} title={labels.continue}
+            <button className="advance-control chapter-advance" data-primary aria-label={labels.continue} title={labels.continue}
               onClick={() => dispatch({ type: 'ADVANCE' })}><span aria-hidden="true" className="pixel-arrow" /></button>
           </section>
         )}
