@@ -7,9 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Foundation only; narrative state is introduced in AMI-006.
+// Existing foundation rows remain valid; only capability-backed rows can resume.
 model GameSession {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String               @id @default(uuid()) @db.Uuid
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  tokenDigest      String?              @unique
+  narrativeVersion String?
+  state            Json?
+  revision         Int                  @default(0)
+  expiresAt        DateTime?
+  receipts         GameCommandReceipt[]
+}
+
+model GameCommandReceipt {
+  sessionId       String      @db.Uuid
+  commandId       String      @db.Uuid
+  requestDigest   String
+  appliedRevision Int
+  createdAt       DateTime    @default(now())
+  session         GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, commandId])
 }
