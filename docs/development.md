@@ -42,20 +42,26 @@ curl -fsS http://localhost:3001/health/ready
 curl -fsS http://localhost:8000/health
 ```
 
-In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. The temporary screen reports whether the API, database and AI health endpoint are reachable. This is not yet a playable game, and AI health is not evidence of real model inference.
+In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. Local Compose sets AMI_DEV_PREVIEW=1, so the root opens the owner-approved bilingual game menu and opening preview. Health endpoints remain available; without the flag, the root is diagnostic. The preview is not yet a playable campaign, and AI health is not evidence of real model inference. See [asset preview and disk recovery](assets.md).
 
 For local Compose, the example values are development-only; replace the password using a URL-safe value (or URL-encode it in the database URL). Never commit `.env`. PostgreSQL is not exposed to the host. The initial migration is applied by the API container on startup.
 
 ```bash
 docker compose logs --tail=100 api ai web db
-docker compose down
+docker compose stop
 ```
 
-Stopping preserves the database volume. Do not use `down -v` unless intentionally deleting local game data. Stop the development session when finished to conserve quota. Cloud Shell is temporary; do not rely on Docker volumes surviving VM replacement.
+Before stopping, check `git status --short`; stop the containers, switch to main only if the worktree is clean, and pull with `git pull --ff-only origin main`. Resume using `docker compose up -d --wait` if the current containers match the checked-out code; rebuild sequentially after source changes or VM replacement. Stopping preserves the database volume. Do not use `down -v` unless intentionally deleting local game data. Stop the development session when finished to conserve quota. Cloud Shell is temporary; do not rely on Docker volumes surviving VM replacement.
 
 ## Current limitations
 
-The initial migration only creates a session identity; authoritative game state is delivered in subsequent issues. No model/provider, game assets, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
+The initial migration only creates a session identity; authoritative game state is delivered in subsequent issues. The 12 approved derived scene assets and manifest are present on the API side; only the local CENA-01 preview route is exposed. No model/provider, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
+
+## Day 1 UI verification (2026-11-16)
+
+- PR #18 merged at `3e7eda0`; final head `6f0c778` passed [CI 43899909994](https://github.com/AlexandroLeao/ami-108/actions/runs/43899909994). Owner approved final preview on desktop and mobile.
+- The Dockerfile installs and builds as node, without recursively changing ownership of dependency trees. See disk-space recovery in assets.md. No paid compute required.
+- Current narrative domain core is independent of the local preview; no live campaign endpoint or persistence is claimed.
 
 ## Bootstrap verification (2026-11-15)
 

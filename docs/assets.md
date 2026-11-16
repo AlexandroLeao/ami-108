@@ -6,7 +6,7 @@ The private official backup contains 12 approved scene images and 9 internal ref
 
 ## Prepare the images
 
-Download the current private backup ZIP and upload it to your Cloud Shell home directory, outside the repository. From the repo root:
+Download the retained private asset backup ZIP v1.9 (the updated official documents are v1.10/v1.8; the ZIP intentionally remains v1.9) and upload it to your Cloud Shell home directory, outside the repository. From the repo root:
 
 ```bash
 uv run --script scripts/prepare-assets.py "$HOME/AMI-108-Backup-v1.9.zip"

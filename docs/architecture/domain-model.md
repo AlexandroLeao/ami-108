@@ -1,6 +1,6 @@
 # Domain model and state transitions
 
-**Proposed schema for AMI-004/005/006, not a migration.** The only implemented model today is the initial GameSession identity. The following preserves the canonical script and is reviewed before code changes.
+**Proposed schema for AMI-004/005/006, not a migration.** The only implemented Prisma model today is the initial GameSession identity. The Chapter 1 pure transition core is separate from durable persistence; its state is not a database schema. The design preserves the canonical script (Master v1.10 / Script v1.8).
 
 ## ER diagram
 
@@ -110,7 +110,7 @@ erDiagram
 | A05-S01 | E-SHIP, CP-BOAR, four BOAR choices; safe BOAR-04 / E-LAUNCH | A05-S02 or dead → CP-BOAR |
 | A05-S02 | Authored final, E-COMPLETE | Credits → menu |
 
-Order within each gate comes from the source script; this table does not reorder dialogue or events. All other encounter choices are lethal. Checkpoints are retry destinations, not alternate scenes. Line identifiers repeat across scenes; use composite (sceneId, lineId) in the catalog.
+Order within each gate comes from the source script; this table does not reorder dialogue or events. All other encounter choices are lethal. Checkpoints are retry destinations, not alternate scenes. Line identifiers repeat across scenes; use composite (sceneId, lineId) in the catalog. The approved opening uses SILENCE, L01a and L01b as presentation beats within A01-S01, retaining later line IDs. Previous dialogue history must not rewind authoritative state.
 
 ## Memory and energy invariants
 

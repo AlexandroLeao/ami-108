@@ -3,8 +3,8 @@
 **Project:** AMI-108  
 **Planning baseline:** November 15, 2026  
 **Production target:** November 16–22, 2026 (seven calendar days).  
-**Canonical sources:** Documento Mestre v1.9 and Roteiro Interativo v1.7, retained privately.  
-**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 design prepared for owner review; no playable campaign or real inference yet.
+**Canonical sources:** Documento Mestre v1.10 and Roteiro Interativo v1.8, retained privately.  
+**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 and AMI-003 completed on November 16 (PRs #17 and #18 merged; owner accepted desktop/mobile preview). AMI-004 started on Day 1, ahead of the original Day 2 target. No playable campaign or real inference yet.
 
 The target is ambitious, not a guaranteed release date. Preserve all approved requirements; record blockers and revise the schedule rather than silently reducing scope. Work is performed in active development sessions, not autonomously between them.
 
@@ -17,6 +17,8 @@ The target is ambitious, not a guaranteed release date. Preserve all approved re
 | 5 | Nov 20 | AMI-010: quality and security | Critical behavior, AI, accessibility, performance and security checks passed |
 | 6 | Nov 21 | AMI-011, 012: deployment and technical documentation | Reproducible deployment where free conditions are verified; evidence and documentation |
 | 7 | Nov 22 | AMI-013: release validation | Owner approves v1.0.0 only after mandatory release gates pass |
+
+Day 1 acceptance: #2, #4 and #5 closed; main merge `3e7eda0`. AMI-004 remains open until the authorized session/projection/UI integration and owner playtest pass. See [narrative core](narrative-engine.md).
 
 Tests, security, documentation and deployment preparation start early. Evaluate provider access and costs on day 1; use authored fallback for development, not as a substitute for demonstrating real AI.
 

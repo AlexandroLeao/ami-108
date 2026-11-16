@@ -1,6 +1,6 @@
 # Architecture decision records
 
-Status: proposed for owner review in AMI-002. These decisions operationalize the approved stack and narrative without adding product scope.
+Status: design merged in AMI-002 (PR #17). These decisions operationalize the approved stack and narrative without adding product scope. ADR-004 session expiry/retention and concrete integration details remain subject to implementation review. AMI-003 validated the local preview; it is not evidence of a durable game session.
 
 ## ADR-001 — Authoritative modular NestJS API
 

@@ -3,7 +3,7 @@
   "info": {
     "title": "AMI-108 Game API",
     "version": "0.1.0-proposed",
-    "description": "Design contract for the same-origin game facade. Only bootstrap health endpoints are currently implemented. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
+    "description": "Design contract for the same-origin game facade. Bootstrap health and an isolated development-only opening asset endpoint exist. AMI-004 starts with a server-only pure narrative core; campaign routes are not live. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
   },
   "servers": [
     {
@@ -424,7 +424,8 @@
               "CONSULT",
               "CHOOSE",
               "RETRY",
-              "FINISH"
+              "FINISH",
+              "PREVIOUS"
             ]
           },
           "label": {
@@ -573,6 +574,17 @@
           },
           "pending": {
             "type": "boolean"
+          },
+          "cue": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pain",
+              "ellipsis",
+              "wake",
+              "memory-cut"
+            ],
+            "description": "Proposed presentation cue for the current authored beat only; no game-state effect."
           }
         },
         "required": [
@@ -587,7 +599,8 @@
           "asset",
           "diagnostics",
           "actions",
-          "pending"
+          "pending",
+          "cue"
         ]
       },
       "CreateSession": {

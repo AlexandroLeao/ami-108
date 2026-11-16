@@ -2,7 +2,7 @@
 
 A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories.
 
-**Status:** pre-production and technical foundation complete (AMI-001); game architecture and requirements specified for review (AMI-002). No playable campaign or completed deployment yet.
+**Status:** technical foundation, architecture and approved visual/asset foundation complete (AMI-001–003). Chapter 1 server-only narrative core is in development (AMI-004). The local opening preview is not yet a playable campaign; no completed deployment or real inference.
 
 ## Product
 
@@ -23,7 +23,15 @@ The game must remain playable using authored fallbacks when the AI provider is u
 
 The repository is currently private. See [development setup](docs/development.md) for environment setup, initial dependency resolution, tests and Compose instructions. The bootstrap was merged in PR #16 after successful CI, four-container startup and Google Cloud Shell preview. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
 
-The canonical narrative sources are Documento Mestre v1.9 and Roteiro Interativo v1.7 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
+The canonical narrative sources are Documento Mestre v1.10 and Roteiro Interativo v1.8 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
+
+## Approved game interface
+
+- [UI specification and opening sequence](docs/ui-design.md)
+- [Scene asset preparation and local preview](docs/assets.md)
+- [Narrative engine implementation status](docs/narrative-engine.md)
+
+The owner approved the opening preview on desktop and mobile; PR #18 merged after CI passed. The server-only narrative core does not expose a live campaign API yet.
 
 ## Architecture specification
 

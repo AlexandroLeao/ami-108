@@ -1,7 +1,7 @@
 # Game requirements and traceability
 
 **AMI-002 · specification, not implementation evidence**  
-Sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7, November 15, 2026; narrative sections 1–11 and visual annexes. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
+Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7 (November 15). Current sources: v1.10 and v1.8 (November 16 addendum); narrative sections 1–11 and visual annexes remain unchanged except the approved opening presentation. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
 
 ## Functional requirements
 
@@ -44,6 +44,10 @@ Performance and accessibility thresholds are proposed for AMI-010 (WCAG 2.2 AA w
 ## Explicit exclusions
 
 No free movement, inventory, pickup systems, audio playback, animated sprites, real-time combat, hunger/thirst, free chat, procedural plot, additional endings, or new artwork. The 9 reference sheets are internal only; 12 scene assets are distinct from the 12 narrative scene IDs. Target duration 10–20 minutes is unmeasured until playtest.
+
+## Day 1 implementation trace
+
+AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile approval and passing CI. FR-02/03 are partially demonstrated by the opening preview, not the full campaign. NFR-01 is verified for the development foundation. FR-04/05/11/13 are addressed by Chapter 1 pure-domain tests in AMI-004, pending session/UI integration; see [narrative engine](../narrative-engine.md). No requirement is marked fully implemented solely by a design or unit test.
 
 ## Release evidence
 
