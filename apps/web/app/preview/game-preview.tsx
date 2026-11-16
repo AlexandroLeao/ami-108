@@ -4,12 +4,12 @@ import { useEffect, useReducer, useRef } from 'react';
 import { copy } from './copy';
 import { DialogueBox, SceneViewer } from './components';
 import { setLocale, useLocale } from './locale';
-import { CHAPTER_DURATION_MS, initialPreview, openingVisual, previewReducer } from './preview-state';
+import { CHAPTER_REVEAL_MS, initialPreview, openingVisual, previewReducer } from './preview-state';
 
 export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
   const locale = useLocale();
   const [state, dispatch] = useReducer(previewReducer, initialPreview);
-  const { stage, line, overlay, extrasPage } = state;
+  const { stage, chapterReady, line, overlay, extrasPage } = state;
   const labels = copy[locale];
   const panelRef = useRef<HTMLDivElement>(null);
   const visual = openingVisual(line);
@@ -19,14 +19,15 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
   }, [locale]);
 
   useEffect(() => {
-    if (stage !== 'chapter' || overlay !== 'none') return;
-    const timer = window.setTimeout(() => dispatch({ type: 'CHAPTER_FINISH' }), CHAPTER_DURATION_MS);
+    if (stage !== 'chapter') return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = window.setTimeout(() => dispatch({ type: 'CHAPTER_READY' }), reducedMotion ? 0 : CHAPTER_REVEAL_MS);
     return () => window.clearTimeout(timer);
-  }, [stage, overlay]);
+  }, [stage]);
 
   useEffect(() => {
     (panelRef.current?.querySelector<HTMLElement>('[data-primary]') ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
-  }, [stage, overlay]);
+  }, [stage, overlay, chapterReady]);
 
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
@@ -64,7 +65,7 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
       <div ref={overlay === 'none' ? panelRef : null} className="game-layer" inert={overlay !== 'none'} aria-hidden={overlay !== 'none' || undefined}>
         {stage === 'menu' && (
           <section className="menu-screen">
-            <h1 className="game-title">AMI<span>-108</span></h1>
+            <h1 className="game-title">AMI<span className="title-dash">-</span>108</h1>
             <nav aria-label={labels.menu} className="menu-options">
               <button className="game-control" onClick={() => dispatch({ type: 'START' })}>{labels.newGame}</button>
               <button className="game-control" disabled title={labels.newGameNotice}>{labels.continueGame}</button>
@@ -76,10 +77,10 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
         )}
         {stage === 'chapter' && (
           <section className="chapter-screen">
-            <button className="small-control top-menu" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>
+            {chapterReady && <button className="small-control top-menu" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>}
             <h1 className="chapter-title">{labels.chapter}</h1>
-            <button className="advance-control chapter-advance" data-primary aria-label={labels.continue} title={labels.continue}
-              onClick={() => dispatch({ type: 'ADVANCE' })}><span aria-hidden="true" className="pixel-arrow" /></button>
+            {chapterReady && <button className="advance-control chapter-advance" data-primary aria-label={labels.continue} title={labels.continue}
+              onClick={() => dispatch({ type: 'ADVANCE' })}><span aria-hidden="true" className="pixel-arrow" /></button>}
           </section>
         )}
         {stage === 'scene' && (
