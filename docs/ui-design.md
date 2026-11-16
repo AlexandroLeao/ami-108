@@ -20,14 +20,14 @@ The owner approved a presentation-only revision of A01-S01/L01: add an initial s
 | Beat | PT-BR | EN | Visual |
 | --- | --- | --- | --- |
 | Chapter card | CAPÍTULO 1 — BANANAS | CHAPTER 1 — BANANAS | Same persistent game frame as dialogue: menu visible from the start, blank dialogue box, dark scene field for about 1.4 s, gradual title reveal. At 3.4 s enable the advance arrow in the usual dialogue position. Fade out the chapter title without changing layout; wait indefinitely for player input. |
-| Opening silence | ... | ... | Dark scene field |
-| L01a | Que merda... | Shit... | Dark scene field |
-| L01b | Minha cabeça... | My head... | Dark scene field, brief subtle text tremor |
-| L02 | Onde eu estou? | Where am I? | CENA-01 remains the same mounted image at the same size throughout the opening. Eyelids open over 1.15 s and a subtle 3 px blur resolves in about 1.6 s; continuing to L03 does not restart or replace the image. |
-| L03 | Sangue...? | Blood...? | CENA-01 visible |
+| Opening silence | ... | ... | First blink, narrow blurred vision, gentle recurring text tremor |
+| L01a | Que merda... | Shit... | Second blink, slightly wider and clearer vision, text tremor |
+| L01b | Minha cabeça... | My head... | Another blink, gradual focus, text tremor |
+| L02 | Onde eu estou? | Where am I? | Final blink opens fully over 1.55 s, mild residual blur, text tremor. Same mounted CENA-01 throughout. |
+| L03 | Sangue...? | Blood...? | CENA-01 fully open and sharp; all waking effects and text tremor stop |
 | L04 | Que diabos aconteceu aqui? | What the hell happened here? | CENA-01 visible |
 
-Speaker is `???`. The reveal begins when entering L02 from a dark beat. Advancing to or revisiting other visible beats does not restart the image transition. Revisiting a dark beat restores darkness. Previous dialogue is bounded within the opening, never crossing a choice, event or checkpoint; future authoritative gameplay must implement read-only dialogue history rather than reverse irreversible game state. Changing locale or pausing does not rewind the preview. Reduced-motion preferences bypass movement. Opening is not a memory flashback.
+Speaker is `???`. The approved waking sequence now begins with the ellipsis: each of the first four beats triggers a single deliberate close/reopen of the eyelids, with progressively wider vision and decreasing blur (5, 4, 3, 0.8 px). Text tremor continues gently while those beats are active. L03 and L04 have fully open, sharp, steady vision and text. Returning to a waking beat restores that beat's visual cue without replacing the image. No automatic dialogue advancement or looping eyelid flashes. Previous dialogue is bounded within the opening, never crossing a choice, event or checkpoint; future authoritative gameplay must implement read-only dialogue history rather than reverse irreversible game state. Changing locale or pausing does not rewind the preview. Reduced-motion preferences bypass movement. Opening is not a memory flashback.
 
 ## David memory transitions
 
@@ -36,6 +36,6 @@ Reusable cues are defined for MEM-D1–D4: show the existing authored pain line 
 ## Validation matrix
 
 - Owner previously validated original opening preview in PT-BR/EN and mobile; redesigned preview needs new acceptance.
-- Test root and /preview in local Compose, both locales, menu/options, three extras cards, disabled resume, chapter reveal and indefinite manual-only advance, black first three lines, short eyelid reveal and stable image focus, previous/next dialogue and remaining dialogue, pause/language/resume without line reset, keyboard and reduced motion.
+- Test root and /preview in local Compose, both locales, menu/options, three extras cards, disabled resume, chapter reveal and indefinite manual-only advance, four gradual waking blinks and text tremor, complete stabilization at Blood, stable image focus, previous/next dialogue and remaining dialogue, pause/language/resume without line reset, keyboard and reduced motion.
 - Check 1366×768 and 1920×1080 desktop, mobile portrait 360×640 and 390×844, mobile landscape 640×360, plus zoom and keyboard focus. No page scrolling at standard sizes; do not crop or hide the next button. Validate actual rendered layout before claiming success.
 - Retain local-only preview flag, gated CENA-01 route and server-only future assets. No saved game, full campaign, LLM inference or production deployment in this PR.
