@@ -26,7 +26,7 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
   }, [stage]);
 
   useEffect(() => {
-    (panelRef.current?.querySelector<HTMLElement>('[data-primary]') ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
+    (panelRef.current?.querySelector<HTMLElement>('[data-primary]:not(:disabled)') ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
   }, [stage, overlay, chapterReady]);
 
   useEffect(() => {
