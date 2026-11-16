@@ -89,17 +89,45 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(returned.diagnostics).toEqual(pain.diagnostics);
     expect(returned.events).toEqual(['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1']);
   });
+  it('reviews only reached dialogue without rewinding authoritative state or replaying events', () => {
+    const original = reach('A01-S01/L03');
+    const previous = projectNarrative(original).actions.find((action) => action.kind === 'PREVIOUS');
+    expect(previous).toBeDefined();
+    const reviewed = advanceNarrative(original, previous?.id ?? 'missing', original.revision);
+    expect(reviewed.stepId).toBe(original.stepId);
+    expect(reviewed.reviewStepId).toBe('A01-S01/L02');
+    expect(projectNarrative(reviewed).text).toBe('Onde eu estou?');
+    expect(currentAsset(reviewed)).toBe('CENA-01');
+    const dark = advanceNarrative(reviewed, projectNarrative(reviewed).actions[1].id, reviewed.revision);
+    expect(currentAsset(dark)).toBeNull();
+    expect(dark.stepId).toBe(original.stepId);
+    const restored = next(next(dark));
+    expect(restored.reviewStepId).toBeNull();
+    expect(restored.stepId).toBe(original.stepId);
+    expect(next(restored).stepId).toBe('A01-S01/L04');
+    for (const id of ['A01-S01/SILENCE', 'A01-S02/ENV-02', 'A01-S03/L01', 'A01-S03/E-JOIN', 'A01-S03/L33', 'A01-S03/L34', 'A01-S03/MEM-D1', 'A01-S03/FB-D1', 'A01-S03/L35']) {
+      const state = reach(id);
+      expect(projectNarrative(state).actions.some((action) => action.kind === 'PREVIOUS')).toBe(false);
+    }
+    const afterIntro = reach('A01-S03/L38');
+    const back = advanceNarrative(afterIntro, projectNarrative(afterIntro).actions[1].id, afterIntro.revision);
+    expect(back.events).toBe(afterIntro.events);
+    expect(back.intro).toBe(afterIntro.intro);
+    expect(back.diagnostics).toBe(afterIntro.diagnostics);
+    expect(next(back).stepId).toBe(afterIntro.stepId);
+  });
   it('traverses Chapter 1 in both locales and stops at the unimplemented Chapter 2 boundary', () => {
     for (const locale of ['pt-BR', 'en'] as const) {
       let state = startNarrative(locale);
       for (const step of CHAPTER_ONE) {
         expect(state.stepId).toBe(step.id);
         const view = projectNarrative(state);
-        expect(view.actions).toHaveLength(1);
+        expect(view.actions.filter((action) => action.kind !== 'PREVIOUS')).toHaveLength(1);
         expect(view.text).toBe(step.text[locale]);
         expect(view).not.toHaveProperty('events');
         expect(view).not.toHaveProperty('intro');
         expect(view).not.toHaveProperty('stepId');
+        expect(view).not.toHaveProperty('reviewStepId');
         state = next(state);
       }
       expect(projectNarrative(state)).toMatchObject({ chapter: 2, sceneId: 'A02-S01', phase: 'CHAPTER_CARD', actions: [], asset: null });
