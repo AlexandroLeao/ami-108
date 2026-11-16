@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export const dynamic = 'force-dynamic';
 
 async function isApiReady(): Promise<boolean> {
@@ -20,6 +22,9 @@ export default async function Home() {
       <h1 className="text-6xl font-bold tracking-tight sm:text-8xl">AMI<span className="text-[#fc2721]">-108</span></h1>
       <p>System initialization — narrative interface pending.</p>
       <p role="status" className="border border-[#fdf3e9] p-4">{ready ? 'API, database and AI service reachable.' : 'Backend not ready. Check service logs.'}</p>
+          {process.env.AMI_DEV_PREVIEW === '1' && (
+        <Link href="/preview" className="game-control self-start">Open development preview</Link>
+      )}
     </main>
   );
 }
