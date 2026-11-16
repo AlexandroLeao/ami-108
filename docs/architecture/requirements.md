@@ -47,7 +47,7 @@ No free movement, inventory, pickup systems, audio playback, animated sprites, r
 
 ## Day 1 implementation trace
 
-AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile approval and passing CI. FR-02/03 are partially demonstrated by the opening preview, not the full campaign. NFR-01 is verified for the development foundation. FR-04/05/11/13 are addressed by Chapter 1 pure-domain tests in AMI-004, pending session/UI integration; see [narrative engine](../narrative-engine.md). No requirement is marked fully implemented solely by a design or unit test.
+AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile approval and passing CI. FR-02/03 are partially demonstrated by the opening preview, not the full campaign. NFR-01 is verified for the development foundation. FR-04/05/11/13 have Chapter 1 domain, persisted-session and authorized-UI integration evidence in merged PRs #19/#20; FR-02/03 now also have a playable bilingual Chapter 1 subset. The owner accepted Chapter 1 presentation; final branch CI and post-merge CI passed. This does not establish full-campaign compliance, encounter behavior, real inference or independent accessibility/security acceptance; see [narrative engine](../narrative-engine.md). No requirement is marked fully implemented solely by a design or unit test.
 
 ## Release evidence
 

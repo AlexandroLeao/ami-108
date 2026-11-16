@@ -1,6 +1,6 @@
 # Domain model and state transitions
 
-**Target schema for AMI-004/005/006.** PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. The ER diagram remains the target for later encounter/checkpoint/slot models, not a claim that every table exists. The design preserves the canonical script (Master v1.10 / Script v1.8).
+**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. The ER diagram remains the target for later encounter/checkpoint/slot models, not a claim that every table exists. The design preserves the canonical script (Master v1.10 / Script v1.8).
 
 ## ER diagram
 
@@ -114,7 +114,7 @@ The session's JSON state stores the current step, review cursor, locale, event f
 | A05-S01 | E-SHIP, CP-BOAR, four BOAR choices; safe BOAR-04 / E-LAUNCH | A05-S02 or dead → CP-BOAR |
 | A05-S02 | Authored final, E-COMPLETE | Credits → menu |
 
-Order within each gate comes from the source script; this table does not reorder dialogue or events. All other encounter choices are lethal. Checkpoints are retry destinations, not alternate scenes. Line identifiers repeat across scenes; use composite (sceneId, lineId) in the catalog. The approved opening uses SILENCE, L01a and L01b as presentation beats within A01-S01, retaining later line IDs. Previous dialogue history must not rewind authoritative state.
+Order within each gate comes from the source script; this table does not reorder dialogue or events. All other encounter choices are lethal. Checkpoints are retry destinations, not alternate scenes. Line identifiers repeat across scenes; use composite (sceneId, lineId) in the catalog. The approved opening uses SILENCE, L01a and L01b as presentation beats within A01-S01, retaining later line IDs. Chapter 1 read-only history spans reached presentation from L02 through the Chapter 2 handoff, including applied events, without rewinding authoritative state; diagnostics are not projected for reviewed beats before E-JOIN. Initial card and dark opening are excluded from new PREVIOUS commands.
 
 ## Memory and energy invariants
 
