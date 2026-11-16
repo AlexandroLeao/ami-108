@@ -1,0 +1,332 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { copy, type Locale } from '../preview/copy';
+import { GameWordmark } from '../preview/components';
+import { useLocale, setLocale } from '../preview/locale';
+import { CHAPTER_REVEAL_MS } from '../preview/preview-state';
+import { CampaignScene } from './campaign-scene';
+import { gameRequest, RequestError, type CampaignView, type CommandBody, type CommandResult } from './client';
+import { paginateText } from './pagination';
+
+type Overlay = 'none' | 'pause' | 'language' | 'extras';
+type PageState = { key: string; pages: string[]; index: number };
+const messages = {
+  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 1 concluído nesta versão. O Capítulo 2 será integrado na próxima etapa.', locked: 'Bloqueado' },
+  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 1 complete in this version. Chapter 2 will be integrated next.', locked: 'Locked' },
+} as const;
+type Notice = 'connection' | 'stale' | 'expired';
+
+function Diagnostics({ view }: { view: CampaignView }) {
+  const d = view.diagnostics;
+  if (!d) return null;
+  return (
+    <div className="campaign-diagnostics" aria-label={copy[view.locale].diagnostics}>
+      <div className="campaign-energy" aria-label={copy[view.locale].energy + ' ' + d.energy + '/3'}>
+        <span>{view.locale === 'pt-BR' ? 'Energia' : 'Energy'}</span>
+        <span className="campaign-bars" aria-hidden="true">
+          {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
+        </span>
+        <span>{d.energy}/3</span>
+      </div>
+      <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span><span>HIST-03 {d.hist}%</span>
+      <span>PERSONAL {d.personal}%{!d.personalUnlocked ? ' · ' + messages[view.locale].locked : ''}</span>
+    </div>
+  );
+}
+
+export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
+  const preference = useLocale();
+  const [view, setView] = useState<CampaignView | null>(null);
+  const [hasSave, setHasSave] = useState(initialHasSave);
+  const [overlay, setOverlay] = useState<Overlay>('none');
+  const [extrasPage, setExtrasPage] = useState(0);
+  const [readyCard, setReadyCard] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const [pagination, setPagination] = useState<PageState>({ key: '', pages: [''], index: 0 });
+  const busyRef = useRef(false);
+  const retry = useRef<{ signature: string; body: CommandBody } | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLElement>(null);
+  const measureRef = useRef<HTMLParagraphElement>(null);
+  const locale = view?.locale ?? preference;
+  const labels = copy[locale];
+  const chapter = view?.phase === 'CHAPTER_CARD';
+  const chapterKey = chapter && view ? String(view.chapter) : null;
+  const chapterReady = !chapter || readyCard === chapterKey;
+  const boundary = !!view && view.actions.length === 0;
+  const showChapter = chapter && !(boundary && chapterReady);
+  const displayText = !view || showChapter ? '' : boundary ? messages[locale].boundary : view.text;
+  const pageKey = view ? (view.actions[0]?.id ?? 'boundary') + ':' + locale + ':' + displayText : '';
+  const pageReady = pagination.key === pageKey;
+  const pageIndex = pageReady ? pagination.index : 0;
+  const pageCount = pageReady ? pagination.pages.length : 1;
+  const pageText = pageReady ? pagination.pages[pageIndex] : displayText;
+  const nextAction = view?.actions.find((action) => action.kind !== 'PREVIOUS');
+  const previousAction = view?.actions.find((action) => action.kind === 'PREVIOUS');
+
+  useEffect(() => { document.documentElement.lang = locale; }, [locale]);
+  useEffect(() => {
+    if (!chapterKey) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = window.setTimeout(() => setReadyCard(chapterKey), reduced ? 0 : CHAPTER_REVEAL_MS);
+    return () => window.clearTimeout(timer);
+  }, [chapterKey]);
+
+  // Measure actual font metrics and fixed frame size. Only the current line is
+  // paginated locally; no server command is sent for intermediate pages.
+  useEffect(() => {
+    const frame = frameRef.current;
+    const measure = measureRef.current;
+    if (!frame || !measure) return;
+    let active = true;
+    let raf = 0;
+    const calculate = () => {
+      if (!active) return;
+      const copyArea = frame.querySelector<HTMLElement>('.dialogue-copy');
+      const speaker = frame.querySelector<HTMLElement>('.dialogue-speaker');
+      if (!copyArea || !copyArea.clientWidth || !frame.clientHeight) return;
+      const style = getComputedStyle(frame);
+      const speakerHeight = speaker ? speaker.offsetHeight + parseFloat(getComputedStyle(speaker).marginBottom || '0') : 0;
+      const height = Math.max(1, frame.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - speakerHeight - 2);
+      measure.style.width = copyArea.clientWidth + 'px';
+      const pages = paginateText(displayText, (text) => {
+        measure.textContent = text;
+        return measure.scrollHeight <= height;
+      });
+      measure.textContent = '';
+      setPagination((old) => {
+        const index = old.key === pageKey ? Math.min(old.index, pages.length - 1) : 0;
+        if (old.key === pageKey && old.index === index && old.pages.join('\u0000') === pages.join('\u0000')) return old;
+        return { key: pageKey, pages, index };
+      });
+    };
+    const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(calculate); };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(frame);
+    schedule();
+    void document.fonts.ready.then(() => { if (active) schedule(); });
+    return () => { active = false; observer.disconnect(); cancelAnimationFrame(raf); };
+  }, [pageKey, displayText, view?.speaker, showChapter]);
+
+  const accept = useCallback((next: CampaignView) => {
+    setView(next);
+    setHasSave(true);
+    setLocale(next.locale);
+  }, []);
+  const run = useCallback(async (operation: () => Promise<void>) => {
+    if (busyRef.current) return false;
+    busyRef.current = true;
+    setBusy(true);
+    setNotice(null);
+    try {
+      await operation();
+      return true;
+    } catch (error) {
+      if (error instanceof RequestError && error.status === 401) {
+        retry.current = null;
+        setView(null); setHasSave(false); setOverlay('none'); setNotice('expired');
+      } else if (error instanceof RequestError && error.status === 409) {
+        retry.current = null;
+        try { accept(await gameRequest<CampaignView>('view')); setNotice('stale'); }
+        catch { setNotice('connection'); }
+      } else {
+        setNotice('connection');
+      }
+      return false;
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }, [accept]);
+
+  const mutate = useCallback(async (current: CampaignView, payload: { actionId: string } | { locale: Locale }) => {
+    const endpoint = 'locale' in payload ? 'locale' : 'commands';
+    const signature = JSON.stringify([endpoint, current.revision, payload]);
+    const body = retry.current?.signature === signature ? retry.current.body
+      : { commandId: crypto.randomUUID(), expectedRevision: current.revision, ...payload };
+    retry.current = { signature, body };
+    const result = await gameRequest<CommandResult>(endpoint, endpoint === 'locale' ? 'PATCH' : 'POST', body);
+    retry.current = null;
+    accept(result.view);
+  }, [accept]);
+
+  const start = () => {
+    if (busyRef.current || (hasSave && !window.confirm(messages[locale].replace))) return;
+    void run(async () => {
+      const next = await gameRequest<CampaignView>('session', 'POST', { locale: preference });
+      retry.current = null;
+      setReadyCard(null);
+      accept(next);
+    });
+  };
+  const resume = () => {
+    void run(async () => {
+      const current = await gameRequest<CampaignView>('view');
+      retry.current = null;
+      setReadyCard(null);
+      if (current.locale !== preference) await mutate(current, { locale: preference });
+      else accept(current);
+    });
+  };
+  const advance = useCallback(() => {
+    if (!view || !nextAction || busyRef.current || overlay !== 'none' || !chapterReady || (!chapter && !pageReady)) return;
+    if (!chapter && pageIndex + 1 < pageCount) {
+      setPagination((old) => ({ ...old, index: old.index + 1 }));
+      return;
+    }
+    void run(() => mutate(view, { actionId: nextAction.id }));
+  }, [view, nextAction, overlay, chapterReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
+  const previous = useCallback(() => {
+    if (!view || chapter || busyRef.current || overlay !== 'none' || !pageReady) return;
+    if (pageIndex > 0) {
+      setPagination((old) => ({ ...old, index: old.index - 1 }));
+      return;
+    }
+    if (previousAction) void run(() => mutate(view, { actionId: previousAction.id }));
+  }, [view, chapter, overlay, pageReady, pageIndex, previousAction, run, mutate]);
+  const closeOverlay = useCallback(() => setOverlay(overlay === 'language' && view ? 'pause' : 'none'), [overlay, view]);
+  const chooseLanguage = async (value: Locale) => {
+    if (busyRef.current) return;
+    if (!view) { setLocale(value); setOverlay('none'); return; }
+    if (value === view.locale || await run(() => mutate(view, { locale: value }))) setOverlay('pause');
+  };
+  const mainMenu = () => {
+    if (busyRef.current) return;
+    retry.current = null;
+    setView(null); setOverlay('none'); setNotice(null); setReadyCard(null);
+  };
+
+  useEffect(() => {
+    if (busy) return;
+    (panelRef.current?.querySelector<HTMLElement>('[data-primary]:not(:disabled)')
+      ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
+  }, [view?.phase, view?.revision, overlay, chapterReady, busy]);
+
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab' && overlay !== 'none') {
+        const controls = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled)') ?? []);
+        const first = controls[0]; const last = controls[controls.length - 1];
+        if (first && last && event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (first && last && !event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+      if (event.key === 'Escape' && !busyRef.current) {
+        if (overlay !== 'none') closeOverlay();
+        else if (view) setOverlay('pause');
+        else return;
+        event.preventDefault(); return;
+      }
+      if (!view || overlay !== 'none' || event.repeat) return;
+      if (event.key === 'ArrowLeft') { event.preventDefault(); previous(); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); advance(); }
+    };
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [view, overlay, closeOverlay, previous, advance]);
+
+  const titleText = view ? (locale === 'pt-BR' ? 'CAPÍTULO ' : 'CHAPTER ') + view.chapter + ' — ' + view.chapterTitle.toLocaleUpperCase(locale) : '';
+  const cue = pageIndex === 0 ? view?.cue : 'none';
+  const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis';
+  const interaction = !chapter && nextAction?.kind === 'INTERACT' && pageIndex === pageCount - 1;
+  const advanceLabel = interaction ? nextAction.label : chapter ? labels.continue : labels.next;
+
+  return (
+    <main className="game-viewport" lang={locale}>
+      <div ref={overlay === 'none' ? panelRef : null} className="game-layer" inert={overlay !== 'none'} aria-hidden={overlay !== 'none' || undefined}>
+        {!view ? (
+          <section className="menu-screen">
+            <GameWordmark />
+            <nav aria-label={labels.menu} className="menu-options">
+              <button className="game-control" disabled={busy} onClick={start}>{labels.newGame}</button>
+              <button className="game-control" disabled={busy || !hasSave} onClick={resume}>{labels.continueGame}</button>
+              <button className="game-control" disabled={busy} onClick={() => setOverlay('language')}>{labels.language}</button>
+              <button className="game-control" disabled={busy} onClick={() => { setExtrasPage(0); setOverlay('extras'); }}>{labels.extras}</button>
+            </nav>
+            <p className="version-label">{labels.version}</p>
+          </section>
+        ) : (
+          <section className="game-stage">
+            <header className="campaign-header">
+              <div className="stage-header">
+                <span>AMI-108</span>
+                <button className="small-control" disabled={busy} onClick={() => setOverlay('pause')}>{labels.menu}</button>
+              </div>
+              <Diagnostics view={view} />
+            </header>
+            <CampaignScene view={view}>
+              <div key={view.chapter} className="chapter-layer" data-active={chapter} aria-hidden={!chapter}>
+                <h1 className="chapter-title">{titleText}</h1>
+              </div>
+            </CampaignScene>
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" aria-busy={busy}>
+              <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
+                {!showChapter && (
+                  <>
+                    {view.speaker && <p className="dialogue-speaker">{view.speaker}</p>}
+                    <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '')}>{pageText}</p>
+                  </>
+                )}
+              </div>
+              <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
+              {pageCount > 1 && <span className="campaign-page-count">{pageIndex + 1}/{pageCount}</span>}
+              {interaction && <span className="campaign-interaction">{nextAction.label}</span>}
+              <div className="dialogue-navigation">
+                <button className="advance-control previous-control" type="button" disabled={busy || chapter || !pageReady || (!previousAction && pageIndex === 0)}
+                  aria-label={labels.previousDialogue} title={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
+                <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || (!chapter && !pageReady)}
+                  aria-label={advanceLabel} title={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
+              </div>
+            </section>
+          </section>
+        )}
+      </div>
+      {overlay !== 'none' && (
+        <div ref={panelRef} className="game-overlay" role="dialog" aria-modal="true"
+          aria-label={overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : labels.extras}>
+          {overlay === 'pause' && (
+            <section className="menu-screen">
+              <h1>{labels.menu}</h1>
+              <div className="menu-options">
+                <button className="game-control" disabled={busy} onClick={() => setOverlay('none')}>{labels.continue}</button>
+                <button className="game-control" disabled={busy} onClick={() => setOverlay('language')}>{labels.language}</button>
+                <button className="game-control" disabled={busy} onClick={mainMenu}>{labels.mainMenu}</button>
+              </div>
+            </section>
+          )}
+          {overlay === 'language' && (
+            <section className="menu-screen">
+              <h1>{labels.language}</h1>
+              <div className="menu-options">
+                {(['pt-BR', 'en'] as const).map((value) => (
+                  <button key={value} className="game-control" lang={value} disabled={busy} aria-pressed={locale === value}
+                    onClick={() => void chooseLanguage(value)}>{value === 'pt-BR' ? 'Português' : 'English'}</button>
+                ))}
+                <button className="game-control" disabled={busy} onClick={closeOverlay}>{labels.back}</button>
+              </div>
+            </section>
+          )}
+          {overlay === 'extras' && (
+            <section className="extras-screen">
+              <header><h1>{labels.extras}</h1><span>{extrasPage + 1}/3</span></header>
+              <article className="extras-card" aria-live="polite">
+                <h2>{labels.extrasPages[extrasPage].title}</h2>
+                {labels.extrasPages[extrasPage].paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              </article>
+              <footer>
+                <button className="small-control" onClick={closeOverlay}>{labels.back}</button>
+                <button className="small-control" disabled={extrasPage === 0} aria-label={labels.previous}
+                  onClick={() => setExtrasPage((page) => Math.max(0, page - 1))}>‹</button>
+                <button className="small-control" disabled={extrasPage === 2} aria-label={labels.nextPage}
+                  onClick={() => setExtrasPage((page) => Math.min(2, page + 1))}>›</button>
+              </footer>
+              <p className="version-label">{labels.version}</p>
+            </section>
+          )}
+        </div>
+      )}
+      {notice && <p className="campaign-notice" role="alert" onClick={() => setNotice(null)}>{messages[locale][notice]}</p>}
+    </main>
+  );
+}
