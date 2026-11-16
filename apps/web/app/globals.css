@@ -99,6 +99,14 @@ button:focus-visible, a:focus-visible {
 .menu-options { display: grid; width: min(100%, 340px); gap: 9px; }
 .version-label { font-size: 18px; margin: 0; text-align: center; }
 .end-screen p { max-width: 34ch; }
+.chapter-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 220ms ease-out;
+}
+.chapter-layer[data-active="false"] { opacity: 0; }
 .chapter-title {
   position: absolute;
   inset: 0;
@@ -240,5 +248,6 @@ button:focus-visible, a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .chapter-title, .dialogue-text, .pain-text { animation: none !important; }
   .scene-art, .scene-frame[data-visible="false"] .scene-art { transition: none !important; filter: none; }
+  .chapter-layer { transition: none; }
   .eyelids { display: none; }
 }
