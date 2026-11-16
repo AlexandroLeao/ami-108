@@ -59,6 +59,30 @@ describe('approved cinematic opening', () => {
     expect(state.stage).toBe('end');
   });
 
+  it('allows previous dialogue only within the current opening and never while paused', () => {
+    const chapter = previewReducer(initialPreview, { type: 'START' });
+    expect(previewReducer(chapter, { type: 'PREVIOUS' })).toEqual(chapter);
+    let state = previewReducer(previewReducer(chapter, { type: 'CHAPTER_READY' }), { type: 'ADVANCE' });
+    expect(previewReducer(state, { type: 'PREVIOUS' })).toEqual(state);
+    for (let n = 0; n < 4; n++) state = previewReducer(state, { type: 'ADVANCE' });
+    expect(state.line).toBe(4);
+    state = previewReducer(state, { type: 'PREVIOUS' });
+    expect(state.line).toBe(3);
+    expect(openingVisual(state.line).reveal).toBe(true);
+    state = previewReducer(state, { type: 'PREVIOUS' });
+    expect(state.line).toBe(2);
+    expect(openingVisual(state.line).reveal).toBe(false);
+    const paused = previewReducer(state, { type: 'PAUSE' });
+    expect(previewReducer(paused, { type: 'PREVIOUS' })).toEqual(paused);
+  });
+
+  it('keeps credits concise and includes horror influences in both languages', () => {
+    expect(copy['pt-BR'].extrasPages[1].paragraphs).toHaveLength(2);
+    expect(copy.en.extrasPages[1].paragraphs).toHaveLength(2);
+    expect(copy['pt-BR'].extrasPages[2].paragraphs[0]).toContain('terror');
+    expect(copy.en.extrasPages[2].paragraphs[0]).toContain('horror');
+  });
+
   it('bounds the extras pages and returns to the menu', () => {
     let state = previewReducer(initialPreview, { type: 'EXTRAS' });
     state = previewReducer(state, { type: 'EXTRAS_PAGE', page: 9 });
