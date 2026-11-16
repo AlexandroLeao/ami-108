@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { copy, type Locale } from './copy';
-import type { VisualCue, WakePhase } from './preview-state';
+import type { VisualCue } from './preview-state';
 
 export function EnergyIndicator({ energy, locale }: { energy: 0 | 1 | 2 | 3; locale: Locale }) {
   return (
@@ -35,12 +35,12 @@ export function ChoicePanel({ actions, locale, onChoice }: {
   );
 }
 
-export function SceneViewer({ imageAvailable, locale, reveal = true, cue = 'none', wakePhase = 'none', children }: {
-  imageAvailable: boolean; locale: Locale; reveal?: boolean; cue?: VisualCue; wakePhase?: WakePhase; children?: ReactNode;
+export function SceneViewer({ imageAvailable, locale, reveal = true, cue = 'none', children }: {
+  imageAvailable: boolean; locale: Locale; reveal?: boolean; cue?: VisualCue; children?: ReactNode;
 }) {
   const visible = reveal && cue !== 'memory-cut';
   return (
-    <div className="scene-frame" data-visible={visible} data-cue={cue} data-wake-phase={wakePhase}>
+    <div className="scene-frame" data-visible={visible} data-cue={cue}>
       <div className="scene-visual" aria-hidden={!visible}>
         {imageAvailable ? (
           <Image src="/preview/asset" alt={visible ? copy[locale].alt : ''} width={1536} height={864}
@@ -48,7 +48,7 @@ export function SceneViewer({ imageAvailable, locale, reveal = true, cue = 'none
         ) : (
           <div className="scene-missing">{visible ? copy[locale].missingArt : ''}</div>
         )}
-        {imageAvailable && <div key={wakePhase} className="eyelids" data-wake-phase={wakePhase} aria-hidden="true"><span /><span /></div>}
+        {imageAvailable && <div className="eyelids" aria-hidden="true"><span /><span /></div>}
       </div>
       {children}
     </div>
@@ -66,7 +66,7 @@ export function DialogueBox({ speaker, text, locale, cue = 'none', onAdvance, on
         {!chapter && (
           <>
             <p className="dialogue-speaker">{speaker}</p>
-            <p key={text} className={cue === 'wake' ? 'dialogue-text waking-text' : cue === 'pain' ? 'dialogue-text pain-text' : 'dialogue-text'}>{text}</p>
+            <p key={text} className={cue === 'wake' || cue === 'pain' ? 'dialogue-text pain-text' : 'dialogue-text'}>{text}</p>
           </>
         )}
       </div>
