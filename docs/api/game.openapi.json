@@ -424,7 +424,8 @@
               "CONSULT",
               "CHOOSE",
               "RETRY",
-              "FINISH"
+              "FINISH",
+              "PREVIOUS"
             ]
           },
           "label": {
