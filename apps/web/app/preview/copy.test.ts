@@ -16,13 +16,14 @@ describe('approved cinematic opening', () => {
     expect(copy.en.extrasPages.length).toBe(copy['pt-BR'].extrasPages.length);
   });
 
-  it('keeps the scene dark until the fourth line and reveals it once', () => {
-    expect(openingVisual(0)).toEqual({ reveal: false, cue: 'none' });
-    expect(openingVisual(1)).toEqual({ reveal: false, cue: 'none' });
-    expect(openingVisual(2)).toEqual({ reveal: false, cue: 'pain' });
-    expect(openingVisual(3)).toEqual({ reveal: true, cue: 'wake' });
-    expect(openingVisual(4)).toEqual({ reveal: true, cue: 'none' });
-    expect(openingVisual(5)).toEqual({ reveal: true, cue: 'none' });
+  it('blinks and trembles for the four waking beats, then stabilizes at Blood', () => {
+    expect(openingVisual(0)).toEqual({ reveal: true, cue: 'wake', wakePhase: 'silence' });
+    expect(openingVisual(1)).toEqual({ reveal: true, cue: 'wake', wakePhase: 'shock' });
+    expect(openingVisual(2)).toEqual({ reveal: true, cue: 'wake', wakePhase: 'pain' });
+    expect(openingVisual(3)).toEqual({ reveal: true, cue: 'wake', wakePhase: 'focus' });
+    expect(openingVisual(4)).toEqual({ reveal: true, cue: 'none', wakePhase: 'none' });
+    expect(openingVisual(5)).toEqual({ reveal: true, cue: 'none', wakePhase: 'none' });
+    expect(openingVisual(-1)).toEqual({ reveal: false, cue: 'none', wakePhase: 'none' });
   });
 
   it('resumes from the same line after pause and language selection', () => {
@@ -71,7 +72,7 @@ describe('approved cinematic opening', () => {
     expect(openingVisual(state.line).reveal).toBe(true);
     state = previewReducer(state, { type: 'PREVIOUS' });
     expect(state.line).toBe(2);
-    expect(openingVisual(state.line).reveal).toBe(false);
+    expect(openingVisual(state.line)).toEqual({ reveal: true, cue: 'wake', wakePhase: 'pain' });
     const paused = previewReducer(state, { type: 'PAUSE' });
     expect(previewReducer(paused, { type: 'PREVIOUS' })).toEqual(paused);
   });
