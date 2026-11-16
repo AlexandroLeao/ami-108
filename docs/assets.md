@@ -22,7 +22,7 @@ docker compose --parallel 1 up --build -d --wait
 curl -fsS http://localhost:3001/development/scene -o /tmp/ami-opening.png
 ```
 
-Open port 3000 and navigate to `/preview`. Choose Portuguese/English, New game, then Continue. Check the chapter card, opening image and four exact approved lines; verify the menu and keyboard controls. This is a visual fixture, not a persistent game or a completed narrative engine. Continue game remains disabled.
+Open port 3000 at the root (or `/preview`). The local development flag opens the game menu directly. Choose Language, New game, then verify the cinematic chapter card, dark opening, eye reveal on the third line, and the five approved opening dialogue steps. Test Extras, pause/resume and keyboard controls. This is a visual fixture, not a persistent game or a completed narrative engine. Continue game remains disabled. The 12 derived PNGs and manifest are already committed; asset preparation is only needed if an approved original changes.
 
 Preview flags are enabled only in local Compose. The API route serves CENA-01 exclusively; later assets remain server-only and no arbitrary scene ID can be requested. Production must not set AMI_DEV_PREVIEW. The authenticated current-step asset endpoint is part of the game engine implementation, not this development route.
 
@@ -31,5 +31,5 @@ Preview flags are enabled only in local Compose. The API route serves CENA-01 ex
 - Actual backup inspected: all 12 sources are 1536 × 864 (16:9); originals are not necessarily three-color PNGs.
 - Local preparation against the v1.9 ZIP produced all 12 indexed PNGs with the exact three colors; the generated manifest records source/output hashes. Inspect derived images before commit.
 - Source files and 9 character sheets stay out of the repository; prepared art must not be copied into Next.js public assets.
-- UI preview implements menu, locale switch, chapter card, opening dialogue and reusable scene/dialogue/choice/energy components. The initial four lines are canonical; no gameplay state, choice outcomes, inference, checkpoint logic or persistence is simulated.
+- UI preview implements menu, locale switch, chapter card, opening dialogue and reusable scene/dialogue/choice/energy components. The owner approved splitting A01-S01/L01 into two cinematic beats; L02–L04 remain verbatim in both languages. No gameplay state, choice outcomes, inference, checkpoint logic or persistence is simulated.
 - Run CI, inspect browser preview with prepared art, and test missing/unauthorized asset requests before accepting AMI-003. Accessibility/performance and actual session-based asset gates are verified with later implementation issues.
