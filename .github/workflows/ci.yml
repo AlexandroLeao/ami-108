@@ -41,6 +41,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: node scripts/smoke-chapter-one.mjs
   python:
     runs-on: ubuntu-latest
     timeout-minutes: 10
