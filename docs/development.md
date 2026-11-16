@@ -42,9 +42,9 @@ curl -fsS http://localhost:3001/health/ready
 curl -fsS http://localhost:8000/health
 ```
 
-In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. Local Compose sets AMI_DEV_PREVIEW=1, so the root opens the owner-approved bilingual game menu and opening preview. Health endpoints remain available; without the flag, the root is diagnostic. The preview is not yet a playable campaign, and AI health is not evidence of real model inference. See [asset preview and disk recovery](assets.md).
+In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. Local Compose sets AMI_DEV_PREVIEW=1, so the root opens the integrated Chapter 1 game with server-controlled progress. `/preview` retains the isolated visual fixture. Health endpoints remain available; without the flag, the root is diagnostic. AI health is not evidence of real model inference. See [asset preview and disk recovery](assets.md).
 
-For local Compose, the example values are development-only; replace the password using a URL-safe value (or URL-encode it in the database URL). Never commit `.env`. PostgreSQL is not exposed to the host. The initial migration is applied by the API container on startup.
+For local Compose, the example values are development-only; replace the password using a URL-safe value (or URL-encode it in the database URL). Never commit `.env`. PostgreSQL is not exposed to the host. Prisma migrations are applied by the API container on startup; the new migration is additive and preserves existing rows.
 
 ```bash
 docker compose logs --tail=100 api ai web db
@@ -53,15 +53,21 @@ docker compose stop
 
 Before stopping, check `git status --short`; stop the containers, switch to main only if the worktree is clean, and pull with `git pull --ff-only origin main`. Resume using `docker compose up -d --wait` if the current containers match the checked-out code; rebuild sequentially after source changes or VM replacement. Stopping preserves the database volume. Do not use `down -v` unless intentionally deleting local game data. Stop the development session when finished to conserve quota. Cloud Shell is temporary; do not rely on Docker volumes surviving VM replacement.
 
+## Chapter 1 integration checks
+
+CI uses an ephemeral PostgreSQL 17 service, applies both migrations, runs API integration tests and starts the built Next.js/NestJS applications for an HTTP smoke test. `AMI_TEST_DATABASE_URL` opts into real database tests; use a dedicated disposable database, not player data. The smoke test needs DATABASE_URL and a migrated database, and ports 3000/3001 free. No provider inference or real deployment is involved.
+
+For an owner playtest of PR #20, fetch and switch to `feat/chapter-one-session` on a clean worktree, ensure `.env` exists, then run `docker compose --parallel 1 up --build -d --wait`. Open port 3000 root (not `/preview`), test the complete first chapter, reload/Continue game, language switching, previous/next, art, the HUD and mobile long-text pages. Use the same browser and origin; an expired cookie or a replaced Cloud Shell VM can prevent resume. Do not delete volumes. See [narrative engine](narrative-engine.md).
+
 ## Current limitations
 
-The initial migration only creates a session identity; authoritative game state is delivered in subsequent issues. The 12 approved derived scene assets and manifest are present on the API side; only the local CENA-01 preview route is exposed. No model/provider, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
+Chapter 1 sessions, state and command receipts are persisted; the remaining encounters, snapshots, consultation slots, restorations and real inference are not implemented in this increment. All 12 derived assets remain on the API side. Only the current authorized scene is served by the game API; the isolated preview still serves CENA-01 alone. No model/provider, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
 
 ## Day 1 UI verification (2026-11-16)
 
 - PR #18 merged at `3e7eda0`; final head `6f0c778` passed [CI 43899909994](https://github.com/AlexandroLeao/ami-108/actions/runs/43899909994). Owner approved final preview on desktop and mobile.
 - The Dockerfile installs and builds as node, without recursively changing ownership of dependency trees. See disk-space recovery in assets.md. No paid compute required.
-- Current narrative domain core is independent of the local preview; no live campaign endpoint or persistence is claimed.
+- PR #19 merged the pure narrative core at `5fa75b6`. PR #20 adds the local persisted game and is pending integrated owner playtest.
 
 ## Bootstrap verification (2026-11-15)
 
