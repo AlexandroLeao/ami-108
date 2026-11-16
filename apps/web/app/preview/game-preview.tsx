@@ -87,7 +87,9 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
             </header>
             <SceneViewer imageAvailable={imageAvailable} locale={locale}
               reveal={stage === 'scene' && visual.reveal} cue={stage === 'scene' ? visual.cue : 'none'}>
-              {stage === 'chapter' && <h1 className="chapter-title">{labels.chapter}</h1>}
+              <div className="chapter-layer" data-active={stage === 'chapter'} aria-hidden={stage !== 'chapter'}>
+                <h1 className="chapter-title">{labels.chapter}</h1>
+              </div>
             </SceneViewer>
             <DialogueBox speaker={labels.speaker} text={labels.lines[line]} locale={locale}
               chapter={stage === 'chapter'} cue={stage === 'scene' ? visual.cue : 'none'}
