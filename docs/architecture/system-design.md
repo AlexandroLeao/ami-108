@@ -1,7 +1,7 @@
 # System design
 
-**AMI-002 · proposed implementation design for review**  
-Canonical narrative: Documento Mestre v1.9 / Roteiro Interativo v1.7 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
+**AMI-002 · reviewed design, merged in PR #17; implementation is incremental**  
+Canonical narrative: Documento Mestre v1.10 / Roteiro Interativo v1.8 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
 
 ## C4 level 1 — system context
 
@@ -48,11 +48,11 @@ flowchart TD
   Queries --> Assets["Asset authorization"]
 ```
 
-Implement pure deterministic domain functions before framework adapters. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
+AMI-004 begins with pure deterministic domain functions in apps/api/src/narrative. Implement framework adapters only after the core is tested. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
 
 ## Deployment and environments
 
-- Observed baseline: local Compose, four healthy services, Node 22 and Python 3.12, CI success, Google Cloud Shell preview; Codespaces config exists but is untested.
+- Observed baseline: local Compose, four healthy services, Node 22 and Python 3.12, CI success, Google Cloud Shell approved visual preview (PR #18); Codespaces config exists but is untested.
 - Production candidate: same-origin web facade, private API/AI/database connections, HTTPS, secrets injected via environment, bounded request/logging policies; no resources provisioned.
 - AWS and external provider use require explicit cost, eligibility, data policy and owner verification. CI/CD and OpenTofu are incremental deliverables.
 - Temporary Cloud Shell volumes are not durable backups. Source code lives in GitHub; official narrative and art backups in Drive.
