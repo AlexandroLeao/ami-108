@@ -1,14 +1,14 @@
 export type VisualCue = 'none' | 'pain' | 'wake' | 'memory-cut';
 export type Stage = 'menu' | 'chapter' | 'scene' | 'end';
 export type Overlay = 'none' | 'pause' | 'language' | 'extras';
-export type PreviewState = { stage: Stage; line: number; overlay: Overlay; extrasPage: number };
+export type PreviewState = { stage: Stage; chapterReady: boolean; line: number; overlay: Overlay; extrasPage: number };
 export type PreviewAction =
-  | { type: 'START' | 'ADVANCE' | 'CHAPTER_FINISH' | 'PAUSE' | 'LANGUAGE' | 'EXTRAS' | 'BACK' | 'MAIN_MENU' }
+  | { type: 'START' | 'ADVANCE' | 'CHAPTER_READY' | 'PAUSE' | 'LANGUAGE' | 'EXTRAS' | 'BACK' | 'MAIN_MENU' }
   | { type: 'EXTRAS_PAGE'; page: number };
 
-export const initialPreview: PreviewState = { stage: 'menu', line: 0, overlay: 'none', extrasPage: 0 };
-export const OPENING_LINE_COUNT = 5;
-export const CHAPTER_DURATION_MS = 2400;
+export const initialPreview: PreviewState = { stage: 'menu', chapterReady: false, line: 0, overlay: 'none', extrasPage: 0 };
+export const OPENING_LINE_COUNT = 6;
+export const CHAPTER_REVEAL_MS = 3400;
 
 export function previewReducer(state: PreviewState, action: PreviewAction): PreviewState {
   switch (action.type) {
@@ -16,11 +16,11 @@ export function previewReducer(state: PreviewState, action: PreviewAction): Prev
       return state.stage === 'menu' && state.overlay === 'none'
         ? { ...initialPreview, stage: 'chapter' }
         : state;
-    case 'CHAPTER_FINISH':
-      return state.stage === 'chapter' && state.overlay === 'none' ? { ...state, stage: 'scene' } : state;
+    case 'CHAPTER_READY':
+      return state.stage === 'chapter' ? { ...state, chapterReady: true } : state;
     case 'ADVANCE':
       if (state.overlay !== 'none') return state;
-      if (state.stage === 'chapter') return { ...state, stage: 'scene' };
+      if (state.stage === 'chapter') return state.chapterReady ? { ...state, stage: 'scene' } : state;
       if (state.stage !== 'scene') return state;
       return state.line === OPENING_LINE_COUNT - 1
         ? { ...state, stage: 'end' }
@@ -49,9 +49,9 @@ export function previewReducer(state: PreviewState, action: PreviewAction): Prev
 }
 
 export function openingVisual(line: number): { reveal: boolean; cue: VisualCue } {
-  if (line === 1) return { reveal: false, cue: 'pain' };
-  if (line === 2) return { reveal: true, cue: 'wake' };
-  return { reveal: line > 2, cue: 'none' };
+  if (line === 2) return { reveal: false, cue: 'pain' };
+  if (line === 3) return { reveal: true, cue: 'wake' };
+  return { reveal: line > 3, cue: 'none' };
 }
 
 // Only David's canonical memory events use this visual transition.
