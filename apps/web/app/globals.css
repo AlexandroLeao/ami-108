@@ -42,9 +42,9 @@ button:focus-visible, a:focus-visible {
   color: var(--coal);
 }
 .game-control:disabled, .small-control:disabled {
-  border-style: dashed;
+  opacity: 0.38;
   cursor: not-allowed;
-  text-decoration: line-through;
+  text-decoration: none;
 }
 .small-control { padding: 5px 12px; font-size: 23px; }
 .game-viewport {
@@ -87,13 +87,15 @@ button:focus-visible, a:focus-visible {
   text-align: center;
 }
 .game-title {
-  font-size: clamp(64px, 14vw, 128px);
-  line-height: 0.85;
-  letter-spacing: -0.035em;
+  font-size: clamp(60px, 13vw, 112px);
+  line-height: 1;
+  letter-spacing: 0.045em;
   white-space: nowrap;
   margin: 0 0 12px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--alert);
 }
-.game-title span { color: var(--alert); }
+.game-title .title-dash { color: var(--alert); }
 .menu-screen h1:not(.game-title), .extras-screen h1 {
   font-size: clamp(32px, 6vw, 48px);
   line-height: 1;
@@ -112,11 +114,11 @@ button:focus-visible, a:focus-visible {
 .chapter-title {
   font-size: clamp(30px, 6vw, 64px);
   max-width: 95%;
-  animation: chapter-reveal 2.4s ease-in-out both;
+  animation: chapter-reveal 3.4s ease-in-out both;
 }
 @keyframes chapter-reveal {
-  0% { opacity: 0; }
-  28%, 100% { opacity: 1; }
+  0%, 42% { opacity: 0; }
+  100% { opacity: 1; }
 }
 .top-menu { position: absolute; top: 0; right: 0; }
 .chapter-advance { position: absolute; bottom: 0; right: 0; }
@@ -173,19 +175,24 @@ button:focus-visible, a:focus-visible {
 }
 .eyelids { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .eyelids span { position: absolute; width: 100%; height: 51%; background: var(--coal); }
-.eyelids span:first-child { top: 0; animation: upper-lid 1.15s ease-in-out both; }
-.eyelids span:last-child { bottom: 0; animation: lower-lid 1.15s ease-in-out both; }
+.eyelids span:first-child { top: 0; animation: upper-lid 3.4s ease-in-out both; }
+.eyelids span:last-child { bottom: 0; animation: lower-lid 3.4s ease-in-out both; }
 @keyframes upper-lid {
   0%, 12% { transform: translateY(0); }
-  34% { transform: translateY(-100%); }
-  54% { transform: translateY(-12%); }
+  48% { transform: translateY(-55%); }
+  65% { transform: translateY(-30%); }
   100% { transform: translateY(-105%); }
 }
 @keyframes lower-lid {
   0%, 12% { transform: translateY(0); }
-  34% { transform: translateY(100%); }
-  54% { transform: translateY(12%); }
+  48% { transform: translateY(55%); }
+  65% { transform: translateY(30%); }
   100% { transform: translateY(105%); }
+}
+.scene-frame[data-cue="wake"] .scene-art { animation: vision-focus 5.6s ease-in-out both; }
+@keyframes vision-focus {
+  0%, 68% { filter: blur(9px); }
+  100% { filter: blur(0); }
 }
 .pain-text { animation: pain 0.38s ease-out both; }
 @keyframes pain {
@@ -228,13 +235,13 @@ button:focus-visible, a:focus-visible {
   .dialogue-text { font-size: 23px; }
   .menu-screen { gap: 8px; }
   .menu-screen .menu-options { grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 460px); }
-  .game-title { font-size: 60px; margin-bottom: 0; }
+  .game-title { font-size: 60px; margin-bottom: 0; padding-bottom: 5px; }
   .menu-options { gap: 5px; }
   .game-control { font-size: 23px; padding: 5px 12px; }
   .extras-screen { gap: 5px; }
   .extras-card { padding: 8px 12px; gap: 5px; font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .chapter-title, .eyelids span, .pain-text { animation: none !important; }
+  .chapter-title, .eyelids span, .pain-text, .scene-frame[data-cue="wake"] .scene-art { animation: none !important; }
   .eyelids { display: none; }
 }
