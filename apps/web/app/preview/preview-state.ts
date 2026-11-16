@@ -3,7 +3,7 @@ export type Stage = 'menu' | 'chapter' | 'scene' | 'end';
 export type Overlay = 'none' | 'pause' | 'language' | 'extras';
 export type PreviewState = { stage: Stage; chapterReady: boolean; line: number; overlay: Overlay; extrasPage: number };
 export type PreviewAction =
-  | { type: 'START' | 'ADVANCE' | 'CHAPTER_READY' | 'PAUSE' | 'LANGUAGE' | 'EXTRAS' | 'BACK' | 'MAIN_MENU' }
+  | { type: 'START' | 'ADVANCE' | 'PREVIOUS' | 'CHAPTER_READY' | 'PAUSE' | 'LANGUAGE' | 'EXTRAS' | 'BACK' | 'MAIN_MENU' }
   | { type: 'EXTRAS_PAGE'; page: number };
 
 export const initialPreview: PreviewState = { stage: 'menu', chapterReady: false, line: 0, overlay: 'none', extrasPage: 0 };
@@ -25,6 +25,10 @@ export function previewReducer(state: PreviewState, action: PreviewAction): Prev
       return state.line === OPENING_LINE_COUNT - 1
         ? { ...state, stage: 'end' }
         : { ...state, line: state.line + 1 };
+    case 'PREVIOUS':
+      return state.stage === 'scene' && state.overlay === 'none' && state.line > 0
+        ? { ...state, line: state.line - 1 }
+        : state;
     case 'PAUSE':
       return (state.stage === 'chapter' || state.stage === 'scene') && state.overlay === 'none'
         ? { ...state, overlay: 'pause' }
