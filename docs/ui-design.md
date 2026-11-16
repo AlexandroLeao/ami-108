@@ -20,14 +20,14 @@ The owner approved a presentation-only revision of A01-S01/L01: add an initial s
 | Beat | PT-BR | EN | Visual |
 | --- | --- | --- | --- |
 | Chapter card | CAPÍTULO 1 — BANANAS | CHAPTER 1 — BANANAS | Same persistent game frame as dialogue: menu visible from the start, blank dialogue box, dark scene field for about 1.4 s, gradual title reveal. At 3.4 s enable the advance arrow in the usual dialogue position. Fade out the chapter title without changing layout; wait indefinitely for player input. |
-| Opening silence | ... | ... | First blink, narrow blurred vision, gentle recurring text tremor |
-| L01a | Que merda... | Shit... | Second blink, slightly wider and clearer vision, text tremor |
-| L01b | Minha cabeça... | My head... | Another blink, gradual focus, text tremor |
-| L02 | Onde eu estou? | Where am I? | Final blink opens fully over 1.55 s, mild residual blur, text tremor. Same mounted CENA-01 throughout. |
+| Opening silence | ... | ... | Completely dark scene field; one brief text tremor |
+| L01a | Que merda... | Shit... | Completely dark scene field; one brief text tremor |
+| L01b | Minha cabeça... | My head... | Completely dark scene field; one brief text tremor |
+| L02 | Onde eu estou? | Where am I? | First and only image reveal: eyelids open, briefly close and reopen over 1.4 s; mild blur resolves over 1.6 s; one brief text tremor. Same mounted CENA-01 throughout. |
 | L03 | Sangue...? | Blood...? | CENA-01 fully open and sharp; all waking effects and text tremor stop |
 | L04 | Que diabos aconteceu aqui? | What the hell happened here? | CENA-01 visible |
 
-Speaker is `???`. The approved waking sequence now begins with the ellipsis: each of the first four beats triggers a single deliberate close/reopen of the eyelids, with progressively wider vision and decreasing blur (5, 4, 3, 0.8 px). Text tremor continues gently while those beats are active. L03 and L04 have fully open, sharp, steady vision and text. Returning to a waking beat restores that beat's visual cue without replacing the image. No automatic dialogue advancement or looping eyelid flashes. Previous dialogue is bounded within the opening, never crossing a choice, event or checkpoint; future authoritative gameplay must implement read-only dialogue history rather than reverse irreversible game state. Changing locale or pausing does not rewind the preview. Reduced-motion preferences bypass movement. Opening is not a memory flashback.
+Speaker is `???`. The owner clarified that the first three dialogue beats must remain fully dark. Only L02 reveals the scene: one deliberate blink (open, close, reopen) and short blur-to-focus transition. On each of the first four beats the newly displayed text shakes once for 0.38 s, then stays still; no infinite animation. L03 and L04 have fully open, sharp, steady vision and text, even when the player advances before the animation finishes. Returning to L02 replays the reveal; returning to any of the first three beats hides the art completely. No automatic dialogue advancement or looping eyelid flashes. Previous dialogue is bounded within the opening, never crossing a choice, event or checkpoint; future authoritative gameplay must implement read-only dialogue history rather than reverse irreversible game state. Changing locale or pausing does not rewind the preview. Reduced-motion preferences bypass movement. Opening is not a memory flashback.
 
 ## David memory transitions
 
@@ -36,6 +36,6 @@ Reusable cues are defined for MEM-D1–D4: show the existing authored pain line 
 ## Validation matrix
 
 - Owner previously validated original opening preview in PT-BR/EN and mobile; redesigned preview needs new acceptance.
-- Test root and /preview in local Compose, both locales, menu/options, three extras cards, disabled resume, chapter reveal and indefinite manual-only advance, four gradual waking blinks and text tremor, complete stabilization at Blood, stable image focus, previous/next dialogue and remaining dialogue, pause/language/resume without line reset, keyboard and reduced motion.
+- Test root and /preview in local Compose, both locales, menu/options, three extras cards, disabled resume, chapter reveal and indefinite manual-only advance, three fully dark beats, one short text tremor on each of the first four beats, single blink and blur-to-focus on L02 only, complete stabilization at Blood, stable image focus, previous/next dialogue and remaining dialogue, pause/language/resume without line reset, keyboard and reduced motion.
 - Check 1366×768 and 1920×1080 desktop, mobile portrait 360×640 and 390×844, mobile landscape 640×360, plus zoom and keyboard focus. No page scrolling at standard sizes; do not crop or hide the next button. Validate actual rendered layout before claiming success.
 - Retain local-only preview flag, gated CENA-01 route and server-only future assets. No saved game, full campaign, LLM inference or production deployment in this PR.
