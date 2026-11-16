@@ -86,7 +86,8 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
               <button className="small-control" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>
             </header>
             <SceneViewer imageAvailable={imageAvailable} locale={locale}
-              reveal={stage === 'scene' && visual.reveal} cue={stage === 'scene' ? visual.cue : 'none'}>
+              reveal={stage === 'scene' && visual.reveal} cue={stage === 'scene' ? visual.cue : 'none'}
+              wakePhase={stage === 'scene' ? visual.wakePhase : 'none'}>
               <div className="chapter-layer" data-active={stage === 'chapter'} aria-hidden={stage !== 'chapter'}>
                 <h1 className="chapter-title">{labels.chapter}</h1>
               </div>
