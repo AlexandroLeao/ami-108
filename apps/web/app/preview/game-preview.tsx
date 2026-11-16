@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { copy, type Locale } from './copy';
-import { DialogueBox, SceneViewer } from './components';
+import { ChoicePanel, DialogueBox, EnergyIndicator, SceneViewer } from './components';
 
 type Stage = 'menu' | 'chapter' | 'scene' | 'end';
 
@@ -68,7 +68,12 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
       ) : (
         <section className="flex min-h-[65vh] flex-col items-center justify-center gap-6 text-center">
           <h1 className="text-3xl font-bold">{labels.end}</h1>
-          <button type="button" className="game-control" onClick={() => setStage('menu')}>{labels.menu}</button>
+          <div className="grid w-full max-w-lg gap-4 border border-[#FDF3E9] p-4 text-left sm:p-6">
+            <h2 className="text-sm font-bold">{labels.samples}</h2>
+            <EnergyIndicator energy={2} locale={locale} />
+            <ChoicePanel locale={locale} actions={[{ id: 'replay', label: labels.replay }, { id: 'menu', label: labels.menu }]}
+              onChoice={(id) => { if (id === 'replay') start(); else setStage('menu'); }} />
+          </div>
         </section>
       )}
     </main>
