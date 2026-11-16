@@ -6,9 +6,8 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/web/package.json apps/web/package.json
 COPY apps/api/package.json apps/api/package.json
 RUN pnpm install --frozen-lockfile
-COPY apps ./apps
-
 FROM dependencies AS api
+COPY apps/api ./apps/api
 RUN pnpm db:generate && pnpm --filter @ami-108/api build && chown -R node:node /app
 WORKDIR /app/apps/api
 USER node
@@ -16,6 +15,7 @@ EXPOSE 3001
 CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && exec node dist/main.js"]
 
 FROM dependencies AS web
+COPY apps/web ./apps/web
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @ami-108/web build && chown -R node:node /app
 WORKDIR /app/apps/web
