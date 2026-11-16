@@ -1,10 +1,11 @@
 import Image from 'next/image';
 import { copy, type Locale } from './copy';
+import type { VisualCue } from './preview-state';
 
 export function EnergyIndicator({ energy, locale }: { energy: 0 | 1 | 2 | 3; locale: Locale }) {
   return (
     <section aria-label={copy[locale].energy} className="flex items-center gap-3">
-      <span className="text-sm">{copy[locale].energy}</span>
+      <span>{copy[locale].energy}</span>
       <div aria-hidden="true" className="flex gap-1">
         {[1, 2, 3].map((bar) => (
           <span key={bar} className={`h-3 w-7 border border-[#FDF3E9] ${bar <= energy ? 'bg-[#FDF3E9]' : 'bg-transparent'}`} />
@@ -33,26 +34,36 @@ export function ChoicePanel({ actions, locale, onChoice }: {
   );
 }
 
-export function SceneViewer({ imageAvailable, locale }: { imageAvailable: boolean; locale: Locale }) {
+export function SceneViewer({ imageAvailable, locale, reveal = true, cue = 'none' }: {
+  imageAvailable: boolean; locale: Locale; reveal?: boolean; cue?: VisualCue;
+}) {
+  const visible = reveal && cue !== 'memory-cut';
   return (
-    <div className="relative aspect-video w-full overflow-hidden border border-[#FDF3E9] bg-[#171717]">
-      {imageAvailable ? (
+    <div className="scene-frame" data-cue={cue}>
+      {visible && (imageAvailable ? (
         <Image src="/preview/asset" alt={copy[locale].alt} width={1536} height={864}
-          unoptimized className="h-full w-full object-contain [image-rendering:pixelated]" />
+          unoptimized className="scene-art" />
       ) : (
-        <div className="flex h-full items-center justify-center p-6 text-center text-sm">
-          {copy[locale].missingArt}
-        </div>
+        <div className="scene-missing">{copy[locale].missingArt}</div>
+      ))}
+      {visible && imageAvailable && cue === 'wake' && (
+        <div className="eyelids" aria-hidden="true"><span /><span /></div>
       )}
     </div>
   );
 }
 
-export function DialogueBox({ speaker, text }: { speaker: string; text: string }) {
+export function DialogueBox({ speaker, text, locale, cue = 'none', onAdvance }: {
+  speaker: string; text: string; locale: Locale; cue?: VisualCue; onAdvance: () => void;
+}) {
   return (
-    <section aria-live="polite" aria-atomic="true" className="min-h-28 border border-[#FDF3E9] p-4 sm:p-5">
-      <p className="mb-2 text-sm font-bold tracking-widest">{speaker}</p>
-      <p className="text-base leading-relaxed sm:text-lg">{text}</p>
+    <section className="dialogue-frame">
+      <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
+        <p className="dialogue-speaker">{speaker}</p>
+        <p className={cue === 'pain' ? 'dialogue-text pain-text' : 'dialogue-text'}>{text}</p>
+      </div>
+      <button type="button" className="advance-control" aria-label={copy[locale].next}
+        title={copy[locale].next} onClick={onAdvance}><span aria-hidden="true" className="pixel-arrow" /></button>
     </section>
   );
 }
