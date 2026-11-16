@@ -12,3 +12,6 @@
 .env
 .env.*
 !.env.example
+
+AMI-108-Backup-*.zip
+local-backup/
