@@ -53,6 +53,7 @@ describe('approved cinematic opening', () => {
 
   it('ends the preview after all six lines without pretending to save progress', () => {
     let state = previewReducer(initialPreview, { type: 'START' });
+    state = previewReducer(state, { type: 'CHAPTER_READY' });
     state = previewReducer(state, { type: 'ADVANCE' });
     for (let n = 0; n < 6; n++) state = previewReducer(state, { type: 'ADVANCE' });
     expect(state.stage).toBe('end');
