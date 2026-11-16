@@ -1,4 +1,282 @@
 @import "tailwindcss";
 
-:root { color-scheme: dark; background: #171717; color: #fdf3e9; }
-body { margin: 0; font-family: system-ui, sans-serif; }
+:root {
+  --coal: #171717;
+  --ivory: #FDF3E9;
+  --alert: #FC2721;
+  color-scheme: dark;
+  background: var(--coal);
+  color: var(--ivory);
+}
+body {
+  margin: 0;
+  font-family: "VT323", monospace;
+  font-size: 24px;
+  line-height: 1.05;
+  font-synthesis: none;
+}
+button, a { font: inherit; }
+button:focus-visible, a:focus-visible {
+  outline: 2px dashed var(--ivory);
+  outline-offset: 3px;
+}
+.game-control, .small-control, .advance-control {
+  min-height: 44px;
+  border: 2px solid var(--ivory);
+  background: var(--coal);
+  color: var(--ivory);
+  cursor: pointer;
+  border-radius: 0;
+  line-height: 1;
+}
+.game-control {
+  display: block;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  font-size: clamp(23px, 3.1vw, 30px);
+}
+.game-control:hover:not(:disabled), .game-control[aria-pressed="true"],
+.small-control:hover:not(:disabled), .advance-control:hover:not(:disabled) {
+  background: var(--ivory);
+  color: var(--coal);
+}
+.game-control:disabled, .small-control:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+.small-control { padding: 5px 12px; font-size: 23px; }
+.game-viewport {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  overflow: auto;
+  background: var(--coal);
+}
+.game-layer {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  background: var(--coal);
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  overflow: auto;
+}
+.menu-screen {
+  width: min(100%, 460px);
+  display: grid;
+  gap: clamp(12px, 3dvh, 28px);
+  justify-items: center;
+  text-align: center;
+}
+.game-title {
+  width: min(94%, 420px);
+  margin: 0 0 16px;
+  line-height: 1;
+}
+.game-wordmark { display: block; width: 100%; height: auto; overflow: visible; }
+.menu-screen h1:not(.game-title), .extras-screen h1 {
+  font-size: clamp(32px, 6vw, 48px);
+  line-height: 1;
+}
+.menu-options { display: grid; width: min(100%, 340px); gap: 9px; }
+.version-label { font-size: 18px; margin: 0; text-align: center; }
+.end-screen p { max-width: 34ch; }
+.chapter-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 220ms ease-out;
+}
+.chapter-layer[data-active="false"] { opacity: 0; }
+.chapter-title {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 10px;
+  font-size: clamp(30px, 6vw, 64px);
+  max-width: 100%;
+  animation: chapter-reveal 3.4s ease-in-out both;
+}
+@keyframes chapter-reveal {
+  0%, 42% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.game-stage {
+  width: min(100%, 1060px, max(520px, calc((100dvh - 224px) * 1.77778)));
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) clamp(116px, 23dvh, 178px);
+  gap: 8px;
+  min-height: 0;
+}
+.stage-header { display: flex; align-items: center; justify-content: space-between; font-size: 24px; }
+.scene-frame {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--coal);
+  overflow: hidden;
+}
+.scene-visual { position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center; }
+/* Keep the same original image mounted but never show it on a dark beat. */
+.scene-frame[data-visible="false"] .scene-visual { visibility: hidden; }
+.scene-art {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; min-width: 0; min-height: 0;
+  object-fit: contain; image-rendering: pixelated;
+}
+/* Optical effects sit ABOVE the unchanged pixel-art image. No filter, scaling,
+   opacity or animation is applied to the original image itself. */
+.wake-optics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: wake-focus 1.4s ease-out both;
+}
+@keyframes wake-focus {
+  0%, 35% { backdrop-filter: blur(4px); opacity: 1; }
+  65% { backdrop-filter: blur(2px); opacity: 1; }
+  100% { backdrop-filter: none; opacity: 0; visibility: hidden; }
+}
+.scene-missing { text-align: center; padding: 12px; }
+.dialogue-frame {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 0;
+  border: 2px solid var(--ivory);
+  box-shadow: inset 0 0 0 3px var(--coal), inset 0 0 0 4px var(--ivory);
+  padding: 12px 106px 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  background: var(--coal);
+}
+.dialogue-copy { min-width: 0; width: 100%; }
+.dialogue-speaker { margin: 0 0 6px; font-size: clamp(21px, 3.5vw, 28px); line-height: 1; }
+.dialogue-text { margin: 0; font-size: clamp(24px, 3.6vw, 34px); line-height: 1.05; overflow-wrap: break-word; }
+.advance-control {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-color: transparent;
+  transition: opacity 280ms ease-out;
+}
+.dialogue-navigation { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 2px; }
+.advance-control:disabled { opacity: 0.28; cursor: not-allowed; }
+.previous-control .pixel-arrow { transform: rotate(180deg); }
+.pixel-arrow {
+  display: block;
+  width: 19px;
+  height: 23px;
+  background: var(--alert);
+  clip-path: polygon(0 0, 25% 0, 25% 20%, 50% 20%, 50% 40%, 100% 40%, 100% 60%, 50% 60%, 50% 80%, 25% 80%, 25% 100%, 0 100%);
+}
+.eyelids { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.eyelids span {
+  position: absolute; width: 100%; height: 51%; background: var(--coal);
+}
+.eyelids span:first-child { top: 0; transform: translateY(-105%); }
+.eyelids span:last-child { bottom: 0; transform: translateY(105%); }
+/* One natural blink, only on "Where am I?": open, close, reopen. */
+.scene-frame[data-cue="wake"][data-visible="true"] .eyelids span:first-child { animation: blink-upper 1.4s ease-in-out both; }
+.scene-frame[data-cue="wake"][data-visible="true"] .eyelids span:last-child { animation: blink-lower 1.4s ease-in-out both; }
+@keyframes blink-upper {
+  0%, 6% { transform: translateY(0); }
+  36% { transform: translateY(-72%); }
+  53% { transform: translateY(0); }
+  100% { transform: translateY(-105%); }
+}
+@keyframes blink-lower {
+  0%, 6% { transform: translateY(0); }
+  36% { transform: translateY(72%); }
+  53% { transform: translateY(0); }
+  100% { transform: translateY(105%); }
+}
+.dialogue-text { animation: dialogue-reveal 160ms ease-out both; }
+@keyframes dialogue-reveal { from { opacity: 0; } to { opacity: 1; } }
+/* Each newly rendered line shakes once, then remains still. */
+.pain-text { animation: dialogue-reveal 160ms ease-out both, pain 0.38s ease-out both; }
+/* Three tiny dots need a slightly wider, still one-shot motion to be perceptible. */
+.ellipsis-text { animation: dialogue-reveal 100ms ease-out both, ellipsis-pain 0.48s ease-out both; }
+@keyframes ellipsis-pain {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  45% { transform: translateX(3px); }
+  70% { transform: translateX(-2px); }
+}
+@keyframes pain {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+}
+.extras-screen { width: min(100%, 680px); display: grid; gap: 12px; }
+.extras-screen header, .extras-screen footer { display: flex; align-items: center; gap: 8px; }
+.extras-screen header { justify-content: space-between; }
+.extras-screen footer button:first-child { margin-right: auto; }
+.extras-card {
+  border: 2px solid var(--ivory);
+  padding: clamp(12px, 3vw, 24px);
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  font-size: clamp(21px, 3vw, 26px);
+  line-height: 1.05;
+  min-height: 0;
+}
+.extras-card h2 { font-size: clamp(26px, 4vw, 34px); margin: 0; }
+.extras-card p { margin: 0; }
+@media (orientation: portrait) {
+  .game-stage {
+    width: min(100%, 640px);
+    height: auto;
+    grid-template-rows: auto auto clamp(145px, 23dvh, 178px);
+    align-self: center;
+  }
+  .scene-frame { aspect-ratio: 16 / 9; height: auto; }
+  .scene-art { width: 100%; height: 100%; }
+  .dialogue-frame { min-height: 145px; }
+  .dialogue-text { font-size: clamp(25px, 5.8vw, 32px); }
+}
+@media (max-height: 460px) and (orientation: landscape) {
+  .game-stage { width: min(100%, 860px); grid-template-rows: auto minmax(0, 1fr) 90px; gap: 4px; }
+  .dialogue-frame { padding: 8px 106px 8px 12px; }
+  .dialogue-speaker { font-size: 20px; margin-bottom: 3px; }
+  .dialogue-text { font-size: 23px; }
+  .menu-screen { gap: 8px; }
+  .menu-screen .menu-options { grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 460px); }
+  .game-title { width: min(75%, 300px); margin-bottom: 0; }
+  .menu-options { gap: 5px; }
+  .game-control { font-size: 23px; padding: 5px 12px; }
+  .extras-screen { gap: 5px; }
+  .extras-card { padding: 8px 12px; gap: 5px; font-size: 21px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-title, .dialogue-text, .pain-text, .ellipsis-text { animation: none !important; }
+  .chapter-layer, .advance-control { transition: none; }
+  .eyelids, .wake-optics { display: none; }
+}

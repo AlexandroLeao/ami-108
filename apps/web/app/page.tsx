@@ -1,3 +1,5 @@
+import PreviewPage from './preview/page';
+
 export const dynamic = 'force-dynamic';
 
 async function isApiReady(): Promise<boolean> {
@@ -13,12 +15,13 @@ async function isApiReady(): Promise<boolean> {
 }
 
 export default async function Home() {
+  if (process.env.AMI_DEV_PREVIEW === '1') return <PreviewPage />;
   const ready = await isApiReady();
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 p-8">
       <p className="text-sm uppercase tracking-[0.25em]">Development foundation</p>
       <h1 className="text-6xl font-bold tracking-tight sm:text-8xl">AMI<span className="text-[#fc2721]">-108</span></h1>
-      <p>System initialization — narrative interface pending.</p>
+      <p>System initialization — narrative engine pending.</p>
       <p role="status" className="border border-[#fdf3e9] p-4">{ready ? 'API, database and AI service reachable.' : 'Backend not ready. Check service logs.'}</p>
     </main>
   );

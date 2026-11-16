@@ -48,3 +48,7 @@ test-results/
 
 # Generated framework files
 next-env.d.ts
+
+# Private source backup (never commit)
+AMI-108-Backup-*.zip
+local-backup/
