@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { CHAPTERS, CHAPTER_ONE, INTRO_FALLBACK } from '../src/narrative/catalog';
 import { advanceNarrative, changeNarrativeLocale, currentAsset, NarrativeError, projectNarrative, startNarrative, type NarrativeState } from '../src/narrative/engine';
 
@@ -22,6 +23,17 @@ describe('server-only Chapter 1 catalog and transition core', () => {
       expect(step.text['pt-BR'].length).toBeGreaterThan(0);
       expect(step.text.en.length).toBeGreaterThan(0);
     }
+  });
+  it('matches all 45 authored localized dialogue beats against the private source digest', () => {
+    // SHA-256 of JSON.stringify ordered tuples [composite ID, PT speaker, EN speaker,
+    // PT text, EN text], independently extracted from Master v1.10 Chapter 1 tables,
+    // substituting only the approved opening addendum for A01-S01/L01.
+    const tuples = CHAPTER_ONE.flatMap((step) => step.speaker
+      ? [[step.id, step.speaker['pt-BR'], step.speaker.en, step.text['pt-BR'], step.text.en]]
+      : []);
+    expect(tuples).toHaveLength(45);
+    expect(createHash('sha256').update(JSON.stringify(tuples), 'utf8').digest('hex'))
+      .toBe('d0c281253ba699d61705279cae74a4cf37ffac27133e3b3c95b077c174179c39');
   });
   it('preserves the approved dark opening and first reveal', () => {
     let state = next(startNarrative('pt-BR'));
