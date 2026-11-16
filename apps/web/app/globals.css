@@ -302,7 +302,10 @@ button:focus-visible, a:focus-visible {
   position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%);
   width: min(90%, 520px); padding: 8px 12px; margin: 0; background: var(--coal);
   border: 2px solid var(--alert); text-align: center; font-size: 21px;
+  display: flex; gap: 8px; align-items: center; justify-content: space-between;
 }
+.campaign-notice p { margin: 0; }
+.campaign-notice .small-control { flex: 0 0 auto; }
 @media (max-height: 460px) and (orientation: landscape) {
   .campaign-diagnostics { font-size: 14px; gap: 3px 8px; }
   .campaign-interaction { font-size: 13px; bottom: 48px; }
