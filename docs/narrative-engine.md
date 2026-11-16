@@ -1,6 +1,6 @@
 # Narrative engine — AMI-004
 
-**Scope:** first server-only domain increment, November 16, 2026. This is not a live campaign or a persisted session.
+**Scope:** Chapter 1 domain core (PR #19, merged) and local persisted campaign integration (PR #20, pending owner acceptance), November 16, 2026. Not the full campaign or a production deployment.
 
 ## Source and boundaries
 
@@ -12,17 +12,26 @@
 ## Implemented pure domain
 
 - Versioned state starts at the Chapter 1 card. One forward action per step plus an authorized previous-dialogue action where available; composite action ID, monotonic revision; arbitrary targets and stale revisions are rejected. A separate review cursor is bounded within already-reached contiguous dialogue, never crossing scene, event, narration/flashback or interaction boundaries. Review does not rewind authoritative progress, repeat events, regenerate INTRO-RANDOM or debit energy.
-- Localized projection contains only the current text, speaker, current scene, presentation cue, current asset reference, currently allowed action and diagnostics only after E-JOIN. It never includes the catalog, event list or internal INTRO cache. Asset identity is derived from the step, not a client parameter. This is an internal type, not a wired HTTP endpoint.
-- E-JOIN initializes 3 energy and memory MED/BIO/HIST/PERSONAL 10/15/12/5 locked. The tutorial follows. INTRO-RANDOM creates exactly one fallback result in run state, consumes no energy, and is preserved on locale change. The provider adapter and durable cache are later work; fallback-only is not proof of real inference.
+- Localized projection contains only the current text, speaker, current scene, presentation cue, current asset reference, currently allowed action and diagnostics only after E-JOIN. It never includes the catalog, event list or internal INTRO cache. Asset identity is derived from the step, not a client parameter. The local session API returns this projection; the current asset URL includes a cache discriminator checked against the authorized step.
+- E-JOIN initializes 3 energy and memory MED/BIO/HIST/PERSONAL 10/15/12/5 locked. The tutorial follows. INTRO-RANDOM creates exactly one fallback result in run state, consumes no energy, and is preserved on locale change. The Chapter 1 fallback is now persisted in the run state; provider adapter and encounter-slot cache are later work; fallback-only is not proof of real inference.
 - MEM-D1 uses the authored pain line, then FB-D1 displays a textual memory over the dark field, then the street returns. No energy/memory mutation or inference.
 - Opening cues: ellipsis, pain, wake, none; first three beats have no authorized image, L02 and L03 use the same CENA-01. No changes to the approved preview UI.
 - Unit tests cover chapter/scene counts, uniqueness, SHA-256 of all 45 ordered authored dialogue beats independently extracted from the canonical source, read-only history, opening reveal, unauthorized/stale actions, E-JOIN, free INTRO fallback and locale stability, flashback, both language traversals and end boundary.
 
+## Integrated local session and transport
+
+- Additive Prisma migration `20261116173000_chapter_one_sessions` adds a unique SHA-256 token digest, narrative version, JSON state, monotonic revision, expiry and command receipts. Existing foundation rows are preserved. The 30-day expiry is provisional for local validation; cleanup and production policy remain AMI-010.
+- The server issues 32 random bytes encoded as a cookie capability; the same-origin facade forwards only that cookie, marks it HttpOnly/SameSite=Lax and Secure on HTTPS. New game is explicit; continuing restores the existing run. A confirmation protects replacement of the browser's current resume target; the prior row is not deleted. No account or client-supplied state.
+- Mutations lock the session row in a PostgreSQL transaction, compare revisions and store unique command receipts atomically. Duplicate identical commands replay the current authorized view; conflicting IDs or stale revisions return 409. A distinct read-only history cursor persists without rewinding events. No provider calls inside transactions.
+- Next.js allowlists the five game endpoints, checks mutation Origin, validates the asset key, proxies only the session cookie and uses private/no-store responses. Both API and facade require AMI_DEV_PREVIEW=1 for local integration. Production origin, rate limiting, retention and comprehensive security review remain pending.
+- Local root reuses the approved wordmark, palette, typography, layout and cues. CENA-01 is a stable image source across L02/L03; only the authorized current asset is requested. Wake optics wait for image load, are removed at L03, and honor reduced motion. Diagnostics appear only after E-JOIN. Long current dialogue is measured and paginated in the existing frame; advancing local pages does not mutate the server. Page layout and new HUD require owner visual acceptance.
+- `/preview` retains the isolated approved visual fixture. The campaign ends at the Chapter 2 card boundary with a development notice; no fake encounter or generated story.
+
 ## Integration order
 
-1. Wrap the pure engine in a durable session and transactional command service (AMI-006 prerequisite work); server-generated token digest, strict input validation, receipt and revision checks, same-origin cookie and Origin policy. Never accept a client state object. Add negative/duplicate/concurrency tests.
-2. Expose only current authorized projection and asset through the API, not arbitrary image IDs. Integrate the Next.js same-origin facade and reuse the approved visual shell. Connect the existing bounded read-only history cursor to the approved previous/next controls, without reversing events or revealing future content.
+1. Implemented in PR #20: wrap the pure engine in a durable session and transactional command service (AMI-006 prerequisite work); server-generated token digest, strict input validation, receipt and revision checks, same-origin cookie and Origin policy. Never accept a client state object. Add negative/duplicate/concurrency tests.
+2. Implemented in PR #20: expose only current authorized projection and asset through the API, not arbitrary image IDs. Integrate the Next.js same-origin facade and reuse the approved visual shell. Connect the existing bounded read-only history cursor to the approved previous/next controls, without reversing events or revealing future content.
 3. Play Chapter 1 in both languages through the actual API; verify E-JOIN HUD, INTRO fallback, FB-D1, manual chapter progression, image consistency and reload. Obtain owner review of narration adaptations and visual acceptance before closing AMI-004.
 4. Continue AMI-005/006: dog encounter, CP-DOG, choices, slots/energy, F1, SOL-01, E-NAME and persistence. Then real AI/RAG and remaining chapters per the production plan.
 
-Current main still serves the AMI-003 development preview. Do not set production flags, expose a public catalog route, or close AMI-004 solely on the unit test suite. No paid services or new dependencies are required for this increment.
+The previous main served only the AMI-003 preview. PR #20 adds a playable local Chapter 1 candidate. Do not set production flags, expose a public catalog route, or close AMI-004 before the integrated owner playtest. No paid services or new dependencies are required for this increment.
