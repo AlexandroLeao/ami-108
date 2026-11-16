@@ -28,6 +28,7 @@ export type CurrentView = Readonly<{
   // UI-only cues are proposed additions to the game contract.
   cue: Cue;
   narration: boolean;
+  information: boolean;
 }>;
 
 export class NarrativeError extends Error {
@@ -57,27 +58,22 @@ function checkRevision(state: NarrativeState, expectedRevision: number): void {
   if (!Number.isSafeInteger(expectedRevision) || state.revision !== expectedRevision) throw new NarrativeError('STALE_REVISION');
 }
 
-// The review cursor is distinct from authoritative progress. It can only move
-// within reached pre-join presentation or contiguous post-join dialogue.
+// Review is presentation-only, including already-applied events. The first
+// visible warehouse beat is the lower bound; the opening card/dark beats
+// cannot be revisited by a new PREVIOUS command.
+const FIRST_REVIEWABLE = CHAPTER_ONE.findIndex((step) => step.id === 'A01-S01/L02');
+const JOIN_INDEX = CHAPTER_ONE.findIndex((step) => step.event === 'E-JOIN');
 function canReviewPrevious(index: number): boolean {
-  const step = CHAPTER_ONE[index];
-  const previous = CHAPTER_ONE[index - 1];
-  if (!step || !previous || step.phase !== 'NARRATIVE' || previous.phase !== 'NARRATIVE'
-    || step.event || previous.event || previous.action === 'INTERACT') return false;
-  // Review reached pre-join narration, artwork and dialogue, never the join event.
-  const joinIndex = CHAPTER_ONE.findIndex((item) => item.event === 'E-JOIN');
-  return index < joinIndex
-    || (step.sceneId === previous.sceneId && step.speaker !== null && previous.speaker !== null);
+  return index > FIRST_REVIEWABLE && index <= CHAPTER_ONE.length;
 }
 
 function visibleIndex(state: NarrativeState): number {
   const authoritative = currentIndex(state);
   if (!state.reviewStepId) return authoritative;
   const index = CHAPTER_ONE.findIndex((step) => step.id === state.reviewStepId);
-  if (index < 0 || index >= authoritative) throw new NarrativeError('INVALID_STATE');
-  for (let i = authoritative; i > index; i--) {
-    if (!canReviewPrevious(i)) throw new NarrativeError('INVALID_STATE');
-  }
+  // Preserve legacy saved review cursors on the initial dark beats: they
+  // may advance to their reached position, but cannot move farther back.
+  if (index < 1 || index >= authoritative) throw new NarrativeError('INVALID_STATE');
   return index;
 }
 
@@ -87,15 +83,17 @@ export function currentAsset(state: NarrativeState): OpeningAsset | null {
 
 function currentActions(state: NarrativeState, index: number): readonly NarrativeAction[] {
   const step = CHAPTER_ONE[index];
-  if (!step) return [];
   const locale = state.locale;
+  const previous: NarrativeAction = { id: (step?.id ?? HANDOFF) + '/PREVIOUS', kind: 'PREVIOUS',
+    label: locale === 'pt-BR' ? 'Fala anterior' : 'Previous dialogue' };
+  if (!step) return canReviewPrevious(index) ? [previous] : [];
   const forward: NarrativeAction = {
     id: step.id + '/NEXT',
     kind: actionsByStep[step.id] ? 'INTERACT' : step.action,
     label: (actionsByStep[step.id] ?? actionLabel)[locale],
   };
   return canReviewPrevious(index)
-    ? [forward, { id: step.id + '/PREVIOUS', kind: 'PREVIOUS', label: locale === 'pt-BR' ? 'Fala anterior' : 'Previous dialogue' }]
+    ? [forward, previous]
     : [forward];
 }
 
@@ -109,16 +107,16 @@ export function projectNarrative(state: NarrativeState): CurrentView {
     return { revision: state.revision, locale, phase: 'CHAPTER_CARD', chapter: 2,
       chapterTitle: CHAPTERS[1].title[locale], sceneId: 'A02-S01',
       speaker: null, text: locale === 'pt-BR' ? 'CAPÍTULO 2 — REGISTRO ATUALIZADO' : 'CHAPTER 2 — RECORD UPDATED',
-      asset: null, diagnostics: state.diagnostics, actions: [], pending: false, cue: 'none', narration: false };
+      asset: null, diagnostics: state.diagnostics, actions: currentActions(state, index), pending: false, cue: 'none', narration: false, information: false };
   }
   return {
     revision: state.revision, locale, phase: step.phase, chapter: 1, chapterTitle: CHAPTERS[0].title[locale],
     sceneId: step.sceneId, speaker: step.speaker?.[locale] ?? null,
     text: step.event === 'INTRO-RANDOM' && state.intro ? state.intro.text[locale] : step.text[locale],
     asset: step.asset ? { url: `/api/game/asset?key=${step.asset}`, alt: OPENING_ASSETS[step.asset][locale] } : null,
-    diagnostics: state.diagnostics,
+    diagnostics: index >= JOIN_INDEX ? state.diagnostics : null,
     actions: currentActions(state, index),
-    pending: false, cue: step.cue, narration: step.narration === true,
+    pending: false, cue: step.cue, narration: step.narration === true, information: step.information === true,
   };
 }
 
@@ -131,7 +129,7 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
     return { ...state, reviewStepId: CHAPTER_ONE[index - 1].id, revision: state.revision + 1 };
   }
   if (state.reviewStepId) {
-    const reviewNext = CHAPTER_ONE[index + 1].id;
+    const reviewNext = CHAPTER_ONE[index + 1]?.id ?? HANDOFF;
     return { ...state, reviewStepId: reviewNext === state.stepId ? null : reviewNext, revision: state.revision + 1 };
   }
   const next = CHAPTER_ONE[index + 1];

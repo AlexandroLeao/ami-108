@@ -591,6 +591,10 @@
             "type": "boolean",
             "description": "Narrative description rather than dialogue or tutorial."
           },
+          "information": {
+            "type": "boolean",
+            "description": "True for the tutorial information card, distinct from narration and dialogue."
+          },
           "cue": {
             "type": "string",
             "enum": [
@@ -599,7 +603,8 @@
               "ellipsis",
               "wake",
               "memory-cut",
-              "fade-black"
+              "fade-black",
+              "close-eyes"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
           }
@@ -618,7 +623,8 @@
           "actions",
           "pending",
           "cue",
-          "narration"
+          "narration",
+          "information"
         ]
       },
       "CreateSession": {

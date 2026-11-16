@@ -19,7 +19,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-02': local('Rua residencial em ruínas.', 'Ruined residential street.'),
   'CENA-03': local('Robô danificado junto à janela da residência abandonada.', 'Damaged robot by the window of the abandoned residence.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
@@ -33,6 +33,7 @@ export type Step = Readonly<{
   event?: EventId;
   // Narration is distinct from dialogue; owner-requested presentation preserves story events.
   narration?: true;
+  information?: true;
   action: 'CONTINUE' | 'INTERACT';
 }>;
 
@@ -102,8 +103,9 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L21', ami, '... Isso foi um erro.', '... That was an error.', 'CENA-03'),
   dialogue(s3, 'L22', unknown, 'É. Essa vai ser uma longa viagem.', 'Yeah. This is going to be a long trip.', 'CENA-03'),
   dialogue(s3, 'L23', ami, 'Obrigado, bobo.', 'Thank you, Bobo.', 'CENA-03'),
-  narration(s3, 'E-JOIN', 'Ele acomoda a cabeça e o tronco remanescente de AMI no arnês frontal da mochila, junto ao peito.', "He places AMI's remaining head and torso in the front harness of his backpack, against his chest.", 'CENA-03', { event: 'E-JOIN' }),
-  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local('Consultar AMI consome uma barra. A memória danificada pode gerar respostas desconexas. A luz solar recupera sua energia de processamento.', 'Consulting AMI costs one bar. Damaged memory can produce unrelated answers. Sunlight restores his processing energy.'), asset: 'CENA-03', cue: 'none', action: 'CONTINUE' },
+  narration(s3, 'E-JOIN', 'Você coloca a cabeça e o que resta do tronco de AMI na parte da frente da mochila, junto ao peito.', "You place AMI's head and what remains of his torso on the front of your backpack, against your chest.", null, { event: 'E-JOIN', cue: 'fade-black' }),
+  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local('Consultar AMI consome uma barra. A memória danificada pode gerar respostas desconexas. A luz solar recupera sua energia de processamento.', 'Consulting AMI costs one bar. Damaged memory can produce unrelated answers. Sunlight restores his processing energy.'), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  narration(s3, 'RETURN-STREET', 'Vocês deixam a residência e retornam à rua, agora seguindo em frente juntos.', 'You leave the house and return to the street, now continuing your journey together.', null),
   dialogue(s3, 'L26', unknown, 'Certo. Alguma ideia de pra onde devemos ir?', 'Right. Any idea where we should go?', 'CENA-02'),
   dialogue(s3, 'L27', ami, 'Existe um terminal de manutenção pública a aproximadamente trezentos metros daqui.', 'There is a public maintenance terminal approximately three hundred meters from here.', 'CENA-02'),
   dialogue(s3, 'L28', unknown, 'Você se lembra disso?', 'You remember that?', 'CENA-02'),
@@ -115,7 +117,14 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L33', ami, INTRO_FALLBACK['pt-BR'], INTRO_FALLBACK.en, 'CENA-02', 'none', 'INTRO-RANDOM'),
   dialogue(s3, 'L34', unknown, 'Maravilha.', 'Wonderful.', 'CENA-02'),
   dialogue(s3, 'MEM-D1', unknown, 'Ah... minha cabeça!', 'Ah... my head!', 'CENA-02', 'pain', 'MEM-D1'),
-  narration(s3, 'FB-D1', 'Uma risada. Duas crianças correm. Uma cai, e a outra volta para ajudar.', 'Laughter. Two children run. One falls, and the other comes back to help.', null, { event: 'FB-D1', phase: 'FLASHBACK', cue: 'memory-cut' }),
+  narration(s3, 'FB-D1', 'Sua cabeça começa a doer bastante.', 'Your head starts to hurt badly.', null, { event: 'FB-D1', phase: 'FLASHBACK', cue: 'close-eyes' }),
+  narration(s3, 'FB-D1b', 'Imagens e sons desconexos invadem sua mente.', 'Disjointed images and sounds flood your mind.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1c', 'Risadas.', 'Laughter.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1d', 'Duas crianças correndo.', 'Two children running.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1e', 'Uma delas cai.', 'One of them falls.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1f', 'A outra volta correndo para ajudar.', 'The other runs back to help.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1g', 'Tudo isso parece estranhamente familiar.', 'It all feels strangely familiar.', null, { phase: 'FLASHBACK' }),
+  dialogue(s3, 'MEM-D1-RETURN', unknown, '...', '...', 'CENA-02', 'wake'),
   dialogue(s3, 'L35', ami, 'Alguma irregularidade?', 'Any irregularities?', 'CENA-02'),
   dialogue(s3, 'L36', unknown, 'Não... Acho que lembrei de alguma coisa.', 'No... I think I remembered something.', 'CENA-02'),
   dialogue(s3, 'L37', ami, 'Excelente. Isso representa um progresso.', 'Excellent. That represents progress.', 'CENA-02'),

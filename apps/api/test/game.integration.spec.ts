@@ -106,8 +106,14 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
       .send({ commandId: randomUUID(), expectedRevision: view.revision, locale: 'en' }).expect(200);
     expect(translated.body.view.text).toBe('Where am I?');
     expect(translated.body.view.asset.url).toBe(view.asset?.url);
-    const previous = translated.body.view.actions.find((action: { kind: string }) => action.kind === 'PREVIOUS');
-    view = await command(first.cookie, translated.body.view, previous.id);
+    expect(translated.body.view.actions.some((action: { kind: string }) => action.kind === 'PREVIOUS')).toBe(false);
+    view = await command(first.cookie, translated.body.view);
+    const previous = view.actions.find((action) => action.kind === 'PREVIOUS')!;
+    view = await command(first.cookie, view, previous.id);
+    expect(view.text).toBe('Where am I?');
+    view = await command(first.cookie, view);
+    view = await command(first.cookie, view);
+    view = await command(first.cookie, view);
     expect(view.asset).toBeNull();
     await request(app.getHttpServer()).get('/game/asset?key=CENA-01').set('Cookie', first.cookie).expect(404);
   });
@@ -117,12 +123,19 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     let view = session.view;
     for (let i = 0; i < CHAPTER_ONE.length; i++) view = await command(session.cookie, view);
     expect(view.chapter).toBe(2);
-    expect(view.actions).toEqual([]);
+    expect(view.actions.map((action) => action.kind)).toEqual(['PREVIOUS']);
     expect(view.diagnostics).toEqual({ energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false });
     const row = await prisma.gameSession.findUniqueOrThrow({ where: { tokenDigest: digest(session.cookie.split('=')[1]) } });
     expect(row.state).toMatchObject({ events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: { category: 'RANDOM', source: 'fallback' } });
     expect(await prisma.gameCommandReceipt.count({ where: { sessionId: row.id } })).toBe(CHAPTER_ONE.length);
     await request(app.getHttpServer()).get('/game/view').set('Cookie', session.cookie).expect(200, view);
+    // Persist history across the handoff and memory, without changing applied events.
+    for (let i = 0; i < 6; i++) view = await command(session.cookie, view, view.actions.find((action) => action.kind === 'PREVIOUS')!.id);
+    expect(view.text).toBe('Tudo isso parece estranhamente familiar.');
+    expect(view.asset).toBeNull();
+    await request(app.getHttpServer()).get('/game/view').set('Cookie', session.cookie).expect(200, view);
+    const reviewed = await prisma.gameSession.findUniqueOrThrow({ where: { id: row.id } });
+    expect(reviewed.state).toMatchObject({ stepId: 'A02-S01/CHAPTER_CARD', events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'] });
   });
 
   it('does not expose integration routes without explicit local flag', async () => {

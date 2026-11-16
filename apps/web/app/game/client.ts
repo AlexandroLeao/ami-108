@@ -7,8 +7,9 @@ export type CampaignView = {
   asset: { url: string; alt: string } | null;
   diagnostics: { energy: 0 | 1 | 2 | 3; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean } | null;
   actions: GameAction[]; pending: boolean;
-  cue: 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black';
+  cue: 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes';
   narration: boolean;
+  information: boolean;
 };
 export type CommandBody = { commandId: string; expectedRevision: number } &
   ({ actionId: string } | { locale: Locale });

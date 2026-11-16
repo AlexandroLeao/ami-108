@@ -29,8 +29,9 @@ function Diagnostics({ view }: { view: CampaignView }) {
         </span>
         <span>{d.energy}/3</span>
       </div>
-      <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span><span>HIST-03 {d.hist}%</span>
-      <span>PERSONAL {d.personal}%{!d.personalUnlocked ? ' · ' + messages[view.locale].locked : ''}</span>
+      <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span>
+      <span>HIST-03 {d.hist}%</span><span>PERSONAL {d.personal}%</span>
+      {!d.personalUnlocked && <span className="campaign-memory-lock">PERSONAL · {messages[view.locale].locked}</span>}
     </div>
   );
 }
@@ -55,7 +56,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const chapter = view?.phase === 'CHAPTER_CARD';
   const chapterKey = chapter && view ? String(view.chapter) : null;
   const chapterReady = !chapter || readyCard === chapterKey;
-  const boundary = !!view && view.actions.length === 0;
+  const boundary = !!view && !view.actions.some((action) => action.kind !== 'PREVIOUS');
   const showChapter = chapter && !(boundary && chapterReady);
   const displayText = !view || showChapter ? '' : boundary ? messages[locale].boundary : view.text;
   const pageKey = view ? (view.actions[0]?.id ?? 'boundary') + ':' + locale + ':' + displayText : '';
@@ -63,7 +64,9 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const pageIndex = pageReady ? pagination.index : 0;
   const pageCount = pageReady ? pagination.pages.length : 1;
   const pageText = pageReady ? pagination.pages[pageIndex] : displayText;
-  const narrationLabel = view?.narration ? (locale === 'pt-BR' ? 'NARRAÇÃO' : 'NARRATION') : null;
+  const narrationLabel = view?.information ? (locale === 'pt-BR' ? 'INFORMAÇÃO' : 'INFORMATION')
+    : view?.narration ? (locale === 'pt-BR' ? 'NARRAÇÃO' : 'NARRATION') : null;
+  const robotDialogue = view?.speaker === 'AMI-108' || view?.speaker === 'Robô' || view?.speaker === 'Robot';
   const nextAction = view?.actions.find((action) => action.kind !== 'PREVIOUS');
   const previousAction = view?.actions.find((action) => action.kind === 'PREVIOUS');
 
@@ -180,13 +183,13 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     void run(() => mutate(view, { actionId: nextAction.id }));
   }, [view, nextAction, overlay, chapterReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
   const previous = useCallback(() => {
-    if (!view || chapter || busyRef.current || overlay !== 'none' || !pageReady) return;
+    if (!view || !chapterReady || busyRef.current || overlay !== 'none' || !pageReady) return;
     if (pageIndex > 0) {
       setPagination((old) => ({ ...old, index: Math.max(0, old.index - 1) }));
       return;
     }
     if (previousAction) void run(() => mutate(view, { actionId: previousAction.id }));
-  }, [view, chapter, overlay, pageReady, pageIndex, previousAction, run, mutate]);
+  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate]);
   const closeOverlay = useCallback(() => setOverlay(overlay === 'language' && view ? 'pause' : 'none'), [overlay, view]);
   const chooseLanguage = async (value: Locale) => {
     if (busyRef.current) return;
@@ -254,14 +257,14 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <span>AMI-108</span>
                 <button className="small-control" disabled={busy} onClick={() => setOverlay('pause')}>{labels.menu}</button>
               </div>
-              <Diagnostics view={view} />
             </header>
             <CampaignScene view={view}>
+              {view.asset && <Diagnostics view={view} />}
               <div key={view.chapter} className="chapter-layer" data-active={chapter} aria-hidden={!chapter}>
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" aria-busy={busy}>
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} aria-busy={busy}>
               <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
                 {!showChapter && (
                   <>
@@ -273,7 +276,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
               {interaction && <span className="campaign-interaction">{nextAction.label}</span>}
               <div className="dialogue-navigation">
-                <button className="advance-control previous-control" type="button" disabled={busy || chapter || !pageReady || (!previousAction && pageIndex === 0)}
+                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || !pageReady || (!previousAction && pageIndex === 0)}
                   aria-label={labels.previousDialogue} title={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
                 <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || (!chapter && !pageReady)}
                   aria-label={advanceLabel} title={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
