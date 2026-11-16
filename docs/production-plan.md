@@ -3,14 +3,14 @@
 **Project:** AMI-108  
 **Planning baseline:** November 15, 2026  
 **Production target:** November 16–22, 2026 (seven calendar days).  
-**Canonical sources:** Documento Mestre v1.8 and Roteiro Interativo v1.6, retained privately.  
-**Status:** Initial engineering baseline merged in PR #1; no application build or software tests verified yet.
+**Canonical sources:** Documento Mestre v1.9 and Roteiro Interativo v1.7, retained privately.  
+**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 design prepared for owner review; no playable campaign or real inference yet.
 
 The target is ambitious, not a guaranteed release date. Preserve all approved requirements; record blockers and revise the schedule rather than silently reducing scope. Work is performed in active development sessions, not autonomously between them.
 
 | Day | Date | Work | Exit gate |
 | --- | --- | --- | --- |
-| 1 | Nov 16 | AMI-001, 002, 003: bootstrap, architecture, requirements, CI, asset pipeline and initial UI | Reproducible web/API/AI/database startup, initial screen and basic checks |
+| 1 | Nov 16 | AMI-002, 003: architecture, requirements, asset pipeline and initial UI; AMI-001 already completed | Reviewed architecture/contracts, verified initial narrative interface and prepared assets |
 | 2 | Nov 17 | AMI-004, 005, 006: narrative engine, localization, Chapters 1–2, dog encounter and persistence | Playable vertical slice with energy, four choices, checkpoint, F1 and SOL-01 |
 | 3 | Nov 18 | AMI-006, 007, 008: persistence, real AI/RAG and Chapter 3 | Real inference and fallback evidence; rat, F2 and SOL-02; durable session/cache |
 | 4 | Nov 19 | AMI-009: Chapters 4–5 | F3, personal archives, flashbacks, boar, launch and complete bilingual campaign |
@@ -26,7 +26,7 @@ Tests, security, documentation and deployment preparation start early. Evaluate 
 - AI assistance produces implementation, tests, review and documentation during active sessions. Report real commands, results and limitations.
 - GitHub is the technical source of truth. Use short branches and PRs with linked issues; close an issue only when its acceptance criteria pass.
 - Use English for repository materials and code. Preserve official Portuguese documents and bilingual game content.
-- Codespaces is for execution, debugging and verification; CloudShell for authorized AWS operations only. Maintain zero mandatory service cost, verify quotas before provisioning, and never commit secrets.
+- Google Cloud Shell is the verified environment for manual execution and preview; GitHub Actions for CI. Codespaces is optional and untested. AWS CloudShell is for authorized AWS operations only. Maintain zero mandatory service cost, verify quotas before provisioning, and never commit secrets.
 - Keep the repository private until licensing, assets, spoilers, credentials and publication have been reviewed by the owner.
 
 ## Release gates
