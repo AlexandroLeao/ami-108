@@ -5,6 +5,10 @@ The two OpenAPI 3.1 JSON documents are design contracts, not generated runtime s
 - [Game API](game.openapi.json): session creation/resume, current projection, commands and protected asset.
 - [AI internal API](ai.openapi.json): authorized generation request and candidate result/fallback signal. Never expose to the browser.
 
+## Implementation boundary
+
+The reviewed contracts remain proposals, not live endpoints. The AMI-004 Chapter 1 pure-domain core now produces a localized internal view, including a proposed presentation cue. Session ownership, receipt transactions, transport validation, asset streaming and the same-origin facade are still required before exposing any catalog-backed route. See [narrative engine](../narrative-engine.md).
+
 ## Conventions
 
 - Same-origin facade on Next.js; internal NestJS API routes use the same shapes. Use server-generated opaque session capability; no session secret in JSON or URL. Session cookie is a proposal in ADR-004.
