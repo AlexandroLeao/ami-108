@@ -1,0 +1,686 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AMI-108 Game API",
+    "version": "0.1.0-proposed",
+    "description": "Design contract for the same-origin game facade. Only bootstrap health endpoints are currently implemented. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
+  },
+  "servers": [
+    {
+      "url": "/api/game"
+    }
+  ],
+  "security": [
+    {
+      "sessionCookie": []
+    }
+  ],
+  "paths": {
+    "/session": {
+      "post": {
+        "operationId": "createSession",
+        "summary": "Start a new run and issue a scoped session cookie",
+        "description": "Create a new run only on explicit player action; do not silently overwrite an existing run on resume. Initial projection starts at the first chapter card.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSession"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Projection"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "Opaque session capability, HttpOnly, Secure in production, SameSite; never returned in response JSON.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/view": {
+      "get": {
+        "operationId": "getView",
+        "summary": "Resume or read the current authorized view",
+        "responses": {
+          "200": {
+            "description": "Current localized view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Projection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commands": {
+      "post": {
+        "operationId": "executeCommand",
+        "summary": "Execute one currently allowed action",
+        "description": "Check duplicate command receipts before revision validation. Client sends only the current action ID. Pending generation returns 202; retry identical command or GET view. Never expose outcomes before choosing.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Command"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Applied or replayed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandResult"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Reserved, processing or replayed pending command",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Action not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, pending command or conflicting idempotency key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locale": {
+      "patch": {
+        "operationId": "changeLocale",
+        "summary": "Change the presentation language, without changing gameplay",
+        "description": "No reroll, extra debit or extra inference; use localized fallback for a missing cached translation. Identical retry is idempotent.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeLocale"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale revision, pending command or conflicting idempotency key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/asset": {
+      "get": {
+        "operationId": "getCurrentAsset",
+        "summary": "Fetch image for the current authorized view",
+        "description": "Derive image ID from the current step. Return private, no-store bytes; no public catalog or arbitrary asset parameter.",
+        "responses": {
+          "200": {
+            "description": "Authorized scene image",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store"
+                }
+              }
+            },
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "ami_session"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "requestId"
+        ]
+      },
+      "Action": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "CONTINUE",
+              "INTERACT",
+              "CONSULT",
+              "CHOOSE",
+              "RETRY",
+              "FINISH"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "label"
+        ]
+      },
+      "Diagnostics": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "energy": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "med": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "bio": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "hist": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "personal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "personalUnlocked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "energy",
+          "med",
+          "bio",
+          "hist",
+          "personal",
+          "personalUnlocked"
+        ]
+      },
+      "Asset": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "pattern": "^/api/game/asset$"
+          },
+          "alt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "alt"
+        ]
+      },
+      "Projection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "pt-BR",
+              "en"
+            ]
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "CHAPTER_CARD",
+              "NARRATIVE",
+              "FLASHBACK",
+              "ENCOUNTER",
+              "DEAD",
+              "CREDITS",
+              "COMPLETE"
+            ]
+          },
+          "chapter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "chapterTitle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sceneId": {
+            "type": "string"
+          },
+          "speaker": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "asset": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Asset"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "diagnostics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Diagnostics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            }
+          },
+          "pending": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "revision",
+          "locale",
+          "phase",
+          "chapter",
+          "chapterTitle",
+          "sceneId",
+          "speaker",
+          "text",
+          "asset",
+          "diagnostics",
+          "actions",
+          "pending"
+        ]
+      },
+      "CreateSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "pt-BR",
+              "en"
+            ]
+          }
+        },
+        "required": [
+          "locale"
+        ]
+      },
+      "Command": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "commandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "actionId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "commandId",
+          "expectedRevision",
+          "actionId"
+        ]
+      },
+      "ChangeLocale": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "commandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "pt-BR",
+              "en"
+            ]
+          }
+        },
+        "required": [
+          "commandId",
+          "expectedRevision",
+          "locale"
+        ]
+      },
+      "CommandResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "commandId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPLIED",
+              "PENDING",
+              "REPLAYED"
+            ]
+          },
+          "view": {
+            "$ref": "#/components/schemas/Projection"
+          }
+        },
+        "required": [
+          "commandId",
+          "status",
+          "view"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+# Architecture decision records
+
+Status: proposed for owner review in AMI-002. These decisions operationalize the approved stack and narrative without adding product scope.
+
+## ADR-001 — Authoritative modular NestJS API
+
+**Context:** deterministic choices, energy, memory, checkpoints, spoiler gates and persistent progress must be enforced consistently.  
+**Decision:** NestJS owns the state transition engine, catalog access, RNG, command receipts and database writes. Next.js renders only a current projection. Use a modular monolith rather than one service per feature.  
+**Alternatives:** browser-only game state exposes outcomes and allows tampering; distributing the engine across services introduces unnecessary coordination.  
+**Consequences:** more API tests and transactions, but a single authority and predictable behavior.
+
+## ADR-002 — Isolate controlled AI behind FastAPI
+
+**Context:** AI must generate AMI wording, not game rules. Python is an approved technology; provider availability is variable.  
+**Decision:** typed internal requests, allowlisted fact retrieval by encounter and category, provider adapter, strict validation, authored fallbacks. NestJS alone selects category and authorizes requests. No model training/vector database or free chat.  
+**Alternatives:** direct LLM calls from Next.js or NestJS simplify deployment but expose or conflate provider and domain concerns; fallback-only does not meet the real inference goal.  
+**Consequences:** HTTP failure/timeout handling and contracts are required. Real inference must be demonstrated, while provider outage must not prevent campaign completion.
+
+## ADR-003 — PostgreSQL and idempotent command processing
+
+**Context:** retries, duplicate requests, concurrent tabs and checkpoint rollback can cause extra debits, rerolls or inconsistent progress.  
+**Decision:** versioned state, transaction boundaries, unique receipts and slot constraints; checkpoint snapshots restore only reversible gameplay state. Reserve/finalize inference outside long transactions, deadline-bound recovery using fallback.  
+**Alternatives:** localStorage or in-memory state are not durable/authoritative; event sourcing adds unnecessary complexity.  
+**Consequences:** PostgreSQL migration and race-condition tests required; keep a simple audit history rather than full event sourcing.
+
+## ADR-004 — Anonymous scoped session and same-origin facade
+
+**Context:** the player needs resume without a signup requirement. Hidden content and session mutations must be protected.  
+**Decision (proposal):** opaque high-entropy capability, HttpOnly secure cookie, server-side digest, same-origin Next.js proxy and Origin checks, per-session authorization. Expiry and retention policy to be confirmed during AMI-006/010. No account/password system for this MVP.  
+**Alternatives:** public session IDs are not credentials; JWT/accounts add complexity without a current product requirement.  
+**Consequences:** browser-specific resume unless an explicit future transfer feature is approved; test cross-session and CSRF protection.
+
+## ADR-005 — Server-only narrative and gated assets
+
+**Context:** future identities, correct choices, private reference sheets and later illustrations can spoil the story.  
+**Decision:** store catalog, choice outcomes, approved fallback and reveal gates server-side. Return only current allowed view and actions. Serve authorized image bytes with private/no-store caching; no future art in Next public assets. Keep source documents/reference sheets outside the repo.  
+**Alternatives:** static public asset paths and complete client-side narrative are not secure against inspection.  
+**Consequences:** additional authenticated image serving; authorized players may save already-viewed images. Source visibility must be reviewed before public release; access controls cannot protect spoilers in public source history.
+
+## ADR-006 — Zero mandatory cost and reproducible local-first development
+
+**Context:** R$0 mandatory service budget, cloud/provider limits, Codespaces unavailable.  
+**Decision:** Compose and GitHub Actions first; Google Cloud Shell for manual validation. Keep optional Codespaces configuration. Use external provider/hosting/AWS only after verifying free eligibility, quotas, data policy and owner approval. Document simulation versus real deployment.  
+**Alternatives:** paid infrastructure or permanently running a Cloud Shell VM are not approved.  
+**Consequences:** public demo availability depends on verified free resources; keep reproducible local execution, no scope reduction to meet a date.
