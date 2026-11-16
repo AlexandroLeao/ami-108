@@ -280,3 +280,89 @@ button:focus-visible, a:focus-visible {
   .chapter-layer, .advance-control { transition: none; }
   .eyelids, .wake-optics { display: none; }
 }
+
+/* Campaign-only additions. The owner-approved preview layout stays unchanged. */
+.campaign-header { display: grid; gap: 4px; }
+/* The existing 44px header row holds title, diagnostics and menu. The middle
+   is width-constrained independently of the art and never adds a second row. */
+.campaign-header .stage-header {
+  display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center; gap: 6px;
+}
+.campaign-header-middle {
+  min-width: 0; width: 100%; height: 44px; display: grid;
+  align-items: center; justify-items: center; container-type: inline-size;
+}
+.campaign-diagnostics { width: 100%; max-width: 440px; min-width: 0; }
+.campaign-diagnostics-content {
+  display: grid; grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center; gap: 8px; font-size: 16px; line-height: 1;
+}
+.campaign-energy, .campaign-bars { display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
+.campaign-bars > span { width: 12px; height: 8px; border: 1px solid var(--ivory); }
+.campaign-bars > span[data-filled="true"] { background: var(--ivory); }
+.campaign-memory {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px 7px; align-items: center; justify-items: center; white-space: nowrap;
+}
+.campaign-personal { display: inline-flex; align-items: center; gap: 2px; }
+.campaign-lock-icon { width: .58em; height: .7em; flex: none; }
+@container (max-width: 325px) {
+  .campaign-diagnostics-content { grid-template-columns: minmax(0, 1fr); gap: 2px; font-size: 13px; }
+  .campaign-memory { gap: 1px 4px; }
+  .campaign-bars > span { width: 9px; height: 7px; }
+}
+@container (max-width: 150px) {
+  .campaign-diagnostics-content { font-size: 11px; }
+  .campaign-memory { gap: 1px 2px; }
+  .campaign-bars > span { width: 8px; height: 6px; }
+}
+/* Very narrow or zoomed viewports may scroll within the status strip rather
+   than overlap the menu or change the scene height. */
+@container (max-width: 112px) {
+  .campaign-diagnostics { overflow-x: auto; }
+  .campaign-diagnostics-content { min-width: 112px; }
+}
+.campaign-dialogue .dialogue-copy { overflow: hidden; max-height: 100%; }
+.campaign-measure { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; animation: none !important; }
+.campaign-notice {
+  position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%);
+  width: min(90%, 520px); padding: 8px 12px; margin: 0; background: var(--coal);
+  border: 2px solid var(--alert); text-align: center; font-size: 21px;
+  display: flex; gap: 8px; align-items: center; justify-content: space-between;
+}
+.campaign-notice p { margin: 0; }
+.campaign-notice .small-control { flex: 0 0 auto; }
+
+/* Campaign-specific narration and exit fade; isolated preview unchanged. */
+.campaign-narration { color: var(--alert); letter-spacing: .04em; }
+.campaign-scene[data-cue="fade-black"] .scene-visual {
+  visibility: visible;
+  animation: campaign-fade-black 450ms ease-in-out both;
+}
+@keyframes campaign-fade-black {
+  from { opacity: 1; }
+  to { opacity: 0; visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campaign-scene[data-cue="fade-black"] .scene-visual { animation: none; visibility: hidden; }
+}
+
+/* Robot speech reverses only the approved coal/ivory colors. */
+.campaign-dialogue[data-robot="true"] {
+  background: var(--ivory); color: var(--coal); border-color: var(--coal);
+  box-shadow: inset 0 0 0 3px var(--ivory), inset 0 0 0 4px var(--coal);
+}
+.campaign-dialogue[data-robot="true"] .advance-control {
+  background: var(--ivory); color: var(--coal);
+}
+.campaign-dialogue[data-robot="true"] .advance-control:hover:not(:disabled) { background: var(--coal); color: var(--ivory); }
+.campaign-dialogue[data-robot="true"] .advance-control:focus-visible { outline-color: var(--coal); }
+.campaign-scene[data-cue="close-eyes"] .scene-visual { visibility: visible; }
+.campaign-close-eyes span:first-child { animation: campaign-close-upper 650ms ease-in-out both; }
+.campaign-close-eyes span:last-child { animation: campaign-close-lower 650ms ease-in-out both; }
+@keyframes campaign-close-upper { from { transform: translateY(-105%); } to { transform: translateY(0); } }
+@keyframes campaign-close-lower { from { transform: translateY(105%); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .campaign-scene[data-cue="close-eyes"] .scene-visual { visibility: hidden; }
+}

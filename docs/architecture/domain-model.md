@@ -1,6 +1,6 @@
 # Domain model and state transitions
 
-**Proposed schema for AMI-004/005/006, not a migration.** The only implemented Prisma model today is the initial GameSession identity. The Chapter 1 pure transition core is separate from durable persistence; its state is not a database schema. The design preserves the canonical script (Master v1.10 / Script v1.8).
+**Target schema for AMI-004/005/006.** PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. The ER diagram remains the target for later encounter/checkpoint/slot models, not a claim that every table exists. The design preserves the canonical script (Master v1.10 / Script v1.8).
 
 ## ER diagram
 
@@ -80,6 +80,10 @@ erDiagram
     string outcome
   }
 ```
+
+### Chapter 1 implemented subset
+
+The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. Later encounter data will use dedicated transactional snapshot and slot tables.
 
 ### Data invariants
 

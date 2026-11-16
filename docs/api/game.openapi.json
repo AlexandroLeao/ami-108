@@ -3,7 +3,7 @@
   "info": {
     "title": "AMI-108 Game API",
     "version": "0.1.0-proposed",
-    "description": "Design contract for the same-origin game facade. Bootstrap health and an isolated development-only opening asset endpoint exist. AMI-004 starts with a server-only pure narrative core; campaign routes are not live. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
+    "description": "Local Chapter 1 subset implemented in PR #20; remaining campaign/action kinds, pending inference, production rate limits and deployment are design proposals. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
   },
   "servers": [
     {
@@ -314,7 +314,7 @@
       "get": {
         "operationId": "getCurrentAsset",
         "summary": "Fetch image for the current authorized view",
-        "description": "Derive image ID from the current step. Return private, no-store bytes; no public catalog or arbitrary asset parameter.",
+        "description": "Derive image ID from the current visible step and require an exact matching cache discriminator; reject absent, stale or future keys. Return private, no-store bytes; no public catalog.",
         "responses": {
           "200": {
             "description": "Authorized scene image",
@@ -375,7 +375,19 @@
               }
             }
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^CENA-[0-9]{2}$"
+            },
+            "description": "Current-image cache discriminator; must equal the asset authorized by session state. Does not select arbitrary art."
+          }
+        ]
       }
     }
   },
@@ -487,7 +499,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "pattern": "^/api/game/asset$"
+            "pattern": "^/api/game/asset\\?key=CENA-[0-9]{2}$"
           },
           "alt": {
             "type": "string"
@@ -575,6 +587,14 @@
           "pending": {
             "type": "boolean"
           },
+          "narration": {
+            "type": "boolean",
+            "description": "Narrative description rather than dialogue or tutorial."
+          },
+          "information": {
+            "type": "boolean",
+            "description": "True for the tutorial information card, distinct from narration and dialogue."
+          },
           "cue": {
             "type": "string",
             "enum": [
@@ -582,9 +602,11 @@
               "pain",
               "ellipsis",
               "wake",
-              "memory-cut"
+              "memory-cut",
+              "fade-black",
+              "close-eyes"
             ],
-            "description": "Proposed presentation cue for the current authored beat only; no game-state effect."
+            "description": "Presentation cue for current authored beat only; no game-state effect."
           }
         },
         "required": [
@@ -600,7 +622,9 @@
           "diagnostics",
           "actions",
           "pending",
-          "cue"
+          "cue",
+          "narration",
+          "information"
         ]
       },
       "CreateSession": {

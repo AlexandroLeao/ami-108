@@ -21,12 +21,12 @@ Status: design merged in AMI-002 (PR #17). These decisions operationalize the ap
 **Context:** retries, duplicate requests, concurrent tabs and checkpoint rollback can cause extra debits, rerolls or inconsistent progress.  
 **Decision:** versioned state, transaction boundaries, unique receipts and slot constraints; checkpoint snapshots restore only reversible gameplay state. Reserve/finalize inference outside long transactions, deadline-bound recovery using fallback.  
 **Alternatives:** localStorage or in-memory state are not durable/authoritative; event sourcing adds unnecessary complexity.  
-**Consequences:** PostgreSQL migration and race-condition tests required; keep a simple audit history rather than full event sourcing.
+**Consequences:** Chapter 1 uses an additive session/receipt migration, JSON progress and row locks with real PostgreSQL integration tests. Later snapshots, consultation slots and race-condition tests are required; keep a simple audit history rather than full event sourcing.
 
 ## ADR-004 — Anonymous scoped session and same-origin facade
 
 **Context:** the player needs resume without a signup requirement. Hidden content and session mutations must be protected.  
-**Decision (proposal):** opaque high-entropy capability, HttpOnly secure cookie, server-side digest, same-origin Next.js proxy and Origin checks, per-session authorization. Expiry and retention policy to be confirmed during AMI-006/010. No account/password system for this MVP.  
+**Decision:** opaque high-entropy capability, HttpOnly secure cookie, server-side digest, same-origin Next.js proxy and Origin checks, per-session authorization. PR #20 implements this for local Chapter 1 with 32 random bytes, SHA-256 digest, 30-day absolute expiry, SameSite=Lax and Secure on HTTPS. Final expiry/cleanup, rate limits and production origin policy remain AMI-010. No account/password system for this MVP.  
 **Alternatives:** public session IDs are not credentials; JWT/accounts add complexity without a current product requirement.  
 **Consequences:** browser-specific resume unless an explicit future transfer feature is approved; test cross-session and CSRF protection.
 

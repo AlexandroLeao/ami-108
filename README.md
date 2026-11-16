@@ -2,7 +2,7 @@
 
 A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories.
 
-**Status:** technical foundation, architecture and approved visual/asset foundation complete (AMI-001–003). Chapter 1 server-only narrative core is in development (AMI-004). The local opening preview is not yet a playable campaign; no completed deployment or real inference.
+**Status:** technical foundation, architecture and approved visual/asset foundation complete (AMI-001–003). Chapter 1 narrative core merged in PR #19; PR #20 integrates persistent Chapter 1 sessions, API and the approved interface (AMI-004/006), pending owner playtest. No full campaign, completed deployment or real inference.
 
 ## Product
 
@@ -31,7 +31,7 @@ The canonical narrative sources are Documento Mestre v1.10 and Roteiro Interativ
 - [Scene asset preparation and local preview](docs/assets.md)
 - [Narrative engine implementation status](docs/narrative-engine.md)
 
-The owner approved the opening preview on desktop and mobile; PR #18 merged after CI passed. The server-only narrative core does not expose a live campaign API yet.
+The owner approved the opening preview on desktop and mobile; PR #18 merged after CI passed. The local root now uses the Chapter 1 campaign API; the isolated visual fixture remains at `/preview`. Continue game is enabled only when a saved session is confirmed. Owner visual acceptance of this integration is pending.
 
 ## Architecture specification
 
