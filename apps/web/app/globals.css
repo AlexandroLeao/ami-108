@@ -280,3 +280,30 @@ button:focus-visible, a:focus-visible {
   .chapter-layer, .advance-control { transition: none; }
   .eyelids, .wake-optics { display: none; }
 }
+
+/* Campaign-only additions. The owner-approved preview layout stays unchanged. */
+.campaign-header { display: grid; gap: 4px; }
+.campaign-diagnostics {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  font-size: clamp(15px, 2.2vw, 20px); line-height: 1;
+}
+.campaign-energy, .campaign-bars { display: flex; align-items: center; gap: 4px; }
+.campaign-bars > span { width: 14px; height: 9px; border: 1px solid var(--ivory); }
+.campaign-bars > span[data-filled="true"] { background: var(--ivory); }
+.campaign-dialogue .dialogue-copy { overflow: hidden; max-height: 100%; }
+.campaign-measure { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; animation: none !important; }
+.campaign-page-count, .campaign-interaction {
+  position: absolute; right: 10px; width: 86px; text-align: center;
+  font-size: 16px; line-height: 1; overflow-wrap: break-word;
+}
+.campaign-page-count { top: 10px; }
+.campaign-interaction { bottom: 53px; font-size: 15px; }
+.campaign-notice {
+  position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%);
+  width: min(90%, 520px); padding: 8px 12px; margin: 0; background: var(--coal);
+  border: 2px solid var(--alert); text-align: center; font-size: 21px;
+}
+@media (max-height: 460px) and (orientation: landscape) {
+  .campaign-diagnostics { font-size: 14px; gap: 3px 8px; }
+  .campaign-interaction { font-size: 13px; bottom: 48px; }
+}
