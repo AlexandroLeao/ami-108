@@ -19,7 +19,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-02': local('Rua residencial em ruínas.', 'Ruined residential street.'),
   'CENA-03': local('Robô danificado junto à janela da residência abandonada.', 'Damaged robot by the window of the abandoned residence.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
@@ -31,14 +31,14 @@ export type Step = Readonly<{
   asset: OpeningAsset | null;
   cue: Cue;
   event?: EventId;
-  // Narration is a faithful adaptation of stage directions, pending owner wording review.
+  // Narration is distinct from dialogue; owner-requested presentation preserves story events.
   narration?: true;
   action: 'CONTINUE' | 'INTERACT';
 }>;
 
 const unknown = local('???', '???');
 const robot = local('Robô', 'Robot');
-const ami = local('AMI', 'AMI');
+const ami = local('AMI-108', 'AMI-108');
 const dialogue = (sceneId: ChapterOneScene, line: string, speaker: Localized, pt: string, en: string, asset: OpeningAsset | null, cue: Cue = 'none', event?: EventId): Step => ({
   id: `${sceneId}/${line}`, sceneId, phase: 'NARRATIVE', speaker,
   text: local(pt, en), asset, cue, event, action: 'CONTINUE',
@@ -60,27 +60,43 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s1, 'L02', unknown, 'Onde eu estou?', 'Where am I?', 'CENA-01', 'wake'),
   dialogue(s1, 'L03', unknown, 'Sangue...?', 'Blood...?', 'CENA-01'),
   dialogue(s1, 'L04', unknown, 'Que diabos aconteceu aqui?', 'What the hell happened here?', 'CENA-01'),
-  narration(s2, 'ENV-02', 'Uma melodia distante vem da residência.', 'A distant melody comes from the residence.', 'CENA-02'),
-  dialogue(s2, 'L01', unknown, 'Tem alguém aí?', 'Is anyone there?', 'CENA-02'),
-  { ...dialogue(s2, 'L02', unknown, 'Ótimo. Ou estou ficando maluco ou finalmente encontrei alguém.', "Great. Either I'm losing it or I've finally found someone.", 'CENA-02'), action: 'INTERACT' },
+  narration(s1, 'EXIT-01', 'Você se levanta e sai do depósito...', 'You get up and leave the warehouse...', null, { cue: 'fade-black' }),
+  narration(s1, 'EXIT-02', 'Ainda meio tonto, você caminha até a rua.', 'Still feeling dizzy, you make your way to the street.', null),
+  dialogue(s2, 'STREET-REVEAL', unknown, 'Que merda aconteceu aqui?', 'What the fuck happened here?', 'CENA-02', 'wake'),
+  narration(s2, 'ENV-02', 'Você escuta uma melodia que vem de uma residência próxima.', 'You hear a melody coming from a nearby house.', 'CENA-02'),
+  narration(s2, 'ENV-02b', 'Não parece vir de uma voz humana.', "It doesn't seem to come from a human voice.", 'CENA-02'),
+  narration(s2, 'ENV-02c', 'É uma melodia calma, estranhamente nostálgica e reconfortante.', 'It is a gentle melody, strangely nostalgic and comforting.', 'CENA-02'),
+  narration(s2, 'ENV-02d', 'Você decide investigar e segue na direção do som.', 'You decide to investigate and follow the sound.', 'CENA-02'),
+  dialogue(s2, 'L01', unknown, 'Tem alguém aí?', 'Is anyone there?', null, 'fade-black'),
+  dialogue(s2, 'L02', unknown, 'Ótimo. Ou estou ficando maluco ou finalmente encontrei alguém.', "Great. Either I'm losing it or I've finally found someone.", null),
+  narration(s3, 'ENTER-01', 'Você adentra a residência, seguindo a melodia.', 'You step inside the house, following the melody.', null),
+  narration(s3, 'ENTER-02', 'Ao perceber que o som vem de baixo, você baixa o olhar.', 'Realizing the sound is coming from below, you look down.', null),
+  dialogue(s3, 'REVEAL', unknown, '...', '...', 'CENA-03', 'wake'),
   dialogue(s3, 'L01', robot, 'Ah. Olá, bobo. Vejo que acordou.', "Ah. Hello, Bobo. I see you're awake.", 'CENA-03'),
-  dialogue(s3, 'L02', unknown, 'Quem você está chamando de bobo? Meu nome não é bobo. Meu nome é...', "Bobo? That's not my name. My name is...", 'CENA-03'),
-  dialogue(s3, 'L03', unknown, '... Aliás, qual é o meu nome mesmo?', '... Wait. What is my name?', 'CENA-03'),
+  dialogue(s3, 'L02', unknown, 'Quem você tá chamando de bobo?!', 'Who are you calling Bobo?!', 'CENA-03'),
+  dialogue(s3, 'L02b', unknown, 'Meu nome é...', 'My name is...', 'CENA-03'),
+  dialogue(s3, 'L03', unknown, '...Aliás, qual é o meu nome mesmo?', '... Wait. What is my name?', 'CENA-03'),
   dialogue(s3, 'L04', robot, 'Não localizado.', 'Not found.', 'CENA-03'),
   dialogue(s3, 'L05', unknown, 'Ótimo.', 'Great.', 'CENA-03'),
   dialogue(s3, 'L06', unknown, 'AMI-108? Esse é o seu nome?', 'AMI-108? Is that your name?', 'CENA-03'),
   dialogue(s3, 'L07', ami, 'A informação parece consistente.', 'The information appears consistent.', 'CENA-03'),
   dialogue(s3, 'L08', unknown, 'Certo. Vou chamar você de AMI.', "All right. I'll call you AMI.", 'CENA-03'),
-  dialogue(s3, 'L09', unknown, 'Preciso descobrir onde estou. E, de preferência, quem diabos eu sou.', 'I need to find out where I am. And preferably who the hell I am.', 'CENA-03'),
+  dialogue(s3, 'L09', unknown, "Preciso descobrir onde estou.", "I need to find out where I am.", 'CENA-03'),
+  dialogue(s3, 'L09b', unknown, "E, de preferência, quem diabos eu sou.", "And preferably who the hell I am.", 'CENA-03'),
   dialogue(s3, 'L10', ami, 'Posso acompanhá-lo. Acredito que seria útil.', 'I can accompany you. I believe I would be useful.', 'CENA-03'),
-  dialogue(s3, 'L11', unknown, 'Não quero ser indelicado, mas... como exatamente um robô sem braços e pernas pretende me ajudar?', "I don't mean to be rude, but... how exactly is a robot with no arms or legs going to help me?", 'CENA-03'),
-  dialogue(s3, 'L12', ami, 'Possuo registros sobre este planeta. Identificação de ameaças, localização de instalações, protocolos de sobrevivência e...', 'I have records of this planet. Threat identification, facility locations, survival protocols and...', 'CENA-03'),
+  dialogue(s3, 'L11', unknown, "Não quero ser indelicado, mas...", "I don't mean to be rude, but...", 'CENA-03'),
+  dialogue(s3, 'L11b', unknown, "como exatamente um robô sem braços e pernas pretende me ajudar?", "how exactly is a robot with no arms or legs going to help me?", 'CENA-03'),
+  dialogue(s3, 'L12', ami, "Possuo registros sobre este planeta.", "I have records of this planet.", 'CENA-03'),
+  dialogue(s3, 'L12b', ami, "Identificação de ameaças, localização de instalações,", "Threat identification, facility locations,", 'CENA-03'),
+  dialogue(s3, 'L12c', ami, "protocolos de sobrevivência e...", "survival protocols and...", 'CENA-03'),
   dialogue(s3, 'L13', ami, '... bananas.', '... bananas.', 'CENA-03'),
   dialogue(s3, 'L14', unknown, 'Bananas?', 'Bananas?', 'CENA-03'),
   dialogue(s3, 'L15', ami, 'Desculpe. Meu sistema de memória apresenta algumas inconsistências.', 'Apologies. My memory system is experiencing some inconsistencies.', 'CENA-03'),
   dialogue(s3, 'L16', unknown, 'Algumas?', 'Some?', 'CENA-03'),
   dialogue(s3, 'L17', ami, 'Muitas.', 'Many.', 'CENA-03'),
-  dialogue(s3, 'L18', ami, 'Meus arquivos ainda existem. Acredito que, com os componentes adequados, seja possível recuperá-los. Se me ajudar, talvez eu consiga encontrar as respostas que procura.', 'My files still exist. With the appropriate components, I believe they can be recovered. If you help me, I may be able to find the answers you seek.', 'CENA-03'),
+  dialogue(s3, 'L18', ami, "Meus arquivos ainda existem.", "My files still exist.", 'CENA-03'),
+  dialogue(s3, 'L18b', ami, "Acredito que, com os componentes adequados, seja possível recuperá-los.", "With the appropriate components, I believe they can be recovered.", 'CENA-03'),
+  dialogue(s3, 'L18c', ami, "Se me ajudar, talvez eu consiga encontrar as respostas que procura.", "If you help me, I may be able to find the answers you seek.", 'CENA-03'),
   dialogue(s3, 'L19', unknown, 'E como você tem tanta certeza disso?', 'And how are you so sure?', 'CENA-03'),
   dialogue(s3, 'L20', ami, 'Bananas.', 'Bananas.', 'CENA-03'),
   dialogue(s3, 'L21', ami, '... Isso foi um erro.', '... That was an error.', 'CENA-03'),
@@ -93,7 +109,8 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L28', unknown, 'Você se lembra disso?', 'You remember that?', 'CENA-02'),
   dialogue(s3, 'L29', ami, 'Parcialmente. Os registros da região ainda estão disponíveis.', 'Partially. The local records are still available.', 'CENA-02'),
   dialogue(s3, 'L30', unknown, 'E o que tem nesse terminal?', "And what's at that terminal?", 'CENA-02'),
-  dialogue(s3, 'L31', ami, 'Componentes compatíveis com meu sistema de armazenamento. Se ainda estiverem intactos, poderemos recuperar parte dos meus arquivos.', 'Components compatible with my storage system. If they are intact, we may be able to recover some of my files.', 'CENA-02'),
+  dialogue(s3, 'L31', ami, "Componentes compatíveis com meu sistema de armazenamento.", "Components compatible with my storage system.", 'CENA-02'),
+  dialogue(s3, 'L31b', ami, "Se ainda estiverem intactos, poderemos recuperar parte dos meus arquivos.", "If they are intact, we may be able to recover some of my files.", 'CENA-02'),
   dialogue(s3, 'L32', unknown, 'E se não estiverem?', "And if they're not?", 'CENA-02'),
   dialogue(s3, 'L33', ami, INTRO_FALLBACK['pt-BR'], INTRO_FALLBACK.en, 'CENA-02', 'none', 'INTRO-RANDOM'),
   dialogue(s3, 'L34', unknown, 'Maravilha.', 'Wonderful.', 'CENA-02'),

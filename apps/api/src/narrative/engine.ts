@@ -6,8 +6,6 @@ const HANDOFF = 'A02-S01/CHAPTER_CARD';
 const INITIAL_DIAGNOSTICS = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false } as const;
 const actionLabel = local('Continuar', 'Continue');
 const actionsByStep: Readonly<Record<string, Localized>> = {
-  'A01-S01/L04': local('Sair do depósito', 'Leave the warehouse'),
-  'A01-S02/L02': local('Seguir a música', 'Follow the music'),
   'A01-S03/L38': local('Seguir para o terminal', 'Head to the terminal'),
 };
 
@@ -29,6 +27,7 @@ export type CurrentView = Readonly<{
   diagnostics: NarrativeState['diagnostics']; actions: readonly NarrativeAction[]; pending: false;
   // UI-only cues are proposed additions to the game contract.
   cue: Cue;
+  narration: boolean;
 }>;
 
 export class NarrativeError extends Error {
@@ -59,14 +58,16 @@ function checkRevision(state: NarrativeState, expectedRevision: number): void {
 }
 
 // The review cursor is distinct from authoritative progress. It can only move
-// within a contiguous authored dialogue group that has already been reached.
+// within reached pre-join presentation or contiguous post-join dialogue.
 function canReviewPrevious(index: number): boolean {
   const step = CHAPTER_ONE[index];
   const previous = CHAPTER_ONE[index - 1];
-  return !!step && !!previous && step.sceneId === previous.sceneId
-    && step.phase === 'NARRATIVE' && previous.phase === 'NARRATIVE'
-    && step.speaker !== null && previous.speaker !== null
-    && !step.event && !previous.event && previous.action !== 'INTERACT';
+  if (!step || !previous || step.phase !== 'NARRATIVE' || previous.phase !== 'NARRATIVE'
+    || step.event || previous.event || previous.action === 'INTERACT') return false;
+  // Review reached pre-join narration, artwork and dialogue, never the join event.
+  const joinIndex = CHAPTER_ONE.findIndex((item) => item.event === 'E-JOIN');
+  return index < joinIndex
+    || (step.sceneId === previous.sceneId && step.speaker !== null && previous.speaker !== null);
 }
 
 function visibleIndex(state: NarrativeState): number {
@@ -108,7 +109,7 @@ export function projectNarrative(state: NarrativeState): CurrentView {
     return { revision: state.revision, locale, phase: 'CHAPTER_CARD', chapter: 2,
       chapterTitle: CHAPTERS[1].title[locale], sceneId: 'A02-S01',
       speaker: null, text: locale === 'pt-BR' ? 'CAPÍTULO 2 — REGISTRO ATUALIZADO' : 'CHAPTER 2 — RECORD UPDATED',
-      asset: null, diagnostics: state.diagnostics, actions: [], pending: false, cue: 'none' };
+      asset: null, diagnostics: state.diagnostics, actions: [], pending: false, cue: 'none', narration: false };
   }
   return {
     revision: state.revision, locale, phase: step.phase, chapter: 1, chapterTitle: CHAPTERS[0].title[locale],
@@ -117,7 +118,7 @@ export function projectNarrative(state: NarrativeState): CurrentView {
     asset: step.asset ? { url: `/api/game/asset?key=${step.asset}`, alt: OPENING_ASSETS[step.asset][locale] } : null,
     diagnostics: state.diagnostics,
     actions: currentActions(state, index),
-    pending: false, cue: step.cue,
+    pending: false, cue: step.cue, narration: step.narration === true,
   };
 }
 

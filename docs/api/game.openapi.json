@@ -587,6 +587,10 @@
           "pending": {
             "type": "boolean"
           },
+          "narration": {
+            "type": "boolean",
+            "description": "Narrative description rather than dialogue or tutorial."
+          },
           "cue": {
             "type": "string",
             "enum": [
@@ -594,7 +598,8 @@
               "pain",
               "ellipsis",
               "wake",
-              "memory-cut"
+              "memory-cut",
+              "fade-black"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
           }
@@ -612,7 +617,8 @@
           "diagnostics",
           "actions",
           "pending",
-          "cue"
+          "cue",
+          "narration"
         ]
       },
       "CreateSession": {

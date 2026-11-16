@@ -63,6 +63,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const pageIndex = pageReady ? pagination.index : 0;
   const pageCount = pageReady ? pagination.pages.length : 1;
   const pageText = pageReady ? pagination.pages[pageIndex] : displayText;
+  const narrationLabel = view?.narration ? (locale === 'pt-BR' ? 'NARRAÇÃO' : 'NARRATION') : null;
   const nextAction = view?.actions.find((action) => action.kind !== 'PREVIOUS');
   const previousAction = view?.actions.find((action) => action.kind === 'PREVIOUS');
 
@@ -108,7 +109,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     schedule();
     void document.fonts.ready.then(() => { if (active) schedule(); });
     return () => { active = false; observer.disconnect(); cancelAnimationFrame(raf); };
-  }, [pageKey, displayText, view?.speaker, showChapter]);
+  }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter]);
 
   const accept = useCallback((next: CampaignView) => {
     setView(next);
@@ -264,13 +265,12 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
                 {!showChapter && (
                   <>
-                    {view.speaker && <p className="dialogue-speaker">{view.speaker}</p>}
+                    {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>{view.speaker ?? narrationLabel}</p>}
                     <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '')}>{pageText}</p>
                   </>
                 )}
               </div>
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
-              {pageCount > 1 && <span className="campaign-page-count">{pageIndex + 1}/{pageCount}</span>}
               {interaction && <span className="campaign-interaction">{nextAction.label}</span>}
               <div className="dialogue-navigation">
                 <button className="advance-control previous-control" type="button" disabled={busy || chapter || !pageReady || (!previousAction && pageIndex === 0)}

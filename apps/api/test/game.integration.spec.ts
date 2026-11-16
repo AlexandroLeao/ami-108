@@ -5,6 +5,7 @@ import request from 'supertest';
 import { PrismaService } from '../src/prisma.service';
 import { GameController } from '../src/game/game.controller';
 import { SessionService, digest } from '../src/game/session.service';
+import { CHAPTER_ONE } from '../src/narrative/catalog';
 import type { CurrentView } from '../src/narrative/engine';
 
 const databaseUrl = process.env.AMI_TEST_DATABASE_URL;
@@ -114,13 +115,13 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
   it('plays all Chapter 1 steps and persists one free introduction, memory and join', async () => {
     const session = await create();
     let view = session.view;
-    for (let i = 0; i < 50; i++) view = await command(session.cookie, view);
+    for (let i = 0; i < CHAPTER_ONE.length; i++) view = await command(session.cookie, view);
     expect(view.chapter).toBe(2);
     expect(view.actions).toEqual([]);
     expect(view.diagnostics).toEqual({ energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false });
     const row = await prisma.gameSession.findUniqueOrThrow({ where: { tokenDigest: digest(session.cookie.split('=')[1]) } });
     expect(row.state).toMatchObject({ events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: { category: 'RANDOM', source: 'fallback' } });
-    expect(await prisma.gameCommandReceipt.count({ where: { sessionId: row.id } })).toBe(50);
+    expect(await prisma.gameCommandReceipt.count({ where: { sessionId: row.id } })).toBe(CHAPTER_ONE.length);
     await request(app.getHttpServer()).get('/game/view').set('Cookie', session.cookie).expect(200, view);
   });
 

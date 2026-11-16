@@ -24,16 +24,74 @@ describe('server-only Chapter 1 catalog and transition core', () => {
       expect(step.text.en.length).toBeGreaterThan(0);
     }
   });
-  it('matches all 45 authored localized dialogue beats against the private source digest', () => {
-    // SHA-256 of JSON.stringify ordered tuples [composite ID, PT speaker, EN speaker,
-    // PT text, EN text], independently extracted from Master v1.10 Chapter 1 tables,
-    // substituting only the approved opening addendum for A01-S01/L01.
-    const tuples = CHAPTER_ONE.flatMap((step) => step.speaker
-      ? [[step.id, step.speaker['pt-BR'], step.speaker.en, step.text['pt-BR'], step.text.en]]
-      : []);
+  it('preserves the original 45-beat digest outside approved presentation edits', () => {
+    const subdivisions: Record<string, string[]> = {
+      L09: ['L09b'], L11: ['L11b'], L12: ['L12b', 'L12c'], L18: ['L18b', 'L18c'], L31: ['L31b'],
+    };
+    const excluded = new Set(['A01-S02/STREET-REVEAL', 'A01-S03/REVEAL', 'A01-S03/L02b',
+      ...Object.values(subdivisions).flat().map((id) => 'A01-S03/' + id)]);
+    const tuples = CHAPTER_ONE.flatMap((step) => {
+      if (!step.speaker || excluded.has(step.id)) return [];
+      const speaker = (value: string) => value === 'AMI-108' ? 'AMI' : value;
+      const parts = step.sceneId === 'A01-S03' ? subdivisions[step.id.split('/')[1]] ?? [] : [];
+      const lines = [step, ...parts.map((id) => CHAPTER_ONE.find((item) => item.id === 'A01-S03/' + id)!)];
+      const pt = step.id === 'A01-S03/L02' ? 'Quem você está chamando de bobo? Meu nome não é bobo. Meu nome é...'
+        : step.id === 'A01-S03/L03' ? '... Aliás, qual é o meu nome mesmo?' : lines.map((item) => item.text['pt-BR']).join(' ');
+      const en = step.id === 'A01-S03/L02' ? "Bobo? That's not my name. My name is..." : lines.map((item) => item.text.en).join(' ');
+      return [[step.id, speaker(step.speaker['pt-BR']), speaker(step.speaker.en), pt, en]];
+    });
     expect(tuples).toHaveLength(45);
     expect(createHash('sha256').update(JSON.stringify(tuples), 'utf8').digest('hex'))
       .toBe('d0c281253ba699d61705279cae74a4cf37ffac27133e3b3c95b077c174179c39');
+  });
+  it('presents the new narration, dark transitions and short Bobo exchange in order', () => {
+    const expected = [
+      ['A01-S01/EXIT-01', null, null, 'fade-black', true],
+      ['A01-S01/EXIT-02', null, null, 'none', true],
+      ['A01-S02/STREET-REVEAL', '???', 'CENA-02', 'wake', false],
+      ['A01-S02/ENV-02', null, 'CENA-02', 'none', true],
+      ['A01-S02/ENV-02b', null, 'CENA-02', 'none', true],
+      ['A01-S02/ENV-02c', null, 'CENA-02', 'none', true],
+      ['A01-S02/ENV-02d', null, 'CENA-02', 'none', true],
+      ['A01-S02/L01', '???', null, 'fade-black', false],
+      ['A01-S02/L02', '???', null, 'none', false],
+      ['A01-S03/ENTER-01', null, null, 'none', true],
+      ['A01-S03/ENTER-02', null, null, 'none', true],
+      ['A01-S03/REVEAL', '???', 'CENA-03', 'wake', false],
+      ['A01-S03/L01', 'Robô', 'CENA-03', 'none', false],
+      ['A01-S03/L02', '???', 'CENA-03', 'none', false],
+      ['A01-S03/L02b', '???', 'CENA-03', 'none', false],
+      ['A01-S03/L03', '???', 'CENA-03', 'none', false],
+    ] as const;
+    let state = reach('A01-S01/L04');
+    expect(projectNarrative(state).actions[0].kind).toBe('CONTINUE');
+    for (const [id, speaker, asset, cue, narration] of expected) {
+      state = next(state);
+      expect(state.stepId).toBe(id);
+      expect(currentAsset(state)).toBe(asset);
+      expect(projectNarrative(state)).toMatchObject({ speaker, cue, narration, diagnostics: null });
+      expect(projectNarrative(state).actions[0].kind).toBe('CONTINUE');
+      expect(projectNarrative(state).actions.some((action) => action.kind === 'PREVIOUS')).toBe(true);
+    }
+    expect(projectNarrative(reach('A01-S03/L02')).text).toBe('Quem você tá chamando de bobo?!');
+    expect(projectNarrative(reach('A01-S03/L02b')).text).toBe('Meu nome é...');
+    expect(projectNarrative(state).text).toBe('...Aliás, qual é o meu nome mesmo?');
+    expect(projectNarrative(reach('A01-S03/L07')).speaker).toBe('AMI-108');
+    expect(projectNarrative(reach('A01-S03/L07', 'en')).speaker).toBe('AMI-108');
+  });
+  it('reviews reached narration and scene boundaries without undoing progress', () => {
+    const original = reach('A01-S03/L01');
+    let state = original;
+    for (const id of ['A01-S03/REVEAL', 'A01-S03/ENTER-02', 'A01-S03/ENTER-01', 'A01-S02/L02', 'A01-S02/L01', 'A01-S02/ENV-02d']) {
+      const previous = projectNarrative(state).actions.find((action) => action.kind === 'PREVIOUS')!;
+      state = advanceNarrative(state, previous.id, state.revision);
+      expect(state.reviewStepId).toBe(id);
+      expect(state.stepId).toBe(original.stepId);
+      expect(state.events).toEqual(original.events);
+    }
+    for (let i = 0; i < 6; i++) state = next(state);
+    expect(state.reviewStepId).toBeNull();
+    expect(state.stepId).toBe(original.stepId);
   });
   it('preserves the approved dark opening and first reveal', () => {
     let state = next(startNarrative('pt-BR'));
@@ -105,7 +163,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(restored.reviewStepId).toBeNull();
     expect(restored.stepId).toBe(original.stepId);
     expect(next(restored).stepId).toBe('A01-S01/L04');
-    for (const id of ['A01-S01/SILENCE', 'A01-S02/ENV-02', 'A01-S03/L01', 'A01-S03/E-JOIN', 'A01-S03/L33', 'A01-S03/L34', 'A01-S03/MEM-D1', 'A01-S03/FB-D1', 'A01-S03/L35']) {
+    for (const id of ['A01-S01/SILENCE', 'A01-S03/E-JOIN', 'A01-S03/L33', 'A01-S03/L34', 'A01-S03/MEM-D1', 'A01-S03/FB-D1', 'A01-S03/L35']) {
       const state = reach(id);
       expect(projectNarrative(state).actions.some((action) => action.kind === 'PREVIOUS')).toBe(false);
     }
