@@ -1,0 +1,105 @@
+{
+  "palette": [
+    "#171717",
+    "#FDF3E9",
+    "#FC2721"
+  ],
+  "scenes": [
+    {
+      "id": "CENA-01",
+      "file": "CENA-01.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "5c7bc4307537551944139e70eb6d5a5d9bf0bab0d6710516a2873fe33b85c81b",
+      "sha256": "4c95b15395dd8605dde04db2ddaa2c4e66e5512112f49327b7868475ae5a58b4"
+    },
+    {
+      "id": "CENA-02",
+      "file": "CENA-02.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "429427c601dcde92198b377209e361b42b5d5e3558641be463dbcc840c05e466",
+      "sha256": "061464175140d9485048a1455b368490f5b58e0e884661cc807850acdb19c54b"
+    },
+    {
+      "id": "CENA-03",
+      "file": "CENA-03.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "a43bc1641f8b2d3e8ccb1e3fcfcdc0efb360105f906497ae16c954235cb19268",
+      "sha256": "93601e4856eba5079e554cb03757c6e1642cae427b9a6867f7aea5c2ce80d369"
+    },
+    {
+      "id": "CENA-04",
+      "file": "CENA-04.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "c626fb63fa27e6d28e31af3c25fae7d51c8bc396a5a1ff054ec08c54cd125798",
+      "sha256": "ee0bd3f01df997c7289ae0a719b2951479fd9cb251b25847c007374084215691"
+    },
+    {
+      "id": "CENA-05",
+      "file": "CENA-05.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "35ec3f7ade576f8c28407b09f10758da3041c317c76c402e9883f21c26b74fec",
+      "sha256": "b1ef12acde7449fb419e31b58b42c52c572c06c211ad9834b411bed112870e62"
+    },
+    {
+      "id": "CENA-06",
+      "file": "CENA-06.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "43c46139fd1a7152bdde1a594b9ed81718da12f2af9855220e6509e8cf29c3e0",
+      "sha256": "c1a204f250bc6b3bd93fe241e0720581a715668dcbef00dfc6df5dcb744b6673"
+    },
+    {
+      "id": "CENA-07",
+      "file": "CENA-07.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "13cd16ca5220a0da5bc3dcf78657b650225fb8a890513e6b5b18700f5cc30adb",
+      "sha256": "2d1e3dcacf3ea1307e610cb64ab6a2d6e9c3e12672023a1a1017ab732664924f"
+    },
+    {
+      "id": "CENA-08",
+      "file": "CENA-08.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "6e5d34cdb769a05086ebf84653e8242aa5d2489aee1180a9c3faec79f7c2f9f8",
+      "sha256": "4f9527a0f11a9ab8093b828b065cbd65cc7959013f8c65b02be2fd12f95409bf"
+    },
+    {
+      "id": "CENA-09",
+      "file": "CENA-09.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "82ea445923bd61561fcb842ad606713021be697b6d0a16ca76909a043692fdff",
+      "sha256": "4bc59e4b4fd228e4f82f285117cce605ba55e2b83173992b5d5ea9f280662a3d"
+    },
+    {
+      "id": "CENA-10",
+      "file": "CENA-10.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "44984e830ff70dce04d578e8b8ebb5f158a7f6ce023b030c6a4290787a3e5053",
+      "sha256": "f67d922f68b19bb99ad0254aac4f0b7ccb94fd3f0924356d9508241135f13e80"
+    },
+    {
+      "id": "CENA-11",
+      "file": "CENA-11.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "8aa729a59a2fc62d1b50061c0e75675af522b643c290ed7c3104ff42fc3c178b",
+      "sha256": "cfcd68052e958e15676f0f58c08eee58591650bd609420a920ac727046cb4f64"
+    },
+    {
+      "id": "CENA-12",
+      "file": "CENA-12.png",
+      "width": 1536,
+      "height": 864,
+      "sourceSha256": "a2c5ba68f1f32cc67bd81b8f4f4362e1766c51c7a41c0b6698c83faa892586c6",
+      "sha256": "22421dfffcd02d16eb94909ac24327a3d83b0fd7a874eeb970a93b232122f745"
+    }
+  ]
+}
