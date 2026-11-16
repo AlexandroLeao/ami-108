@@ -9,6 +9,7 @@ export const copy = {
     continue: 'Continuar',
     next: 'Próxima fala',
     previous: 'Anterior',
+    previousDialogue: 'Fala anterior',
     nextPage: 'Próxima página',
     menu: 'Menu',
     back: 'Voltar',
@@ -27,8 +28,8 @@ export const copy = {
     newGameNotice: 'Continuar jogo estará disponível após a integração do progresso salvo.',
     extrasPages: [
       { title: 'Sobre o jogo', paragraphs: ['AMI-108 é uma aventura narrativa de sobrevivência retrofuturista. David e um robô de memórias corrompidas exploram um mundo em ruínas.', 'Projeto autoral de engenharia de software: une narrativa interativa, arte pixelada e inteligência artificial controlada.'] },
-      { title: 'Créditos', paragraphs: ['Alexandro Milhomes Leão', 'Idealização, roteiro, direção criativa, conceito visual e liderança técnica.', 'Desenvolvimento assistido por IA.'] },
-      { title: 'Referências e tecnologia', paragraphs: ['Jogos clássicos de aventura e RPG, Pokémon e Hora de Aventura: inspiração na linguagem visual, no diálogo e na atmosfera.', 'Next.js, NestJS, PostgreSQL, Prisma e FastAPI. A IA complementa a narrativa; as regras do jogo são determinísticas.'] },
+      { title: 'Créditos', paragraphs: ['Alexandro Milhomes Leão', 'Idealização, roteiro, direção criativa, conceito visual e liderança técnica.'] },
+      { title: 'Referências e tecnologia', paragraphs: ['Jogos clássicos de aventura, RPG e terror, Pokémon e Hora de Aventura: inspiração na linguagem visual, no diálogo e na atmosfera.', 'Next.js, NestJS, PostgreSQL, Prisma e FastAPI. A IA complementa a narrativa; as regras do jogo são determinísticas.'] },
     ],
     lines: [
       '...',
@@ -47,6 +48,7 @@ export const copy = {
     continue: 'Continue',
     next: 'Next dialogue',
     previous: 'Previous',
+    previousDialogue: 'Previous dialogue',
     nextPage: 'Next page',
     menu: 'Menu',
     back: 'Back',
@@ -65,8 +67,8 @@ export const copy = {
     newGameNotice: 'Continue game will become available after saved progress is integrated.',
     extrasPages: [
       { title: 'About the game', paragraphs: ['AMI-108 is a retrofuturistic narrative survival adventure. David and a robot with corrupted memories explore a ruined world.', 'An original software engineering project combining interactive storytelling, pixel art and controlled artificial intelligence.'] },
-      { title: 'Credits', paragraphs: ['Alexandro Milhomes Leão', 'Original concept, writing, creative direction, visual concept and technical leadership.', 'AI-assisted development.'] },
-      { title: 'References and technology', paragraphs: ['Classic adventure games and RPGs, Pokémon and Adventure Time: inspiration for visual language, dialogue and atmosphere.', 'Next.js, NestJS, PostgreSQL, Prisma and FastAPI. AI complements the narrative; game rules are deterministic.'] },
+      { title: 'Credits', paragraphs: ['Alexandro Milhomes Leão', 'Original concept, writing, creative direction, visual concept and technical leadership.'] },
+      { title: 'References and technology', paragraphs: ['Classic adventure, RPG and horror games, Pokémon and Adventure Time: inspiration for visual language, dialogue and atmosphere.', 'Next.js, NestJS, PostgreSQL, Prisma and FastAPI. AI complements the narrative; game rules are deterministic.'] },
     ],
     lines: [
       '...',
