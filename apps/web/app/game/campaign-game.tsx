@@ -20,18 +20,29 @@ type Notice = 'connection' | 'stale' | 'expired';
 function Diagnostics({ view }: { view: CampaignView }) {
   const d = view.diagnostics;
   if (!d) return null;
+  const personalLabel = view.locale === 'pt-BR' ? 'PESSOAL' : 'PERSONAL';
   return (
-    <div className="campaign-diagnostics" aria-label={copy[view.locale].diagnostics}>
-      <div className="campaign-energy" aria-label={copy[view.locale].energy + ' ' + d.energy + '/3'}>
-        <span>{view.locale === 'pt-BR' ? 'Energia' : 'Energy'}</span>
-        <span className="campaign-bars" aria-hidden="true">
-          {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
-        </span>
-        <span>{d.energy}/3</span>
+    <div className="campaign-diagnostics" role="group" aria-label={copy[view.locale].diagnostics}>
+      <div className="campaign-diagnostics-content">
+        <div className="campaign-energy">
+          <span>{view.locale === 'pt-BR' ? 'Energia' : 'Energy'}</span>
+          <span className="campaign-bars" aria-hidden="true">
+            {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
+          </span>
+          <span>{d.energy}/3</span>
+        </div>
+        <div className="campaign-memory">
+          <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span>
+          <span>HIST-03 {d.hist}%</span>
+          <span className="campaign-personal" aria-label={personalLabel + ' ' + d.personal + '%' + (!d.personalUnlocked ? ' · ' + messages[view.locale].locked : '')}>
+            {personalLabel} {d.personal}%
+            {!d.personalUnlocked && <svg className="campaign-lock-icon" viewBox="0 0 10 12" fill="none" aria-hidden="true">
+              <path d="M2.5 5V3.5a2.5 2.5 0 0 1 5 0V5M1 5h8v6H1z" stroke="currentColor" strokeWidth="1.4" />
+              <path d="M5 7v2" stroke="currentColor" strokeWidth="1.4" />
+            </svg>}
+          </span>
+        </div>
       </div>
-      <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span>
-      <span>HIST-03 {d.hist}%</span><span>PERSONAL {d.personal}%</span>
-      {!d.personalUnlocked && <span className="campaign-memory-lock">PERSONAL · {messages[view.locale].locked}</span>}
     </div>
   );
 }
@@ -233,8 +244,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const titleText = view ? (locale === 'pt-BR' ? 'CAPÍTULO ' : 'CHAPTER ') + view.chapter + ' — ' + view.chapterTitle.toLocaleUpperCase(locale) : '';
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis';
-  const interaction = !chapter && nextAction?.kind === 'INTERACT' && pageIndex === pageCount - 1;
-  const advanceLabel = interaction ? nextAction.label : chapter ? labels.continue : labels.next;
+  const advanceLabel = chapter ? labels.continue : labels.next;
 
   return (
     <main className="game-viewport" lang={locale}>
@@ -255,11 +265,11 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
+                <div className="campaign-header-middle">{view.asset && <Diagnostics view={view} />}</div>
                 <button className="small-control" disabled={busy} onClick={() => setOverlay('pause')}>{labels.menu}</button>
               </div>
             </header>
             <CampaignScene view={view}>
-              {view.asset && <Diagnostics view={view} />}
               <div key={view.chapter} className="chapter-layer" data-active={chapter} aria-hidden={!chapter}>
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
@@ -274,12 +284,11 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 )}
               </div>
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
-              {interaction && <span className="campaign-interaction">{nextAction.label}</span>}
               <div className="dialogue-navigation">
                 <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || !pageReady || (!previousAction && pageIndex === 0)}
-                  aria-label={labels.previousDialogue} title={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
+                  aria-label={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
                 <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || (!chapter && !pageReady)}
-                  aria-label={advanceLabel} title={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
+                  aria-label={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
               </div>
             </section>
           </section>
