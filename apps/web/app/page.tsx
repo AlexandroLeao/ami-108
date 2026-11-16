@@ -1,4 +1,4 @@
-import PreviewPage from './preview/page';
+import GamePage from './game/page';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +15,7 @@ async function isApiReady(): Promise<boolean> {
 }
 
 export default async function Home() {
-  if (process.env.AMI_DEV_PREVIEW === '1') return <PreviewPage />;
+  if (process.env.AMI_DEV_PREVIEW === '1') return <GamePage />;
   const ready = await isApiReady();
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 p-8">
