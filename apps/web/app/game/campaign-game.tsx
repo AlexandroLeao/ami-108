@@ -173,7 +173,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const advance = useCallback(() => {
     if (!view || !nextAction || busyRef.current || overlay !== 'none' || !chapterReady || (!chapter && !pageReady)) return;
     if (!chapter && pageIndex + 1 < pageCount) {
-      setPagination((old) => ({ ...old, index: old.index + 1 }));
+      setPagination((old) => ({ ...old, index: Math.min(old.index + 1, old.pages.length - 1) }));
       return;
     }
     void run(() => mutate(view, { actionId: nextAction.id }));
@@ -181,7 +181,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const previous = useCallback(() => {
     if (!view || chapter || busyRef.current || overlay !== 'none' || !pageReady) return;
     if (pageIndex > 0) {
-      setPagination((old) => ({ ...old, index: old.index - 1 }));
+      setPagination((old) => ({ ...old, index: Math.max(0, old.index - 1) }));
       return;
     }
     if (previousAction) void run(() => mutate(view, { actionId: previousAction.id }));
@@ -326,7 +326,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
           )}
         </div>
       )}
-      {notice && <p className="campaign-notice" role="alert" onClick={() => setNotice(null)}>{messages[locale][notice]}</p>}
+      {notice && <div className="campaign-notice"><p role="alert">{messages[locale][notice]}</p><button type="button" className="small-control" onClick={() => setNotice(null)} aria-label={labels.back}>×</button></div>}
     </main>
   );
 }
