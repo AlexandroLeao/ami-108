@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useRef } from 'react';
 import { copy } from './copy';
-import { DialogueBox, SceneViewer } from './components';
+import { DialogueBox, GameWordmark, SceneViewer } from './components';
 import { setLocale, useLocale } from './locale';
 import { CHAPTER_REVEAL_MS, initialPreview, openingVisual, previewReducer } from './preview-state';
 
@@ -51,6 +51,10 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
         return;
       }
       if (overlay !== 'none' || (stage !== 'scene' && stage !== 'chapter')) return;
+      if (event.key === 'ArrowLeft' && !event.repeat && stage === 'scene') {
+        event.preventDefault();
+        dispatch({ type: 'PREVIOUS' });
+      }
       if (event.key === 'ArrowRight' && !event.repeat) {
         event.preventDefault();
         dispatch({ type: 'ADVANCE' });
@@ -65,7 +69,7 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
       <div ref={overlay === 'none' ? panelRef : null} className="game-layer" inert={overlay !== 'none'} aria-hidden={overlay !== 'none' || undefined}>
         {stage === 'menu' && (
           <section className="menu-screen">
-            <h1 className="game-title">AMI<span className="title-dash">-</span>108</h1>
+            <GameWordmark />
             <nav aria-label={labels.menu} className="menu-options">
               <button className="game-control" onClick={() => dispatch({ type: 'START' })}>{labels.newGame}</button>
               <button className="game-control" disabled title={labels.newGameNotice}>{labels.continueGame}</button>
@@ -75,23 +79,21 @@ export function GamePreview({ imageAvailable }: { imageAvailable: boolean }) {
             <p className="version-label">{labels.version}</p>
           </section>
         )}
-        {stage === 'chapter' && (
-          <section className="chapter-screen">
-            {chapterReady && <button className="small-control top-menu" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>}
-            <h1 className="chapter-title">{labels.chapter}</h1>
-            {chapterReady && <button className="advance-control chapter-advance" data-primary aria-label={labels.continue} title={labels.continue}
-              onClick={() => dispatch({ type: 'ADVANCE' })}><span aria-hidden="true" className="pixel-arrow" /></button>}
-          </section>
-        )}
-        {stage === 'scene' && (
+        {(stage === 'chapter' || stage === 'scene') && (
           <section className="game-stage">
             <header className="stage-header">
               <span aria-label={labels.chapter}>AMI-108</span>
               <button className="small-control" onClick={() => dispatch({ type: 'PAUSE' })}>{labels.menu}</button>
             </header>
-            <SceneViewer imageAvailable={imageAvailable} locale={locale} reveal={visual.reveal} cue={visual.cue} />
+            <SceneViewer imageAvailable={imageAvailable} locale={locale}
+              reveal={stage === 'scene' && visual.reveal} cue={stage === 'scene' ? visual.cue : 'none'}>
+              {stage === 'chapter' && <h1 className="chapter-title">{labels.chapter}</h1>}
+            </SceneViewer>
             <DialogueBox speaker={labels.speaker} text={labels.lines[line]} locale={locale}
-              cue={visual.cue} onAdvance={() => dispatch({ type: 'ADVANCE' })} />
+              chapter={stage === 'chapter'} cue={stage === 'scene' ? visual.cue : 'none'}
+              canAdvance={stage === 'scene' || chapterReady} canPrevious={stage === 'scene' && line > 0}
+              onPrevious={() => dispatch({ type: 'PREVIOUS' })}
+              onAdvance={() => dispatch({ type: 'ADVANCE' })} />
           </section>
         )}
         {stage === 'end' && (
