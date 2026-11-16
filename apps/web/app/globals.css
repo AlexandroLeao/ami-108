@@ -152,6 +152,12 @@ button:focus-visible, a:focus-visible {
 }
 .scene-frame[data-visible="true"] .scene-art { opacity: 1; filter: blur(0); }
 .scene-frame[data-visible="false"] .scene-art { transition: opacity 180ms ease, filter 0s linear 180ms; }
+/* The original image remains mounted; only optical blur and eyelids change. */
+.scene-frame[data-wake-phase="silence"] .scene-art { filter: blur(5px); }
+.scene-frame[data-wake-phase="shock"] .scene-art { filter: blur(4px); }
+.scene-frame[data-wake-phase="pain"] .scene-art { filter: blur(3px); }
+.scene-frame[data-wake-phase="focus"] .scene-art { filter: blur(0.8px); transition: opacity 180ms ease, filter 1.25s ease-out; }
+.scene-frame[data-visible="true"][data-wake-phase="none"] .scene-art { filter: blur(0); transition: opacity 180ms ease, filter 160ms ease-out; }
 .scene-missing { text-align: center; padding: 12px; }
 .dialogue-frame {
   position: relative;
@@ -196,9 +202,36 @@ button:focus-visible, a:focus-visible {
 .scene-frame[data-visible="true"] .eyelids span:first-child { transform: translateY(-105%); }
 .scene-frame[data-visible="true"] .eyelids span:last-child { transform: translateY(105%); }
 .scene-frame[data-visible="false"] .eyelids span { transition-duration: 200ms; }
+/* One deliberate close/reopen per beat, progressively wider vision. */
+.eyelids[data-wake-phase="silence"] { --lid-start: 0%; --lid-peek: -48%; --lid-end: -35%; }
+.eyelids[data-wake-phase="shock"] { --lid-start: -35%; --lid-peek: -68%; --lid-end: -58%; }
+.eyelids[data-wake-phase="pain"] { --lid-start: -58%; --lid-peek: -82%; --lid-end: -75%; }
+.eyelids[data-wake-phase="focus"] { --lid-start: -75%; --lid-peek: -100%; --lid-end: -105%; }
+.eyelids:not([data-wake-phase="none"]) span { transition: none; }
+.eyelids:not([data-wake-phase="none"]) span:first-child { animation: blink-upper 1.55s ease-in-out both; }
+.eyelids:not([data-wake-phase="none"]) span:last-child { animation: blink-lower 1.55s ease-in-out both; }
+@keyframes blink-upper {
+  0% { transform: translateY(var(--lid-start)); }
+  28% { transform: translateY(var(--lid-peek)); }
+  51% { transform: translateY(0); }
+  100% { transform: translateY(var(--lid-end)); }
+}
+@keyframes blink-lower {
+  0% { transform: translateY(calc(0% - var(--lid-start))); }
+  28% { transform: translateY(calc(0% - var(--lid-peek))); }
+  51% { transform: translateY(0); }
+  100% { transform: translateY(calc(0% - var(--lid-end))); }
+}
 .dialogue-text { animation: dialogue-reveal 160ms ease-out both; }
 @keyframes dialogue-reveal { from { opacity: 0; } to { opacity: 1; } }
 .pain-text { animation: dialogue-reveal 160ms ease-out both, pain 0.38s ease-out both; }
+.waking-text { animation: dialogue-reveal 160ms ease-out both, waking-tremor 1.2s ease-in-out infinite; }
+@keyframes waking-tremor {
+  0%, 45%, 100% { transform: translateX(0); }
+  12% { transform: translateX(-1.5px); }
+  24% { transform: translateX(1.5px); }
+  34% { transform: translateX(-1px); }
+}
 @keyframes pain {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-2px); }
@@ -246,8 +279,8 @@ button:focus-visible, a:focus-visible {
   .extras-card { padding: 8px 12px; gap: 5px; font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .chapter-title, .dialogue-text, .pain-text { animation: none !important; }
-  .scene-art, .scene-frame[data-visible="false"] .scene-art { transition: none !important; filter: none; }
+  .chapter-title, .dialogue-text, .pain-text, .waking-text { animation: none !important; }
+  .scene-art, .scene-frame[data-visible] .scene-art { transition: none !important; filter: none !important; }
   .chapter-layer { transition: none; }
   .eyelids { display: none; }
 }
