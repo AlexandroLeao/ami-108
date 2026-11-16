@@ -38,6 +38,12 @@ describe('approved cinematic opening', () => {
     expect(previewReducer(state, { type: 'MAIN_MENU' })).toEqual(initialPreview);
   });
 
+  it('does not skip the first line when the chapter timer fires after a manual advance', () => {
+    const chapter = previewReducer(initialPreview, { type: 'START' });
+    const scene = previewReducer(chapter, { type: 'ADVANCE' });
+    expect(previewReducer(scene, { type: 'CHAPTER_FINISH' })).toEqual(scene);
+  });
+
   it('ends the preview after all five lines without pretending to save progress', () => {
     let state = previewReducer(initialPreview, { type: 'START' });
     state = previewReducer(state, { type: 'ADVANCE' });
