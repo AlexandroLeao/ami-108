@@ -3,12 +3,12 @@ import { copy } from './copy';
 import { davidMemoryCue, initialPreview, openingVisual, previewReducer } from './preview-state';
 
 describe('approved cinematic opening', () => {
-  it('splits only the approved initial line and keeps subsequent dialogue and speaker', () => {
+  it('adds the approved silent beat, splits the initial line and preserves subsequent dialogue', () => {
     expect(copy['pt-BR'].lines).toEqual([
-      'Que merda...', 'Minha cabeça...', 'Onde eu estou?', 'Sangue...?', 'Que diabos aconteceu aqui?',
+      '...', 'Que merda...', 'Minha cabeça...', 'Onde eu estou?', 'Sangue...?', 'Que diabos aconteceu aqui?',
     ]);
     expect(copy.en.lines).toEqual([
-      'Shit...', 'My head...', 'Where am I?', 'Blood...?', 'What the hell happened here?',
+      '...', 'Shit...', 'My head...', 'Where am I?', 'Blood...?', 'What the hell happened here?',
     ]);
     expect(copy.en.speaker).toBe('???');
     expect(copy['pt-BR'].speaker).toBe('???');
@@ -16,16 +16,18 @@ describe('approved cinematic opening', () => {
     expect(copy.en.extrasPages.length).toBe(copy['pt-BR'].extrasPages.length);
   });
 
-  it('keeps the scene dark until the third line and reveals it once', () => {
+  it('keeps the scene dark until the fourth line and reveals it once', () => {
     expect(openingVisual(0)).toEqual({ reveal: false, cue: 'none' });
-    expect(openingVisual(1)).toEqual({ reveal: false, cue: 'pain' });
-    expect(openingVisual(2)).toEqual({ reveal: true, cue: 'wake' });
-    expect(openingVisual(3)).toEqual({ reveal: true, cue: 'none' });
+    expect(openingVisual(1)).toEqual({ reveal: false, cue: 'none' });
+    expect(openingVisual(2)).toEqual({ reveal: false, cue: 'pain' });
+    expect(openingVisual(3)).toEqual({ reveal: true, cue: 'wake' });
     expect(openingVisual(4)).toEqual({ reveal: true, cue: 'none' });
+    expect(openingVisual(5)).toEqual({ reveal: true, cue: 'none' });
   });
 
   it('resumes from the same line after pause and language selection', () => {
     let state = previewReducer(initialPreview, { type: 'START' });
+    state = previewReducer(state, { type: 'CHAPTER_READY' });
     state = previewReducer(state, { type: 'ADVANCE' });
     state = previewReducer(state, { type: 'ADVANCE' });
     state = previewReducer(state, { type: 'PAUSE' });
@@ -38,16 +40,21 @@ describe('approved cinematic opening', () => {
     expect(previewReducer(state, { type: 'MAIN_MENU' })).toEqual(initialPreview);
   });
 
-  it('does not skip the first line when the chapter timer fires after a manual advance', () => {
+  it('keeps the chapter on screen until the player advances after the reveal', () => {
     const chapter = previewReducer(initialPreview, { type: 'START' });
-    const scene = previewReducer(chapter, { type: 'ADVANCE' });
-    expect(previewReducer(scene, { type: 'CHAPTER_FINISH' })).toEqual(scene);
+    expect(previewReducer(chapter, { type: 'ADVANCE' })).toEqual(chapter);
+    const ready = previewReducer(chapter, { type: 'CHAPTER_READY' });
+    expect(ready).toMatchObject({ stage: 'chapter', chapterReady: true, line: 0 });
+    expect(previewReducer(ready, { type: 'CHAPTER_READY' })).toEqual(ready);
+    const scene = previewReducer(ready, { type: 'ADVANCE' });
+    expect(scene).toMatchObject({ stage: 'scene', line: 0 });
+    expect(previewReducer(scene, { type: 'CHAPTER_READY' })).toEqual(scene);
   });
 
-  it('ends the preview after all five lines without pretending to save progress', () => {
+  it('ends the preview after all six lines without pretending to save progress', () => {
     let state = previewReducer(initialPreview, { type: 'START' });
     state = previewReducer(state, { type: 'ADVANCE' });
-    for (let n = 0; n < 5; n++) state = previewReducer(state, { type: 'ADVANCE' });
+    for (let n = 0; n < 6; n++) state = previewReducer(state, { type: 'ADVANCE' });
     expect(state.stage).toBe('end');
   });
 
