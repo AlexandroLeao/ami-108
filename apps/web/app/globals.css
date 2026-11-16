@@ -149,13 +149,18 @@ button:focus-visible, a:focus-visible {
   width: 100%; height: 100%; min-width: 0; min-height: 0;
   object-fit: contain; image-rendering: pixelated;
 }
-.scene-frame[data-cue="wake"][data-visible="true"] .scene-art {
-  animation: wake-focus 1.6s ease-out both;
+/* Optical effects sit ABOVE the unchanged pixel-art image. No filter, scaling,
+   opacity or animation is applied to the original image itself. */
+.wake-optics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: wake-focus 1.4s ease-out both;
 }
 @keyframes wake-focus {
-  0%, 46% { filter: blur(4px); }
-  72% { filter: blur(2px); }
-  100% { filter: none; }
+  0%, 35% { backdrop-filter: blur(4px); opacity: 1; }
+  65% { backdrop-filter: blur(2px); opacity: 1; }
+  100% { backdrop-filter: none; opacity: 0; visibility: hidden; }
 }
 .scene-missing { text-align: center; padding: 12px; }
 .dialogue-frame {
@@ -179,9 +184,9 @@ button:focus-visible, a:focus-visible {
   height: 44px;
   padding: 0;
   border-color: transparent;
+  transition: opacity 280ms ease-out;
 }
 .dialogue-navigation { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 2px; }
-.advance-control[hidden] { display: none; }
 .advance-control:disabled { opacity: 0.28; cursor: not-allowed; }
 .previous-control .pixel-arrow { transform: rotate(180deg); }
 .pixel-arrow {
@@ -216,6 +221,14 @@ button:focus-visible, a:focus-visible {
 @keyframes dialogue-reveal { from { opacity: 0; } to { opacity: 1; } }
 /* Each newly rendered line shakes once, then remains still. */
 .pain-text { animation: dialogue-reveal 160ms ease-out both, pain 0.38s ease-out both; }
+/* Three tiny dots need a slightly wider, still one-shot motion to be perceptible. */
+.ellipsis-text { animation: dialogue-reveal 100ms ease-out both, ellipsis-pain 0.48s ease-out both; }
+@keyframes ellipsis-pain {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  45% { transform: translateX(3px); }
+  70% { transform: translateX(-2px); }
+}
 @keyframes pain {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-2px); }
@@ -263,8 +276,7 @@ button:focus-visible, a:focus-visible {
   .extras-card { padding: 8px 12px; gap: 5px; font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .chapter-title, .dialogue-text, .pain-text, .scene-frame[data-cue="wake"] .scene-art { animation: none !important; }
-  .scene-art, .scene-frame[data-visible] .scene-art { transition: none !important; filter: none !important; }
-  .chapter-layer { transition: none; }
-  .eyelids { display: none; }
+  .chapter-title, .dialogue-text, .pain-text, .ellipsis-text { animation: none !important; }
+  .chapter-layer, .advance-control { transition: none; }
+  .eyelids, .wake-optics { display: none; }
 }
