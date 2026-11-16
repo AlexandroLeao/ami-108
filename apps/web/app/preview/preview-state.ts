@@ -1,5 +1,4 @@
 export type VisualCue = 'none' | 'pain' | 'wake' | 'memory-cut';
-export type WakePhase = 'none' | 'silence' | 'shock' | 'pain' | 'focus';
 export type Stage = 'menu' | 'chapter' | 'scene' | 'end';
 export type Overlay = 'none' | 'pause' | 'language' | 'extras';
 export type PreviewState = { stage: Stage; chapterReady: boolean; line: number; overlay: Overlay; extrasPage: number };
@@ -53,11 +52,10 @@ export function previewReducer(state: PreviewState, action: PreviewAction): Prev
   }
 }
 
-export function openingVisual(line: number): { reveal: boolean; cue: VisualCue; wakePhase: WakePhase } {
-  const phases = ['silence', 'shock', 'pain', 'focus'] as const;
-  const wakePhase = phases[line];
-  if (wakePhase) return { reveal: true, cue: 'wake', wakePhase };
-  return { reveal: line >= 4, cue: 'none', wakePhase: 'none' };
+export function openingVisual(line: number): { reveal: boolean; cue: VisualCue } {
+  if (line >= 0 && line <= 2) return { reveal: false, cue: 'pain' };
+  if (line === 3) return { reveal: true, cue: 'wake' };
+  return { reveal: line >= 4, cue: 'none' };
 }
 
 // Only David's canonical memory events use this visual transition.
