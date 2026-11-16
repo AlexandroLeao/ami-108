@@ -15,7 +15,7 @@ The visual preview establishes a reusable game shell; it is not the authoritativ
 
 ## Opening sequence
 
-The owner approved a presentation-only revision of A01-S01/L01: add an initial silent ellipsis, then split the initial sentence into two dialogue beats without renumbering subsequent canonical dialogue IDs. Preserve the remaining lines verbatim. Treat the following as the approved UI override pending synchronization of the private canonical documents.
+The owner approved a presentation-only revision of A01-S01/L01: add an initial silent ellipsis, then split the initial sentence into two dialogue beats without renumbering subsequent canonical dialogue IDs. Preserve the remaining lines verbatim. The approved UI presentation is synchronized in the November 16 addenda of private Documento Mestre v1.10 and Roteiro Interativo v1.8.
 
 | Beat | PT-BR | EN | Visual |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ Reusable cues are defined for MEM-D1–D4: show the existing authored pain line 
 
 ## Validation matrix
 
-- Owner previously validated original opening preview in PT-BR/EN and mobile; redesigned preview needs new acceptance.
+- Owner validated the original bilingual preview and accepted the final redesign on desktop and mobile on November 16; PR #18 merged after CI passed. Full manual accessibility/zoom verification remains AMI-010.
 - Test root and /preview in local Compose, both locales, menu/options, three extras cards, disabled resume, chapter reveal, always-visible dimmed arrows, smooth enablement after 3.4 s and indefinite manual-only advance, three fully dark beats, one short text tremor on each of the first four beats, single blink and blur-to-focus on L02 only, complete stabilization at Blood, stable image focus, previous/next dialogue and remaining dialogue, pause/language/resume without line reset, keyboard and reduced motion.
 - Check 1366×768 and 1920×1080 desktop, mobile portrait 360×640 and 390×844, mobile landscape 640×360, plus zoom and keyboard focus. No page scrolling at standard sizes; do not crop or hide the next button. Validate actual rendered layout before claiming success.
 - Retain local-only preview flag, gated CENA-01 route and server-only future assets. No saved game, full campaign, LLM inference or production deployment in this PR.
