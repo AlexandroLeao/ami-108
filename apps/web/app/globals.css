@@ -2,3 +2,16 @@
 
 :root { color-scheme: dark; background: #171717; color: #fdf3e9; }
 body { margin: 0; font-family: system-ui, sans-serif; }
+
+.game-control {
+  min-height: 44px;
+  border: 1px solid #FDF3E9;
+  padding: 0.75rem 1.25rem;
+  color: #FDF3E9;
+  background: #171717;
+  font-weight: 600;
+  cursor: pointer;
+}
+.game-control:hover:not(:disabled), .game-control[aria-pressed="true"] { background: #FDF3E9; color: #171717; }
+.game-control:focus-visible { outline: 3px solid #FC2721; outline-offset: 3px; }
+.game-control:disabled { opacity: 0.55; cursor: not-allowed; }
