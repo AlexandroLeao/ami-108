@@ -62,7 +62,7 @@ export function DialogueBox({ speaker, text, locale, cue = 'none', onAdvance }: 
         <p className="dialogue-speaker">{speaker}</p>
         <p className={cue === 'pain' ? 'dialogue-text pain-text' : 'dialogue-text'}>{text}</p>
       </div>
-      <button type="button" className="advance-control" aria-label={copy[locale].next}
+      <button type="button" className="advance-control" data-primary aria-label={copy[locale].next}
         title={copy[locale].next} onClick={onAdvance}><span aria-hidden="true" className="pixel-arrow" /></button>
     </section>
   );
