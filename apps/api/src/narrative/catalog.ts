@@ -1,0 +1,106 @@
+// Server-only narrative data. Do not import from the web application.
+// Canonical sources: private Master v1.10 / Interactive Script v1.8.
+export const NARRATIVE_VERSION = '1.10-1.8-chapter1-v1' as const;
+export type Locale = 'pt-BR' | 'en';
+export type Localized = Readonly<Record<Locale, string>>;
+export const local = (pt: string, en: string): Localized => ({ 'pt-BR': pt, en });
+
+export const CHAPTERS = [
+  { number: 1, title: local('Bananas', 'Bananas'), scenes: ['A01-S01', 'A01-S02', 'A01-S03'] },
+  { number: 2, title: local('Registro Atualizado', 'Record Updated'), scenes: ['A02-S01', 'A02-S02'] },
+  { number: 3, title: local('Pensamento Positivo', 'Stay Positive'), scenes: ['A03-S01', 'A03-S02', 'A03-S03'] },
+  { number: 4, title: local('AMI-108 & David', 'AMI-108 & David'), scenes: ['A04-S01', 'A04-S02'] },
+  { number: 5, title: local('De nada, Bobo', 'You’re Welcome, Bobo'), scenes: ['A05-S01', 'A05-S02'] },
+] as const;
+
+export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03';
+export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
+  'CENA-01': local('Depósito industrial em ruínas, com caixas e luz pelas janelas.', 'Ruined industrial warehouse, with crates and light through the windows.'),
+  'CENA-02': local('Rua residencial em ruínas.', 'Ruined residential street.'),
+  'CENA-03': local('Robô danificado junto à janela da residência abandonada.', 'Damaged robot by the window of the abandoned residence.'),
+};
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut';
+export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1';
+type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
+export type Step = Readonly<{
+  id: string;
+  sceneId: ChapterOneScene;
+  phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK';
+  speaker: Localized | null;
+  text: Localized;
+  asset: OpeningAsset | null;
+  cue: Cue;
+  event?: EventId;
+  // Narration is a faithful adaptation of stage directions, pending owner wording review.
+  narration?: true;
+  action: 'CONTINUE' | 'INTERACT';
+}>;
+
+const unknown = local('???', '???');
+const robot = local('Robô', 'Robot');
+const ami = local('AMI', 'AMI');
+const dialogue = (sceneId: ChapterOneScene, line: string, speaker: Localized, pt: string, en: string, asset: OpeningAsset | null, cue: Cue = 'none', event?: EventId): Step => ({
+  id: `${sceneId}/${line}`, sceneId, phase: 'NARRATIVE', speaker,
+  text: local(pt, en), asset, cue, event, action: 'CONTINUE',
+});
+const narration = (sceneId: ChapterOneScene, line: string, pt: string, en: string, asset: OpeningAsset | null, options: { event?: EventId; phase?: 'FLASHBACK'; cue?: Cue; action?: 'INTERACT' } = {}): Step => ({
+  id: `${sceneId}/${line}`, sceneId, speaker: null, text: local(pt, en), asset,
+  phase: options.phase ?? 'NARRATIVE', cue: options.cue ?? 'none', event: options.event,
+  narration: true, action: options.action ?? 'CONTINUE',
+});
+const s1 = 'A01-S01';
+const s2 = 'A01-S02';
+const s3 = 'A01-S03';
+export const INTRO_FALLBACK = local('Os polvos têm três corações.', 'Octopuses have three hearts.');
+export const CHAPTER_ONE: readonly Step[] = [
+  { id: s1 + '/CHAPTER_CARD', sceneId: s1, phase: 'CHAPTER_CARD', speaker: null, text: local('CAPÍTULO 1 — BANANAS', 'CHAPTER 1 — BANANAS'), asset: null, cue: 'none', action: 'CONTINUE' },
+  dialogue(s1, 'SILENCE', unknown, '...', '...', null, 'ellipsis'),
+  dialogue(s1, 'L01a', unknown, 'Que merda...', 'Shit...', null, 'pain'),
+  dialogue(s1, 'L01b', unknown, 'Minha cabeça...', 'My head...', null, 'pain'),
+  dialogue(s1, 'L02', unknown, 'Onde eu estou?', 'Where am I?', 'CENA-01', 'wake'),
+  dialogue(s1, 'L03', unknown, 'Sangue...?', 'Blood...?', 'CENA-01'),
+  dialogue(s1, 'L04', unknown, 'Que diabos aconteceu aqui?', 'What the hell happened here?', 'CENA-01'),
+  narration(s2, 'ENV-02', 'Uma melodia distante vem da residência.', 'A distant melody comes from the residence.', 'CENA-02'),
+  dialogue(s2, 'L01', unknown, 'Tem alguém aí?', 'Is anyone there?', 'CENA-02'),
+  { ...dialogue(s2, 'L02', unknown, 'Ótimo. Ou estou ficando maluco ou finalmente encontrei alguém.', "Great. Either I'm losing it or I've finally found someone.", 'CENA-02'), action: 'INTERACT' },
+  dialogue(s3, 'L01', robot, 'Ah. Olá, bobo. Vejo que acordou.', "Ah. Hello, Bobo. I see you're awake.", 'CENA-03'),
+  dialogue(s3, 'L02', unknown, 'Quem você está chamando de bobo? Meu nome não é bobo. Meu nome é...', "Bobo? That's not my name. My name is...", 'CENA-03'),
+  dialogue(s3, 'L03', unknown, '... Aliás, qual é o meu nome mesmo?', '... Wait. What is my name?', 'CENA-03'),
+  dialogue(s3, 'L04', robot, 'Não localizado.', 'Not found.', 'CENA-03'),
+  dialogue(s3, 'L05', unknown, 'Ótimo.', 'Great.', 'CENA-03'),
+  dialogue(s3, 'L06', unknown, 'AMI-108? Esse é o seu nome?', 'AMI-108? Is that your name?', 'CENA-03'),
+  dialogue(s3, 'L07', ami, 'A informação parece consistente.', 'The information appears consistent.', 'CENA-03'),
+  dialogue(s3, 'L08', unknown, 'Certo. Vou chamar você de AMI.', "All right. I'll call you AMI.", 'CENA-03'),
+  dialogue(s3, 'L09', unknown, 'Preciso descobrir onde estou. E, de preferência, quem diabos eu sou.', 'I need to find out where I am. And preferably who the hell I am.', 'CENA-03'),
+  dialogue(s3, 'L10', ami, 'Posso acompanhá-lo. Acredito que seria útil.', 'I can accompany you. I believe I would be useful.', 'CENA-03'),
+  dialogue(s3, 'L11', unknown, 'Não quero ser indelicado, mas... como exatamente um robô sem braços e pernas pretende me ajudar?', "I don't mean to be rude, but... how exactly is a robot with no arms or legs going to help me?", 'CENA-03'),
+  dialogue(s3, 'L12', ami, 'Possuo registros sobre este planeta. Identificação de ameaças, localização de instalações, protocolos de sobrevivência e...', 'I have records of this planet. Threat identification, facility locations, survival protocols and...', 'CENA-03'),
+  dialogue(s3, 'L13', ami, '... bananas.', '... bananas.', 'CENA-03'),
+  dialogue(s3, 'L14', unknown, 'Bananas?', 'Bananas?', 'CENA-03'),
+  dialogue(s3, 'L15', ami, 'Desculpe. Meu sistema de memória apresenta algumas inconsistências.', 'Apologies. My memory system is experiencing some inconsistencies.', 'CENA-03'),
+  dialogue(s3, 'L16', unknown, 'Algumas?', 'Some?', 'CENA-03'),
+  dialogue(s3, 'L17', ami, 'Muitas.', 'Many.', 'CENA-03'),
+  dialogue(s3, 'L18', ami, 'Meus arquivos ainda existem. Acredito que, com os componentes adequados, seja possível recuperá-los. Se me ajudar, talvez eu consiga encontrar as respostas que procura.', 'My files still exist. With the appropriate components, I believe they can be recovered. If you help me, I may be able to find the answers you seek.', 'CENA-03'),
+  dialogue(s3, 'L19', unknown, 'E como você tem tanta certeza disso?', 'And how are you so sure?', 'CENA-03'),
+  dialogue(s3, 'L20', ami, 'Bananas.', 'Bananas.', 'CENA-03'),
+  dialogue(s3, 'L21', ami, '... Isso foi um erro.', '... That was an error.', 'CENA-03'),
+  dialogue(s3, 'L22', unknown, 'É. Essa vai ser uma longa viagem.', 'Yeah. This is going to be a long trip.', 'CENA-03'),
+  dialogue(s3, 'L23', ami, 'Obrigado, bobo.', 'Thank you, Bobo.', 'CENA-03'),
+  narration(s3, 'E-JOIN', 'Ele acomoda a cabeça e o tronco remanescente de AMI no arnês frontal da mochila, junto ao peito.', "He places AMI's remaining head and torso in the front harness of his backpack, against his chest.", 'CENA-03', { event: 'E-JOIN' }),
+  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local('Consultar AMI consome uma barra. A memória danificada pode gerar respostas desconexas. A luz solar recupera sua energia de processamento.', 'Consulting AMI costs one bar. Damaged memory can produce unrelated answers. Sunlight restores his processing energy.'), asset: 'CENA-03', cue: 'none', action: 'CONTINUE' },
+  dialogue(s3, 'L26', unknown, 'Certo. Alguma ideia de pra onde devemos ir?', 'Right. Any idea where we should go?', 'CENA-02'),
+  dialogue(s3, 'L27', ami, 'Existe um terminal de manutenção pública a aproximadamente trezentos metros daqui.', 'There is a public maintenance terminal approximately three hundred meters from here.', 'CENA-02'),
+  dialogue(s3, 'L28', unknown, 'Você se lembra disso?', 'You remember that?', 'CENA-02'),
+  dialogue(s3, 'L29', ami, 'Parcialmente. Os registros da região ainda estão disponíveis.', 'Partially. The local records are still available.', 'CENA-02'),
+  dialogue(s3, 'L30', unknown, 'E o que tem nesse terminal?', "And what's at that terminal?", 'CENA-02'),
+  dialogue(s3, 'L31', ami, 'Componentes compatíveis com meu sistema de armazenamento. Se ainda estiverem intactos, poderemos recuperar parte dos meus arquivos.', 'Components compatible with my storage system. If they are intact, we may be able to recover some of my files.', 'CENA-02'),
+  dialogue(s3, 'L32', unknown, 'E se não estiverem?', "And if they're not?", 'CENA-02'),
+  dialogue(s3, 'L33', ami, INTRO_FALLBACK['pt-BR'], INTRO_FALLBACK.en, 'CENA-02', 'none', 'INTRO-RANDOM'),
+  dialogue(s3, 'L34', unknown, 'Maravilha.', 'Wonderful.', 'CENA-02'),
+  dialogue(s3, 'MEM-D1', unknown, 'Ah... minha cabeça!', 'Ah... my head!', 'CENA-02', 'pain', 'MEM-D1'),
+  narration(s3, 'FB-D1', 'Uma risada. Duas crianças correm. Uma cai, e a outra volta para ajudar.', 'Laughter. Two children run. One falls, and the other comes back to help.', null, { event: 'FB-D1', phase: 'FLASHBACK', cue: 'memory-cut' }),
+  dialogue(s3, 'L35', ami, 'Alguma irregularidade?', 'Any irregularities?', 'CENA-02'),
+  dialogue(s3, 'L36', unknown, 'Não... Acho que lembrei de alguma coisa.', 'No... I think I remembered something.', 'CENA-02'),
+  dialogue(s3, 'L37', ami, 'Excelente. Isso representa um progresso.', 'Excellent. That represents progress.', 'CENA-02'),
+  { ...dialogue(s3, 'L38', unknown, 'É. Espero que sim.', 'Yeah. I hope so.', 'CENA-02'), action: 'INTERACT' },
+];
