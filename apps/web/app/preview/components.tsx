@@ -48,7 +48,12 @@ export function SceneViewer({ imageAvailable, locale, reveal = true, cue = 'none
         ) : (
           <div className="scene-missing">{visible ? copy[locale].missingArt : ''}</div>
         )}
-        {imageAvailable && <div className="eyelids" aria-hidden="true"><span /><span /></div>}
+        {imageAvailable && cue === 'wake' && visible && (
+          <>
+            <div className="wake-optics" aria-hidden="true" />
+            <div className="eyelids" aria-hidden="true"><span /><span /></div>
+          </>
+        )}
       </div>
       {children}
     </div>
@@ -66,17 +71,17 @@ export function DialogueBox({ speaker, text, locale, cue = 'none', onAdvance, on
         {!chapter && (
           <>
             <p className="dialogue-speaker">{speaker}</p>
-            <p key={text} className={cue === 'wake' || cue === 'pain' ? 'dialogue-text pain-text' : 'dialogue-text'}>{text}</p>
+            <p key={text} className={`dialogue-text${cue === 'wake' || cue === 'pain' ? ' pain-text' : ''}${text === '...' && cue === 'pain' ? ' ellipsis-text' : ''}`}>{text}</p>
           </>
         )}
       </div>
       <div className="dialogue-navigation">
-        {!chapter && <button type="button" className="advance-control previous-control" disabled={!canPrevious}
+        <button type="button" className="advance-control previous-control" disabled={chapter || !canPrevious}
           aria-label={labels.previousDialogue} title={labels.previousDialogue} onClick={onPrevious}>
           <span aria-hidden="true" className="pixel-arrow" />
-        </button>}
+        </button>
         <button type="button" className="advance-control" data-primary
-          disabled={!canAdvance} hidden={!canAdvance}
+          disabled={!canAdvance}
           aria-label={chapter ? labels.continue : labels.next} title={chapter ? labels.continue : labels.next}
           onClick={onAdvance}><span aria-hidden="true" className="pixel-arrow" /></button>
       </div>
