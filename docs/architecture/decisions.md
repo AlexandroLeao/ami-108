@@ -1,6 +1,6 @@
 # Architecture decision records
 
-Status: design merged in AMI-002 (PR #17). These decisions operationalize the approved stack and narrative without adding product scope. ADR-004 session expiry/retention and concrete integration details remain subject to implementation review. AMI-003 validated the local preview; it is not evidence of a durable game session.
+Status: design merged in AMI-002 (PR #17). These decisions operationalize the approved stack and narrative without adding product scope. ADR-004 session expiry/retention and concrete integration details remain subject to implementation review. AMI-003 validated the local preview; PR #20 subsequently implemented and verified durable local Chapter 1 sessions. Production retention, rate limiting and deployment remain pending.
 
 ## ADR-001 — Authoritative modular NestJS API
 
@@ -26,7 +26,7 @@ Status: design merged in AMI-002 (PR #17). These decisions operationalize the ap
 ## ADR-004 — Anonymous scoped session and same-origin facade
 
 **Context:** the player needs resume without a signup requirement. Hidden content and session mutations must be protected.  
-**Decision:** opaque high-entropy capability, HttpOnly secure cookie, server-side digest, same-origin Next.js proxy and Origin checks, per-session authorization. PR #20 implements this for local Chapter 1 with 32 random bytes, SHA-256 digest, 30-day absolute expiry, SameSite=Lax and Secure on HTTPS. Final expiry/cleanup, rate limits and production origin policy remain AMI-010. No account/password system for this MVP.  
+**Decision:** opaque high-entropy capability, HttpOnly secure cookie, server-side digest, same-origin Next.js proxy and Origin checks, per-session authorization. Merged PR #20 implements this for local Chapter 1 with 32 random bytes, SHA-256 digest, 30-day absolute expiry, SameSite=Lax and Secure on HTTPS. Final expiry/cleanup, rate limits and production origin policy remain AMI-010. No account/password system for this MVP.  
 **Alternatives:** public session IDs are not credentials; JWT/accounts add complexity without a current product requirement.  
 **Consequences:** browser-specific resume unless an explicit future transfer feature is approved; test cross-session and CSRF protection.
 
