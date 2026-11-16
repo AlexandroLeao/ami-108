@@ -25,7 +25,7 @@ export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERAC
 export type CurrentView = Readonly<{
   revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK';
   chapter: number; chapterTitle: string; sceneId: string; speaker: string | null; text: string;
-  asset: { url: '/api/game/asset'; alt: string } | null;
+  asset: { url: `/api/game/asset?key=${OpeningAsset}`; alt: string } | null;
   diagnostics: NarrativeState['diagnostics']; actions: readonly NarrativeAction[]; pending: false;
   // UI-only cues are proposed additions to the game contract.
   cue: Cue;
@@ -114,7 +114,7 @@ export function projectNarrative(state: NarrativeState): CurrentView {
     revision: state.revision, locale, phase: step.phase, chapter: 1, chapterTitle: CHAPTERS[0].title[locale],
     sceneId: step.sceneId, speaker: step.speaker?.[locale] ?? null,
     text: step.event === 'INTRO-RANDOM' && state.intro ? state.intro.text[locale] : step.text[locale],
-    asset: step.asset ? { url: '/api/game/asset', alt: OPENING_ASSETS[step.asset][locale] } : null,
+    asset: step.asset ? { url: `/api/game/asset?key=${step.asset}`, alt: OPENING_ASSETS[step.asset][locale] } : null,
     diagnostics: state.diagnostics,
     actions: currentActions(state, index),
     pending: false, cue: step.cue,
