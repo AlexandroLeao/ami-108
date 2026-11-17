@@ -87,3 +87,7 @@ Restore all pre-fourth-refinement layout declarations verbatim; the normal dialo
 ### Targeted owner refinement — energy, dog entrance and identity
 
 The first information card (TUTORIAL) alone has `energy-reveal`: show the existing energy indicator on the dark information cards, gently fade in and pulse twice over 1900ms only on the first. Other dark beats retain the previous HUD visibility. Dog L01 alone fades a coal veil over the loaded, unchanged CENA-04 and briefly translates the visual layer for 860ms; no scale/filter/transform on the PNG, no persistent shake fill, and the next line reuses the same asset and ordinary layout. L18c alternates ???/DAVID with subtle motion and crossfades for 2600ms before settling on DAVID. All cues honor reduced motion. No changes to approved dimensions, choices, colors, or other animations.
+
+### Latest owner refinement
+
+ARRIVAL-03 and FOUND remain dark; reveal CENA-05 only on L01 through a 700ms coal veil, leaving the original PNG untransformed. Dog L01 holds the coal veil for the first 435ms of its 1450ms reveal after load, letting dialogue appear first; brief existing layer shake settles before the end. Subsequent beats use the same mounted image with no effect. L18c alternates ???/DAVID more distinctly over 1500ms. No changes to approved layout, other cues or assets.

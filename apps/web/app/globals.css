@@ -379,24 +379,24 @@ button:focus-visible, a:focus-visible {
    The loaded image remains mounted by asset URL across the next dialogue.
    No fill on the shake: the layer returns to its original rendering state. */
 .campaign-scene[data-cue="startle"] .scene-visual:has(.scene-art[data-startle="true"]) {
-  animation: campaign-startle 860ms ease-out;
+  animation: campaign-startle 1450ms ease-out;
 }
 .campaign-scene[data-cue="startle"] .scene-visual:has(.scene-art[data-startle="true"])::after {
   content: ''; position: absolute; inset: 0; background: var(--coal); pointer-events: none;
-  animation: campaign-startle-veil 860ms ease-out both;
+  animation: campaign-startle-veil 1450ms ease-out both;
 }
 @keyframes campaign-startle-veil {
-  0% { opacity: 1; }
-  30% { opacity: .6; }
-  75%, 100% { opacity: 0; visibility: hidden; }
+  0%, 30% { opacity: 1; }
+  55% { opacity: .55; }
+  84%, 100% { opacity: 0; visibility: hidden; }
 }
 @keyframes campaign-startle {
-  0%, 20% { transform: none; }
-  34% { transform: translateX(-5px); }
-  46% { transform: translateX(4px); }
-  58% { transform: translateX(-3px); }
-  70% { transform: translateX(2px); }
-  82%, 100% { transform: none; }
+  0%, 45% { transform: none; }
+  56% { transform: translateX(-5px); }
+  64% { transform: translateX(4px); }
+  72% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+  88%, 100% { transform: none; }
 }
 .campaign-skull { color: var(--alert); width: min(32%, 144px); height: auto; z-index: 1; animation: campaign-skull-reveal 420ms ease-out both; }
 @keyframes campaign-skull-reveal { from { opacity: 0; } to { opacity: 1; } }
@@ -451,11 +451,15 @@ button:focus-visible, a:focus-visible {
   .campaign-scene[data-cue="blink-black"] .scene-visual { visibility: hidden; }
 }
 
-/* Terminal arrival only: a quiet one-shot reveal after the image loads. */
-.scene-art[data-fade-in="true"] { animation: campaign-terminal-reveal 700ms ease-out both; }
-@keyframes campaign-terminal-reveal { from { opacity: 0; } to { opacity: 1; } }
+/* Terminal L01 only: reveal the same mounted original through a temporary
+   coal veil. Never animate, filter, or scale the PNG itself. */
+.campaign-scene[data-cue="fade-in"] .scene-visual:has(.scene-art[data-fade-in="true"])::after {
+  content: ''; position: absolute; inset: 0; background: var(--coal); pointer-events: none;
+  animation: campaign-terminal-reveal 700ms ease-out both;
+}
+@keyframes campaign-terminal-reveal { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) {
-  .scene-art[data-fade-in="true"] { animation: none; }
+  .campaign-scene[data-cue="fade-in"] .scene-visual::after { display: none; }
 }
 
 /* Only the explicitly tagged memory beats move continuously. No opacity flicker,
@@ -472,23 +476,23 @@ button:focus-visible, a:focus-visible {
    is exposed to assistive tech; the old label is a visual transition. */
 .campaign-name-reveal { display: inline-grid; vertical-align: top; }
 .campaign-name-reveal > span { grid-area: 1 / 1; }
-.campaign-name-before { animation: campaign-name-out 2600ms ease-in-out both; }
-.campaign-name-after { animation: campaign-name-in 2600ms ease-in-out both; }
+.campaign-name-before { animation: campaign-name-out 1500ms linear both; }
+.campaign-name-after { animation: campaign-name-in 1500ms linear both; }
 @keyframes campaign-name-out {
-  0%, 12% { opacity: 1; transform: none; }
-  24% { opacity: .15; transform: translateX(-.7px); }
-  36% { opacity: .92; transform: translateX(.5px); }
-  48% { opacity: .08; transform: translateX(-.5px); }
-  60% { opacity: .78; transform: translateX(.6px); }
-  78%, 100% { opacity: 0; transform: none; }
+  0%, 13% { opacity: 1; transform: none; }
+  17%, 29% { opacity: 0; transform: translateX(-.7px); }
+  33%, 45% { opacity: 1; transform: translateX(.5px); }
+  49%, 61% { opacity: 0; transform: translateX(-.5px); }
+  65%, 77% { opacity: 1; transform: translateX(.6px); }
+  81%, 100% { opacity: 0; transform: none; }
 }
 @keyframes campaign-name-in {
-  0%, 12% { opacity: 0; transform: none; }
-  24% { opacity: .85; transform: translateX(.7px); }
-  36% { opacity: .08; transform: translateX(-.5px); }
-  48% { opacity: .92; transform: translateX(.5px); }
-  60% { opacity: .22; transform: translateX(-.6px); }
-  78%, 100% { opacity: 1; transform: none; }
+  0%, 13% { opacity: 0; transform: none; }
+  17%, 29% { opacity: 1; transform: translateX(.7px); }
+  33%, 45% { opacity: 0; transform: translateX(-.5px); }
+  49%, 61% { opacity: 1; transform: translateX(.5px); }
+  65%, 77% { opacity: 0; transform: translateX(-.6px); }
+  81%, 100% { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .campaign-dialogue .campaign-memory-shiver { animation: none !important; }

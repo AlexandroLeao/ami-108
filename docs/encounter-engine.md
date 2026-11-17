@@ -49,3 +49,7 @@ Revert the dog-wide geometry override exactly to the approved b9da1be layout. Us
 ## Targeted owner refinement — November 17
 
 Energy indicator gently appears on the first tutorial card and stays visible on the remaining information cards. Dog reveal uses a temporary coal veil and brief visual-layer translation rather than transforming the PNG; no layout resize. Insert L08b before solar explanation, retain SOL-01 application on entry to L09 with existing independent recharge semantics and stable L08/L09 IDs. Name alternates ???/DAVID over 2600ms and settles on DAVID. No other story, energy, asset, layout, cache or replay changes. Browser validation pending.
+
+## Latest owner refinement — November 17
+
+Only ARRIVAL-03 wording, FOUND dark/L01 terminal fade-in, dog reveal timing and L18c name animation change. The same original CENA-04 and CENA-05 files remain authorized at their illustrated beats; no duplicate art, layout, energy, event or persistence changes. Tests assert dark FOUND and stable CENA-05 across adjacent illustrated beats.

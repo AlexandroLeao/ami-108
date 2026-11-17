@@ -109,13 +109,17 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(state.stepId).toBe('A02-S01/'+variant+'1');
     let count=0;
     while(state.stepId!=='A02-S02/ARRIVAL-01' && count++<30) state=forward(state);
-    for (const text of ['Vocês chegam ao terminal de manutenção indicado por AMI.', 'Você retira AMI da mochila e o posiciona junto ao painel.', 'Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto examina o sistema.']) {
+    for (const text of ['Vocês chegam ao terminal de manutenção indicado por AMI.', 'Você retira AMI da mochila e o posiciona junto ao painel.', 'Você observa AMI se conectar ao sistema enquanto emite breves sons eletrônicos.']) {
       expect(projectNarrative(state)).toMatchObject({ text, asset: null, narration: true });
       state=forward(state);
     }
-    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Encontrado.', cue: 'fade-in', asset: { url: '/api/game/asset?key=CENA-05' } });
+    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Encontrado.', cue: 'none', asset: null });
+    expect(currentAsset(state)).toBeNull();
     state=forward(state);
-    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Identifiquei uma unidade compatível com meu sistema de armazenamento.', cue: 'none', asset: { url: '/api/game/asset?key=CENA-05' } });
+    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Identifiquei uma unidade compatível com meu sistema de armazenamento.', cue: 'fade-in', asset: { url: '/api/game/asset?key=CENA-05' } });
+    const terminalArtwork = projectNarrative(state).asset;
+    state=forward(state);
+    expect(projectNarrative(state)).toMatchObject({ cue: 'none', asset: terminalArtwork });
     while(state.stepId!=='A02-S02/L04' && count++<30) state=forward(state);
     expect(state.stepId).toBe('A02-S02/L04');
     expect(state.diagnostics).toEqual({energy:category==='NONE'?3:2,med:35,bio:42,hist:53,personal:5,personalUnlocked:false});

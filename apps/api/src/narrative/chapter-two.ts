@@ -38,7 +38,7 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S01/C2": { speaker: 'AMI', text: local("Logo adiante. Recuperar meus arquivos continua sendo uma prioridade.", "Just ahead. Recovering my files remains a priority.") },
   "A02-S02/ARRIVAL-01": { speaker: 'NARRATION', text: local("Vocês chegam ao terminal de manutenção indicado por AMI.", "You reach the maintenance terminal AMI directed you to.") },
   "A02-S02/ARRIVAL-02": { speaker: 'NARRATION', text: local("Você retira AMI da mochila e o posiciona junto ao painel.", "You take AMI out of your backpack and position him beside the panel.") },
-  "A02-S02/ARRIVAL-03": { speaker: 'NARRATION', text: local("Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto examina o sistema.", "You watch AMI connect to the panel, emitting brief electronic sounds as he examines the system.") },
+  "A02-S02/ARRIVAL-03": { speaker: 'NARRATION', text: local("Você observa AMI se conectar ao sistema enquanto emite breves sons eletrônicos.", "You watch AMI connect to the system while emitting brief electronic sounds.") },
   "A02-S02/FOUND": { speaker: 'AMI', text: local("Encontrado.", "Found.") },
   "A02-S02/L01": { speaker: 'AMI', text: local("Identifiquei uma unidade compatível com meu sistema de armazenamento.", "I have identified a unit compatible with my storage system.") },
   "A02-S02/L02": { speaker: 'UNKNOWN', text: local("Finalmente. Vamos ver se isso funciona.", "Finally. Let's see if this works.") },
@@ -114,7 +114,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
 }
 export function chapterTwoAsset(state: NarrativeState): OpeningAsset | null {
   const id = visible(state);
-  if (id === END || ['ARRIVAL-01', 'ARRIVAL-02', 'ARRIVAL-03', 'MEM-D2-PAIN', 'MEM-D2', 'MEM-D2-SILENCE', 'F01', 'F01b', 'MEM-D2-CALL'].some(step => id === terminalId(step)) || darkIntro.includes(id) || /^A02-S01\/[ABC]\d$/.test(id) || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
+  if (id === END || ['ARRIVAL-01', 'ARRIVAL-02', 'ARRIVAL-03', 'FOUND', 'MEM-D2-PAIN', 'MEM-D2', 'MEM-D2-SILENCE', 'F01', 'F01b', 'MEM-D2-CALL'].some(step => id === terminalId(step)) || darkIntro.includes(id) || /^A02-S01\/[ABC]\d$/.test(id) || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
   return id.startsWith(DOG_SCENE + '/') ? 'CENA-04' : 'CENA-05';
 }
 export function chapterTwoView(state: NarrativeState): CurrentView {
@@ -154,7 +154,7 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
     narration = beat.speaker === 'NARRATION';
     speaker = narration || beat.speaker === 'NONE' ? null : beat.speaker === 'AMI' ? 'AMI-108' : beat.speaker === 'VOICE' ? local('Voz familiar', 'Familiar voice')[locale] : named ? 'DAVID' : '???';
     if (id === FIRST) cue = 'startle';
-    if (id === terminalId('FOUND')) cue = 'fade-in';
+    if (id === terminalId('L01')) cue = 'fade-in';
     if (id === terminalId('MEM-D2-PAIN')) cue = 'blink-black';
     if (id === terminalId('MEM-D2') || id === terminalId('F01') || id === terminalId('F01b')) cue = 'memory-shiver';
     if (id === terminalId('L18c')) cue = 'name-reveal';

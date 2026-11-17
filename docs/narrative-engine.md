@@ -59,3 +59,7 @@ A02-S02/L04 uses “Então vai parar de falar coisas aleatórias?” / “So you
 ### Targeted owner refinement
 
 TUTORIAL adds presentation-only energy-reveal. Insert bilingual L08b immediately before L09: “Quanto à minha energia, existe uma forma de recuperá-la.” / “As for my energy, there is a way to restore it.” SOL-01 remains applied exactly once on entering L09; its existing interaction moves from L08 to the new L08b. Existing L08 saves advance normally, existing later saves retain their already applied event. Dog L01/L02 retain CENA-04; startle remains L01-only. L18c name reveal changes presentation only.
+
+### Latest owner refinement
+
+ARRIVAL-03: “Você observa AMI se conectar ao sistema enquanto emite breves sons eletrônicos.” / “You watch AMI connect to the system while emitting brief electronic sounds.” FOUND is dark, cue none; L01 alone authorizes CENA-05 and fade-in. All three branches and existing step IDs retain their transitions. Dog L01 reveal delays the image relative to its text; L18c alternation is faster. No other dialogue or state changes.

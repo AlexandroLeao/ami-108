@@ -39,3 +39,5 @@
 - Owner correction: preserve the exact b9da1be layout for normal dialogue and choices; do not adjust image or frame dimensions without specific owner approval. A02-S02/L04 has one localized text for all success variants; no recipe-dependent alternative. Name reveal 1800ms; no unrelated changes.
 
 - Targeted owner refinement: energy-reveal on first information card, same CENA-04 with one-shot veil/brief layer shake, L08b solar lead-in (SOL-01 still on entry to L09), alternating name reveal 2600ms. No changes to approved dimensions or other dialogue, rules or artwork.
+
+- Latest owner refinement: exact shortened ARRIVAL-03; dark FOUND and L01-only CENA-05 veil; slower dog reveal with text first; faster distinct ???/DAVID alternation. No other changes to text, layout, original assets or mechanics.
