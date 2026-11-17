@@ -17,7 +17,7 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S01/PRE-02": { speaker: 'NARRATION', text: local("De repente, ruídos vindos dos veículos à frente interrompem sua caminhada.", "Suddenly, noises from the vehicles ahead interrupt your walk.") },
   "A02-S01/PRE-03": { speaker: 'NARRATION', text: local("Você observa com atenção o ponto de onde vêm os ruídos.", "You look closely toward the source of the noises.") },
   "A02-S01/L01": { speaker: 'UNKNOWN', text: local("Puta merda! O que é aquilo?!", "Holy shit! What is that thing?!") },
-  "A02-S01/L02": { speaker: 'AMI', text: local("Olha a língua.", "Language.") },
+  "A02-S01/L02": { speaker: 'AMI', text: local("Um cachorrinho, bobo.", "A little dog, Bobo.") },
   "A02-S01/L03": { speaker: 'UNKNOWN', text: local("Você tá falando sério?!", "Are you serious?!") },
   "A02-S01/L04": { speaker: 'AMI', text: local("Afirmativo.", "Affirmative.") },
   "A02-S01/WARNING-01": { speaker: 'NARRATION', text: local("Você percebe que a criatura à sua frente não é amistosa.", "You realize the creature ahead is not friendly.") },
@@ -48,13 +48,6 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S02/L06": { speaker: 'AMI', text: local("Recuperei o mapa desta região. Existe um centro de pesquisa nas proximidades.", "I have recovered a map of this area. There is a research facility nearby.") },
   "A02-S02/L07": { speaker: 'UNKNOWN', text: local("Pode ter mais peças pra você lá?", "Think there might be more parts for you there?") },
   "A02-S02/L08": { speaker: 'AMI', text: local("É uma possibilidade.", "It is a possibility.") },
-  "A02-S02/L08b": { speaker: 'AMI', text: local("Quanto à minha energia, existe uma forma de recuperá-la.", "As for my energy, there is a way to restore it.") },
-  "A02-S02/L09": { speaker: 'AMI', text: local("Minha energia de processamento pode ser recuperada através da luz solar.", "My processing energy can be restored through sunlight.") },
-  "A02-S02/L10": { speaker: 'UNKNOWN', text: local("Então é só deixar você no sol?", "So I just leave you in the sun?") },
-  "A02-S02/L11": { speaker: 'AMI', text: local("Correto.", "Correct.") },
-  "A02-S02/L12": { speaker: 'UNKNOWN', text: local("Pelo menos um de nós é autossuficiente.", "At least one of us is self-sufficient.") },
-  "A02-S02/L13": { speaker: 'AMI', text: local("Você continua sendo necessário para o transporte.", "You are still required for transportation.") },
-  "A02-S02/L14": { speaker: 'UNKNOWN', text: local("É. Imaginei.", "Yeah. I figured.") },
   "A02-S02/MEM-D2-PAIN": { speaker: 'UNKNOWN', text: local("Ai!", "Ow!") },
   "A02-S02/MEM-D2": { speaker: 'UNKNOWN', text: local("Minha cabeça de novo!", "My head again!") },
   "A02-S02/MEM-D2-SILENCE": { speaker: 'NONE', text: local("...", "...") },
@@ -101,7 +94,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
   const back = index > 0 && !barrier(id) && !barrier(c.trail[index - 1]) ? [previous(state, id)] : [];
   // Historical decision screens cannot issue a new choice or debit energy.
   if (state.reviewStepId) return [next(state, id), ...back];
-  if (id === END) return back;
+  if (id === END) return [next(state, id), ...back];
   if (id === dogId('DEAD-CARD')) return [action(id + '/RETRY', 'RETRY', local('Retornar ao checkpoint', 'Return to checkpoint'), state)];
   if (id.startsWith(dogId('DECISION-'))) {
     const available: NarrativeAction[] = DOG.choices.map(choice => action(choice.id, 'CHOOSE', choice.label, state));
@@ -109,7 +102,6 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
     return available;
   }
   if (id === terminalId('L02')) return [next(state, id, 'INTERACT', local('Restaurar memória', 'Restore memory')), ...back];
-  if (id === terminalId('L08b')) return [next(state, id, 'INTERACT', local('Recarregar energia', 'Recharge energy')), ...back];
   return [next(state, id), ...back];
 }
 export function chapterTwoAsset(state: NarrativeState): OpeningAsset | null {
@@ -172,11 +164,10 @@ function move(state: NarrativeState, id: string, dog = get(state).dog, event?: E
   let events = state.events;
   if (event && !events.includes(event)) {
     events = [...events, event];
-    if (event === 'F1') diagnostics = { ...diagnostics, med: 35, bio: 42, hist: 53 };
-    if (event === 'SOL-01') diagnostics = { ...diagnostics, energy: 3 };
+    if (event === 'F1') diagnostics = { ...diagnostics, energy: 3, med: 35, bio: 42, hist: 53 };
   }
   // After the encounter, energy is independent of the encounter's historical usage.
-  if (state.events.includes('SOL-01')) diagnostics = { ...diagnostics, energy: 3 };
+  if (state.events.includes('F1')) diagnostics = { ...diagnostics, energy: 3 };
   return { ...state, stepId: id, reviewStepId: null, revision: state.revision + 1, diagnostics, events,
     chapterTwo: { ...c, dog, trail: [...c.trail, id] } };
 }
@@ -236,13 +227,11 @@ export function advanceChapterTwo(state: NarrativeState, actionId: string, rando
   if (id === terminalId('L18')) return move(state, terminalId('L18b'));
   if (id === terminalId('L18b')) return move(state, terminalId('L18c'), c.dog, 'E-NAME');
   if (id === terminalId('L18c')) return move(state, terminalId('L19'));
-  if (id === terminalId('L08')) return move(state, terminalId('L08b'));
-  if (id === terminalId('L08b')) return move(state, terminalId('L09'), c.dog, 'SOL-01');
+  if (id === terminalId('L08')) return move(state, terminalId('MEM-D2-PAIN'), c.dog, 'MEM-D2');
   const terminal = id.match(/^A02-S02\/L(\d\d)$/);
   if (terminal) {
     const n = Number(terminal[1]);
     if (n === 20) return move(state, END);
-    if (n === 14) return move(state, terminalId('MEM-D2-PAIN'), c.dog, 'MEM-D2');
     const event = n === 2 ? 'F1' : undefined;
     return move(state, terminalId('L' + String(n + 1).padStart(2, '0')), c.dog, event);
   }

@@ -12,8 +12,8 @@ import { paginateText } from './pagination';
 type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
 type PageState = { key: string; pages: string[]; index: number };
 const messages = {
-  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 2 concluído nesta versão. O Capítulo 3 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
-  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 2 complete in this version. Chapter 3 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
+  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 3 concluído nesta versão. O Capítulo 4 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
+  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 3 complete in this version. Chapter 4 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
 } as const;
 type Notice = 'connection' | 'stale' | 'expired';
 
@@ -257,7 +257,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
   // Continuous memory motion applies across all measured pages of this beat.
-  const memoryShiver = view?.cue === 'memory-shiver';
+  const memoryShiver = view?.cue === 'memory-shiver' || (view?.cue === 'name-reveal' && view.speaker === 'HOWARD');
   const nameReveal = view?.cue === 'name-reveal';
   const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 
@@ -293,7 +293,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={view.cue === 'archive-record'} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
               {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
                 <div className="campaign-choice-list">
@@ -304,7 +304,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 {!showChapter && (
                   <>
                     {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
-                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">???</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
+                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">{view.speaker === 'HOWARD' ? (locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice') : '???'}</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
                     </p>}
                     <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '') + (memoryShiver ? ' campaign-memory-shiver' : '')}>{pageText}</p>
                   </>

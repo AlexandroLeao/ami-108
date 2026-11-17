@@ -102,6 +102,15 @@ export class SessionService {
           }
         }
       }
+      if (next.chapterThree?.checkpoint && !state.chapterThree?.checkpoint) {
+        await tx.gameCheckpoint.upsert({ where: { sessionId_checkpointId: { sessionId, checkpointId: 'CP-RAT' } }, update: {}, create: { sessionId, checkpointId: 'CP-RAT', snapshot: JSON.parse(JSON.stringify(next.chapterThree.checkpoint)) as Prisma.InputJsonObject } });
+      }
+      if (next.chapterThree?.rat) {
+        const priorRatSlots = state.savedRatSlots ?? state.chapterThree?.rat?.slots ?? [];
+        for (const slot of next.chapterThree.rat.slots) {
+          if (!priorRatSlots.some(item => item.index === slot.index)) await tx.gameConsultationSlot.create({ data: { sessionId, encounterId: 'RAT', slotIndex: slot.index, category: slot.category, localizedText: { ...slot.text }, recipe: slot.recipe } });
+        }
+      }
       await tx.gameSession.update({ where: { id: sessionId }, data: { state: jsonState(next), revision: next.revision } });
       await tx.gameCommandReceipt.create({ data: { sessionId, commandId: input.commandId, requestDigest: fingerprint, appliedRevision: next.revision } });
       return { commandId: input.commandId, status: 'APPLIED' as const, view: projectNarrative(next) };
