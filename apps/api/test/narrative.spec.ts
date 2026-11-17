@@ -203,7 +203,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(projectNarrative(legacy).text).toBe('Minha cabeça...');
     expect(next(next(legacy)).reviewStepId).toBeNull();
   });
-  it('traverses Chapter 1 in both locales and stops at the unimplemented Chapter 2 boundary', () => {
+  it('traverses Chapter 1 in both locales and reaches the Chapter 2 card', () => {
     for (const locale of ['pt-BR', 'en'] as const) {
       let state = startNarrative(locale);
       for (const step of CHAPTER_ONE) {
@@ -217,7 +217,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
         expect(view).not.toHaveProperty('reviewStepId');
         state = next(state);
       }
-      expect(projectNarrative(state)).toMatchObject({ chapter: 2, sceneId: 'A02-S01', phase: 'CHAPTER_CARD', actions: [{ id: 'A02-S01/CHAPTER_CARD/PREVIOUS', kind: 'PREVIOUS' }], asset: null });
+      expect(projectNarrative(state)).toMatchObject({ chapter: 2, sceneId: 'A02-S01', phase: 'CHAPTER_CARD', actions: [{ id: 'A02-S01/CHAPTER_CARD/NEXT', kind: 'CONTINUE' }, { id: 'A02-S01/CHAPTER_CARD/PREVIOUS', kind: 'PREVIOUS' }], asset: null });
       expect(state.events).toEqual(['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1']);
       expect(() => advanceNarrative(state, 'A02-S01/L01/NEXT', state.revision)).toThrow('ACTION_NOT_ALLOWED');
     }

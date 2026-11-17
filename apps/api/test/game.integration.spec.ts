@@ -123,7 +123,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     let view = session.view;
     for (let i = 0; i < CHAPTER_ONE.length; i++) view = await command(session.cookie, view);
     expect(view.chapter).toBe(2);
-    expect(view.actions.map((action) => action.kind)).toEqual(['PREVIOUS']);
+    expect(view.actions.map((action) => action.kind)).toEqual(['CONTINUE', 'PREVIOUS']);
     expect(view.diagnostics).toEqual({ energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false });
     const row = await prisma.gameSession.findUniqueOrThrow({ where: { tokenDigest: digest(session.cookie.split('=')[1]) } });
     expect(row.state).toMatchObject({ events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: { category: 'RANDOM', source: 'fallback' } });

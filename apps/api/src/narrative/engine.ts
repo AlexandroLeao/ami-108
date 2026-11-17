@@ -2,8 +2,12 @@
 // Persistence and transactional command receipts must wrap these functions.
 import { CHAPTERS, CHAPTER_ONE, INTRO_FALLBACK, NARRATIVE_VERSION, OPENING_ASSETS, local, type Cue, type EventId, type Locale, type Localized, type OpeningAsset } from './catalog';
 
+import { beginChapterTwo, chapterTwoView, advanceChapterTwo, type ChapterTwoState } from './chapter-two';
+import type { Energy } from './encounter';
+
 const HANDOFF = 'A02-S01/CHAPTER_CARD';
-const INITIAL_DIAGNOSTICS = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false } as const;
+export type Diagnostics = Readonly<{ energy: Energy; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean }>;
+const INITIAL_DIAGNOSTICS: Diagnostics = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false };
 const actionLabel = local('Continuar', 'Continue');
 const actionsByStep: Readonly<Record<string, Localized>> = {
   'A01-S03/L38': local('Seguir para o terminal', 'Head to the terminal'),
@@ -16,12 +20,13 @@ export type NarrativeState = Readonly<{
   locale: Locale;
   revision: number;
   events: readonly EventId[];
-  diagnostics: typeof INITIAL_DIAGNOSTICS | null;
+  diagnostics: Diagnostics | null;
+  chapterTwo?: ChapterTwoState;
   intro: Readonly<{ category: 'RANDOM'; source: 'fallback'; text: Localized }> | null;
 }>;
-export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS'; label: string }>;
+export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS' | 'CONSULT' | 'CHOOSE' | 'RETRY'; label: string }>;
 export type CurrentView = Readonly<{
-  revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK';
+  revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK' | 'ENCOUNTER' | 'DEAD';
   chapter: number; chapterTitle: string; sceneId: string; speaker: string | null; text: string;
   asset: { url: `/api/game/asset?key=${OpeningAsset}`; alt: string } | null;
   diagnostics: NarrativeState['diagnostics']; actions: readonly NarrativeAction[]; pending: false;
@@ -78,6 +83,7 @@ function visibleIndex(state: NarrativeState): number {
 }
 
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
+  if (state.chapterTwo) return chapterTwoView(state).asset?.url.split('key=')[1] as OpeningAsset | undefined ?? null;
   return CHAPTER_ONE[visibleIndex(state)]?.asset ?? null;
 }
 
@@ -86,7 +92,7 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
   const locale = state.locale;
   const previous: NarrativeAction = { id: (step?.id ?? HANDOFF) + '/PREVIOUS', kind: 'PREVIOUS',
     label: locale === 'pt-BR' ? 'Fala anterior' : 'Previous dialogue' };
-  if (!step) return canReviewPrevious(index) ? [previous] : [];
+  if (!step) return [{ id: HANDOFF + '/NEXT', kind: 'CONTINUE', label: actionLabel[locale] }, previous];
   const forward: NarrativeAction = {
     id: step.id + '/NEXT',
     kind: actionsByStep[step.id] ? 'INTERACT' : step.action,
@@ -99,11 +105,13 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
 
 export function projectNarrative(state: NarrativeState): CurrentView {
   ensureLocale(state.locale);
+  if (state.version !== NARRATIVE_VERSION) throw new NarrativeError('INVALID_STATE');
+  if (state.chapterTwo) return chapterTwoView(state);
   const index = visibleIndex(state);
   const step = CHAPTER_ONE[index];
   const locale = state.locale;
   if (!step) {
-    // AMI-005 connects this boundary to the first encounter and creates CP-DOG.
+    // Stable handoff ID also resumes sessions created before Chapter 2.
     return { revision: state.revision, locale, phase: 'CHAPTER_CARD', chapter: 2,
       chapterTitle: CHAPTERS[1].title[locale], sceneId: 'A02-S01',
       speaker: null, text: locale === 'pt-BR' ? 'CAPÍTULO 2 — REGISTRO ATUALIZADO' : 'CHAPTER 2 — RECORD UPDATED',
@@ -120,8 +128,9 @@ export function projectNarrative(state: NarrativeState): CurrentView {
   };
 }
 
-export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number): NarrativeState {
+export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number, random: () => number = Math.random): NarrativeState {
   checkRevision(state, expectedRevision);
+  if (state.chapterTwo) return advanceChapterTwo(state, actionId, random);
   const index = visibleIndex(state);
   const allowed = currentActions(state, index).find((action) => action.id === actionId);
   if (!allowed) throw new NarrativeError('ACTION_NOT_ALLOWED');
@@ -132,6 +141,7 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
     const reviewNext = CHAPTER_ONE[index + 1]?.id ?? HANDOFF;
     return { ...state, reviewStepId: reviewNext === state.stepId ? null : reviewNext, revision: state.revision + 1 };
   }
+  if (index === CHAPTER_ONE.length) return beginChapterTwo(state);
   const next = CHAPTER_ONE[index + 1];
   let result: NarrativeState = { ...state, stepId: next?.id ?? HANDOFF, reviewStepId: null, revision: state.revision + 1 };
   if (next?.event && !state.events.includes(next.event)) {
@@ -144,7 +154,7 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
 
 export function changeNarrativeLocale(state: NarrativeState, locale: Locale, expectedRevision: number): NarrativeState {
   checkRevision(state, expectedRevision);
-  visibleIndex(state);
+  projectNarrative(state);
   ensureLocale(locale);
   return { ...state, locale, revision: state.revision + 1 };
 }
