@@ -36,7 +36,9 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(currentAsset(state)).toBe('CENA-04');
     const revealed = projectNarrative(state).asset;
     state = forward(state);
-    expect(projectNarrative(state)).toMatchObject({ cue: 'none', text: 'Olha a língua.', asset: revealed });
+    expect(projectNarrative(state)).toMatchObject({ cue: 'none', text: 'Um cachorrinho, bobo.', asset: revealed });
+    const translated = changeNarrativeLocale(state, 'en', state.revision);
+    expect(projectNarrative(translated)).toMatchObject({ cue: 'none', text: 'A little dog, Bobo.', asset: { url: revealed?.url } });
     for (let i = 0; i < 10 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
     expect(projectNarrative(state).actions.some(a => a.kind === 'PREVIOUS')).toBe(false);
   });

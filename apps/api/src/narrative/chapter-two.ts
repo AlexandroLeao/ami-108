@@ -17,7 +17,7 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S01/PRE-02": { speaker: 'NARRATION', text: local("De repente, ruídos vindos dos veículos à frente interrompem sua caminhada.", "Suddenly, noises from the vehicles ahead interrupt your walk.") },
   "A02-S01/PRE-03": { speaker: 'NARRATION', text: local("Você observa com atenção o ponto de onde vêm os ruídos.", "You look closely toward the source of the noises.") },
   "A02-S01/L01": { speaker: 'UNKNOWN', text: local("Puta merda! O que é aquilo?!", "Holy shit! What is that thing?!") },
-  "A02-S01/L02": { speaker: 'AMI', text: local("Olha a língua.", "Language.") },
+  "A02-S01/L02": { speaker: 'AMI', text: local("Um cachorrinho, bobo.", "A little dog, Bobo.") },
   "A02-S01/L03": { speaker: 'UNKNOWN', text: local("Você tá falando sério?!", "Are you serious?!") },
   "A02-S01/L04": { speaker: 'AMI', text: local("Afirmativo.", "Affirmative.") },
   "A02-S01/WARNING-01": { speaker: 'NARRATION', text: local("Você percebe que a criatura à sua frente não é amistosa.", "You realize the creature ahead is not friendly.") },

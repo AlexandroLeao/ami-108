@@ -28,6 +28,7 @@ const memorySteps = new Set(ARRIVAL_MEMORY.map(beat => lab(beat.id)));
 const archiveOrder = SECOND_FRAGMENT.map(beat => archive(beat.id));
 // These are presentation instructions grounded in the existing scene descriptions,
 // not added character dialogue or new plot facts.
+const arrival = local('Vocês seguem adiante até o arquivo central.', 'You proceed to the central archive.');
 const restore = local('AMI identifica o segundo componente em um equipamento compatível.', 'AMI identifies the second component in a compatible device.');
 const route = local('Com a rota para a instalação militar identificada, vocês sabem para onde seguir.', 'With the route to the military facility identified, you know where to go next.');
 
@@ -70,7 +71,7 @@ export function chapterThreeAsset(state: NarrativeState): OpeningAsset | null {
     || /^A03-S02\/[ABC]\d$/.test(id) || [rat('DEATH'), rat('DEAD-CARD'), rat('SUCCESS'), archive('DEPART'), archive('ROUTE')].includes(id)) return null;
   if (id.startsWith(LAB + '/')) return 'CENA-06';
   if (id.startsWith(RAT_SCENE + '/')) return 'CENA-07';
-  return id === archive('RESTORE') ? 'CENA-06' : 'CENA-05';
+  return id === archive('ARRIVAL') || id === archive('RESTORE') ? 'CENA-06' : 'CENA-05';
 }
 
 export function chapterThreeView(state: NarrativeState): CurrentView {
@@ -95,8 +96,8 @@ export function chapterThreeView(state: NarrativeState): CurrentView {
     if (id === rat('DEATH')) phase = 'DEAD';
   } else if (id === rat('DEAD-CARD')) {
     phase = 'DEAD'; text = local('VOCÊ NÃO SOBREVIVEU', 'YOU DID NOT SURVIVE');
-  } else if (id === archive('RESTORE') || id === archive('ROUTE')) {
-    text = id === archive('RESTORE') ? restore : route; narration = true;
+  } else if (id === archive('ARRIVAL') || id === archive('RESTORE') || id === archive('ROUTE')) {
+    text = id === archive('ARRIVAL') ? arrival : id === archive('RESTORE') ? restore : route; narration = true;
   } else {
     const key = id.split('/')[1];
     const slotBeat = id.match(/^A03-S02\/(Q|ANSWER|R)-(\d)$/);
@@ -186,7 +187,8 @@ export function advanceChapterThree(state: NarrativeState, actionId: string, ran
   if (id === rat('L05')) return move(state, rat('WARNING'));
   if (id === rat('WARNING')) return move(state, decision(0));
   const branch = id.match(/^A03-S02\/([ABC])([12])$/);
-  if (branch) return move(state, branch[2] === '1' ? rat(branch[1] + '2') : archive('RESTORE'));
+  if (branch) return move(state, branch[2] === '1' ? rat(branch[1] + '2') : archive('ARRIVAL'));
+  if (id === archive('ARRIVAL')) return move(state, archive('RESTORE'));
   if (id === archive('RESTORE')) return move(state, archive('L01'), { events: ['F2'], diagnostics: { ...diagnostics, energy: 3, med: 75, bio: 85, hist: 78 } });
   if (id === archive('L07')) return move(state, archive('ROUTE'));
   if (id === archive('ROUTE')) return move(state, archive('DEPART'));

@@ -61,7 +61,18 @@ describe('Chapter 3 integrated progression', () => {
     expect(projectNarrative(s)).toMatchObject({cue:'wake',text:'...'});
     expect(currentAsset(s)).toBe('CENA-06');
     expect(s.events).toEqual(expect.arrayContaining(['E-ARCHIVE','MEM-D3','FB-D3','E-PLANET','E-PARTNER']));
-    s=reach(s,x=>x.stepId==='A03-S01/EXIT-01');
+    s=reach(s,x=>x.stepId==='A03-S01/RETURN-02');
+    const bridge = [
+      ['RETURN-02','Sua memória também está progredindo, Bobo.','Your memory is progressing too, Bobo.'],
+      ['RETURN-02b','Devemos prosseguir. Pode haver um arquivo central.','We must proceed. There may be a central archive.'],
+      ['RETURN-02c','Lá, talvez eu possa restaurar mais dos meus arquivos.','There, I may be able to restore more of my files.'],
+    ] as const;
+    for (const [id,pt,en] of bridge) {
+      expect(s.stepId).toBe('A03-S01/'+id);
+      expect(projectNarrative(s)).toMatchObject({speaker:'AMI-108',text:locale==='pt-BR'?pt:en,cue:'none',asset:{url:'/api/game/asset?key=CENA-06'}});
+      s=step(s);
+    }
+    expect(s.stepId).toBe('A03-S01/EXIT-01');
     expect(projectNarrative(s)).toMatchObject({cue:'fade-black',asset:null});
     s=step(s);
     expect(s.stepId).toBe('A03-S01/EXIT-01b');
@@ -125,10 +136,21 @@ describe('Chapter 3 integrated progression', () => {
     if(cat !== 'NONE') s=consult(s, () => cat==='CORRECT'?0.4199:0.42);
     s=step(step(s,'RAT-02'));
     expect(s.stepId).toBe('A03-S02/'+branch+'1');
-    s=reach(s,x=>x.stepId==='A03-S03/RESTORE');
+    s=reach(s,x=>x.stepId==='A03-S03/ARRIVAL');
+    const arrival=projectNarrative(s);
+    expect(arrival).toMatchObject({text:'Vocês seguem adiante até o arquivo central.',narration:true,asset:{url:'/api/game/asset?key=CENA-06'}});
+    expect(arrival.actions[0].kind).toBe('CONTINUE');
+    expect(projectNarrative(changeNarrativeLocale(s,'en',s.revision)).text).toBe('You proceed to the central archive.');
+    expect(s.events).not.toContain('F2');
+    const beforeEnergy=s.diagnostics?.energy;
+    s=step(s);
+    expect(s.stepId).toBe('A03-S03/RESTORE');
+    expect(projectNarrative(s)).toMatchObject({text:'AMI identifica o segundo componente em um equipamento compatível.',narration:true,asset:arrival.asset});
     expect(projectNarrative(s).actions[0].kind).toBe('INTERACT');
     expect(s.events).not.toContain('F2');
+    expect(s.diagnostics?.energy).toBe(beforeEnergy);
     s=step(s);
+    expect(projectNarrative(s).text).toBe('Restauração concluída. Recuperei registros de evacuação.');
     expect(s.diagnostics).toEqual({energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
     expect(s.events.filter(x=>x==='F2')).toHaveLength(1);
     s=reach(s,x=>x.stepId==='A03-S03/ROUTE');
