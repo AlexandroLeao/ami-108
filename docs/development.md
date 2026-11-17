@@ -98,3 +98,7 @@ Chapter 1 sessions, state and command receipts are persisted; the remaining enco
 - Owner ran Docker Compose in Google Cloud Shell: all four containers healthy; web and AI liveness returned HTTP 200, API readiness returned database and AI status `ok`.
 - Owner confirmed the Next.js development screen in Web Preview on port 3000, displaying `API, database and AI service reachable.`
 - These are development integration checks, not evidence of game completion, real inference, production deployment or Codespaces validation.
+
+## Chapter 2 candidate playtest (PR #22)
+
+After the candidate CI passes, switch to `feat/dog-encounter` with a clean worktree, pull, and rebuild sequentially. A third additive migration creates CP-DOG and resolved slot tables; the prior Chapter 1 session/version remains compatible. Use private Web Preview on port 3000, not `/preview`. Resume the Chapter 2 card if available; otherwise play from a new run only after protecting any existing resume target. Verify direct choice, all three death/return paths, three consultation debits and cached reuse, no consult at zero, F1 without recharge, independent SOL-01, MEM-D2, E-NAME, both locales and reload. Do not expose safe-choice IDs in player-facing UI. Back up local player data before switching branches; do not delete volumes. Full owner acceptance and browser verification remain pending.

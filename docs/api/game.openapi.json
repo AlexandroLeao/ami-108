@@ -3,7 +3,7 @@
   "info": {
     "title": "AMI-108 Game API",
     "version": "0.1.0-proposed",
-    "description": "Local Chapter 1 subset implemented in PR #20; remaining campaign/action kinds, pending inference, production rate limits and deployment are design proposals. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
+    "description": "Local Chapter 1 merged; Chapter 2 encounter/checkpoint and restoration candidate in PR #22. Later campaign, pending inference, rate limits and deployment remain proposals. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
   },
   "servers": [
     {

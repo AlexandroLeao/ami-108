@@ -50,3 +50,5 @@ Short-lived branches, reviewable pull requests, explicit acceptance criteria and
 Repository documentation, issue and PR text, commits, code identifiers and comments are written in English. Official private documents and owner-facing reports are in Portuguese; in-game content remains PT-BR/EN.
 
 License and asset distribution terms are not yet decided.
+
+Chapter 2 local integration is in draft PR #22; see [encounter engine](docs/encounter-engine.md). It is not accepted until CI and owner playtest pass.

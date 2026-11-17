@@ -59,3 +59,7 @@ Replace the in-art diagnostics overlay with a compact status strip centered betw
 ## Acceptance and source synchronization
 
 PR #20 merged at `3cf942a` after the owner's local playtest and final refinement approval. Post-merge CI passed. The final header and arrow rules above are authoritative for the implemented Chapter 1 presentation; the isolated preview remains unchanged. The private cumulative source revisions v1.11/v1.9 were synchronized on November 17; the asset ZIP remains unchanged. Full browser E2E, independent viewport/zoom checks and accessibility review remain AMI-010.
+
+## Chapter 2 candidate (PR #22)
+
+Keep the accepted Chapter 1 shell and header. Show CENA-04 for the dog and CENA-05 for the terminal only when authorized. Decision buttons occupy the dialogue frame; two columns where space allows, one on portrait screens, with internal scrolling in short viewports. Show only legal CONSULT and four fixed CHOOSE actions, no success hints or arrow captions. Death consequence on coal, then red VOCÊ MORREU/YOU DIED and explicit checkpoint-return button. Do not bind a generic forward arrow to a choice or retry. F1 and SOL-01 advance through existing interaction arrows; the header reflects applied values on illustrated beats. MEM-D2 uses the dark voice beat and wake return. This layout requires owner playtest and independent responsive validation.

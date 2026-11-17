@@ -39,3 +39,5 @@ Tests, security, documentation and deployment preparation start early. Evaluate 
 - Next.js, NestJS, FastAPI, Prisma/PostgreSQL, Docker Compose, CI/CD; unit, integration, contract and E2E evidence; accessibility, performance and security validation.
 - Reproducible execution, verified free deployment conditions, AWS integration only when authorized and viable; clearly distinguish simulation from real deployment.
 - No unresolved critical defects, owner approval, and honest documentation. No release solely because the target date has arrived.
+
+Day 2 increment: draft PR #22 connects the dog, CP-DOG, resolved consultation slots, F1, SOL-01, MEM-D2/FB-D2 and E-NAME. CI and owner acceptance are pending; do not mark AMI-005/006 complete. Real inference and later chapters remain separate.

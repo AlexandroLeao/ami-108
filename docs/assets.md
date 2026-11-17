@@ -37,3 +37,5 @@ Preview flags are enabled only in local Compose. The isolated development route 
 ## Cloud Shell disk-space recovery
 
 If Compose fails during a build with `No space left on device`, inspect `df -h /`, `df -i /` and `docker system df`. The Node Dockerfile installs and builds as the unprivileged node user; it no longer recursively changes ownership of the whole dependency tree. To reclaim space, stop this project with `docker compose down --rmi local` (retains PostgreSQL volumes), then run `docker builder prune -a` only if you can discard unused build caches, including those from other projects. Confirm the prompt, check free space and rebuild sequentially with `docker compose --parallel 1 up --build -d --wait`. Never add `--volumes` or `-v` to recovery commands. The corrective Dockerfile requires a fresh integrated runtime check; application CI alone does not verify container builds.
+
+PR #22 authorizes CENA-04 and CENA-05 only at current Chapter 2 views. The original twelve PNGs and manifest are unchanged; future assets remain inaccessible. The encounter layout and visual transitions require owner playtest.
