@@ -43,3 +43,7 @@ Main now includes the accepted playable local Chapter 1. Final branch [CI 439341
 ### Second owner refinement — terminal arrival and memory
 
 The solar information card is retired; AMI's existing explanation in A02-S02 remains unchanged. Old `A01-S03/TUTORIAL-d` authoritative cursors resume at RETURN-STREET and review cursors map to TUTORIAL-c, without replaying an event or altering revision. All three dog success branches now converge on three dark arrival narration beats before CENA-05 and L01. MEM-D2 starts with the new pain beat and a one-shot blink-to-black cue, followed by the existing dark pain line, unlabeled silence, familiar voice, AMI's dark call and L15 wake. L18 is split into three beats; E-NAME applies on the last, explicit recognition beat. Existing MEM-D2, FB-D2, E-NAME and F1/SOL-01 event IDs and effects remain unchanged. See [encounter engine](encounter-engine.md).
+
+### Third owner refinement
+
+ARRIVAL-03 describes observing AMI connect to the panel and emit brief electronic sounds while searching for a component. FOUND introduces “Componente localizado.” / “Component located.” and the terminal fade-in before the unchanged L01. The cake-related L04 variant becomes “Então vai parar de falar coisas aleatórias?”; the existing no-recipe bananas variant remains unchanged. FB-D2 familiar voice is now two dark beats F01 and F01b (“Sinto muito...” / “David...”); the dark MEM-D2 line uses the existing pain cue. Stable prior IDs and event effects retained. No change to SOL-01 or other transitions.
