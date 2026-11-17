@@ -7,7 +7,7 @@ The two OpenAPI 3.1 JSON documents are design contracts, not generated runtime s
 
 ## Implementation boundary
 
-Chapter 1 implements POST session, GET view, POST commands, PATCH locale and GET asset through the local same-origin facade. Session ownership, row-locked receipt transactions, strict input validation, bounded history and protected current-step art are implemented. Later action kinds, pending inference, encounters, production rate limits and deployment remain proposals. See [narrative engine](../narrative-engine.md).
+The Chapter 1 baseline implements POST session, GET view, POST commands, PATCH locale and GET asset through the local same-origin facade. PR #22 uses the same routes for Chapter 2; checkpoint/slot rows and receipts are committed atomically. Session ownership, row-locked receipt transactions, strict input validation, bounded history and protected current-step art are implemented. CONSULT, CHOOSE and RETRY are implemented in the Chapter 2 candidate; later encounters/action kinds, pending inference, production rate limits and deployment remain proposals. See [narrative engine](../narrative-engine.md).
 
 ## Conventions
 

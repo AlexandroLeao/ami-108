@@ -217,7 +217,8 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
 
   useEffect(() => {
     if (busy) return;
-    (panelRef.current?.querySelector<HTMLElement>('[data-primary]:not(:disabled)')
+    (panelRef.current?.querySelector<HTMLElement>('.campaign-choice-area')
+      ?? panelRef.current?.querySelector<HTMLElement>('[data-primary]:not(:disabled)')
       ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
   }, [view?.phase, view?.revision, overlay, chapterReady, busy]);
 
@@ -263,7 +264,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <p className="version-label">{labels.version}</p>
           </section>
         ) : (
-          <section className="game-stage">
+          <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'}>
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
@@ -277,10 +278,10 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               </div>
             </CampaignScene>
             <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
-              {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text}>
+              {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
                 <div className="campaign-choice-list">
-                  {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" disabled={busy}
+                  {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" data-kind={action.kind} disabled={busy}
                     onClick={() => void run(() => mutate(view, { actionId: action.id }))}>{action.label}</button>)}
                 </div>
               </div> : <div className="dialogue-copy" aria-live="polite" aria-atomic="true">

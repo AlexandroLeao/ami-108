@@ -1,5 +1,5 @@
 // Server-only narrative data. Do not import from the web application.
-// Canonical sources: private Master v1.10 / Interactive Script v1.8.
+// Canonical sources: private Master v1.11 / Interactive Script v1.9 (cumulative revisions).
 export const NARRATIVE_VERSION = '1.10-1.8-chapter1-v1' as const;
 export type Locale = 'pt-BR' | 'en';
 export type Localized = Readonly<Record<Locale, string>>;
