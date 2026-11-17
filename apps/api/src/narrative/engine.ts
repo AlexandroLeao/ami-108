@@ -101,8 +101,60 @@ function normalizeRetiredTutorial(state: NarrativeState): NarrativeState {
     stepId: state.stepId === retired ? 'A01-S03/RETURN-STREET' : state.stepId,
     reviewStepId: state.reviewStepId === retired ? 'A01-S03/TUTORIAL-c' : state.reviewStepId };
 }
+// Compatibility for saves made before the owner removed solar dialogue and
+// condensed the laboratory/rat sequence. Retired steps never become playable.
+const retiredTwo = new Set(['L08b','L09','L10','L11','L12','L13','L14'].map(id => 'A02-S02/' + id));
+const retiredThree: Readonly<Record<string, string>> = {
+  'A03-S01/LAB-TIME': 'A03-S01/L06a',
+  'A03-S01/F07': 'A03-S01/F08',
+  'A03-S02/L03': 'A03-S02/WARNING',
+  'A03-S02/L04': 'A03-S02/WARNING',
+  'A03-S02/L05': 'A03-S02/WARNING',
+  'A03-S03/SOL-02': 'A03-S03/DEPART',
+  'A03-S03/SOL-02-L01': 'A03-S03/DEPART',
+  'A03-S03/SOL-02-L02': 'A03-S03/DEPART',
+};
+function repairTrail(trail: readonly string[], current: string, replacement: string, retired: (id: string) => boolean, review: string | null) {
+  const kept = trail.filter(id => !retired(id));
+  if (replacement !== current && kept.at(-1) !== replacement) kept.push(replacement);
+  let cursor = review;
+  if (cursor && retired(cursor)) {
+    const previous = trail.slice(0, trail.indexOf(cursor)).filter(id => !retired(id)).at(-1);
+    cursor = previous && previous !== replacement ? previous : null;
+  }
+  return { trail: kept, reviewStepId: cursor === replacement ? null : cursor };
+}
+function normalizeRetiredScenes(state: NarrativeState): NarrativeState {
+  state = normalizeRetiredScenes(state);
+  if (state.chapterTwo && !state.chapterThree) {
+    const c = state.chapterTwo;
+    const replacement = retiredTwo.has(state.stepId) ? 'A02-S02/MEM-D2-PAIN' : state.stepId;
+    const needsTrail = c.trail.some(id => retiredTwo.has(id));
+    const needsEnergy = !!state.diagnostics && state.events.includes('F1') && state.diagnostics.energy !== 3;
+    if (needsTrail || needsEnergy) {
+      const repaired = repairTrail(c.trail,state.stepId,replacement,id=>retiredTwo.has(id),state.reviewStepId);
+      const events = replacement !== state.stepId && !state.events.includes('MEM-D2') ? [...state.events,'MEM-D2' as const] : state.events;
+      state = { ...state, stepId: replacement, reviewStepId: repaired.reviewStepId, events,
+        diagnostics: needsEnergy && state.diagnostics ? {...state.diagnostics,energy:3} : state.diagnostics,
+        chapterTwo: {...c,trail:repaired.trail} };
+    }
+  }
+  if (state.chapterThree) {
+    const c=state.chapterThree;
+    const replacement=retiredThree[state.stepId] ?? state.stepId;
+    const needsTrail=c.trail.some(id=>Object.hasOwn(retiredThree,id));
+    const needsEnergy=!!state.diagnostics && state.events.includes('F2') && state.diagnostics.energy!==3;
+    if(needsTrail || needsEnergy) {
+      const repaired=repairTrail(c.trail,state.stepId,replacement,id=>Object.hasOwn(retiredThree,id),state.reviewStepId);
+      state={...state,stepId:replacement,reviewStepId:repaired.reviewStepId,
+        diagnostics:needsEnergy && state.diagnostics ? {...state.diagnostics,energy:3}:state.diagnostics,
+        chapterThree:{...c,trail:repaired.trail}};
+    }
+  }
+  return state;
+}
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
-  state = normalizeRetiredTutorial(state);
+  state = normalizeRetiredScenes(state);
   if (state.chapterThree) { chapterThreeView(state); return chapterThreeAsset(state); }
   if (state.chapterTwo) { chapterTwoView(state); return chapterTwoAsset(state); }
   return CHAPTER_ONE[visibleIndex(state)]?.asset ?? null;
@@ -129,7 +181,7 @@ function unlocked(state: NarrativeState): number {
   return Math.min(4, Math.max(reached, state.unlockedChapter ?? 1));
 }
 export function projectNarrative(state: NarrativeState): CurrentView {
-  state = normalizeRetiredTutorial(state);
+  state = normalizeRetiredScenes(state);
   const view = projectCurrent(state);
   return { ...view, chapters: CHAPTERS.slice(0, unlocked(state)).map(chapter => ({ number: chapter.number, title: chapter.title[state.locale] })) };
 }
@@ -199,9 +251,10 @@ function restartChapter(state: NarrativeState, chapter: number): NarrativeState 
 }
 export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number, random: () => number = Math.random): NarrativeState {
   checkRevision(state, expectedRevision);
+  state = normalizeRetiredScenes(state);
   const restart = /^CHAPTER\/RESTART\/([1-5])$/.exec(actionId);
   if (restart) return restartChapter(state, Number(restart[1]));
-  return rememberProgress(advanceCurrent(normalizeRetiredTutorial(state), actionId, random));
+  return rememberProgress(advanceCurrent(state, actionId, random));
 }
 function advanceCurrent(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
   if (state.chapterThree) return advanceChapterThree(state, actionId, random);
@@ -232,5 +285,5 @@ export function changeNarrativeLocale(state: NarrativeState, locale: Locale, exp
   checkRevision(state, expectedRevision);
   projectNarrative(state);
   ensureLocale(locale);
-  return { ...normalizeRetiredTutorial(state), locale, revision: state.revision + 1 };
+  return { ...normalizeRetiredScenes(state), locale, revision: state.revision + 1 };
 }

@@ -28,26 +28,34 @@ describe('Chapter 3 integrated progression', () => {
     expect(projectNarrative(s).actions[0].kind).toBe('CONTINUE');
     expect(currentAsset(s)).toBeNull();
     s = step(s);
+    expect(s.stepId).toBe('A03-S01/PRE-01');
+    expect(currentAsset(s)).toBeNull();
+    s=reach(s,x=>x.stepId==='A03-S01/L01');
     expect(currentAsset(s)).toBe('CENA-06');
-    expect(projectNarrative(s).chapter).toBe(3);
+    expect(projectNarrative(s)).toMatchObject({chapter:3,cue:'fade-in'});
     s = reach(s, x => x.stepId === 'A03-S01/L05');
     expect(projectNarrative(s).actions[0].kind).toBe('INTERACT');
     s = step(s);
+    expect(s.stepId).toBe('A03-S01/CONNECT-01');
+    s=reach(s,x=>x.stepId==='A03-S01/LAB-01');
     for (const record of LAB_RECORDS) {
       expect(s.stepId).toBe('A03-S01/'+record.id);
-      expect(projectNarrative(s).text).toBe(record.text[locale]);
+      expect(projectNarrative(s)).toMatchObject({text:record.text[locale],speaker:null,narration:false,cue:'archive-record'});
       expect(currentAsset(s)).toBeNull();
       expect(s.diagnostics?.energy).toBe(3);
       s = step(s);
     }
-    expect(s.stepId).toBe('A03-S01/LAB-TIME');
+    expect(s.stepId).toBe('A03-S01/L06a');
+    expect(projectNarrative(s)).toMatchObject({cue:'fade-in',asset:{url:'/api/game/asset?key=CENA-06'}});
     s = reach(s, x => x.stepId === 'A03-S01/F01');
-    expect(projectNarrative(s).speaker).toBe(locale === 'pt-BR' ? 'Parceiro' : 'Partner');
+    expect(projectNarrative(s).speaker).toBe(locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice');
     expect(currentAsset(s)).toBeNull();
     expect(s.events).not.toContain('E-PARTNER');
-    s = reach(s, x => x.stepId === 'A03-S01/F07');
-    expect(projectNarrative(s).speaker).toBe('HOWARD');
-    s = reach(s, x => x.stepId === 'A03-S01/RETURN-01');
+    s = reach(s, x => x.stepId === 'A03-S01/F09');
+    expect(projectNarrative(s)).toMatchObject({speaker:'HOWARD',cue:'name-reveal',asset:null});
+    s = step(s);
+    expect(s.stepId).toBe('A03-S01/RETURN-00');
+    expect(projectNarrative(s)).toMatchObject({cue:'wake',text:'...'});
     expect(currentAsset(s)).toBe('CENA-06');
     expect(s.events).toEqual(expect.arrayContaining(['E-ARCHIVE','MEM-D3','FB-D3','E-PLANET','E-PARTNER']));
     s = ratDecision(s);
@@ -70,7 +78,7 @@ describe('Chapter 3 integrated progression', () => {
     expect(rng).not.toHaveBeenCalled();
     expect(s.chapterThree?.rat?.slots[0]).toEqual(cached);
   });
-  it.each([{cat:'NONE',branch:'C'},{cat:'CORRECT',branch:'B'},{cat:'RANDOM',branch:'A'}])('requires F2, SOL-02 and route after $cat', ({cat,branch}) => {
+  it.each([{cat:'NONE',branch:'C'},{cat:'CORRECT',branch:'B'},{cat:'RANDOM',branch:'A'}])('requires F2 with immediate recharge and route after $cat', ({cat,branch}) => {
     let s = ratDecision();
     if(cat !== 'NONE') s=consult(s, () => cat==='CORRECT'?0.4199:0.42);
     s=step(step(s,'RAT-02'));
@@ -78,16 +86,16 @@ describe('Chapter 3 integrated progression', () => {
     s=reach(s,x=>x.stepId==='A03-S03/RESTORE');
     expect(projectNarrative(s).actions[0].kind).toBe('INTERACT');
     expect(s.events).not.toContain('F2');
-    const energy=s.diagnostics?.energy;
     s=step(s);
-    expect(s.diagnostics).toEqual({energy,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
+    expect(s.diagnostics).toEqual({energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
     expect(s.events.filter(x=>x==='F2')).toHaveLength(1);
-    s=reach(s,x=>x.stepId==='A03-S03/SOL-02');
+    s=reach(s,x=>x.stepId==='A03-S03/ROUTE');
     expect(s.events).not.toContain('SOL-02');
     s=step(s);
+    expect(s.stepId).toBe('A03-S03/DEPART');
     expect(s.diagnostics?.energy).toBe(3);
     s=reach(s,x=>x.stepId==='A04-S01/CHAPTER_CARD');
-    expect(s.events).toEqual(expect.arrayContaining(['F2','SOL-02','E-ESCAPE-ROUTE']));
+    expect(s.events).toEqual(expect.arrayContaining(['F2','E-ESCAPE-ROUTE']));
     expect(projectNarrative(s).chapters?.map(x=>x.number)).toEqual([1,2,3,4]);
     expect(projectNarrative(s).actions.map(x=>x.kind)).toEqual(['PREVIOUS']);
     expect(()=>step(s,'CHAPTER/RESTART/5')).toThrow('ACTION_NOT_ALLOWED');

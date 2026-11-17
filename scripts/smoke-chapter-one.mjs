@@ -118,6 +118,8 @@ try {
   assert.deepEqual(view.diagnostics, { energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
   assert.equal((await call('asset?key=CENA-06')).status, 404);
   await send(view.actions[0]);
+  assert.equal(view.asset, null);
+  for(let i=0;i<5 && !view.asset;i++) await send(view.actions[0]);
   assert.equal(view.asset.url, '/api/game/asset?key=CENA-06');
   assert.equal((await call('asset?key=CENA-07')).status, 404);
   for(let i=0;i<65 && view.phase!=='ENCOUNTER';i++) await send(view.actions[0]);
@@ -130,7 +132,7 @@ try {
   assert.equal(view.chapter,4);
   assert.deepEqual(view.diagnostics,{energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
   assert.deepEqual([...verifiedAssets].sort(), ['CENA-01', 'CENA-02', 'CENA-03', 'CENA-04', 'CENA-05', 'CENA-06', 'CENA-07']);
-  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 7 reached assets, locale, resume, dog and rat encounters, F2/SOL-02 and Chapter 4 boundary.');
+  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 7 reached assets, locale, resume, dog and rat encounters, F2 recharge and Chapter 4 boundary.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
 }

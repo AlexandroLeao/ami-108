@@ -1,6 +1,6 @@
 import {
   ARRIVAL_MEMORY, CHAPTER_THREE_GATES, LAB_AFTER_RECORDS, LAB_ENTRY, LAB_RECORDS,
-  LAB_RETURN, LAB_TIME, RAT, RAT_ENTRY, RAT_QUESTION, RAT_REACTIONS, RAT_SUCCESS,
+  LAB_RETURN, RAT, RAT_ENTRY, RAT_QUESTION, RAT_REACTIONS, RAT_SUCCESS,
   SECOND_FRAGMENT,
 } from '../src/narrative/chapter-three-catalog';
 import { chooseEncounter, consultEncounter, retryEncounter, startEncounter, successVariant } from '../src/narrative/encounter';
@@ -8,13 +8,12 @@ import { chooseEncounter, consultEncounter, retryEncounter, startEncounter, succ
 describe('Chapter 3 source catalog — not yet integrated', () => {
   it('retains bilingual ordered records, dialogue and separate memory gates', () => {
     expect(LAB_ENTRY.map(beat => beat.id)).toEqual(['L01','L02','L03','L04','L05']);
-    expect(LAB_RECORDS.map(beat => beat.id)).toEqual(['LAB-01','LAB-02','LAB-03','LAB-04','LAB-05']);
-    expect(LAB_TIME.text).toEqual({ 'pt-BR': '20 ANOS ATRÁS', en: '20 YEARS AGO' });
+    expect(LAB_RECORDS.map(beat => beat.id)).toEqual(['LAB-01','LAB-01b','LAB-02','LAB-02b','LAB-03','LAB-04','LAB-04b','LAB-04c','LAB-05','LAB-05b','LAB-05c']);
     expect(LAB_AFTER_RECORDS.at(-1)?.id).toBe('MEM-D3');
-    expect(ARRIVAL_MEMORY.map(beat => beat.id)).toEqual(['F01','F02','F03','F04','F05','F06','F07','F08','F09']);
-    expect(ARRIVAL_MEMORY.filter(beat => beat.speaker === 'HOWARD')[0].id).toBe('F07');
-    expect(LAB_RETURN.map(beat => beat.id)).toEqual(['RETURN-01','RETURN-02']);
-    const all = [...LAB_ENTRY, ...LAB_RECORDS, LAB_TIME, ...LAB_AFTER_RECORDS,
+    expect(ARRIVAL_MEMORY.map(beat => beat.id)).toEqual(['F01','F02','F03','F04','F05','F06','F08','F09']);
+    expect(ARRIVAL_MEMORY.filter(beat => beat.speaker === 'HOWARD')[0].id).toBe('F09');
+    expect(LAB_RETURN.map(beat => beat.id)).toEqual(['RETURN-00','RETURN-01','RETURN-01b','RETURN-01c','RETURN-02','EXIT-01','EXIT-02','EXIT-03']);
+    const all = [...LAB_ENTRY, ...LAB_RECORDS, ...LAB_AFTER_RECORDS,
       ...ARRIVAL_MEMORY, ...LAB_RETURN, ...RAT_ENTRY, RAT_QUESTION, ...RAT_REACTIONS,
       ...Object.values(RAT_SUCCESS).flat(), ...SECOND_FRAGMENT];
     for (const beat of all) {
@@ -24,7 +23,7 @@ describe('Chapter 3 source catalog — not yet integrated', () => {
     expect(CHAPTER_THREE_GATES.restoredMemory).toEqual({
       med:75, bio:85, hist:78, personal:5, personalUnlocked:false,
     });
-    expect(CHAPTER_THREE_GATES.solar).toBe('SOL-02');
+    expect(CHAPTER_THREE_GATES.recharge).toBe('F2');
     expect(CHAPTER_THREE_GATES.route).toBe('E-ESCAPE-ROUTE');
   });
   it('keeps biological weakness out of public records and early dialogue', () => {

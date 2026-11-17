@@ -183,7 +183,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(view.chapter).toBe(3);
     expect(view.diagnostics).toEqual({ energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
     expect(await prisma.gameCheckpoint.count({ where: { sessionId: row.id } })).toBe(1);
-    expect((await prisma.gameSession.findUniqueOrThrow({ where: { id: row.id } })).state).toMatchObject({ events: expect.arrayContaining(['F1', 'SOL-01', 'MEM-D2', 'FB-D2', 'E-NAME']) });
+    expect((await prisma.gameSession.findUniqueOrThrow({ where: { id: row.id } })).state).toMatchObject({ events: expect.arrayContaining(['F1', 'MEM-D2', 'FB-D2', 'E-NAME']) });
     expect(view.chapters?.map(c => c.number)).toEqual([1,2,3]);
     view = await command(cookie, view, 'CHAPTER/RESTART/1');
     expect(view.chapter).toBe(1);
@@ -202,7 +202,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     await request(app.getHttpServer()).post('/game/commands').set('Cookie', cookie).send({commandId: randomUUID(), expectedRevision: view.revision, actionId: 'CHAPTER/RESTART/4'}).expect(403);
   }, 30000);
 
-  it('persists rat checkpoint, cache, F2 and SOL-02 and chapter replay', async () => {
+  it('persists rat checkpoint, cache, F2 recharge and chapter replay', async () => {
     const { cookie, view: initial } = await create();
     let view = initial;
     for (let i=0; i<100 && view.phase!=='ENCOUNTER'; i++) view=await command(cookie,view);
@@ -211,6 +211,8 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(view.chapter).toBe(3);
     await request(app.getHttpServer()).get('/game/asset?key=CENA-06').set('Cookie',cookie).expect(404);
     view=await command(cookie,view);
+    expect(view.asset).toBeNull();
+    for(let i=0;i<5 && !view.asset;i++) view=await command(cookie,view);
     expect(view.asset?.url).toBe('/api/game/asset?key=CENA-06');
     await request(app.getHttpServer()).get('/game/asset?key=CENA-07').set('Cookie',cookie).expect(404);
     for (let i=0; i<65 && view.phase!=='ENCOUNTER'; i++) view=await command(cookie,view);
@@ -244,7 +246,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(view.chapter).toBe(4);
     expect(view.diagnostics).toEqual({energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
     expect(await prisma.gameCheckpoint.count({where:{sessionId:row.id}})).toBe(2);
-    expect((await prisma.gameSession.findUniqueOrThrow({where:{id:row.id}})).state).toMatchObject({events:expect.arrayContaining(['E-ARCHIVE','MEM-D3','FB-D3','E-PLANET','E-PARTNER','CP-RAT','F2','SOL-02','E-ESCAPE-ROUTE'])});
+    expect((await prisma.gameSession.findUniqueOrThrow({where:{id:row.id}})).state).toMatchObject({events:expect.arrayContaining(['E-ARCHIVE','MEM-D3','FB-D3','E-PLANET','E-PARTNER','CP-RAT','F2','E-ESCAPE-ROUTE'])});
     view=await command(cookie,view,'CHAPTER/RESTART/3');
     expect(view.chapter).toBe(3);
     expect(view.diagnostics?.bio).toBe(42);
