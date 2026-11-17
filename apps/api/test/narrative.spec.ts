@@ -121,7 +121,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     const joined = next(before);
     expect(joined.events).toEqual(['E-JOIN']);
     expect(projectNarrative(joined).diagnostics).toEqual({ energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false });
-    expect(projectNarrative(next(joined)).text).toContain('Consultar AMI consome uma barra.');
+    expect(projectNarrative(next(joined)).text).toBe('Consultar AMI consome sua energia.');
   });
   it('uses one free fixed RANDOM fallback and keeps it when changing locale', () => {
     const state = reach('A01-S03/L33');
@@ -138,10 +138,14 @@ describe('server-only Chapter 1 catalog and transition core', () => {
   it('shows the dark join, information card and narrated return to the street', () => {
     let state = reach('A01-S03/E-JOIN');
     expect(projectNarrative(state)).toMatchObject({ narration: true, information: false, asset: null, cue: 'fade-black' });
-    expect(projectNarrative(state).text).toContain('Você coloca');
+    expect(projectNarrative(state).text).toContain('Você então coloca');
     expect(projectNarrative(state).text).not.toContain('arnês');
     state = next(state);
-    expect(projectNarrative(state)).toMatchObject({ narration: false, information: true, asset: null });
+    expect(projectNarrative(state)).toMatchObject({ narration: false, information: true, asset: null, cue: 'energy-reveal', diagnostics: { energy: 3 } });
+    for (const text of ['A memória danificada pode gerar respostas desconexas.', 'Ajude AMI a recuperar seus arquivos de memória para obter respostas precisas.']) {
+      state = next(state);
+      expect(projectNarrative(state)).toMatchObject({ information: true, asset: null, cue: 'none', text });
+    }
     state = next(state);
     expect(state.stepId).toBe('A01-S03/RETURN-STREET');
     expect(projectNarrative(state)).toMatchObject({ narration: true, asset: null });
@@ -149,6 +153,17 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(state.stepId).toBe('A01-S03/L26');
     expect(currentAsset(state)).toBe('CENA-02');
     expect(state.events).toEqual(['E-JOIN']);
+  });
+  it('skips the retired solar information beat in old saves and history without replay', () => {
+    const tutorial = reach('A01-S03/TUTORIAL-c');
+    const legacy = { ...tutorial, stepId: 'A01-S03/TUTORIAL-d' };
+    expect(projectNarrative(legacy).information).toBe(false);
+    expect(projectNarrative(legacy).text).toBe(projectNarrative(next(tutorial)).text);
+    expect(next(legacy).stepId).toBe('A01-S03/L26');
+    const reviewed = { ...reach('A01-S03/L26'), reviewStepId: 'A01-S03/TUTORIAL-d' };
+    expect(projectNarrative(reviewed).text).toContain('obter respostas precisas.');
+    expect(next(next(reviewed)).reviewStepId).toBeNull();
+    expect(currentAsset(reviewed)).toBeNull();
   });
   it('runs MEM-D1, seven dark memory beats and a blink return without replay or debit', () => {
     const pain = reach('A01-S03/MEM-D1');
@@ -160,7 +175,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     for (const [index, text] of texts.entries()) {
       state = next(state);
       expect(projectNarrative(state)).toMatchObject({ phase: 'FLASHBACK', asset: null, narration: true,
-        cue: index === 0 ? 'close-eyes' : 'none', text });
+        cue: index === 0 ? 'close-eyes' : 'memory-shiver', text });
       expect(currentAsset(state)).toBeNull();
     }
     state = next(state);
@@ -170,6 +185,13 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(projectNarrative(state).text).toBe('Alguma irregularidade?');
     expect(state.diagnostics).toEqual(pain.diagnostics);
     expect(state.events).toEqual(['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1']);
+  });
+  it('limits continuous memory tremor to the six specified Chapter 1 beats in both languages', () => {
+    const expected = ['FB-D1b', 'FB-D1c', 'FB-D1d', 'FB-D1e', 'FB-D1f', 'FB-D1g'].map(id => 'A01-S03/' + id);
+    for (const locale of ['pt-BR', 'en'] as const) {
+      expect(CHAPTER_ONE.filter(step => step.cue === 'memory-shiver').map(step => step.id)).toEqual(expected);
+      for (const id of expected) expect(projectNarrative(reach(id, locale))).toMatchObject({ cue: 'memory-shiver', asset: null, phase: 'FLASHBACK' });
+    }
   });
   it('reviews every reached beat from the end through events without undoing state or revealing early diagnostics', () => {
     const original = reach('A02-S01/CHAPTER_CARD');
@@ -203,7 +225,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(projectNarrative(legacy).text).toBe('Minha cabeça...');
     expect(next(next(legacy)).reviewStepId).toBeNull();
   });
-  it('traverses Chapter 1 in both locales and stops at the unimplemented Chapter 2 boundary', () => {
+  it('traverses Chapter 1 in both locales and reaches the Chapter 2 card', () => {
     for (const locale of ['pt-BR', 'en'] as const) {
       let state = startNarrative(locale);
       for (const step of CHAPTER_ONE) {
@@ -217,7 +239,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
         expect(view).not.toHaveProperty('reviewStepId');
         state = next(state);
       }
-      expect(projectNarrative(state)).toMatchObject({ chapter: 2, sceneId: 'A02-S01', phase: 'CHAPTER_CARD', actions: [{ id: 'A02-S01/CHAPTER_CARD/PREVIOUS', kind: 'PREVIOUS' }], asset: null });
+      expect(projectNarrative(state)).toMatchObject({ chapter: 2, sceneId: 'A02-S01', phase: 'CHAPTER_CARD', actions: [{ id: 'A02-S01/CHAPTER_CARD/NEXT', kind: 'CONTINUE' }, { id: 'A02-S01/CHAPTER_CARD/PREVIOUS', kind: 'PREVIOUS' }], asset: null });
       expect(state.events).toEqual(['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1']);
       expect(() => advanceNarrative(state, 'A02-S01/L01/NEXT', state.revision)).toThrow('ACTION_NOT_ALLOWED');
     }

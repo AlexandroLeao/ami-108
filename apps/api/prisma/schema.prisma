@@ -18,6 +18,8 @@ model GameSession {
   revision         Int                  @default(0)
   expiresAt        DateTime?
   receipts         GameCommandReceipt[]
+  checkpoints      GameCheckpoint[]
+  consultationSlots GameConsultationSlot[]
 }
 
 model GameCommandReceipt {
@@ -29,4 +31,27 @@ model GameCommandReceipt {
   session         GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@id([sessionId, commandId])
+}
+
+model GameCheckpoint {
+  sessionId    String      @db.Uuid
+  checkpointId String
+  snapshot     Json
+  createdAt    DateTime    @default(now())
+  session      GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, checkpointId])
+}
+
+model GameConsultationSlot {
+  sessionId     String      @db.Uuid
+  encounterId   String
+  slotIndex     Int
+  category      String
+  localizedText Json
+  recipe        Boolean
+  createdAt     DateTime    @default(now())
+  session       GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, encounterId, slotIndex])
 }

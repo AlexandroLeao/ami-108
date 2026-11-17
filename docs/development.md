@@ -98,3 +98,17 @@ Chapter 1 sessions, state and command receipts are persisted; the remaining enco
 - Owner ran Docker Compose in Google Cloud Shell: all four containers healthy; web and AI liveness returned HTTP 200, API readiness returned database and AI status `ok`.
 - Owner confirmed the Next.js development screen in Web Preview on port 3000, displaying `API, database and AI service reachable.`
 - These are development integration checks, not evidence of game completion, real inference, production deployment or Codespaces validation.
+
+## Chapter 2 candidate playtest (PR #22)
+
+After the candidate CI passes, switch to `feat/dog-encounter` with a clean worktree, pull, and rebuild sequentially. A third additive migration creates CP-DOG and resolved slot tables; the prior Chapter 1 session/version remains compatible. Use private Web Preview on port 3000, not `/preview`. Resume the Chapter 2 card if available; otherwise play from a new run only after protecting any existing resume target. Verify direct choice, all three death/return paths, three consultation debits and cached reuse, no consult at zero, F1 without recharge, independent SOL-01, MEM-D2, E-NAME, both locales and reload. Do not expose safe-choice IDs in player-facing UI. Back up local player data before switching branches; do not delete volumes. Full owner acceptance and browser verification remain pending.
+
+Owner refinement: test Continue → Continue where you left off / Chapters; only reached chapters appear. Restart Chapter 1, then Chapter 2, then Chapter 3 if reached, verify high-water access, exact restored entry state, persisted slot reuse and reload. Also check the stable header Menu during navigation, three red information cards, dark dog approach, one-shot reveal, no backward action at the decision, no clipped choices at standard portrait/landscape, skull death card and dark success branch. Keep existing volumes; no schema migration beyond the earlier CP-DOG/slot migration.
+
+Second refinement checks: all three dog success variants converge on dark arrival narration, then CENA-05; check red skull, energy bars without fraction, three information cards and retired tutorial compatibility, MEM-D2 closure/black beats/wake, delayed DAVID label and exactly-once E-NAME. No change to existing migration or save format version.
+
+Third refinement checks: main Continue and submenu Continue game / Chapters, number-only chapter buttons, centered larger energy bars without visible memory metrics, terminal search narration and single loaded-art fade-in on FOUND, unchanged L01, revised cake-related dialogue, two dark familiar-voice beats, brief text tremor on MEM-D2. Verify F1 does not recharge and SOL-01 still restores three bars exactly once. No new migrations or assets.
+
+Fourth refinement checks: verify the terminal wording, continuous subtle tremor only on FB-D1b–g, MEM-D2/F01/F01b and one-shot ??? → DAVID on L18c (reduced motion supported). Check that CENA-04 dialogue and choice geometry matches the pre-fourth-refinement layout, all choices visible and original CENA-05 stable across adjacent beats. Smoke now checks all 12 disk asset hashes and all illustrated HTTP beats through Chapter 2 against the manifest. No new asset or migration.
+
+Owner correction checks: compare the normal CENA-04 dialogue frame and decision screen with b9da1be; the added dog-wide sizing rule and marker are removed. All three success branches use the same L04 text in PT-BR/EN, and the one-shot name crossfade lasts 1800ms. Preserve the scoped continuous memory motion and asset hash smoke.

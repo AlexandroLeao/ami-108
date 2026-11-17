@@ -19,7 +19,7 @@ Keep the approved visual shell, same 16:9 art and chapter/scene geometry. The ro
 
 ## Opening sequence
 
-The owner approved a presentation-only revision of A01-S01/L01: add an initial silent ellipsis, then split the initial sentence into two dialogue beats without renumbering subsequent canonical dialogue IDs. Preserve the remaining lines verbatim. The approved UI presentation is synchronized in the November 16 addenda of private Documento Mestre v1.10 and Roteiro Interativo v1.8.
+The owner approved a presentation-only revision of A01-S01/L01: add an initial silent ellipsis, then split the initial sentence into two dialogue beats without renumbering subsequent canonical dialogue IDs. Preserve the remaining lines verbatim. The approved UI presentation is synchronized in the November 16 addenda of private Documento Mestre v1.11 and Roteiro Interativo v1.9.
 
 | Beat | PT-BR | EN | Visual |
 | --- | --- | --- | --- |
@@ -58,4 +58,36 @@ Replace the in-art diagnostics overlay with a compact status strip centered betw
 
 ## Acceptance and source synchronization
 
-PR #20 merged at `3cf942a` after the owner's local playtest and final refinement approval. Post-merge CI passed. The final header and arrow rules above are authoritative for the implemented Chapter 1 presentation; the isolated preview remains unchanged. These technical records do not revise the private Documento Mestre v1.10, Roteiro Interativo v1.8 or asset ZIP. Full browser E2E, independent viewport/zoom checks and accessibility review remain AMI-010.
+PR #20 merged at `3cf942a` after the owner's local playtest and final refinement approval. Post-merge CI passed. The final header and arrow rules above are authoritative for the implemented Chapter 1 presentation; the isolated preview remains unchanged. The private cumulative source revisions v1.11/v1.9 were synchronized on November 17; the asset ZIP remains unchanged. Full browser E2E, independent viewport/zoom checks and accessibility review remain AMI-010.
+
+## Chapter 2 candidate (PR #22)
+
+Keep the accepted Chapter 1 shell and header. Show CENA-04 for the dog and CENA-05 for the terminal only when authorized. Decision buttons occupy the dialogue frame; consultation occupies its own row above four equally styled choices; two columns where space allows, one on portrait screens. The portrait decision frame grows to accommodate the controls without cropping the 16:9 image. Internal scrolling remains a fallback on short/zoomed viewports. Chapter 1 layout is unchanged. Show only legal CONSULT and four fixed CHOOSE actions, no success hints or arrow captions. Death consequence on coal, then red VOCÊ MORREU/YOU DIED and explicit checkpoint-return button. Do not bind a generic forward arrow to a choice or retry. F1 and SOL-01 advance through existing interaction arrows; the header reflects applied values on illustrated beats. MEM-D2 uses the dark voice beat and wake return. This layout requires owner playtest and independent responsive validation.
+
+## Owner refinement — information, dog reveal and chapter selection
+
+The November 17 owner playtest supersedes the prior information palette and decision layout: E-JOIN is concise second-person narration; three dark information beats use alert-red background, coal text/frame and ivory arrows. The header Menu retains its normal appearance during pending commands (aria-disabled guard rather than dimming) and is never the automatic focus fallback during dialogue navigation. Dog entry: three dark narration beats, then CENA-04 once with a short loaded-image startle animation (520ms; reduced motion skips it); two illustrated narration beats warn before decisions. No back arrow on active choices. Full-width consult above four equal two-column choices, including portrait; no internal scroll, shrink contained artwork when necessary, allow outer scrolling only on extreme viewport/zoom. Death consequence and all successful post-encounter dialogue are dark; death card uses an original coded pixel skull, red VOCÊ NÃO SOBREVIVEU / YOU DID NOT SURVIVE and explicit return button. No new scene assets. Main Continue opens resume and chapter selection with reached chapters only; restart requires confirmation and retains unlocked access and cache. Chapter 3 remains a boundary. Browser approval pending.
+
+### Second owner refinement — terminal and memory
+
+The three information cards remain red/coal with ivory arrows; shorten the third and omit the solar card. The solar explanation is still AMI's existing terminal dialogue. Render the death skull in alert red, with its original silhouette and animation. Diagnostics show the energy label and three bars without a visible numeric fraction; the bars expose a localized accessible count. Three dark arrival narration beats precede CENA-05. At MEM-D2-PAIN, reuse the already-mounted terminal art only for a one-shot eyelid sequence ending in darkness (1050ms); reduced motion cuts directly to coal. All intervening memory beats stay dark, the ellipsis has no speaker/label, the voice is labelled Familiar voice, and AMI calls to Bobo before L15 restores the original art via the existing wake cue. No change to the Chapter 1 blink, decision layout, other palettes, or chapter selection. Owner visual confirmation remains pending.
+
+### Third owner refinement — compact menu and energy HUD
+
+The campaign root uses Continue / Continuar on the main menu; the submenu contains Continue game / Continuar jogo and Chapters / Capítulos. Unlocked chapter buttons show only the localized chapter number. This changes labels, not chapter access or saved-state semantics. The approved 44px header retains AMI-108 and Menu, with only the larger centered energy label and three bars between them. No numeric fraction, memory percentages, or lock icon are rendered. The memory state and response probabilities are unchanged. Terminal reveal uses the new `fade-in` cue on FOUND only (700ms after artwork load, no motion under reduced motion); L01 reuses the same mounted image with no repeated animation. MEM-D2 uses the existing one-shot pain text cue on the dark headache line. Original art, other UI and the isolated preview remain unchanged. Owner visual verification pending.
+
+### Fourth owner refinement — memory motion and consistent artwork
+
+Only FB-D1b–g, MEM-D2, F01 and F01b use `memory-shiver`: continuous, subtle subpixel text motion without flickering or blurring. Other dialogue and memory cues stay unchanged, including the unlabeled silence. L18c uses `name-reveal`: the displayed ??? crossfades to DAVID in a single fixed label cell, with only DAVID accessible; E-NAME remains server-authoritative and exactly once. Reduced motion disables the continuous motion and shows the final name immediately. Owner correction: the attempt to reserve a decision-sized row on all dog beats changed approved dialogue geometry and was reverted in full. Restore the exact pre-refinement stage layout, with the previously approved compact choice layout only on active decisions. Never resize ordinary dialogue or alter image scaling to address a perceived quality issue without explicit approval. The original image bytes remain unchanged. All 12 PNG and manifest Git blob IDs match main; built smoke verifies actual manifest SHA-256 and original HTTP bytes. Browser confirmation of scaling/animation remains required.
+
+### Owner correction — restore approved frame and slower identity transition
+
+Restore all pre-fourth-refinement layout declarations verbatim; the normal dialogue/image geometry and the active choice layout are the same as `b9da1be`. The L18c label crossfade is now 1800ms with ease-in-out, reduced motion still shows DAVID immediately. No other visual effects are changed.
+
+### Targeted owner refinement — energy, dog entrance and identity
+
+The first information card (TUTORIAL) alone has `energy-reveal`: show the existing energy indicator on the dark information cards, gently fade in and pulse twice over 1900ms only on the first. Other dark beats retain the previous HUD visibility. Dog L01 alone fades a coal veil over the loaded, unchanged CENA-04 and briefly translates the visual layer for 860ms; no scale/filter/transform on the PNG, no persistent shake fill, and the next line reuses the same asset and ordinary layout. L18c alternates ???/DAVID with subtle motion and crossfades for 2600ms before settling on DAVID. All cues honor reduced motion. No changes to approved dimensions, choices, colors, or other animations.
+
+### Latest owner refinement
+
+ARRIVAL-03 and FOUND remain dark; reveal CENA-05 only on L01 through a 700ms coal veil, leaving the original PNG untransformed. Dog L01 holds the coal veil for the first 435ms of its 1450ms reveal after load, letting dialogue appear first; brief existing layer shake settles before the end. Subsequent beats use the same mounted image with no effect. L18c alternates ???/DAVID more distinctly over 1500ms. No changes to approved layout, other cues or assets.

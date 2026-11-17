@@ -52,3 +52,5 @@ AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile ap
 ## Release evidence
 
 Track FR/NFR IDs in subsequent PRs and tests. AMI-004/005/006 cover the first two chapters, AMI-007 real inference and contingency, AMI-008/009 remaining campaign, AMI-010 full acceptance/security/accessibility, AMI-011/012 deployment/docs, AMI-013 final approval. Do not replace a missing implementation with a checked specification box.
+
+Draft PR #22 extends the implemented candidate to Chapter 2: CP-DOG, four choices, resolved consultation cache, F1, SOL-01, MEM-D2/FB-D2 and E-NAME. Evidence and owner acceptance remain pending; see [encounter engine](../encounter-engine.md).

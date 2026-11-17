@@ -31,12 +31,8 @@ function readState(row: GameSession | null): NarrativeState {
   try { projectNarrative(state); } catch { throw new GameError(503, 'INVALID_SAVED_STATE'); }
   return state;
 }
-const jsonState = (state: NarrativeState): Prisma.InputJsonObject => ({
-  ...state,
-  events: [...state.events],
-  diagnostics: state.diagnostics ? { ...state.diagnostics } : null,
-  intro: state.intro ? { ...state.intro, text: { ...state.intro.text } } : null,
-});
+// Server-owned state contains only JSON data; strip optional undefined fields.
+const jsonState = (state: NarrativeState): Prisma.InputJsonObject => JSON.parse(JSON.stringify(state)) as Prisma.InputJsonObject;
 
 @Injectable()
 export class SessionService {
@@ -93,6 +89,18 @@ export class SessionService {
           throw new GameError(error.code === 'STALE_REVISION' ? 409 : error.code === 'ACTION_NOT_ALLOWED' ? 403 : 400, error.code);
         }
         throw error;
+      }
+      // Normalized checkpoint and resolved slots commit with JSON progress and receipt.
+      if (next.chapterTwo && !state.chapterTwo) {
+        await tx.gameCheckpoint.upsert({ where: { sessionId_checkpointId: { sessionId, checkpointId: 'CP-DOG' } }, update: {}, create: { sessionId, checkpointId: 'CP-DOG', snapshot: JSON.parse(JSON.stringify(next.chapterTwo.checkpoint)) as Prisma.InputJsonObject } });
+      }
+      if (next.chapterTwo) {
+        const priorSlots = state.savedDogSlots ?? state.chapterTwo?.dog.slots ?? [];
+        for (const slot of next.chapterTwo.dog.slots) {
+          if (!priorSlots.some(item => item.index === slot.index)) {
+            await tx.gameConsultationSlot.create({ data: { sessionId, encounterId: 'DOG', slotIndex: slot.index, category: slot.category, localizedText: { ...slot.text }, recipe: slot.recipe } });
+          }
+        }
       }
       await tx.gameSession.update({ where: { id: sessionId }, data: { state: jsonState(next), revision: next.revision } });
       await tx.gameCommandReceipt.create({ data: { sessionId, commandId: input.commandId, requestDigest: fingerprint, appliedRevision: next.revision } });

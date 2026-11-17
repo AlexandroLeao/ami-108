@@ -2,7 +2,7 @@
 
 A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories.
 
-**Status:** technical foundation, architecture and approved visual/asset foundation complete (AMI-001–003). Chapter 1 narrative core merged in PR #19; the owner-approved persistent Chapter 1 campaign (75 presentation beats, PT-BR/EN), API and interface merged in PR #20 at `3cf942a` on November 16, 2026. AMI-004 implementation is accepted; formal issue #6 closure remains pending. AMI-006 is partial. No full campaign, completed deployment or real inference.
+**Status:** technical foundation, architecture and approved visual/asset foundation complete (AMI-001–003). Chapter 1 narrative core merged in PR #19; the owner-approved persistent Chapter 1 campaign (75 presentation beats, PT-BR/EN), API and interface merged in PR #20 at `3cf942a` on November 16, 2026. AMI-004 implementation is accepted; issue #6 closed on November 17. AMI-006 is partial. No full campaign, completed deployment or real inference.
 
 ## Product
 
@@ -23,7 +23,7 @@ The game must remain playable using authored fallbacks when the AI provider is u
 
 The repository is currently private. See [development setup](docs/development.md) for environment setup, initial dependency resolution, tests and Compose instructions. The bootstrap was merged in PR #16 after successful CI, four-container startup and Google Cloud Shell preview. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
 
-The canonical narrative sources are Documento Mestre v1.10 and Roteiro Interativo v1.8 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
+The canonical narrative sources are Documento Mestre v1.11 and Roteiro Interativo v1.9 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
 
 ## Approved game interface
 
@@ -50,3 +50,5 @@ Short-lived branches, reviewable pull requests, explicit acceptance criteria and
 Repository documentation, issue and PR text, commits, code identifiers and comments are written in English. Official private documents and owner-facing reports are in Portuguese; in-game content remains PT-BR/EN.
 
 License and asset distribution terms are not yet decided.
+
+Chapter 2 local integration is in draft PR #22; see [encounter engine](docs/encounter-engine.md). It is not accepted until CI and owner playtest pass.

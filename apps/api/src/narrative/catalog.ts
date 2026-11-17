@@ -1,5 +1,5 @@
 // Server-only narrative data. Do not import from the web application.
-// Canonical sources: private Master v1.10 / Interactive Script v1.8.
+// Canonical sources: private Master v1.11 / Interactive Script v1.9 (cumulative revisions).
 export const NARRATIVE_VERSION = '1.10-1.8-chapter1-v1' as const;
 export type Locale = 'pt-BR' | 'en';
 export type Localized = Readonly<Record<Locale, string>>;
@@ -13,14 +13,16 @@ export const CHAPTERS = [
   { number: 5, title: local('De nada, Bobo', 'You’re Welcome, Bobo'), scenes: ['A05-S01', 'A05-S02'] },
 ] as const;
 
-export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03';
+export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03' | 'CENA-04' | 'CENA-05';
 export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-01': local('Depósito industrial em ruínas, com caixas e luz pelas janelas.', 'Ruined industrial warehouse, with crates and light through the windows.'),
   'CENA-02': local('Rua residencial em ruínas.', 'Ruined residential street.'),
   'CENA-03': local('Robô danificado junto à janela da residência abandonada.', 'Damaged robot by the window of the abandoned residence.'),
+  'CENA-04': local('Criatura deformada entre veículos na rua residencial.', 'Deformed creature among vehicles on the residential street.'),
+  'CENA-05': local('Terminal de manutenção pública.', 'Public maintenance terminal.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes';
-export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal';
+export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
   id: string;
@@ -103,8 +105,10 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L21', ami, '... Isso foi um erro.', '... That was an error.', 'CENA-03'),
   dialogue(s3, 'L22', unknown, 'É. Essa vai ser uma longa viagem.', 'Yeah. This is going to be a long trip.', 'CENA-03'),
   dialogue(s3, 'L23', ami, 'Obrigado, bobo.', 'Thank you, Bobo.', 'CENA-03'),
-  narration(s3, 'E-JOIN', 'Você coloca a cabeça e o que resta do tronco de AMI na parte da frente da mochila, junto ao peito.', "You place AMI's head and what remains of his torso on the front of your backpack, against your chest.", null, { event: 'E-JOIN', cue: 'fade-black' }),
-  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local('Consultar AMI consome uma barra. A memória danificada pode gerar respostas desconexas. A luz solar recupera sua energia de processamento.', 'Consulting AMI costs one bar. Damaged memory can produce unrelated answers. Sunlight restores his processing energy.'), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  narration(s3, 'E-JOIN', 'Você então coloca AMI na parte da frente da sua mochila, junto ao seu peito.', 'You then place AMI on the front of your backpack, against your chest.', null, { event: 'E-JOIN', cue: 'fade-black' }),
+  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Consultar AMI consome sua energia.", "Consulting AMI consumes his energy."), asset: null, cue: 'energy-reveal', information: true, action: 'CONTINUE' },
+  { id: s3 + '/TUTORIAL-b', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("A memória danificada pode gerar respostas desconexas.", "Damaged memory can produce unrelated answers."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  { id: s3 + '/TUTORIAL-c', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Ajude AMI a recuperar seus arquivos de memória para obter respostas precisas.", "Help AMI recover his memory files to get accurate answers."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
   narration(s3, 'RETURN-STREET', 'Vocês deixam a residência e retornam à rua, agora seguindo em frente juntos.', 'You leave the house and return to the street, now continuing your journey together.', null),
   dialogue(s3, 'L26', unknown, 'Certo. Alguma ideia de pra onde devemos ir?', 'Right. Any idea where we should go?', 'CENA-02'),
   dialogue(s3, 'L27', ami, 'Existe um terminal de manutenção pública a aproximadamente trezentos metros daqui.', 'There is a public maintenance terminal approximately three hundred meters from here.', 'CENA-02'),
@@ -118,12 +122,12 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L34', unknown, 'Maravilha.', 'Wonderful.', 'CENA-02'),
   dialogue(s3, 'MEM-D1', unknown, 'Ah... minha cabeça!', 'Ah... my head!', 'CENA-02', 'pain', 'MEM-D1'),
   narration(s3, 'FB-D1', 'Sua cabeça começa a doer bastante.', 'Your head starts to hurt badly.', null, { event: 'FB-D1', phase: 'FLASHBACK', cue: 'close-eyes' }),
-  narration(s3, 'FB-D1b', 'Imagens e sons desconexos invadem sua mente.', 'Disjointed images and sounds flood your mind.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1c', 'Risadas.', 'Laughter.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1d', 'Duas crianças correndo.', 'Two children running.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1e', 'Uma delas cai.', 'One of them falls.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1f', 'A outra volta correndo para ajudar.', 'The other runs back to help.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1g', 'Tudo isso parece estranhamente familiar.', 'It all feels strangely familiar.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1b', 'Imagens e sons desconexos invadem sua mente.', 'Disjointed images and sounds flood your mind.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1c', 'Risadas.', 'Laughter.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1d', 'Duas crianças correndo.', 'Two children running.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1e', 'Uma delas cai.', 'One of them falls.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1f', 'A outra volta correndo para ajudar.', 'The other runs back to help.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1g', 'Tudo isso parece estranhamente familiar.', 'It all feels strangely familiar.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
   dialogue(s3, 'MEM-D1-RETURN', unknown, '...', '...', 'CENA-02', 'wake'),
   dialogue(s3, 'L35', ami, 'Alguma irregularidade?', 'Any irregularities?', 'CENA-02'),
   dialogue(s3, 'L36', unknown, 'Não... Acho que lembrei de alguma coisa.', 'No... I think I remembered something.', 'CENA-02'),

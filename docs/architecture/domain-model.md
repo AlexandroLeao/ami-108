@@ -1,6 +1,6 @@
 # Domain model and state transitions
 
-**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. The ER diagram remains the target for later encounter/checkpoint/slot models, not a claim that every table exists. The design preserves the canonical script (Master v1.10 / Script v1.8).
+**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. The ER diagram remains the target for later encounter/checkpoint/slot models, not a claim that every table exists. The design preserves the canonical script (Master v1.11 / Script v1.9).
 
 ## ER diagram
 
@@ -83,7 +83,7 @@ erDiagram
 
 ### Chapter 1 implemented subset
 
-The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. Later encounter data will use dedicated transactional snapshot and slot tables.
+The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. PR #22 adds dedicated transactional checkpoint and resolved-slot tables for CP-DOG; the pure engine retains a JSON checkpoint and slot cache persisted atomically with normalized records and receipts. Provider reservation/finalization and later encounters remain pending.
 
 ### Data invariants
 

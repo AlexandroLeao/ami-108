@@ -2,8 +2,12 @@
 // Persistence and transactional command receipts must wrap these functions.
 import { CHAPTERS, CHAPTER_ONE, INTRO_FALLBACK, NARRATIVE_VERSION, OPENING_ASSETS, local, type Cue, type EventId, type Locale, type Localized, type OpeningAsset } from './catalog';
 
+import { beginChapterTwo, chapterTwoView, chapterTwoAsset, advanceChapterTwo, type ChapterTwoState } from './chapter-two';
+import type { Energy, Slot } from './encounter';
+
 const HANDOFF = 'A02-S01/CHAPTER_CARD';
-const INITIAL_DIAGNOSTICS = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false } as const;
+export type Diagnostics = Readonly<{ energy: Energy; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean }>;
+const INITIAL_DIAGNOSTICS: Diagnostics = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false };
 const actionLabel = local('Continuar', 'Continue');
 const actionsByStep: Readonly<Record<string, Localized>> = {
   'A01-S03/L38': local('Seguir para o terminal', 'Head to the terminal'),
@@ -16,12 +20,17 @@ export type NarrativeState = Readonly<{
   locale: Locale;
   revision: number;
   events: readonly EventId[];
-  diagnostics: typeof INITIAL_DIAGNOSTICS | null;
+  diagnostics: Diagnostics | null;
+  chapterTwo?: ChapterTwoState;
+  unlockedChapter?: number;
+  savedDogSlots?: readonly Slot[];
+  chapterThreeStart?: Readonly<{ chapterTwo: ChapterTwoState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   intro: Readonly<{ category: 'RANDOM'; source: 'fallback'; text: Localized }> | null;
 }>;
-export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS'; label: string }>;
+export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS' | 'CONSULT' | 'CHOOSE' | 'RETRY'; label: string }>;
+export type ChapterOption = Readonly<{ number: number; title: string }>;
 export type CurrentView = Readonly<{
-  revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK';
+  revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK' | 'ENCOUNTER' | 'DEAD';
   chapter: number; chapterTitle: string; sceneId: string; speaker: string | null; text: string;
   asset: { url: `/api/game/asset?key=${OpeningAsset}`; alt: string } | null;
   diagnostics: NarrativeState['diagnostics']; actions: readonly NarrativeAction[]; pending: false;
@@ -29,6 +38,7 @@ export type CurrentView = Readonly<{
   cue: Cue;
   narration: boolean;
   information: boolean;
+  chapters?: readonly ChapterOption[];
 }>;
 
 export class NarrativeError extends Error {
@@ -77,7 +87,19 @@ function visibleIndex(state: NarrativeState): number {
   return index;
 }
 
+// The removed solar tutorial never reappears, including on old saves.
+// Resume an authoritative cursor at the next surviving beat, or a review
+// cursor at the preceding information card. No event or revision is changed.
+function normalizeRetiredTutorial(state: NarrativeState): NarrativeState {
+  const retired = 'A01-S03/TUTORIAL-d';
+  if (state.stepId !== retired && state.reviewStepId !== retired) return state;
+  return { ...state,
+    stepId: state.stepId === retired ? 'A01-S03/RETURN-STREET' : state.stepId,
+    reviewStepId: state.reviewStepId === retired ? 'A01-S03/TUTORIAL-c' : state.reviewStepId };
+}
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
+  state = normalizeRetiredTutorial(state);
+  if (state.chapterTwo) { chapterTwoView(state); return chapterTwoAsset(state); }
   return CHAPTER_ONE[visibleIndex(state)]?.asset ?? null;
 }
 
@@ -86,7 +108,7 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
   const locale = state.locale;
   const previous: NarrativeAction = { id: (step?.id ?? HANDOFF) + '/PREVIOUS', kind: 'PREVIOUS',
     label: locale === 'pt-BR' ? 'Fala anterior' : 'Previous dialogue' };
-  if (!step) return canReviewPrevious(index) ? [previous] : [];
+  if (!step) return [{ id: HANDOFF + '/NEXT', kind: 'CONTINUE', label: actionLabel[locale] }, previous];
   const forward: NarrativeAction = {
     id: step.id + '/NEXT',
     kind: actionsByStep[step.id] ? 'INTERACT' : step.action,
@@ -97,13 +119,24 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
     : [forward];
 }
 
+function unlocked(state: NarrativeState): number {
+  const reached = state.stepId === 'A03-S01/CHAPTER_CARD' ? 3 : state.chapterTwo || state.stepId === HANDOFF ? 2 : 1;
+  return Math.min(3, Math.max(reached, state.unlockedChapter ?? 1));
+}
 export function projectNarrative(state: NarrativeState): CurrentView {
+  state = normalizeRetiredTutorial(state);
+  const view = projectCurrent(state);
+  return { ...view, chapters: CHAPTERS.slice(0, unlocked(state)).map(chapter => ({ number: chapter.number, title: chapter.title[state.locale] })) };
+}
+function projectCurrent(state: NarrativeState): CurrentView {
   ensureLocale(state.locale);
+  if (state.version !== NARRATIVE_VERSION) throw new NarrativeError('INVALID_STATE');
+  if (state.chapterTwo) return chapterTwoView(state);
   const index = visibleIndex(state);
   const step = CHAPTER_ONE[index];
   const locale = state.locale;
   if (!step) {
-    // AMI-005 connects this boundary to the first encounter and creates CP-DOG.
+    // Stable handoff ID also resumes sessions created before Chapter 2.
     return { revision: state.revision, locale, phase: 'CHAPTER_CARD', chapter: 2,
       chapterTitle: CHAPTERS[1].title[locale], sceneId: 'A02-S01',
       speaker: null, text: locale === 'pt-BR' ? 'CAPÍTULO 2 — REGISTRO ATUALIZADO' : 'CHAPTER 2 — RECORD UPDATED',
@@ -120,8 +153,39 @@ export function projectNarrative(state: NarrativeState): CurrentView {
   };
 }
 
-export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number): NarrativeState {
+function retainedSlots(state: NarrativeState): readonly Slot[] {
+  const cached = state.savedDogSlots ?? [];
+  const current = state.chapterTwo?.dog.slots ?? [];
+  // All slots are immutable and allocated sequentially. A restored earlier
+  // chapter snapshot can have a shorter prefix than the run-wide cache.
+  return current.length > cached.length ? current : cached;
+}
+function rememberProgress(state: NarrativeState): NarrativeState {
+  const archive = state.stepId === 'A03-S01/CHAPTER_CARD' && state.chapterTwo && state.diagnostics
+    ? { chapterTwo: state.chapterTwo, diagnostics: state.diagnostics, events: state.events } : state.chapterThreeStart;
+  return { ...state, unlockedChapter: unlocked(state), savedDogSlots: retainedSlots(state), ...(archive ? { chapterThreeStart: archive } : {}) };
+}
+function restartChapter(state: NarrativeState, chapter: number): NarrativeState {
+  if (chapter < 1 || chapter > unlocked(state)) throw new NarrativeError('ACTION_NOT_ALLOWED');
+  const remembered = rememberProgress(state);
+  const common = { ...startNarrative(state.locale), revision: state.revision + 1, intro: state.intro,
+    unlockedChapter: remembered.unlockedChapter, savedDogSlots: remembered.savedDogSlots,
+    ...(remembered.chapterThreeStart ? { chapterThreeStart: remembered.chapterThreeStart } : {}) };
+  if (chapter === 1) return common;
+  if (chapter === 2) return { ...common, stepId: HANDOFF, diagnostics: INITIAL_DIAGNOSTICS,
+    events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: state.intro ?? { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
+  const snapshot = remembered.chapterThreeStart;
+  if (!snapshot) throw new NarrativeError('ACTION_NOT_ALLOWED');
+  return { ...common, ...snapshot, chapterTwo: { ...snapshot.chapterTwo, dog: { ...snapshot.chapterTwo.dog, slots: retainedSlots(remembered) } }, stepId: 'A03-S01/CHAPTER_CARD' };
+}
+export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number, random: () => number = Math.random): NarrativeState {
   checkRevision(state, expectedRevision);
+  const restart = /^CHAPTER\/RESTART\/([1-5])$/.exec(actionId);
+  if (restart) return restartChapter(state, Number(restart[1]));
+  return rememberProgress(advanceCurrent(normalizeRetiredTutorial(state), actionId, random));
+}
+function advanceCurrent(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
+  if (state.chapterTwo) return advanceChapterTwo(state, actionId, random);
   const index = visibleIndex(state);
   const allowed = currentActions(state, index).find((action) => action.id === actionId);
   if (!allowed) throw new NarrativeError('ACTION_NOT_ALLOWED');
@@ -132,19 +196,20 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
     const reviewNext = CHAPTER_ONE[index + 1]?.id ?? HANDOFF;
     return { ...state, reviewStepId: reviewNext === state.stepId ? null : reviewNext, revision: state.revision + 1 };
   }
+  if (index === CHAPTER_ONE.length) return beginChapterTwo(state);
   const next = CHAPTER_ONE[index + 1];
   let result: NarrativeState = { ...state, stepId: next?.id ?? HANDOFF, reviewStepId: null, revision: state.revision + 1 };
   if (next?.event && !state.events.includes(next.event)) {
     result = { ...result, events: [...state.events, next.event] };
     if (next.event === 'E-JOIN') result = { ...result, diagnostics: INITIAL_DIAGNOSTICS };
-    if (next.event === 'INTRO-RANDOM') result = { ...result, intro: { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
+    if (next.event === 'INTRO-RANDOM') result = { ...result, intro: state.intro ?? { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
   }
   return result;
 }
 
 export function changeNarrativeLocale(state: NarrativeState, locale: Locale, expectedRevision: number): NarrativeState {
   checkRevision(state, expectedRevision);
-  visibleIndex(state);
+  projectNarrative(state);
   ensureLocale(locale);
-  return { ...state, locale, revision: state.revision + 1 };
+  return { ...normalizeRetiredTutorial(state), locale, revision: state.revision + 1 };
 }

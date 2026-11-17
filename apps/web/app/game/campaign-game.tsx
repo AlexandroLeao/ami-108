@@ -9,40 +9,24 @@ import { CampaignScene } from './campaign-scene';
 import { gameRequest, RequestError, type CampaignView, type CommandBody, type CommandResult } from './client';
 import { paginateText } from './pagination';
 
-type Overlay = 'none' | 'pause' | 'language' | 'extras';
+type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
 type PageState = { key: string; pages: string[]; index: number };
 const messages = {
-  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 1 concluído nesta versão. O Capítulo 2 será integrado na próxima etapa.', locked: 'Bloqueado' },
-  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 1 complete in this version. Chapter 2 will be integrated next.', locked: 'Locked' },
+  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 2 concluído nesta versão. O Capítulo 3 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
+  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 2 complete in this version. Chapter 3 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
 } as const;
 type Notice = 'connection' | 'stale' | 'expired';
 
-function Diagnostics({ view }: { view: CampaignView }) {
+function EnergyIndicator({ view }: { view: CampaignView }) {
   const d = view.diagnostics;
   if (!d) return null;
-  const personalLabel = view.locale === 'pt-BR' ? 'PESSOAL' : 'PERSONAL';
+  const label = view.locale === 'pt-BR' ? 'Energia' : 'Energy';
   return (
-    <div className="campaign-diagnostics" role="group" aria-label={copy[view.locale].diagnostics}>
-      <div className="campaign-diagnostics-content">
-        <div className="campaign-energy">
-          <span>{view.locale === 'pt-BR' ? 'Energia' : 'Energy'}</span>
-          <span className="campaign-bars" aria-hidden="true">
-            {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
-          </span>
-          <span>{d.energy}/3</span>
-        </div>
-        <div className="campaign-memory">
-          <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span>
-          <span>HIST-03 {d.hist}%</span>
-          <span className="campaign-personal" aria-label={personalLabel + ' ' + d.personal + '%' + (!d.personalUnlocked ? ' · ' + messages[view.locale].locked : '')}>
-            {personalLabel} {d.personal}%
-            {!d.personalUnlocked && <svg className="campaign-lock-icon" viewBox="0 0 10 12" fill="none" aria-hidden="true">
-              <path d="M2.5 5V3.5a2.5 2.5 0 0 1 5 0V5M1 5h8v6H1z" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M5 7v2" stroke="currentColor" strokeWidth="1.4" />
-            </svg>}
-          </span>
-        </div>
-      </div>
+    <div className="campaign-diagnostics campaign-energy" data-energy-reveal={view.cue === 'energy-reveal'} role="group" aria-label={label}>
+      <span>{label}</span>
+      <span className="campaign-bars" role="img" aria-label={view.locale === 'pt-BR' ? `${d.energy} de 3 barras` : `${d.energy} of 3 bars`}>
+        {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
+      </span>
     </div>
   );
 }
@@ -51,6 +35,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const preference = useLocale();
   const [view, setView] = useState<CampaignView | null>(null);
   const [hasSave, setHasSave] = useState(initialHasSave);
+  const [menuSave, setMenuSave] = useState<CampaignView | null>(null);
   const [overlay, setOverlay] = useState<Overlay>('none');
   const [extrasPage, setExtrasPage] = useState(0);
   const [readyCard, setReadyCard] = useState<string | null>(null);
@@ -78,7 +63,10 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const narrationLabel = view?.information ? (locale === 'pt-BR' ? 'INFORMAÇÃO' : 'INFORMATION')
     : view?.narration ? (locale === 'pt-BR' ? 'NARRAÇÃO' : 'NARRATION') : null;
   const robotDialogue = view?.speaker === 'AMI-108' || view?.speaker === 'Robô' || view?.speaker === 'Robot';
-  const nextAction = view?.actions.find((action) => action.kind !== 'PREVIOUS');
+  const nextAction = view?.actions.find((action) => action.kind === 'CONTINUE' || action.kind === 'INTERACT');
+  const explicitActions = view?.actions.filter((action) => action.kind === 'CONSULT' || action.kind === 'CHOOSE' || action.kind === 'RETRY') ?? [];
+  const choiceMode = explicitActions.length > 0;
+  const deathCard = view?.phase === 'DEAD' && explicitActions.some(action => action.kind === 'RETRY');
   const previousAction = view?.actions.find((action) => action.kind === 'PREVIOUS');
 
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
@@ -123,14 +111,14 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     schedule();
     void document.fonts.ready.then(() => { if (active) schedule(); });
     return () => { active = false; observer.disconnect(); cancelAnimationFrame(raf); };
-  }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter]);
+  }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter, choiceMode]);
 
   const accept = useCallback((next: CampaignView) => {
     setView(next);
     setHasSave(true);
     setLocale(next.locale);
   }, []);
-  const run = useCallback(async (operation: () => Promise<void>) => {
+  const run = useCallback(async (operation: () => Promise<unknown>) => {
     if (busyRef.current) return false;
     busyRef.current = true;
     setBusy(true);
@@ -165,6 +153,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     const result = await gameRequest<CommandResult>(endpoint, endpoint === 'locale' ? 'PATCH' : 'POST', body);
     retry.current = null;
     accept(result.view);
+    return result.view;
   }, [accept]);
 
   const start = () => {
@@ -176,6 +165,13 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       accept(next);
     });
   };
+  const openResume = () => {
+    void run(async () => {
+      const current = await gameRequest<CampaignView>('view');
+      setMenuSave(current);
+      setOverlay('resume');
+    });
+  };
   const resume = () => {
     void run(async () => {
       const current = await gameRequest<CampaignView>('view');
@@ -183,6 +179,18 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       setReadyCard(null);
       if (current.locale !== preference) await mutate(current, { locale: preference });
       else accept(current);
+      setOverlay('none');
+    });
+  };
+  const restartChapter = (number: number) => {
+    if (busyRef.current || !menuSave?.chapters?.some(chapter => chapter.number === number) || !window.confirm(messages[locale].restart)) return;
+    void run(async () => {
+      const current = await gameRequest<CampaignView>('view');
+      retry.current = null;
+      setReadyCard(null);
+      const next = await mutate(current, { actionId: 'CHAPTER/RESTART/' + number });
+      if (next.locale !== preference) await mutate(next, { locale: preference });
+      setOverlay('none');
     });
   };
   const advance = useCallback(() => {
@@ -194,14 +202,14 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     void run(() => mutate(view, { actionId: nextAction.id }));
   }, [view, nextAction, overlay, chapterReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
   const previous = useCallback(() => {
-    if (!view || !chapterReady || busyRef.current || overlay !== 'none' || !pageReady) return;
+    if (!view || choiceMode || !chapterReady || busyRef.current || overlay !== 'none' || !pageReady) return;
     if (pageIndex > 0) {
       setPagination((old) => ({ ...old, index: Math.max(0, old.index - 1) }));
       return;
     }
     if (previousAction) void run(() => mutate(view, { actionId: previousAction.id }));
-  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate]);
-  const closeOverlay = useCallback(() => setOverlay(overlay === 'language' && view ? 'pause' : 'none'), [overlay, view]);
+  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate, choiceMode]);
+  const closeOverlay = useCallback(() => setOverlay(overlay === 'chapters' ? 'resume' : overlay === 'language' && view ? 'pause' : 'none'), [overlay, view]);
   const chooseLanguage = async (value: Locale) => {
     if (busyRef.current) return;
     if (!view) { setLocale(value); setOverlay('none'); return; }
@@ -215,9 +223,13 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
 
   useEffect(() => {
     if (busy) return;
-    (panelRef.current?.querySelector<HTMLElement>('[data-primary]:not(:disabled)')
-      ?? panelRef.current?.querySelector<HTMLElement>('button:not(:disabled)'))?.focus();
-  }, [view?.phase, view?.revision, overlay, chapterReady, busy]);
+    // Never focus the header menu as a fallback during dialogue transitions.
+    const panel = panelRef.current;
+    const target = panel?.querySelector<HTMLElement>('.campaign-choice-area')
+      ?? panel?.querySelector<HTMLElement>('[data-primary]:not(:disabled)')
+      ?? (view && overlay === 'none' ? panel?.querySelector<HTMLElement>('.dialogue-navigation button:not(:disabled)') : panel?.querySelector<HTMLElement>('button:not(:disabled)'));
+    target?.focus({ preventScroll: true });
+  }, [view, overlay, chapterReady, busy]);
 
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
@@ -243,8 +255,11 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
 
   const titleText = view ? (locale === 'pt-BR' ? 'CAPÍTULO ' : 'CHAPTER ') + view.chapter + ' — ' + view.chapterTitle.toLocaleUpperCase(locale) : '';
   const cue = pageIndex === 0 ? view?.cue : 'none';
-  const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis';
-  const advanceLabel = chapter ? labels.continue : labels.next;
+  const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
+  // Continuous memory motion applies across all measured pages of this beat.
+  const memoryShiver = view?.cue === 'memory-shiver';
+  const nameReveal = view?.cue === 'name-reveal';
+  const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 
   return (
     <main className="game-viewport" lang={locale}>
@@ -254,38 +269,50 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <GameWordmark />
             <nav aria-label={labels.menu} className="menu-options">
               <button className="game-control" disabled={busy} onClick={start}>{labels.newGame}</button>
-              <button className="game-control" disabled={busy || !hasSave} onClick={resume}>{labels.continueGame}</button>
+              <button className="game-control" disabled={busy || !hasSave} onClick={openResume}>{labels.continue}</button>
               <button className="game-control" disabled={busy} onClick={() => setOverlay('language')}>{labels.language}</button>
               <button className="game-control" disabled={busy} onClick={() => { setExtrasPage(0); setOverlay('extras'); }}>{labels.extras}</button>
             </nav>
             <p className="version-label">{labels.version}</p>
           </section>
         ) : (
-          <section className="game-stage">
+          <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'}>
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
-                <div className="campaign-header-middle">{view.asset && <Diagnostics view={view} />}</div>
-                <button className="small-control" disabled={busy} onClick={() => setOverlay('pause')}>{labels.menu}</button>
+                <div className="campaign-header-middle">{(view.asset || view.information) && <EnergyIndicator view={view} />}</div>
+                <button className="small-control campaign-menu-control" aria-disabled={busy} onClick={() => { if (!busyRef.current) setOverlay('pause'); }}>{labels.menu}</button>
               </div>
             </header>
             <CampaignScene view={view}>
+              {deathCard && <svg className="campaign-skull" viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
+                <path fill="currentColor" d="M5 1h6v1h2v2h1v6h-2v2h-1v3H5v-3H4v-2H2V4h1V2h2z" />
+                <path fill="var(--coal)" d="M4 5h3v3H4zM9 5h3v3H9zM7 9h2v2H7zM6 12h1v3H6zM9 12h1v3H9z" />
+              </svg>}
               <div key={view.chapter} className="chapter-layer" data-active={chapter} aria-hidden={!chapter}>
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} aria-busy={busy}>
-              <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
+              {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
+                {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
+                <div className="campaign-choice-list">
+                  {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" data-kind={action.kind} disabled={busy}
+                    onClick={() => void run(() => mutate(view, { actionId: action.id }))}>{action.label}</button>)}
+                </div>
+              </div> : <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
                 {!showChapter && (
                   <>
-                    {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>{view.speaker ?? narrationLabel}</p>}
-                    <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '')}>{pageText}</p>
+                    {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
+                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">???</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
+                    </p>}
+                    <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '') + (memoryShiver ? ' campaign-memory-shiver' : '')}>{pageText}</p>
                   </>
                 )}
-              </div>
+              </div>}
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
-              <div className="dialogue-navigation">
-                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || !pageReady || (!previousAction && pageIndex === 0)}
+              <div className="dialogue-navigation" hidden={choiceMode}>
+                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
                   aria-label={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
                 <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || (!chapter && !pageReady)}
                   aria-label={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
@@ -296,7 +323,28 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       </div>
       {overlay !== 'none' && (
         <div ref={panelRef} className="game-overlay" role="dialog" aria-modal="true"
-          aria-label={overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : labels.extras}>
+          aria-label={overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : overlay === 'resume' ? labels.continue : overlay === 'chapters' ? messages[locale].chapters : labels.extras}>
+          {overlay === 'resume' && (
+            <section className="menu-screen">
+              <h1>{labels.continue}</h1>
+              <div className="menu-options">
+                <button className="game-control" disabled={busy} onClick={resume}>{messages[locale].resumeAt}</button>
+                <button className="game-control" disabled={busy || !menuSave?.chapters?.length} onClick={() => setOverlay('chapters')}>{messages[locale].chapters}</button>
+                <button className="game-control" disabled={busy} onClick={closeOverlay}>{labels.back}</button>
+              </div>
+            </section>
+          )}
+          {overlay === 'chapters' && (
+            <section className="menu-screen campaign-chapter-menu">
+              <h1>{messages[locale].chapters}</h1>
+              <div className="menu-options">
+                {menuSave?.chapters?.map(item => <button key={item.number} className="game-control" disabled={busy} onClick={() => restartChapter(item.number)}>
+                  {locale === 'pt-BR' ? 'Capítulo ' : 'Chapter '}{item.number}
+                </button>)}
+                <button className="game-control" disabled={busy} onClick={closeOverlay}>{labels.back}</button>
+              </div>
+            </section>
+          )}
           {overlay === 'pause' && (
             <section className="menu-screen">
               <h1>{labels.menu}</h1>

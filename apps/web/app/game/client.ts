@@ -1,15 +1,16 @@
 import type { Locale } from '../preview/copy';
 
-export type GameAction = { id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS'; label: string };
+export type GameAction = { id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS' | 'CONSULT' | 'CHOOSE' | 'RETRY'; label: string };
 export type CampaignView = {
-  revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK';
+  revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK' | 'ENCOUNTER' | 'DEAD';
   chapter: number; chapterTitle: string; sceneId: string; speaker: string | null; text: string;
   asset: { url: string; alt: string } | null;
   diagnostics: { energy: 0 | 1 | 2 | 3; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean } | null;
   actions: GameAction[]; pending: boolean;
-  cue: 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes';
+  cue: 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal';
   narration: boolean;
   information: boolean;
+  chapters?: { number: number; title: string }[];
 };
 export type CommandBody = { commandId: string; expectedRevision: number } &
   ({ actionId: string } | { locale: Locale });
