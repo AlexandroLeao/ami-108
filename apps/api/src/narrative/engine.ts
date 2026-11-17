@@ -3,7 +3,7 @@
 import { CHAPTERS, CHAPTER_ONE, INTRO_FALLBACK, NARRATIVE_VERSION, OPENING_ASSETS, local, type Cue, type EventId, type Locale, type Localized, type OpeningAsset } from './catalog';
 
 import { beginChapterTwo, chapterTwoView, chapterTwoAsset, advanceChapterTwo, type ChapterTwoState } from './chapter-two';
-import type { Energy } from './encounter';
+import type { Energy, Slot } from './encounter';
 
 const HANDOFF = 'A02-S01/CHAPTER_CARD';
 export type Diagnostics = Readonly<{ energy: Energy; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean }>;
@@ -22,9 +22,13 @@ export type NarrativeState = Readonly<{
   events: readonly EventId[];
   diagnostics: Diagnostics | null;
   chapterTwo?: ChapterTwoState;
+  unlockedChapter?: number;
+  savedDogSlots?: readonly Slot[];
+  chapterThreeStart?: Readonly<{ chapterTwo: ChapterTwoState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   intro: Readonly<{ category: 'RANDOM'; source: 'fallback'; text: Localized }> | null;
 }>;
 export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS' | 'CONSULT' | 'CHOOSE' | 'RETRY'; label: string }>;
+export type ChapterOption = Readonly<{ number: number; title: string }>;
 export type CurrentView = Readonly<{
   revision: number; locale: Locale; phase: 'CHAPTER_CARD' | 'NARRATIVE' | 'FLASHBACK' | 'ENCOUNTER' | 'DEAD';
   chapter: number; chapterTitle: string; sceneId: string; speaker: string | null; text: string;
@@ -34,6 +38,7 @@ export type CurrentView = Readonly<{
   cue: Cue;
   narration: boolean;
   information: boolean;
+  chapters?: readonly ChapterOption[];
 }>;
 
 export class NarrativeError extends Error {
@@ -103,7 +108,15 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
     : [forward];
 }
 
+function unlocked(state: NarrativeState): number {
+  const reached = state.stepId === 'A03-S01/CHAPTER_CARD' ? 3 : state.chapterTwo || state.stepId === HANDOFF ? 2 : 1;
+  return Math.min(3, Math.max(reached, state.unlockedChapter ?? 1));
+}
 export function projectNarrative(state: NarrativeState): CurrentView {
+  const view = projectCurrent(state);
+  return { ...view, chapters: CHAPTERS.slice(0, unlocked(state)).map(chapter => ({ number: chapter.number, title: chapter.title[state.locale] })) };
+}
+function projectCurrent(state: NarrativeState): CurrentView {
   ensureLocale(state.locale);
   if (state.version !== NARRATIVE_VERSION) throw new NarrativeError('INVALID_STATE');
   if (state.chapterTwo) return chapterTwoView(state);
@@ -128,8 +141,31 @@ export function projectNarrative(state: NarrativeState): CurrentView {
   };
 }
 
+function rememberProgress(state: NarrativeState): NarrativeState {
+  const archive = state.stepId === 'A03-S01/CHAPTER_CARD' && state.chapterTwo && state.diagnostics
+    ? { chapterTwo: state.chapterTwo, diagnostics: state.diagnostics, events: state.events } : state.chapterThreeStart;
+  return { ...state, unlockedChapter: unlocked(state), savedDogSlots: state.chapterTwo?.dog.slots ?? state.savedDogSlots ?? [], ...(archive ? { chapterThreeStart: archive } : {}) };
+}
+function restartChapter(state: NarrativeState, chapter: number): NarrativeState {
+  if (chapter < 1 || chapter > unlocked(state)) throw new NarrativeError('ACTION_NOT_ALLOWED');
+  const remembered = rememberProgress(state);
+  const common = { ...startNarrative(state.locale), revision: state.revision + 1, intro: state.intro,
+    unlockedChapter: remembered.unlockedChapter, savedDogSlots: remembered.savedDogSlots,
+    ...(remembered.chapterThreeStart ? { chapterThreeStart: remembered.chapterThreeStart } : {}) };
+  if (chapter === 1) return common;
+  if (chapter === 2) return { ...common, stepId: HANDOFF, diagnostics: INITIAL_DIAGNOSTICS,
+    events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: state.intro ?? { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
+  const snapshot = remembered.chapterThreeStart;
+  if (!snapshot) throw new NarrativeError('ACTION_NOT_ALLOWED');
+  return { ...common, ...snapshot, stepId: 'A03-S01/CHAPTER_CARD' };
+}
 export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number, random: () => number = Math.random): NarrativeState {
   checkRevision(state, expectedRevision);
+  const restart = /^CHAPTER\/RESTART\/([1-5])$/.exec(actionId);
+  if (restart) return restartChapter(state, Number(restart[1]));
+  return rememberProgress(advanceCurrent(state, actionId, random));
+}
+function advanceCurrent(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
   if (state.chapterTwo) return advanceChapterTwo(state, actionId, random);
   const index = visibleIndex(state);
   const allowed = currentActions(state, index).find((action) => action.id === actionId);
@@ -147,7 +183,7 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
   if (next?.event && !state.events.includes(next.event)) {
     result = { ...result, events: [...state.events, next.event] };
     if (next.event === 'E-JOIN') result = { ...result, diagnostics: INITIAL_DIAGNOSTICS };
-    if (next.event === 'INTRO-RANDOM') result = { ...result, intro: { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
+    if (next.event === 'INTRO-RANDOM') result = { ...result, intro: state.intro ?? { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
   }
   return result;
 }

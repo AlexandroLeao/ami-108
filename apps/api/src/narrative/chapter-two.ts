@@ -8,13 +8,20 @@ const DOG_SCENE = 'A02-S01';
 const TERMINAL = 'A02-S02';
 const END = 'A03-S01/CHAPTER_CARD';
 const FIRST = DOG_SCENE + '/L01';
-type Speaker = 'AMI' | 'UNKNOWN' | 'VOICE';
+const ENTRY = DOG_SCENE + '/PRE-01';
+const darkIntro = ['PRE-01', 'PRE-02', 'PRE-03'].map(id => DOG_SCENE + '/' + id);
+type Speaker = 'AMI' | 'UNKNOWN' | 'VOICE' | 'NARRATION';
 type Beat = { speaker: Speaker; text: Localized };
 const beats: Readonly<Record<string, Beat>> = {
-  "A02-S01/L01": { speaker: 'UNKNOWN', text: local("Puta merda. O que é aquilo?", "Holy shit. What is that thing?") },
+  "A02-S01/PRE-01": { speaker: 'NARRATION', text: local("Vocês partem em direção ao terminal de manutenção.", "You set off together toward the maintenance terminal.") },
+  "A02-S01/PRE-02": { speaker: 'NARRATION', text: local("De repente, ruídos vindos dos veículos à frente interrompem sua caminhada.", "Suddenly, noises from the vehicles ahead interrupt your walk.") },
+  "A02-S01/PRE-03": { speaker: 'NARRATION', text: local("Você observa com atenção o ponto de onde vêm os ruídos.", "You look closely toward the source of the noises.") },
+  "A02-S01/L01": { speaker: 'UNKNOWN', text: local("Puta merda! O que é aquilo?!", "Holy shit! What is that thing?!") },
   "A02-S01/L02": { speaker: 'AMI', text: local("Olha a língua.", "Language.") },
-  "A02-S01/L03": { speaker: 'UNKNOWN', text: local("Você tá falando sério?", "Are you serious?") },
+  "A02-S01/L03": { speaker: 'UNKNOWN', text: local("Você tá falando sério?!", "Are you serious?!") },
   "A02-S01/L04": { speaker: 'AMI', text: local("Afirmativo.", "Affirmative.") },
+  "A02-S01/WARNING-01": { speaker: 'NARRATION', text: local("Você percebe que a criatura à sua frente não é amistosa.", "You realize the creature ahead is not friendly.") },
+  "A02-S01/WARNING-02": { speaker: 'NARRATION', text: local("Se quiser sobreviver, precisará tomar a decisão certa.", "If you want to survive, you will have to make the right decision.") },
   "A02-S01/Q-DOG": { speaker: 'UNKNOWN', text: local("AMI, como a gente passa por essa coisa?", "AMI, how do we get past that thing?") },
   "A02-S01/R-DOG": { speaker: 'UNKNOWN', text: local("Certo... Pelo visto, dessa vez estou por conta própria.", "Right... Looks like I'm on my own this time.") },
   "A02-S01/A1": { speaker: 'UNKNOWN', text: local("Quase morri lá atrás. Você sabe disso, né?", "I almost died back there. You know that, right?") },
@@ -72,14 +79,15 @@ const previous = (state: NarrativeState, id: string) => action(id + '/PREVIOUS',
 export function beginChapterTwo(state: NarrativeState): NarrativeState {
   if (!state.diagnostics || state.diagnostics.energy !== 3 || state.diagnostics.bio !== 15) return invalid();
   const events: readonly EventId[] = [...state.events, 'CP-DOG'];
-  return { ...state, stepId: FIRST, reviewStepId: null, revision: state.revision + 1,
-    events, chapterTwo: { dog: startEncounter(DOG, state.diagnostics.energy), checkpoint: { stepId: FIRST, diagnostics: state.diagnostics, events }, trail: [FIRST] } };
+  return { ...state, stepId: ENTRY, reviewStepId: null, revision: state.revision + 1,
+    events, chapterTwo: { dog: { ...startEncounter(DOG, state.diagnostics.energy), slots: state.savedDogSlots ?? [] }, checkpoint: { stepId: FIRST, diagnostics: state.diagnostics, events }, trail: [ENTRY] } };
 }
 function actions(state: NarrativeState, id: string): NarrativeAction[] {
   const c = get(state);
   const index = c.trail.indexOf(id);
   if (index < 0 || c.trail[c.trail.length - 1] !== state.stepId) return invalid();
-  const back = index > 0 && id !== dogId('DEATH') && id !== dogId('DEAD-CARD') ? [previous(state, id)] : [];
+  const barrier = (step: string) => step.startsWith(dogId('DECISION-')) || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(step);
+  const back = index > 0 && !barrier(id) && !barrier(c.trail[index - 1]) ? [previous(state, id)] : [];
   // Historical decision screens cannot issue a new choice or debit energy.
   if (state.reviewStepId) return [next(state, id), ...back];
   if (id === END) return back;
@@ -87,7 +95,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
   if (id.startsWith(dogId('DECISION-'))) {
     const available: NarrativeAction[] = DOG.choices.map(choice => action(choice.id, 'CHOOSE', choice.label, state));
     if (c.dog.energy > 0 && c.dog.used.length < 3) available.unshift(action(id + '/CONSULT', 'CONSULT', local('Consultar AMI (−1 energia)', 'Consult AMI (−1 energy)'), state));
-    return [...available, ...back];
+    return available;
   }
   if (id === terminalId('L02')) return [next(state, id, 'INTERACT', local('Restaurar memória', 'Restore memory')), ...back];
   if (id === terminalId('L08')) return [next(state, id, 'INTERACT', local('Recarregar energia', 'Recharge energy')), ...back];
@@ -95,7 +103,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
 }
 export function chapterTwoAsset(state: NarrativeState): OpeningAsset | null {
   const id = visible(state);
-  if (id === END || id === terminalId('F01') || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
+  if (id === END || id === terminalId('F01') || darkIntro.includes(id) || /^A02-S01\/[ABC]\d$/.test(id) || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
   return id.startsWith(DOG_SCENE + '/') ? 'CENA-04' : 'CENA-05';
 }
 export function chapterTwoView(state: NarrativeState): CurrentView {
@@ -118,10 +126,10 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
     phase = 'ENCOUNTER'; text = local('Escolha uma ação.', 'Choose an action.');
   } else if (id === dogId('DEATH') || id === dogId('SUCCESS')) {
     const choice = DOG.choices.find(item => item.id === c.dog.selected) ?? invalid();
-    text = choice.consequence; narration = true; asset = null; cue = 'fade-black';
+    text = choice.consequence; narration = true; asset = null; cue = 'none';
     if (id === dogId('DEATH')) phase = 'DEAD';
   } else if (id === dogId('DEAD-CARD')) {
-    asset = null; phase = 'DEAD'; text = local('VOCÊ MORREU', 'YOU DIED');
+    asset = null; phase = 'DEAD'; text = local('VOCÊ NÃO SOBREVIVEU', 'YOU DID NOT SURVIVE');
   } else {
     let beat = beats[id];
     const q = id.match(/^A02-S01\/(Q|ANSWER|R)-(\d)$/);
@@ -132,7 +140,9 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
     if (!beat) return invalid();
     text = beat.text;
     const named = sceneId === TERMINAL && ['L18', 'L19', 'L20'].includes(id.split('/')[1]);
-    speaker = beat.speaker === 'AMI' ? 'AMI-108' : beat.speaker === 'VOICE' ? local('Voz', 'Voice')[locale] : named ? 'DAVID' : '???';
+    narration = beat.speaker === 'NARRATION';
+    speaker = narration ? null : beat.speaker === 'AMI' ? 'AMI-108' : beat.speaker === 'VOICE' ? local('Voz', 'Voice')[locale] : named ? 'DAVID' : '???';
+    if (id === FIRST) cue = 'startle';
     if (id === terminalId('L04') && !c.dog.recipeSeen) text = local('Então você vai parar de me falar de bananas?', "So you'll stop talking to me about bananas?");
     if (id === terminalId('MEM-D2')) cue = 'pain';
     if (id === terminalId('F01')) { asset = null; phase = 'FLASHBACK'; cue = 'close-eyes'; }
@@ -191,7 +201,10 @@ export function advanceChapterTwo(state: NarrativeState, actionId: string, rando
       : slotBeat[1] === 'ANSWER' && slot.category === 'RANDOM' ? consultation('R', count) : decision(count));
   }
   const intro = id.match(/^A02-S01\/L0([1-4])$/);
-  if (intro) return move(state, Number(intro[1]) === 4 ? decision(0) : dogId('L0' + (Number(intro[1]) + 1)));
+  if (darkIntro.includes(id)) return move(state, darkIntro[darkIntro.indexOf(id) + 1] ?? FIRST);
+  if (id === dogId('WARNING-01')) return move(state, dogId('WARNING-02'));
+  if (id === dogId('WARNING-02')) return move(state, decision(0));
+  if (intro) return move(state, Number(intro[1]) === 4 ? dogId('WARNING-01') : dogId('L0' + (Number(intro[1]) + 1)));
   const branch = id.match(/^A02-S01\/([ABC])(\d)$/);
   if (branch) {
     const last = branch[1] === 'A' ? 6 : branch[1] === 'B' ? 4 : 2;

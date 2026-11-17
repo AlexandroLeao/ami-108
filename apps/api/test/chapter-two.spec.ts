@@ -12,7 +12,7 @@ function forward(state: NarrativeState) {
 function reachDog(locale: 'pt-BR' | 'en' = 'pt-BR') {
   let state = startNarrative(locale);
   for (let i = 0; i <= CHAPTER_ONE.length; i++) state = forward(state);
-  for (let i = 0; i < 4; i++) state = forward(state);
+  for (let i = 0; i < 12 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
   return state;
 }
 function consult(state: NarrativeState, rng: () => number) {
@@ -25,6 +25,46 @@ function consult(state: NarrativeState, rng: () => number) {
 }
 function choose(state: NarrativeState, id: string) { return advanceNarrative(state, id, state.revision); }
 describe('Chapter 2 integration in pure narrative engine', () => {
+  it('starts with three dark narration beats, reveals the dog once and locks decisions', () => {
+    let state = startNarrative('pt-BR');
+    for (let i = 0; i <= CHAPTER_ONE.length; i++) state = forward(state);
+    for (let i = 0; i < 3; i++) {
+      expect(projectNarrative(state)).toMatchObject({ asset: null, narration: true });
+      state = forward(state);
+    }
+    expect(projectNarrative(state)).toMatchObject({ cue: 'startle', text: 'Puta merda! O que é aquilo?!' });
+    expect(currentAsset(state)).toBe('CENA-04');
+    state = forward(state);
+    expect(projectNarrative(state).cue).toBe('none');
+    for (let i = 0; i < 10 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
+    expect(projectNarrative(state).actions.some(a => a.kind === 'PREVIOUS')).toBe(false);
+  });
+  it('restarts only unlocked chapters and keeps high-water access and resolved slots', () => {
+    const initial = startNarrative('pt-BR');
+    expect(() => choose(initial, 'CHAPTER/RESTART/2')).toThrow('ACTION_NOT_ALLOWED');
+    let state = consult(reachDog(), () => 0.9);
+    const slot = state.chapterTwo!.dog.slots[0];
+    state = choose(state, 'DOG-04');
+    for (let i = 0; i < 60 && projectNarrative(state).chapter !== 3; i++) state = forward(state);
+    expect(projectNarrative(state).chapters?.map(c => c.number)).toEqual([1,2,3]);
+    state = choose(state, 'CHAPTER/RESTART/1');
+    expect(state.stepId).toBe('A01-S01/CHAPTER_CARD');
+    expect(state.diagnostics).toBeNull();
+    expect(projectNarrative(state).chapters?.map(c => c.number)).toEqual([1,2,3]);
+    state = choose(state, 'CHAPTER/RESTART/2');
+    expect(state.stepId).toBe('A02-S01/CHAPTER_CARD');
+    expect(state.diagnostics?.energy).toBe(3);
+    for (let i = 0; i < 15 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
+    const rng = jest.fn(() => 0);
+    state = consult(state, rng);
+    expect(rng).not.toHaveBeenCalled();
+    expect(state.chapterTwo?.dog.slots[0]).toEqual(slot);
+    state = choose(state, 'CHAPTER/RESTART/3');
+    expect(state.stepId).toBe('A03-S01/CHAPTER_CARD');
+    expect(state.diagnostics?.bio).toBe(42);
+    expect(state.diagnostics?.energy).toBe(3);
+    expect(() => choose(state, 'CHAPTER/RESTART/4')).toThrow('ACTION_NOT_ALLOWED');
+  });
   it.each(['pt-BR','en'] as const)('preserves handoff and four ordered choices in %s', locale => {
     const state = reachDog(locale);
     expect(currentAsset(state)).toBe('CENA-04');
@@ -41,11 +81,11 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(projectNarrative(state).phase).toBe('DEAD');
     expect(state.diagnostics?.energy).toBe(2);
     state = forward(state);
-    expect(projectNarrative(state).text).toBe('VOCÊ MORREU');
+    expect(projectNarrative(state).text).toBe('VOCÊ NÃO SOBREVIVEU');
     state = step(state,'RETRY');
     expect(state.diagnostics?.energy).toBe(3);
     expect(state.chapterTwo?.dog.slots[0]).toEqual(first);
-    for(let i=0;i<4;i++) state=forward(state);
+    for(let i=0;i<12 && projectNarrative(state).phase!=='ENCOUNTER';i++) state=forward(state);
     const rng=jest.fn(()=>0);
     state=consult(state,rng);
     expect(rng).not.toHaveBeenCalled();
@@ -80,10 +120,9 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(state.diagnostics?.energy).toBe(0);
     expect(projectNarrative(state).actions.some(x=>x.kind==='CONSULT')).toBe(false);
     const before=state;
-    state=step(state,'PREVIOUS');
-    expect(projectNarrative(state).actions.some(x=>x.kind==='CHOOSE'||x.kind==='CONSULT')).toBe(false);
+    expect(projectNarrative(state).actions.some(x=>x.kind==='PREVIOUS')).toBe(false);
+    expect(()=>advanceNarrative(state,state.stepId+'/PREVIOUS',state.revision)).toThrow('ACTION_NOT_ALLOWED');
     state=changeNarrativeLocale(state,'en',state.revision);
-    state=forward(state);
     expect(state.chapterTwo).toBe(before.chapterTwo);
     expect(state.diagnostics).toBe(before.diagnostics);
     expect(choose(state,'DOG-04').chapterTwo?.dog.phase).toBe('SUCCESS');

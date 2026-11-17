@@ -89,7 +89,7 @@ try {
   await send(view.actions[0]);
   await send(view.actions.find(action => action.kind === 'RETRY'));
   assert.equal(view.diagnostics.energy, 3);
-  for (let i = 0; i < 4; i++) await send(view.actions[0]);
+  for (let i = 0; i < 12 && view.phase !== 'ENCOUNTER'; i++) await send(view.actions[0]);
   await send(view.actions.find(action => action.id === 'DOG-04'));
   for (let i = 0; i < 60 && view.chapter !== 3; i++) await send(view.actions[0]);
   assert.equal(view.chapter, 3);

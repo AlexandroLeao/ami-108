@@ -138,10 +138,14 @@ describe('server-only Chapter 1 catalog and transition core', () => {
   it('shows the dark join, information card and narrated return to the street', () => {
     let state = reach('A01-S03/E-JOIN');
     expect(projectNarrative(state)).toMatchObject({ narration: true, information: false, asset: null, cue: 'fade-black' });
-    expect(projectNarrative(state).text).toContain('Você coloca');
+    expect(projectNarrative(state).text).toContain('Você então coloca');
     expect(projectNarrative(state).text).not.toContain('arnês');
     state = next(state);
     expect(projectNarrative(state)).toMatchObject({ narration: false, information: true, asset: null });
+    for (const text of ['A memória danificada pode gerar respostas desconexas.', 'Ajude AMI a recuperar seus arquivos de memória para obter respostas mais precisas.', 'A luz solar recupera sua energia de processamento.']) {
+      state = next(state);
+      expect(projectNarrative(state)).toMatchObject({ information: true, asset: null, text });
+    }
     state = next(state);
     expect(state.stepId).toBe('A01-S03/RETURN-STREET');
     expect(projectNarrative(state)).toMatchObject({ narration: true, asset: null });

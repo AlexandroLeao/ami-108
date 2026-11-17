@@ -25,10 +25,10 @@ export const DOG: EncounterDefinition = {
   random: local('Três ovos. Duas xícaras de açúcar. Misture até obter uma consistência homogênea.', 'Three eggs. Two cups of sugar. Mix until smooth.'),
   randomIsRecipe: true,
   choices: [
-    { id: 'DOG-01', label: local('Atravessar enquanto a criatura estiver de costas.', 'Cross while the creature is facing away.'), consequence: local('Os passos denunciam David; a criatura o alcança.', "David's footsteps give him away; the creature catches him."), outcome: 'DEAD' },
-    { id: 'DOG-02', label: local('Avançar usando os veículos como cobertura.', 'Advance using the vehicles as cover.'), consequence: local('Os destroços sob os pés produzem ruído suficiente para revelar sua posição.', 'Debris underfoot makes enough noise to reveal his position.'), outcome: 'DEAD' },
-    { id: 'DOG-03', label: local('Distrair a criatura com um objeto.', 'Distract the creature with an object.'), consequence: local('Ela ouve o objeto e também a movimentação de David.', 'It hears the object and David moving as well.'), outcome: 'DEAD' },
-    { id: 'DOG-04', label: local('Permanecer escondido e aguardar.', 'Stay hidden and wait.'), consequence: local('A criatura deixa a rua; David atravessa em segurança.', 'The creature leaves the street; David crosses safely.'), outcome: 'SUCCESS' },
+    { id: 'DOG-01', label: local('Atravessar enquanto a criatura estiver de costas.', 'Cross while the creature is facing away.'), consequence: local('Seus passos denunciam sua posição, e a criatura alcança você.', 'Your footsteps give you away, and the creature catches you.'), outcome: 'DEAD' },
+    { id: 'DOG-02', label: local('Avançar usando os veículos como cobertura.', 'Advance using the vehicles as cover.'), consequence: local('Os destroços sob seus pés denunciam sua posição, e a criatura ataca.', 'The debris under your feet gives you away, and the creature attacks.'), outcome: 'DEAD' },
+    { id: 'DOG-03', label: local('Distrair a criatura com um objeto.', 'Distract the creature with an object.'), consequence: local('A criatura ouve o objeto e seus movimentos, e alcança você.', 'The creature hears the object and your movements, and catches you.'), outcome: 'DEAD' },
+    { id: 'DOG-04', label: local('Permanecer escondido e aguardar.', 'Stay hidden and wait.'), consequence: local('A criatura deixa a rua, e vocês atravessam em segurança.', 'The creature leaves the street, and you both cross safely.'), outcome: 'SUCCESS' },
   ],
 };
 function active(state: EncounterState, definition: EncounterDefinition) {

@@ -21,7 +21,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-04': local('Criatura deformada entre veículos na rua residencial.', 'Deformed creature among vehicles on the residential street.'),
   'CENA-05': local('Terminal de manutenção pública.', 'Public maintenance terminal.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
@@ -105,8 +105,11 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L21', ami, '... Isso foi um erro.', '... That was an error.', 'CENA-03'),
   dialogue(s3, 'L22', unknown, 'É. Essa vai ser uma longa viagem.', 'Yeah. This is going to be a long trip.', 'CENA-03'),
   dialogue(s3, 'L23', ami, 'Obrigado, bobo.', 'Thank you, Bobo.', 'CENA-03'),
-  narration(s3, 'E-JOIN', 'Você coloca a cabeça e o que resta do tronco de AMI na parte da frente da mochila, junto ao peito.', "You place AMI's head and what remains of his torso on the front of your backpack, against your chest.", null, { event: 'E-JOIN', cue: 'fade-black' }),
-  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local('Consultar AMI consome uma barra. A memória danificada pode gerar respostas desconexas. A luz solar recupera sua energia de processamento.', 'Consulting AMI costs one bar. Damaged memory can produce unrelated answers. Sunlight restores his processing energy.'), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  narration(s3, 'E-JOIN', 'Você então coloca AMI na parte da frente da sua mochila, junto ao seu peito.', 'You then place AMI on the front of your backpack, against your chest.', null, { event: 'E-JOIN', cue: 'fade-black' }),
+  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Consultar AMI consome sua energia.", "Consulting AMI consumes his energy."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  { id: s3 + '/TUTORIAL-b', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("A memória danificada pode gerar respostas desconexas.", "Damaged memory can produce unrelated answers."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  { id: s3 + '/TUTORIAL-c', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Ajude AMI a recuperar seus arquivos de memória para obter respostas mais precisas.", "Help AMI recover his memory files to get more accurate answers."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  { id: s3 + '/TUTORIAL-d', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("A luz solar recupera sua energia de processamento.", "Sunlight restores his processing energy."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
   narration(s3, 'RETURN-STREET', 'Vocês deixam a residência e retornam à rua, agora seguindo em frente juntos.', 'You leave the house and return to the street, now continuing your journey together.', null),
   dialogue(s3, 'L26', unknown, 'Certo. Alguma ideia de pra onde devemos ir?', 'Right. Any idea where we should go?', 'CENA-02'),
   dialogue(s3, 'L27', ami, 'Existe um terminal de manutenção pública a aproximadamente trezentos metros daqui.', 'There is a public maintenance terminal approximately three hundred meters from here.', 'CENA-02'),

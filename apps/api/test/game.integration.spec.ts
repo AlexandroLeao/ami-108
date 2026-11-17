@@ -145,9 +145,10 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     const row = await prisma.gameSession.findUniqueOrThrow({ where: { tokenDigest: digest(cookie.split('=')[1]) } });
     const cp = await prisma.gameCheckpoint.findUniqueOrThrow({ where: { sessionId_checkpointId: { sessionId: row.id, checkpointId: 'CP-DOG' } } });
     expect(cp.snapshot).toMatchObject({ stepId: 'A02-S01/L01', diagnostics: { energy: 3, bio: 15 } });
-    await request(app.getHttpServer()).get('/game/asset?key=CENA-04').set('Cookie', cookie).expect(200);
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-04').set('Cookie', cookie).expect(404);
     await request(app.getHttpServer()).get('/game/asset?key=CENA-05').set('Cookie', cookie).expect(404);
-    for (let i = 0; i < 4; i++) view = await command(cookie, view);
+    for (let i = 0; i < 12 && view.phase !== 'ENCOUNTER'; i++) view = await command(cookie, view);
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-04').set('Cookie', cookie).expect(200);
     const consult = view.actions.find(x => x.kind === 'CONSULT')!;
     const body = { commandId: randomUUID(), expectedRevision: view.revision, actionId: consult.id };
     const send = () => request(app.getHttpServer()).post('/game/commands').set('Cookie', cookie).send(body);
@@ -170,7 +171,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     view = await command(cookie, view);
     view = await command(cookie, view, view.actions.find(x => x.kind === 'RETRY')!.id);
     expect(view.diagnostics?.energy).toBe(3);
-    for (let i = 0; i < 4; i++) view = await command(cookie, view);
+    for (let i = 0; i < 12 && view.phase !== 'ENCOUNTER'; i++) view = await command(cookie, view);
     view = await command(cookie, view, view.actions.find(x => x.kind === 'CONSULT')!.id);
     view = await command(cookie, view);
     expect(view.text).toBe(answer);
