@@ -1,7 +1,7 @@
 # Game requirements and traceability
 
 **AMI-002 · specification, not implementation evidence**  
-Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7 (November 15). Current sources: v1.10 and v1.8 (November 16 addendum); narrative sections 1–11 and visual annexes remain unchanged except the approved opening presentation. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
+Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7 (November 15). Current private sources: v1.11 and v1.9 (November 16 cumulative addenda); narrative sections 1–11 and visual annexes remain unchanged except the approved opening presentation. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
 
 ## Functional requirements
 
@@ -53,4 +53,4 @@ AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile ap
 
 Track FR/NFR IDs in subsequent PRs and tests. AMI-004/005/006 cover the first two chapters, AMI-007 real inference and contingency, AMI-008/009 remaining campaign, AMI-010 full acceptance/security/accessibility, AMI-011/012 deployment/docs, AMI-013 final approval. Do not replace a missing implementation with a checked specification box.
 
-Draft PR #22 extends the implemented candidate to Chapter 2: CP-DOG, four choices, resolved consultation cache, F1, SOL-01, MEM-D2/FB-D2 and E-NAME. Evidence and owner acceptance remain pending; see [encounter engine](../encounter-engine.md).
+Merged PR #22 extends the accepted local subset to Chapter 2: CP-DOG, four choices, resolved consultation cache, F1, SOL-01, MEM-D2/FB-D2 and E-NAME. PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes). Full-campaign, later encounters, real inference and independent security/accessibility acceptance remain pending. See [encounter engine](../encounter-engine.md). Private Master v1.11 / Script v1.9 remain the last synchronized private revisions; the November 17 owner-approved Chapter 1/2 amendments in PR #22 take precedence for the explicitly approved presentation, dialogue and chapter replay changes until a separate cumulative private-source update. No private file or asset ZIP is changed here.

@@ -2,7 +2,7 @@
 
 A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories.
 
-**Status:** technical foundation, architecture and approved visual/asset foundation complete (AMI-001–003). Chapter 1 narrative core merged in PR #19; the owner-approved persistent Chapter 1 campaign (75 presentation beats, PT-BR/EN), API and interface merged in PR #20 at `3cf942a` on November 16, 2026. AMI-004 implementation is accepted; issue #6 closed on November 17. AMI-006 is partial. No full campaign, completed deployment or real inference.
+**Status:** AMI-001–004 complete; AMI-005 implementation accepted and merged (formal issue #7 closure pending). AMI-006 partially complete. The owner-approved local bilingual Chapters 1–2 campaign is merged in PR #22 at `76946f9` (November 17, 2026), with persistent sessions, the dog encounter, checkpoint/cache, F1, SOL-01 and chapter replay. Chapter 1 has 77 presentation beats; Chapter 3 is a boundary only. No full campaign, real inference or production deployment.
 
 ## Product
 
@@ -31,7 +31,7 @@ The canonical narrative sources are Documento Mestre v1.11 and Roteiro Interativ
 - [Scene asset preparation and local preview](docs/assets.md)
 - [Narrative engine implementation status](docs/narrative-engine.md)
 
-The owner approved the opening preview on desktop and mobile; PR #18 merged after CI passed. The local root now uses the Chapter 1 campaign API; the isolated visual fixture remains at `/preview`. Continue game is enabled only when a saved session is confirmed. The owner accepted the Chapter 1 playtest refinements; post-merge [CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passed. See the narrative engine for verification limits and next steps.
+The owner approved the opening preview on desktop and mobile; PR #18 merged after CI passed. The local root now uses the persisted Chapters 1–2 campaign API; the isolated visual fixture remains at `/preview`. Continue game is enabled only when a saved session is confirmed. The owner accepted the Chapter 1 playtest refinements; post-merge [CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passed. See the narrative engine for verification limits and next steps.
 
 ## Architecture specification
 
@@ -51,4 +51,8 @@ Repository documentation, issue and PR text, commits, code identifiers and comme
 
 License and asset distribution terms are not yet decided.
 
-Chapter 2 local integration is in draft PR #22; see [encounter engine](docs/encounter-engine.md). It is not accepted until CI and owner playtest pass.
+PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
+
+Private Master v1.11 / Script v1.9 remain the last synchronized private revisions; the November 17 owner-approved Chapter 1/2 amendments in PR #22 take precedence for the explicitly approved presentation, dialogue and chapter replay changes until a separate cumulative private-source update. No private file or asset ZIP is changed here.
+
+Next: AMI-007 authorized inference/RAG and AMI-008 Chapter 3, with remaining AMI-006 persistence/restoration work. See [encounter engine](docs/encounter-engine.md) and [production plan](docs/production-plan.md).
