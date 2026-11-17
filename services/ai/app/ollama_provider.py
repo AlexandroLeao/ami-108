@@ -64,7 +64,7 @@ class OllamaProvider:
                 raise ValueError("Incomplete generation response")
             text = result.get("response")
             if not isinstance(text, str):
-                raise ValueError("Invalid generation response")
+                raise TypeError("Invalid generation response")
             return text
         finally:
             conn.close()
