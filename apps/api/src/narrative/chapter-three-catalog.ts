@@ -81,7 +81,7 @@ export const LAB_RETURN: readonly Beat[] = [
   beat('RETURN-02b', 'AMI-108', 'Devemos prosseguir. Pode haver um arquivo central.', 'We must proceed. There may be a central archive.'),
   beat('RETURN-02c', 'AMI-108', 'Lá, talvez eu possa restaurar mais dos meus arquivos.', 'There, I may be able to restore more of my files.'),
   beat('EXIT-01', 'NARRATION', 'Você recoloca AMI na mochila.', 'You put AMI back in your backpack.'),
-  beat('EXIT-01b', 'NARRATION', 'Ainda confuso com a lembrança, decide sair dali.', 'Still confused by the memory, you decide to leave.'),
+  beat('EXIT-01b', 'NARRATION', 'Ainda confuso com a lembrança, você segue em frente.', 'Still confused by the memory, you press on.'),
   beat('EXIT-02', 'NARRATION', 'A caminho do arquivo central, vocês escutam um ruído vindo do corredor.', 'On your way to the central archive, you hear a noise from the corridor.'),
   beat('EXIT-03', 'NARRATION', 'Você observa com atenção o que se move à sua frente.', 'You look closely at what is moving ahead of you.'),
 ];
