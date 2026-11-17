@@ -37,3 +37,5 @@
 - Fourth owner refinement: reduce repeated storage-component wording, continuous memory-shiver only FB-D1b–g/MEM-D2/F01/F01b, one-shot name-reveal on L18c, original approved CENA-04 geometry (experimental override reverted after owner review), manifest and HTTP artwork hashes checked. Preserve original art, stable IDs, event effects, chapter replay and solar mechanics.
 
 - Owner correction: preserve the exact b9da1be layout for normal dialogue and choices; do not adjust image or frame dimensions without specific owner approval. A02-S02/L04 has one localized text for all success variants; no recipe-dependent alternative. Name reveal 1800ms; no unrelated changes.
+
+- Targeted owner refinement: energy-reveal on first information card, same CENA-04 with one-shot veil/brief layer shake, L08b solar lead-in (SOL-01 still on entry to L09), alternating name reveal 2600ms. No changes to approved dimensions or other dialogue, rules or artwork.

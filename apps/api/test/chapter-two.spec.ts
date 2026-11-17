@@ -34,8 +34,9 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     }
     expect(projectNarrative(state)).toMatchObject({ cue: 'startle', text: 'Puta merda! O que é aquilo?!' });
     expect(currentAsset(state)).toBe('CENA-04');
+    const revealed = projectNarrative(state).asset;
     state = forward(state);
-    expect(projectNarrative(state).cue).toBe('none');
+    expect(projectNarrative(state)).toMatchObject({ cue: 'none', text: 'Olha a língua.', asset: revealed });
     for (let i = 0; i < 10 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
     expect(projectNarrative(state).actions.some(a => a.kind === 'PREVIOUS')).toBe(false);
   });
@@ -125,6 +126,13 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(state.diagnostics?.energy).toBe(category==='NONE'?3:2);
     expect(state.events).not.toContain('SOL-01');
     state=forward(state);
+    expect(state.stepId).toBe('A02-S02/L08b');
+    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Quanto à minha energia, existe uma forma de recuperá-la.', cue: 'none' });
+    expect(state.diagnostics?.energy).toBe(category==='NONE'?3:2);
+    expect(state.events).not.toContain('SOL-01');
+    expect(projectNarrative(state).actions[0].kind).toBe('INTERACT');
+    state=forward(state);
+    expect(state.stepId).toBe('A02-S02/L09');
     expect(state.events.filter(event => event === 'SOL-01')).toHaveLength(1);
     expect(state.diagnostics?.energy).toBe(3);
     while(state.stepId!=='A02-S02/MEM-D2-PAIN' && count++<60) state=forward(state);

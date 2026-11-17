@@ -609,7 +609,8 @@
               "blink-black",
               "fade-in",
               "memory-shiver",
-              "name-reveal"
+              "name-reveal",
+              "energy-reveal"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
           },

@@ -21,7 +21,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-04': local('Criatura deformada entre veículos na rua residencial.', 'Deformed creature among vehicles on the residential street.'),
   'CENA-05': local('Terminal de manutenção pública.', 'Public maintenance terminal.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
@@ -106,7 +106,7 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L22', unknown, 'É. Essa vai ser uma longa viagem.', 'Yeah. This is going to be a long trip.', 'CENA-03'),
   dialogue(s3, 'L23', ami, 'Obrigado, bobo.', 'Thank you, Bobo.', 'CENA-03'),
   narration(s3, 'E-JOIN', 'Você então coloca AMI na parte da frente da sua mochila, junto ao seu peito.', 'You then place AMI on the front of your backpack, against your chest.', null, { event: 'E-JOIN', cue: 'fade-black' }),
-  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Consultar AMI consome sua energia.", "Consulting AMI consumes his energy."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
+  { id: s3 + '/TUTORIAL', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Consultar AMI consome sua energia.", "Consulting AMI consumes his energy."), asset: null, cue: 'energy-reveal', information: true, action: 'CONTINUE' },
   { id: s3 + '/TUTORIAL-b', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("A memória danificada pode gerar respostas desconexas.", "Damaged memory can produce unrelated answers."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
   { id: s3 + '/TUTORIAL-c', sceneId: s3, phase: 'NARRATIVE', speaker: null, text: local("Ajude AMI a recuperar seus arquivos de memória para obter respostas precisas.", "Help AMI recover his memory files to get accurate answers."), asset: null, cue: 'none', information: true, action: 'CONTINUE' },
   narration(s3, 'RETURN-STREET', 'Vocês deixam a residência e retornam à rua, agora seguindo em frente juntos.', 'You leave the house and return to the street, now continuing your journey together.', null),

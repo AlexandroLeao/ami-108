@@ -45,3 +45,7 @@ Remove repeated component wording; localized ARRIVAL-03/FOUND/L01 only. Continuo
 ## Owner correction — November 17
 
 Revert the dog-wide geometry override exactly to the approved b9da1be layout. Use the same owner-approved L04 text for every success variant (no bananas substitution); keep all A/B/C branch logic and cache intact. Slow name-reveal to 1800ms, preserve memory-shiver scope and image hash verification. No other story, layout, state or asset changes.
+
+## Targeted owner refinement — November 17
+
+Energy indicator gently appears on the first tutorial card and stays visible on the remaining information cards. Dog reveal uses a temporary coal veil and brief visual-layer translation rather than transforming the PNG; no layout resize. Insert L08b before solar explanation, retain SOL-01 application on entry to L09 with existing independent recharge semantics and stable L08/L09 IDs. Name alternates ???/DAVID over 2600ms and settles on DAVID. No other story, energy, asset, layout, cache or replay changes. Browser validation pending.

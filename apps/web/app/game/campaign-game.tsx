@@ -22,7 +22,7 @@ function EnergyIndicator({ view }: { view: CampaignView }) {
   if (!d) return null;
   const label = view.locale === 'pt-BR' ? 'Energia' : 'Energy';
   return (
-    <div className="campaign-diagnostics campaign-energy" role="group" aria-label={label}>
+    <div className="campaign-diagnostics campaign-energy" data-energy-reveal={view.cue === 'energy-reveal'} role="group" aria-label={label}>
       <span>{label}</span>
       <span className="campaign-bars" role="img" aria-label={view.locale === 'pt-BR' ? `${d.energy} de 3 barras` : `${d.energy} of 3 bars`}>
         {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
@@ -280,7 +280,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
-                <div className="campaign-header-middle">{view.asset && <EnergyIndicator view={view} />}</div>
+                <div className="campaign-header-middle">{(view.asset || view.information) && <EnergyIndicator view={view} />}</div>
                 <button className="small-control campaign-menu-control" aria-disabled={busy} onClick={() => { if (!busyRef.current) setOverlay('pause'); }}>{labels.menu}</button>
               </div>
             </header>

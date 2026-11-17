@@ -55,3 +55,7 @@ ARRIVAL-03 now describes AMI examining the system, FOUND says “Encontrado.” 
 ### Owner correction
 
 A02-S02/L04 uses “Então vai parar de falar coisas aleatórias?” / “So you'll stop saying random things?” for all three successful dog branches, without a recipe-dependent bananas override. Preserve the prior branch dialogue, recipe exposure data, event IDs and effects. The name reveal is presentation-only, now 1800ms. No other narrative changes.
+
+### Targeted owner refinement
+
+TUTORIAL adds presentation-only energy-reveal. Insert bilingual L08b immediately before L09: “Quanto à minha energia, existe uma forma de recuperá-la.” / “As for my energy, there is a way to restore it.” SOL-01 remains applied exactly once on entering L09; its existing interaction moves from L08 to the new L08b. Existing L08 saves advance normally, existing later saves retain their already applied event. Dog L01/L02 retain CENA-04; startle remains L01-only. L18c name reveal changes presentation only.

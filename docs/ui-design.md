@@ -83,3 +83,7 @@ Only FB-D1b–g, MEM-D2, F01 and F01b use `memory-shiver`: continuous, subtle su
 ### Owner correction — restore approved frame and slower identity transition
 
 Restore all pre-fourth-refinement layout declarations verbatim; the normal dialogue/image geometry and the active choice layout are the same as `b9da1be`. The L18c label crossfade is now 1800ms with ease-in-out, reduced motion still shows DAVID immediately. No other visual effects are changed.
+
+### Targeted owner refinement — energy, dog entrance and identity
+
+The first information card (TUTORIAL) alone has `energy-reveal`: show the existing energy indicator on the dark information cards, gently fade in and pulse twice over 1900ms only on the first. Other dark beats retain the previous HUD visibility. Dog L01 alone fades a coal veil over the loaded, unchanged CENA-04 and briefly translates the visual layer for 860ms; no scale/filter/transform on the PNG, no persistent shake fill, and the next line reuses the same asset and ordinary layout. L18c alternates ???/DAVID with subtle motion and crossfades for 2600ms before settling on DAVID. All cues honor reduced motion. No changes to approved dimensions, choices, colors, or other animations.

@@ -48,6 +48,7 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S02/L06": { speaker: 'AMI', text: local("Recuperei o mapa desta região. Existe um centro de pesquisa nas proximidades.", "I have recovered a map of this area. There is a research facility nearby.") },
   "A02-S02/L07": { speaker: 'UNKNOWN', text: local("Pode ter mais peças pra você lá?", "Think there might be more parts for you there?") },
   "A02-S02/L08": { speaker: 'AMI', text: local("É uma possibilidade.", "It is a possibility.") },
+  "A02-S02/L08b": { speaker: 'AMI', text: local("Quanto à minha energia, existe uma forma de recuperá-la.", "As for my energy, there is a way to restore it.") },
   "A02-S02/L09": { speaker: 'AMI', text: local("Minha energia de processamento pode ser recuperada através da luz solar.", "My processing energy can be restored through sunlight.") },
   "A02-S02/L10": { speaker: 'UNKNOWN', text: local("Então é só deixar você no sol?", "So I just leave you in the sun?") },
   "A02-S02/L11": { speaker: 'AMI', text: local("Correto.", "Correct.") },
@@ -108,7 +109,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
     return available;
   }
   if (id === terminalId('L02')) return [next(state, id, 'INTERACT', local('Restaurar memória', 'Restore memory')), ...back];
-  if (id === terminalId('L08')) return [next(state, id, 'INTERACT', local('Recarregar energia', 'Recharge energy')), ...back];
+  if (id === terminalId('L08b')) return [next(state, id, 'INTERACT', local('Recarregar energia', 'Recharge energy')), ...back];
   return [next(state, id), ...back];
 }
 export function chapterTwoAsset(state: NarrativeState): OpeningAsset | null {
@@ -235,12 +236,14 @@ export function advanceChapterTwo(state: NarrativeState, actionId: string, rando
   if (id === terminalId('L18')) return move(state, terminalId('L18b'));
   if (id === terminalId('L18b')) return move(state, terminalId('L18c'), c.dog, 'E-NAME');
   if (id === terminalId('L18c')) return move(state, terminalId('L19'));
+  if (id === terminalId('L08')) return move(state, terminalId('L08b'));
+  if (id === terminalId('L08b')) return move(state, terminalId('L09'), c.dog, 'SOL-01');
   const terminal = id.match(/^A02-S02\/L(\d\d)$/);
   if (terminal) {
     const n = Number(terminal[1]);
     if (n === 20) return move(state, END);
     if (n === 14) return move(state, terminalId('MEM-D2-PAIN'), c.dog, 'MEM-D2');
-    const event = n === 2 ? 'F1' : n === 8 ? 'SOL-01' : undefined;
+    const event = n === 2 ? 'F1' : undefined;
     return move(state, terminalId('L' + String(n + 1).padStart(2, '0')), c.dog, event);
   }
   return invalid();

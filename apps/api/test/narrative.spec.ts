@@ -141,10 +141,10 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(projectNarrative(state).text).toContain('Você então coloca');
     expect(projectNarrative(state).text).not.toContain('arnês');
     state = next(state);
-    expect(projectNarrative(state)).toMatchObject({ narration: false, information: true, asset: null });
+    expect(projectNarrative(state)).toMatchObject({ narration: false, information: true, asset: null, cue: 'energy-reveal', diagnostics: { energy: 3 } });
     for (const text of ['A memória danificada pode gerar respostas desconexas.', 'Ajude AMI a recuperar seus arquivos de memória para obter respostas precisas.']) {
       state = next(state);
-      expect(projectNarrative(state)).toMatchObject({ information: true, asset: null, text });
+      expect(projectNarrative(state)).toMatchObject({ information: true, asset: null, cue: 'none', text });
     }
     state = next(state);
     expect(state.stepId).toBe('A01-S03/RETURN-STREET');
