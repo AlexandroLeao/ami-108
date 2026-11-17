@@ -162,6 +162,19 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(state.events.filter(x=>x==='F1')).toHaveLength(1);
     expect(state.events).not.toContain('SOL-01');
   });
+  it('resumes a legacy solar-dialogue save at the memory without a new debit', () => {
+    let state=consult(reachDog(),()=>0.9);
+    state=choose(state,'DOG-04');
+    while(state.stepId!=='A02-S02/L08') state=forward(state);
+    const old={...state,stepId:'A02-S02/L09',diagnostics:{...state.diagnostics!,energy:2 as const},
+      chapterTwo:{...state.chapterTwo!,trail:[...state.chapterTwo!.trail,'A02-S02/L08b','A02-S02/L09']}};
+    expect(projectNarrative(old)).toMatchObject({text:'Ai!',cue:'blink-black',diagnostics:{energy:3}});
+    const next=forward(old);
+    expect(next.stepId).toBe('A02-S02/MEM-D2');
+    expect(next.events).toContain('MEM-D2');
+    expect(next.chapterTwo?.dog.slots).toEqual(state.chapterTwo?.dog.slots);
+    expect(next.chapterTwo?.trail).not.toContain('A02-S02/L09');
+  });
   it('never replays consultation on locale change or history review and permits choice at zero', () => {
     let state=reachDog();
     for(let i=0;i<3;i++) state=consult(state,()=>0.9);

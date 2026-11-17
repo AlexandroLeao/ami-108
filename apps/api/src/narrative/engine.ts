@@ -125,7 +125,7 @@ function repairTrail(trail: readonly string[], current: string, replacement: str
   return { trail: kept, reviewStepId: cursor === replacement ? null : cursor };
 }
 function normalizeRetiredScenes(state: NarrativeState): NarrativeState {
-  state = normalizeRetiredScenes(state);
+  state = normalizeRetiredTutorial(state);
   if (state.chapterTwo && !state.chapterThree) {
     const c = state.chapterTwo;
     const replacement = retiredTwo.has(state.stepId) ? 'A02-S02/MEM-D2-PAIN' : state.stepId;

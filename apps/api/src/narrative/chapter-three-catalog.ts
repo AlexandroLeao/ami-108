@@ -1,4 +1,4 @@
-// Server-only source transcription for AMI-008. Not connected to progression.
+// Server-only Chapter 3 source and owner-approved presentation amendments.
 // Master v1.12 / Script v1.10 preserve the original Chapter 3 canon.
 // Do not expose this catalog to the browser or a provider.
 import { local, type Localized } from './catalog';
@@ -55,8 +55,8 @@ export const LAB_AFTER_RECORDS: readonly Beat[] = [
   beat('MEM-D3', 'DAVID', 'Ah... essa dor de novo...', 'Ah... that pain again...'),
 ];
 
-// FB-D3 must be dark. PARTNER remains unnamed until David says Howard at F06.
-// No face, betrayal, energy-core or earlier voice association is introduced.
+// FB-D3 must be dark. Familiar voice changes to HOWARD only at F09.
+// No face, betrayal or energy-core information is introduced.
 export const ARRIVAL_MEMORY: readonly Beat[] = [
   beat('F01', 'PARTNER', 'Esse planeta tá todo fodido. Pelo que dizem, tentaram curar alguma doença e acabaram deixando os animais malucos.', "This planet is fucked. From what I've heard, they tried to cure some disease and ended up driving the animals crazy."),
   beat('F02', 'DAVID', 'Pelo menos dessa vez não vai ter ninguém disputando a coleta com a gente.', "At least this time we won't have anyone competing with us for salvage."),

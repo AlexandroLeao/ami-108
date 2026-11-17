@@ -109,6 +109,19 @@ describe('Chapter 3 integrated progression', () => {
     expect(s.diagnostics?.bio).toBe(85);
     expect(s.savedRatSlots).toEqual(saved);
   });
+  it('resumes retired Chapter 3 beats and restores energy without changing the saved slot', () => {
+    let s=ratDecision();
+    s=consult(s,()=>0.9);
+    s=step(s,'RAT-02');
+    s=reach(s,x=>x.stepId==='A03-S03/ROUTE');
+    const old={...s,stepId:'A03-S03/SOL-02',diagnostics:{...s.diagnostics!,energy:2 as const},
+      chapterThree:{...s.chapterThree!,trail:[...s.chapterThree!.trail,'A03-S03/SOL-02']}};
+    expect(projectNarrative(old)).toMatchObject({text:'Então vamos nessa.',diagnostics:{energy:3}});
+    const resumed=step(old);
+    expect(resumed.stepId).toBe('A04-S01/CHAPTER_CARD');
+    expect(resumed.savedRatSlots).toEqual(s.savedRatSlots);
+    expect(resumed.events).not.toContain('SOL-02');
+  });
   it('allows choices at zero and keeps locale/history from rerolling or reapplying events', () => {
     let s=ratDecision();
     for(let i=0;i<3;i++) s=consult(s,()=>0.99);
