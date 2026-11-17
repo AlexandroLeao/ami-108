@@ -107,9 +107,6 @@ const retiredTwo = new Set(['L08b','L09','L10','L11','L12','L13','L14'].map(id =
 const retiredThree: Readonly<Record<string, string>> = {
   'A03-S01/LAB-TIME': 'A03-S01/L06a',
   'A03-S01/F07': 'A03-S01/F08',
-  'A03-S02/L03': 'A03-S02/WARNING',
-  'A03-S02/L04': 'A03-S02/WARNING',
-  'A03-S02/L05': 'A03-S02/WARNING',
   'A03-S03/SOL-02': 'A03-S03/DEPART',
   'A03-S03/SOL-02-L01': 'A03-S03/DEPART',
   'A03-S03/SOL-02-L02': 'A03-S03/DEPART',

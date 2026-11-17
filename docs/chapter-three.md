@@ -22,3 +22,7 @@ Supersedes earlier solar mechanics and presentation notes: F1/F2 restore memory 
 ## Targeted owner polish — November 17
 
 All FB-D3 dialogue, including the new natural continuation beats F01b/F01c/F02b/F05b, uses the existing subtle continuous memory text motion; F09 combines it with the existing familiar voice → HOWARD label reveal. All remain dark. Split long F01, F02, F05 and EXIT-01 at meaningful sentence boundaries in both languages; keep stable existing IDs and insert only new continuation IDs, without altering historical save positions, events, or other dialogue. DEPART becomes “Ok AMI, vamos nessa.” / “OK, AMI, let's go.”. Increase only the temporary visual-layer translation amplitude for the shared dog/rat startle; retain the original 1450ms duration, 435ms dark hold, veil, settling and reduced-motion handling. Original PNGs, frame geometry, remaining mechanics and AI integration unchanged. The active Chapter 3 branch still uses authored randomized categories/fallback, not real model inference; PR #24 remains separate.
+
+## Owner correction — November 17
+
+Restore the exact original RAT L03–L05 bilingual dialogue between L02 and WARNING. These IDs are no longer retired; older saves on those beats remain valid. Keep WARNING, current art, cue timing, dimensions, choices, and all other dialogue and mechanics unchanged.

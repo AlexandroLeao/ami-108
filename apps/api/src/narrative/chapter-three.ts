@@ -180,7 +180,10 @@ export function advanceChapterThree(state: NarrativeState, actionId: string, ran
     return move(state, target, { events });
   }
   if (id === rat('L01')) return move(state, rat('L02'));
-  if (id === rat('L02')) return move(state, rat('WARNING'));
+  if (id === rat('L02')) return move(state, rat('L03'));
+  if (id === rat('L03')) return move(state, rat('L04'));
+  if (id === rat('L04')) return move(state, rat('L05'));
+  if (id === rat('L05')) return move(state, rat('WARNING'));
   if (id === rat('WARNING')) return move(state, decision(0));
   const branch = id.match(/^A03-S02\/([ABC])([12])$/);
   if (branch) return move(state, branch[2] === '1' ? rat(branch[1] + '2') : archive('RESTORE'));

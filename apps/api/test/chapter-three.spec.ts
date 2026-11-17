@@ -71,6 +71,19 @@ describe('Chapter 3 integrated progression', () => {
     expect(projectNarrative(s)).toMatchObject({cue:'startle',asset:{url:'/api/game/asset?key=CENA-07'}});
     s=step(s);
     expect(projectNarrative(s)).toMatchObject({cue:'none',asset:ratArt});
+    const ratLines = [
+      ['L02','AMI-108','Aparentemente.','Apparently.'],
+      ['L03','DAVID','Aparentemente?','Apparently?'],
+      ['L04','AMI-108','Suas dimensões excedem consideravelmente os parâmetros habituais.','Its dimensions considerably exceed the usual parameters.'],
+      ['L05','DAVID','É. Eu percebi.','Yeah. I noticed.'],
+    ] as const;
+    for (const [id,speaker,pt,en] of ratLines) {
+      expect(s.stepId).toBe('A03-S02/'+id);
+      expect(projectNarrative(s)).toMatchObject({speaker,text:locale==='pt-BR'?pt:en,cue:'none',asset:ratArt});
+      s=step(s);
+    }
+    expect(s.stepId).toBe('A03-S02/WARNING');
+    expect(projectNarrative(s)).toMatchObject({narration:true,asset:ratArt,cue:'none'});
     s = ratDecision(s);
     expect(currentAsset(s)).toBe('CENA-07');
     expect(s.chapterThree?.checkpoint?.diagnostics).toEqual({ energy:3,med:35,bio:42,hist:53,personal:5,personalUnlocked:false });

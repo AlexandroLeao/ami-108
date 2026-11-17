@@ -101,6 +101,9 @@ export const RAT: EncounterDefinition = {
 export const RAT_ENTRY: readonly Beat[] = [
   beat('L01', 'DAVID', 'Caralho! Isso é um rato?!', 'Fuck! Is that a rat?!'),
   beat('L02', 'AMI-108', 'Aparentemente.', 'Apparently.'),
+  beat('L03', 'DAVID', 'Aparentemente?', 'Apparently?'),
+  beat('L04', 'AMI-108', 'Suas dimensões excedem consideravelmente os parâmetros habituais.', 'Its dimensions considerably exceed the usual parameters.'),
+  beat('L05', 'DAVID', 'É. Eu percebi.', 'Yeah. I noticed.'),
   beat('WARNING', 'NARRATION', 'Escolha corretamente como deve passar pela criatura para sobreviver.', 'Choose the right way to get past the creature to survive.'),
 ];
 export const RAT_QUESTION = beat('Q-RAT', 'DAVID', 'Alguma ideia de como tirar essa coisa do caminho?', 'Any idea how to get that thing out of the way?');
