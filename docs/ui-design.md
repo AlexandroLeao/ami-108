@@ -1,5 +1,14 @@
 # Retro game presentation
 
+## Current approved presentation — PR #25
+
+Chapter 2: DOG L02 “Um cachorrinho, bobo.”; no solar dialogue; F1 recharges. Both creatures appear immediately on artwork load with 650ms one-shot decaying layer shake, max translation 14px horizontal / 4px vertical, no veil or delayed fade; reduced motion skips shake. Chapter 3: dark approach, lab CENA-06 soft reveal, connection narration, eleven dark archive cards red/ivory with no extra label, soft return on David's reaction, 20-year reference in AMI dialogue. FB-D3 dark, continuous memory text shiver, F09 voice-name reveal, wake return, short natural text beats, approved AMI bridge and archive arrival. Original L03–L05 rat dialogue retained before warning; choices/layout intact. F2 restores energy with memory, no solar beat. DEPART “Ok AMI, vamos nessa.”. Existing image dimensions/fonts/frame geometry/arrows/HUD/reduced motion intact.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 **AMI-003 / AMI-004 · owner-approved direction and accepted Chapter 1 integration, November 16, 2026**
 
 The visual preview establishes a reusable game shell; it is not the authoritative campaign. Keep the approved three colors (#171717, #FDF3E9, #FC2721), the 12 existing scene images and the source narrative. A new menu illustration is explicitly deferred.

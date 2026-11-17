@@ -1,5 +1,14 @@
 # Scene asset preparation
 
+## Current art authorization
+
+CENA-01–07 are reached in Chapters 1–3; CENA-05/06 reused as approved. Future CENA-08–12 remain inaccessible in campaign. All original PNGs/manifest identical. Creature reveal uses immediate loaded-art shake only, 650ms; laboratory/terminal fades unchanged.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 AMI-003 — approved art pipeline and isolated development preview.
 
 The private official backup contains 12 approved scene images and 9 internal reference sheets. Only the 12 approved game scenes are inputs to this script; the reference sheets and original backup remain in Drive. Preserve the originals. No new art is generated.

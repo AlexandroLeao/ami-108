@@ -1,5 +1,14 @@
 # System design
 
+## Current implemented containers and boundary
+
+NestJS controls DOG/RAT, CP-DOG/CP-RAT, slots, F1/F2 and chapter replay with current-only artwork. No provider requests on main. Consultation reservation sequence below is the intended design; draft #24 optional initial transport/reservation and local adapter are not merged, reconciled or real-model tested.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 **AMI-002 · reviewed design, merged in PR #17; implementation is incremental**  
 Canonical narrative: Documento Mestre v1.12 / Roteiro Interativo v1.10 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
 
@@ -48,7 +57,7 @@ flowchart TD
   Queries --> Assets["Asset authorization"]
 ```
 
-AMI-004 began with pure deterministic domain functions in apps/api/src/narrative (PR #19). The tested core is now wrapped by the persisted session/receipt service, authorized NestJS endpoints and Next.js same-origin facade in merged PR #20. Merged PR #22 adds the dog encounter, CP-DOG/slot tables, F1/SOL-01 and chapter replay. Later encounters/restorations and real inference remain planned. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
+AMI-004 began with pure deterministic domain functions in apps/api/src/narrative (PR #19). The tested core is now wrapped by the persisted session/receipt service, authorized NestJS endpoints and Next.js same-origin facade in merged PR #20. Merged PR #22 added dog and CP-DOG/slot tables; PR #25 adds RAT, CP-RAT, F1/F2 restoration-linked recharge and Chapter 4 entry replay. Later boar/F3 and real inference remain planned. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
 
 ## Deployment and environments
 

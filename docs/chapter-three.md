@@ -1,5 +1,17 @@
 # AMI-008 — Chapter 3 source and domain preparation
 
+## Final accepted Chapter 3 — current specification
+
+- A03-S01: dark approach, original lab fade, connect, eleven red/ivory records, MEM-D3 dark and FB-D3 text shiver, F09 name transition, wake. Approved AMI bridge to archive; departure “Ainda confuso com a lembrança, você segue em frente.”.
+- A03-S02: immediate loaded rat art with 650ms shake; original L02–L05 dialogue retained; warning then choices, unchanged probabilities/outcomes, RAT-04 consequence no dog reference. CP-RAT and slots durable.
+- A03-S03: archive arrival → restoration interaction → F2 restores all three bars and 75/85/78/5 locked; route, “Ok AMI, vamos nessa.” and Chapter 4 boundary. No separate solar recharge. Both locales/replay tested.
+- Remaining AMI-008 criterion is real AI/fallback integration with draft #24. No new assets, schema or gameplay outside owner-approved changes.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 November 17, 2026. Draft, isolated from accepted Chapters 1–2. Canonical source: private Master v1.12 / Script v1.10, Chapter 3 unchanged from prior approved script. The server-only catalog transcribes authored bilingual lab, record, memory, rat and second-fragment text. Rat uses the existing generic encounter engine at 42%; tests cover all four outcomes, cache/retry/energy and successful-attempt branches. No existing campaign file is modified. Catalog is not imported into the running narrative engine, does not authorize assets, and cannot expose future scenes to the browser. F2/SOL-02 gate metadata is not a state transition.
 
 ## Required integration sequence
