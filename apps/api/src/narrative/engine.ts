@@ -87,7 +87,18 @@ function visibleIndex(state: NarrativeState): number {
   return index;
 }
 
+// The removed solar tutorial never reappears, including on old saves.
+// Resume an authoritative cursor at the next surviving beat, or a review
+// cursor at the preceding information card. No event or revision is changed.
+function normalizeRetiredTutorial(state: NarrativeState): NarrativeState {
+  const retired = 'A01-S03/TUTORIAL-d';
+  if (state.stepId !== retired && state.reviewStepId !== retired) return state;
+  return { ...state,
+    stepId: state.stepId === retired ? 'A01-S03/RETURN-STREET' : state.stepId,
+    reviewStepId: state.reviewStepId === retired ? 'A01-S03/TUTORIAL-c' : state.reviewStepId };
+}
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
+  state = normalizeRetiredTutorial(state);
   if (state.chapterTwo) { chapterTwoView(state); return chapterTwoAsset(state); }
   return CHAPTER_ONE[visibleIndex(state)]?.asset ?? null;
 }
@@ -113,6 +124,7 @@ function unlocked(state: NarrativeState): number {
   return Math.min(3, Math.max(reached, state.unlockedChapter ?? 1));
 }
 export function projectNarrative(state: NarrativeState): CurrentView {
+  state = normalizeRetiredTutorial(state);
   const view = projectCurrent(state);
   return { ...view, chapters: CHAPTERS.slice(0, unlocked(state)).map(chapter => ({ number: chapter.number, title: chapter.title[state.locale] })) };
 }
@@ -170,7 +182,7 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
   checkRevision(state, expectedRevision);
   const restart = /^CHAPTER\/RESTART\/([1-5])$/.exec(actionId);
   if (restart) return restartChapter(state, Number(restart[1]));
-  return rememberProgress(advanceCurrent(state, actionId, random));
+  return rememberProgress(advanceCurrent(normalizeRetiredTutorial(state), actionId, random));
 }
 function advanceCurrent(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
   if (state.chapterTwo) return advanceChapterTwo(state, actionId, random);
@@ -199,5 +211,5 @@ export function changeNarrativeLocale(state: NarrativeState, locale: Locale, exp
   checkRevision(state, expectedRevision);
   projectNarrative(state);
   ensureLocale(locale);
-  return { ...state, locale, revision: state.revision + 1 };
+  return { ...normalizeRetiredTutorial(state), locale, revision: state.revision + 1 };
 }

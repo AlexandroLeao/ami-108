@@ -107,17 +107,38 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     state=choose(state,'DOG-04');state=forward(state);
     expect(state.stepId).toBe('A02-S01/'+variant+'1');
     let count=0;
+    while(state.stepId!=='A02-S02/ARRIVAL-01' && count++<30) state=forward(state);
+    for (const text of ['Vocês chegam ao terminal de manutenção indicado por AMI.', 'Você retira AMI da mochila e o posiciona junto ao painel.', 'Ele precisa encontrar um componente capaz de restaurar seus arquivos de memória.']) {
+      expect(projectNarrative(state)).toMatchObject({ text, asset: null, narration: true });
+      state=forward(state);
+    }
+    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Identifiquei um componente compatível com meu sistema de armazenamento.', asset: { url: '/api/game/asset?key=CENA-05' } });
     while(state.stepId!=='A02-S02/L04' && count++<30) state=forward(state);
     expect(state.stepId).toBe('A02-S02/L04');
     expect(state.diagnostics).toEqual({energy:category==='NONE'?3:2,med:35,bio:42,hist:53,personal:5,personalUnlocked:false});
     expect(projectNarrative(state).text).toContain(recipe?'bolo':'bananas');
-    while(state.stepId!=='A02-S02/F01' && count++<60) state=forward(state);
-    expect(currentAsset(state)).toBeNull();
-    expect(projectNarrative(state).text).toBe('Sinto muito, David...');
+    while(state.stepId!=='A02-S02/MEM-D2-PAIN' && count++<60) state=forward(state);
     expect(state.diagnostics?.energy).toBe(3);
+    const expected = [
+      { text: 'Ai!', speaker: '???', cue: 'blink-black' },
+      { text: 'Minha cabeça de novo!', speaker: '???', cue: 'none' },
+      { text: '...', speaker: null, cue: 'none', narration: false },
+      { text: 'Sinto muito... David...', speaker: 'Voz familiar', cue: 'none' },
+      { text: 'Bobo? Está tudo bem?', speaker: 'AMI-108', cue: 'none' },
+    ];
+    for (const beat of expected) {
+      expect(projectNarrative(state)).toMatchObject({ ...beat, asset: null });
+      state=forward(state);
+    }
+    expect(projectNarrative(state)).toMatchObject({ text: 'Você está apresentando sinais de desconforto.', speaker: 'AMI-108', cue: 'wake', asset: {url: '/api/game/asset?key=CENA-05'} });
     while(state.stepId!=='A02-S02/L18' && count++<70) state=forward(state);
-    expect(projectNarrative(state).speaker).toBe('DAVID');
-    expect(state.events).toContain('E-NAME');
+    expect(projectNarrative(state)).toMatchObject({ text: 'Tinha alguém falando comigo...', speaker: '???' });
+    expect(state.events).not.toContain('E-NAME');
+    state=forward(state);
+    expect(projectNarrative(state)).toMatchObject({ text: 'E disse o meu nome...', speaker: '???' });
+    state=forward(state);
+    expect(projectNarrative(state)).toMatchObject({ text: 'David... Eu me lembro, esse é o meu nome.', speaker: 'DAVID' });
+    expect(state.events.filter(event => event === 'E-NAME')).toHaveLength(1);
     while(state.stepId!=='A03-S01/CHAPTER_CARD' && count++<90) state=forward(state);
     expect(projectNarrative(state)).toMatchObject({chapter:3,phase:'CHAPTER_CARD',asset:null});
     expect(projectNarrative(state).actions.map(x=>x.kind)).toEqual(['PREVIOUS']);

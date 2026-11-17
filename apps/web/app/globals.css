@@ -394,7 +394,7 @@ button:focus-visible, a:focus-visible {
   80% { transform: translateX(1px); }
   100% { opacity: 1; transform: none; }
 }
-.campaign-skull { color: var(--ivory); width: min(32%, 144px); height: auto; z-index: 1; animation: campaign-skull-reveal 420ms ease-out both; }
+.campaign-skull { color: var(--alert); width: min(32%, 144px); height: auto; z-index: 1; animation: campaign-skull-reveal 420ms ease-out both; }
 @keyframes campaign-skull-reveal { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .scene-art[data-startle="true"], .campaign-skull { animation: none; }
@@ -423,4 +423,25 @@ button:focus-visible, a:focus-visible {
   .campaign-dialogue[data-choices="true"] { padding: 7px 10px; }
   .campaign-choice-list { gap: 4px; }
   .campaign-choice { font-size: 19px; padding: 3px 5px; }
+}
+
+/* MEM-D2 alone: two brief eyelid movements ending in darkness. The last
+   already-mounted authorized image is retained only for the exit cue. */
+.campaign-scene[data-cue="blink-black"] .scene-visual { visibility: visible; }
+.campaign-blink-black span:first-child { animation: campaign-blink-black-upper 1050ms ease-in-out both; }
+.campaign-blink-black span:last-child { animation: campaign-blink-black-lower 1050ms ease-in-out both; }
+@keyframes campaign-blink-black-upper {
+  0% { transform: translateY(-105%); }
+  24% { transform: translateY(0); }
+  48% { transform: translateY(-45%); }
+  72%, 100% { transform: translateY(0); }
+}
+@keyframes campaign-blink-black-lower {
+  0% { transform: translateY(105%); }
+  24% { transform: translateY(0); }
+  48% { transform: translateY(45%); }
+  72%, 100% { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campaign-scene[data-cue="blink-black"] .scene-visual { visibility: hidden; }
 }

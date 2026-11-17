@@ -26,10 +26,9 @@ function Diagnostics({ view }: { view: CampaignView }) {
       <div className="campaign-diagnostics-content">
         <div className="campaign-energy">
           <span>{view.locale === 'pt-BR' ? 'Energia' : 'Energy'}</span>
-          <span className="campaign-bars" aria-hidden="true">
+          <span className="campaign-bars" role="img" aria-label={view.locale === 'pt-BR' ? `${d.energy} de 3 barras` : `${d.energy} of 3 bars`}>
             {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
           </span>
-          <span>{d.energy}/3</span>
         </div>
         <div className="campaign-memory">
           <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span>
@@ -271,7 +270,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
 
   const titleText = view ? (locale === 'pt-BR' ? 'CAPÍTULO ' : 'CHAPTER ') + view.chapter + ' — ' + view.chapterTitle.toLocaleUpperCase(locale) : '';
   const cue = pageIndex === 0 ? view?.cue : 'none';
-  const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis';
+  const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
   const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 
   return (

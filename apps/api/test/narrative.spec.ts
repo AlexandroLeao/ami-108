@@ -142,7 +142,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(projectNarrative(state).text).not.toContain('arnês');
     state = next(state);
     expect(projectNarrative(state)).toMatchObject({ narration: false, information: true, asset: null });
-    for (const text of ['A memória danificada pode gerar respostas desconexas.', 'Ajude AMI a recuperar seus arquivos de memória para obter respostas mais precisas.', 'A luz solar recupera sua energia de processamento.']) {
+    for (const text of ['A memória danificada pode gerar respostas desconexas.', 'Ajude AMI a recuperar seus arquivos de memória para obter respostas precisas.']) {
       state = next(state);
       expect(projectNarrative(state)).toMatchObject({ information: true, asset: null, text });
     }
@@ -153,6 +153,17 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(state.stepId).toBe('A01-S03/L26');
     expect(currentAsset(state)).toBe('CENA-02');
     expect(state.events).toEqual(['E-JOIN']);
+  });
+  it('skips the retired solar information beat in old saves and history without replay', () => {
+    const tutorial = reach('A01-S03/TUTORIAL-c');
+    const legacy = { ...tutorial, stepId: 'A01-S03/TUTORIAL-d' };
+    expect(projectNarrative(legacy).information).toBe(false);
+    expect(projectNarrative(legacy).text).toBe(projectNarrative(next(tutorial)).text);
+    expect(next(legacy).stepId).toBe('A01-S03/L26');
+    const reviewed = { ...reach('A01-S03/L26'), reviewStepId: 'A01-S03/TUTORIAL-d' };
+    expect(projectNarrative(reviewed).text).toContain('obter respostas precisas.');
+    expect(next(next(reviewed)).reviewStepId).toBeNull();
+    expect(currentAsset(reviewed)).toBeNull();
   });
   it('runs MEM-D1, seven dark memory beats and a blink return without replay or debit', () => {
     const pain = reach('A01-S03/MEM-D1');

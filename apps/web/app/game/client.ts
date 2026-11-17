@@ -7,7 +7,7 @@ export type CampaignView = {
   asset: { url: string; alt: string } | null;
   diagnostics: { energy: 0 | 1 | 2 | 3; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean } | null;
   actions: GameAction[]; pending: boolean;
-  cue: 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle';
+  cue: 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black';
   narration: boolean;
   information: boolean;
   chapters?: { number: number; title: string }[];
