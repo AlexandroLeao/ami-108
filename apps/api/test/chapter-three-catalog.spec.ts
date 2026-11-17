@@ -10,9 +10,14 @@ describe('Chapter 3 source catalog — not yet integrated', () => {
     expect(LAB_ENTRY.map(beat => beat.id)).toEqual(['L01','L02','L03','L04','L05']);
     expect(LAB_RECORDS.map(beat => beat.id)).toEqual(['LAB-01','LAB-01b','LAB-02','LAB-02b','LAB-03','LAB-04','LAB-04b','LAB-04c','LAB-05','LAB-05b','LAB-05c']);
     expect(LAB_AFTER_RECORDS.at(-1)?.id).toBe('MEM-D3');
-    expect(ARRIVAL_MEMORY.map(beat => beat.id)).toEqual(['F01','F02','F03','F04','F05','F06','F08','F09']);
+    expect(ARRIVAL_MEMORY.map(beat => beat.id)).toEqual(['F01','F01b','F01c','F02','F02b','F03','F04','F05','F05b','F06','F08','F09']);
     expect(ARRIVAL_MEMORY.filter(beat => beat.speaker === 'HOWARD')[0].id).toBe('F09');
-    expect(LAB_RETURN.map(beat => beat.id)).toEqual(['RETURN-00','RETURN-01','RETURN-01b','RETURN-01c','RETURN-02','EXIT-01','EXIT-02','EXIT-03']);
+    for (const beat of [...ARRIVAL_MEMORY, ...LAB_RETURN.filter(beat => beat.id === 'EXIT-01' || beat.id === 'EXIT-01b')]) {
+      expect(beat.text['pt-BR'].length).toBeLessThanOrEqual(56);
+      expect(beat.text.en.length).toBeLessThanOrEqual(56);
+    }
+    expect(SECOND_FRAGMENT.at(-1)?.text).toEqual({ 'pt-BR': 'Ok, AMI, vamos nessa.', en: "OK, AMI, let's go." });
+    expect(LAB_RETURN.map(beat => beat.id)).toEqual(['RETURN-00','RETURN-01','RETURN-01b','RETURN-01c','RETURN-02','EXIT-01','EXIT-01b','EXIT-02','EXIT-03']);
     const all = [...LAB_ENTRY, ...LAB_RECORDS, ...LAB_AFTER_RECORDS,
       ...ARRIVAL_MEMORY, ...LAB_RETURN, ...RAT_ENTRY, RAT_QUESTION, ...RAT_REACTIONS,
       ...Object.values(RAT_SUCCESS).flat(), ...SECOND_FRAGMENT];

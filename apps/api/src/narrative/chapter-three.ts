@@ -24,6 +24,7 @@ export type ChapterThreeState = Readonly<{
 
 const labOrder = [...LAB_APPROACH, ...LAB_ENTRY, ...LAB_CONNECT, ...LAB_RECORDS, ...LAB_AFTER_RECORDS, ...ARRIVAL_MEMORY, ...LAB_RETURN];
 const labSteps = labOrder.map(beat => lab(beat.id));
+const memorySteps = new Set(ARRIVAL_MEMORY.map(beat => lab(beat.id)));
 const archiveOrder = SECOND_FRAGMENT.map(beat => archive(beat.id));
 // These are presentation instructions grounded in the existing scene descriptions,
 // not added character dialogue or new plot facts.
@@ -65,7 +66,7 @@ export function beginChapterThree(state: NarrativeState): NarrativeState {
 
 export function chapterThreeAsset(state: NarrativeState): OpeningAsset | null {
   const id = visible(state);
-  if (id === CHAPTER_FOUR_CARD || /^A03-S01\/(PRE-|LAB-|F0[1-9]$|EXIT-)/.test(id) || id === lab('MEM-D3')
+  if (id === CHAPTER_FOUR_CARD || (/^A03-S01\/(PRE-|LAB-|EXIT-)/.test(id) || memorySteps.has(id)) || id === lab('MEM-D3')
     || /^A03-S02\/[ABC]\d$/.test(id) || [rat('DEATH'), rat('DEAD-CARD'), rat('SUCCESS'), archive('DEPART'), archive('ROUTE')].includes(id)) return null;
   if (id.startsWith(LAB + '/')) return 'CENA-06';
   if (id.startsWith(RAT_SCENE + '/')) return 'CENA-07';
@@ -113,8 +114,7 @@ export function chapterThreeView(state: NarrativeState): CurrentView {
     if (id === lab('L01') || id === lab('L06a')) cue = 'fade-in';
     if (id === rat('L01')) cue = 'startle';
     if (id === lab('MEM-D3')) { cue = 'blink-black'; phase = 'FLASHBACK'; }
-    if (/^A03-S01\/F0[1-9]$/.test(id)) phase = 'FLASHBACK';
-    if (id === lab('F09')) cue = 'name-reveal';
+    if (memorySteps.has(id)) { phase = 'FLASHBACK'; cue = id === lab('F09') ? 'name-reveal' : 'memory-shiver'; }
     if (id === lab('RETURN-00')) cue = 'wake';
     if (id === lab('EXIT-01')) cue = 'fade-black';
     if (id === archive('L01')) cue = 'fade-in';

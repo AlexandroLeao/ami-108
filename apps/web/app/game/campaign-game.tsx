@@ -257,7 +257,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
   // Continuous memory motion applies across all measured pages of this beat.
-  const memoryShiver = view?.cue === 'memory-shiver';
+  const memoryShiver = view?.cue === 'memory-shiver' || (view?.cue === 'name-reveal' && view.speaker === 'HOWARD');
   const nameReveal = view?.cue === 'name-reveal';
   const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 

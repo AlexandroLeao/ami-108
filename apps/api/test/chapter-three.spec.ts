@@ -1,6 +1,6 @@
 import { advanceNarrative, changeNarrativeLocale, currentAsset, projectNarrative, startNarrative, type NarrativeState } from '../src/narrative/engine';
 import { CHAPTER_ONE, type Locale } from '../src/narrative/catalog';
-import { LAB_RECORDS } from '../src/narrative/chapter-three-catalog';
+import { ARRIVAL_MEMORY, LAB_RECORDS } from '../src/narrative/chapter-three-catalog';
 
 const step = (s: NarrativeState, action = projectNarrative(s).actions[0].id, rng = () => 0.9) => advanceNarrative(s, action, s.revision, rng);
 function reach(s: NarrativeState, predicate: (s: NarrativeState) => boolean, limit = 200): NarrativeState {
@@ -51,13 +51,26 @@ describe('Chapter 3 integrated progression', () => {
     expect(projectNarrative(s).speaker).toBe(locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice');
     expect(currentAsset(s)).toBeNull();
     expect(s.events).not.toContain('E-PARTNER');
-    s = reach(s, x => x.stepId === 'A03-S01/F09');
-    expect(projectNarrative(s)).toMatchObject({speaker:'HOWARD',cue:'name-reveal',asset:null});
-    s = step(s);
+    for (const beat of ARRIVAL_MEMORY) {
+      expect(s.stepId).toBe('A03-S01/' + beat.id);
+      expect(projectNarrative(s)).toMatchObject({phase:'FLASHBACK',text:beat.text[locale],cue:beat.id==='F09'?'name-reveal':'memory-shiver',asset:null});
+      if (beat.id==='F09') expect(projectNarrative(s).speaker).toBe('HOWARD');
+      s=step(s);
+    }
     expect(s.stepId).toBe('A03-S01/RETURN-00');
     expect(projectNarrative(s)).toMatchObject({cue:'wake',text:'...'});
     expect(currentAsset(s)).toBe('CENA-06');
     expect(s.events).toEqual(expect.arrayContaining(['E-ARCHIVE','MEM-D3','FB-D3','E-PLANET','E-PARTNER']));
+    s=reach(s,x=>x.stepId==='A03-S01/EXIT-01');
+    expect(projectNarrative(s)).toMatchObject({cue:'fade-black',asset:null});
+    s=step(s);
+    expect(s.stepId).toBe('A03-S01/EXIT-01b');
+    expect(projectNarrative(s)).toMatchObject({cue:'none',asset:null});
+    s=reach(s,x=>x.stepId==='A03-S02/L01');
+    const ratArt=projectNarrative(s).asset;
+    expect(projectNarrative(s)).toMatchObject({cue:'startle',asset:{url:'/api/game/asset?key=CENA-07'}});
+    s=step(s);
+    expect(projectNarrative(s)).toMatchObject({cue:'none',asset:ratArt});
     s = ratDecision(s);
     expect(currentAsset(s)).toBe('CENA-07');
     expect(s.chapterThree?.checkpoint?.diagnostics).toEqual({ energy:3,med:35,bio:42,hist:53,personal:5,personalUnlocked:false });
@@ -116,7 +129,7 @@ describe('Chapter 3 integrated progression', () => {
     s=reach(s,x=>x.stepId==='A03-S03/ROUTE');
     const old={...s,stepId:'A03-S03/SOL-02',diagnostics:{...s.diagnostics!,energy:2 as const},
       chapterThree:{...s.chapterThree!,trail:[...s.chapterThree!.trail,'A03-S03/SOL-02']}};
-    expect(projectNarrative(old)).toMatchObject({text:'Então vamos nessa.',diagnostics:{energy:3}});
+    expect(projectNarrative(old)).toMatchObject({text:'Ok, AMI, vamos nessa.',diagnostics:{energy:3}});
     const resumed=step(old);
     expect(resumed.stepId).toBe('A04-S01/CHAPTER_CARD');
     expect(resumed.savedRatSlots).toEqual(s.savedRatSlots);

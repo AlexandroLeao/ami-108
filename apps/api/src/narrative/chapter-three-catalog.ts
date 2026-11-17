@@ -58,11 +58,15 @@ export const LAB_AFTER_RECORDS: readonly Beat[] = [
 // FB-D3 must be dark. Familiar voice changes to HOWARD only at F09.
 // No face, betrayal or energy-core information is introduced.
 export const ARRIVAL_MEMORY: readonly Beat[] = [
-  beat('F01', 'PARTNER', 'Esse planeta tá todo fodido. Pelo que dizem, tentaram curar alguma doença e acabaram deixando os animais malucos.', "This planet is fucked. From what I've heard, they tried to cure some disease and ended up driving the animals crazy."),
-  beat('F02', 'DAVID', 'Pelo menos dessa vez não vai ter ninguém disputando a coleta com a gente.', "At least this time we won't have anyone competing with us for salvage."),
+  beat('F01', 'PARTNER', 'Esse planeta tá todo fodido.', 'This planet is fucked.'),
+  beat('F01b', 'PARTNER', 'Pelo que dizem, tentaram curar alguma doença.', "From what I've heard, they tried to cure some disease."),
+  beat('F01c', 'PARTNER', 'E acabaram deixando os animais malucos.', 'And ended up driving the animals crazy.'),
+  beat('F02', 'DAVID', 'Pelo menos dessa vez...', 'At least this time...'),
+  beat('F02b', 'DAVID', 'Ninguém vai disputar a coleta com a gente.', "No one will compete with us for salvage."),
   beat('F03', 'PARTNER', 'Se a gente voltar vivo.', 'If we make it back alive.'),
   beat('F04', 'DAVID', 'É. Tem esse pequeno detalhe.', "Yeah. There's that little detail."),
-  beat('F05', 'PARTNER', 'Precisamos encontrar alguma coisa boa, David. Não dá pra continuar vivendo desse jeito.', "We need to find something good, David. We can't keep living like this."),
+  beat('F05', 'PARTNER', 'Precisamos encontrar alguma coisa boa, David.', 'We need to find something good, David.'),
+  beat('F05b', 'PARTNER', 'Não dá pra continuar vivendo desse jeito.', "We can't keep living like this."),
   beat('F06', 'DAVID', 'Howard, Howard... O que eu sempre digo?', 'Howard, Howard... What do I always say?'),
   beat('F08', 'DAVID', 'Pensamento positivo, cara. A gente sempre consegue.', 'Stay positive, man. We always figure something out.'),
   beat('F09', 'HOWARD', 'Espero que sim.', 'I hope so.'),
@@ -74,7 +78,8 @@ export const LAB_RETURN: readonly Beat[] = [
   beat('RETURN-01b', 'DAVID', 'com alguém.', 'with someone.'),
   beat('RETURN-01c', 'DAVID', 'Howard...', 'Howard...'),
   beat('RETURN-02', 'AMI-108', 'Recuperar suas memórias continua sendo um progresso, Bobo.', 'Recovering your memories remains a sign of progress, Bobo.'),
-  beat('EXIT-01', 'NARRATION', 'Ainda confuso com a lembrança, você recoloca AMI na mochila, decidido a sair dali.', 'Still confused by the memory, you put AMI back in your backpack, determined to get out of there.'),
+  beat('EXIT-01', 'NARRATION', 'Você recoloca AMI na mochila.', 'You put AMI back in your backpack.'),
+  beat('EXIT-01b', 'NARRATION', 'Ainda confuso com a lembrança, decide sair dali.', 'Still confused by the memory, you decide to leave.'),
   beat('EXIT-02', 'NARRATION', 'A caminho do arquivo central, vocês escutam um ruído vindo do corredor.', 'On your way to the central archive, you hear a noise from the corridor.'),
   beat('EXIT-03', 'NARRATION', 'Você observa com atenção o que se move à sua frente.', 'You look closely at what is moving ahead of you.'),
 ];
@@ -125,7 +130,7 @@ export const SECOND_FRAGMENT: readonly Beat[] = [
   beat('L05', 'DAVID', 'E qual é a chance de ainda funcionar?', 'And what are the chances one still works?'),
   beat('L06', 'AMI-108', 'Insuficiência de dados.', 'Insufficient data.'),
   beat('L07', 'DAVID', 'Pensamento positivo, AMI.', 'Stay positive, AMI.'),
-  beat('DEPART', 'DAVID', 'Então vamos nessa.', "Then let's go."),
+  beat('DEPART', 'DAVID', 'Ok, AMI, vamos nessa.', "OK, AMI, let's go."),
 ];
 
 // Canonical gate metadata only; no event is applied until engine integration.

@@ -392,10 +392,10 @@ button:focus-visible, a:focus-visible {
 }
 @keyframes campaign-startle {
   0%, 45% { transform: none; }
-  56% { transform: translateX(-5px); }
-  64% { transform: translateX(4px); }
-  72% { transform: translateX(-3px); }
-  80% { transform: translateX(2px); }
+  56% { transform: translate(-14px, 4px); }
+  64% { transform: translate(12px, -3px); }
+  72% { transform: translate(-8px, 2px); }
+  80% { transform: translate(5px, -1px); }
   88%, 100% { transform: none; }
 }
 .campaign-skull { color: var(--alert); width: min(32%, 144px); height: auto; z-index: 1; animation: campaign-skull-reveal 420ms ease-out both; }
