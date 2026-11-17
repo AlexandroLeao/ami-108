@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
 
 from app.generation import GenerationRequest, GenerationResult, Provider, generate
+from app.ollama_provider import local_provider
 
 
 class HealthResponse(BaseModel):
@@ -55,6 +56,6 @@ def create_app(
     return app
 
 
-# No live provider is registered, even if an internal token is configured.
-# Existing Compose and health behavior are unchanged.
-app = create_app(internal_token=os.getenv("AMI_AI_INTERNAL_TOKEN"))
+# Local provider requires explicit opt-in, a named tag and local endpoint.
+# With defaults, health and authored fallback behavior are unchanged.
+app = create_app(provider=local_provider(), internal_token=os.getenv("AMI_AI_INTERNAL_TOKEN"))

@@ -1,0 +1,74 @@
+import json
+from unittest.mock import MagicMock, patch
+from uuid import uuid4
+
+import pytest
+
+from app.generation import GenerationRequest, retrieve
+from app.ollama_provider import OllamaProvider, local_provider
+
+
+@pytest.mark.parametrize(
+    ("url", "model"),
+    [
+        ("https://ollama.com", "model:1b"),
+        ("http://8.8.8.8:11434", "model:1b"),
+        ("http://localhost:11434/path", "model:1b"),
+        ("http://user@localhost:11434", "model:1b"),
+        ("http://localhost:11434", "model:cloud"),
+        ("http://localhost:11434", "model"),
+    ],
+)
+def test_refuses_nonlocal_or_cloud_configuration(
+    monkeypatch: pytest.MonkeyPatch, url: str, model: str
+) -> None:
+    monkeypatch.setenv("AMI_AI_PROVIDER", "ollama")
+    monkeypatch.setenv("AMI_OLLAMA_URL", url)
+    monkeypatch.setenv("AMI_OLLAMA_MODEL", model)
+    assert local_provider() is None
+
+
+def test_explicit_local_configuration(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AMI_OLLAMA_URL", "http://ollama:11434")
+    monkeypatch.setenv("AMI_OLLAMA_MODEL", "model:1b")
+    monkeypatch.delenv("AMI_AI_PROVIDER", raising=False)
+    assert local_provider() is None
+    monkeypatch.setenv("AMI_AI_PROVIDER", "ollama")
+    assert local_provider() == OllamaProvider("ollama", 11434, "model:1b")
+
+
+def test_transport_uses_bounded_nonstreaming_authorized_context() -> None:
+    req = GenerationRequest(
+        requestId=str(uuid4()),
+        questionId="INTRO-RANDOM",
+        category="RANDOM",
+        locale="pt-BR",
+        factIds=["INTRO-OCTOPUS"],
+        deadlineMs=2500,
+    )
+    context = retrieve(req)
+    assert context is not None
+    with patch("app.ollama_provider.http.client.HTTPConnection") as constructor:
+        conn = constructor.return_value
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = json.dumps(
+            {"done": True, "response": context.approved_text}
+        ).encode()
+        conn.getresponse.return_value = response
+        provider = OllamaProvider("ollama", 11434, "model:1b")
+        assert provider._generate(context) == context.approved_text
+        method, path, body, headers = conn.request.call_args.args
+        assert method == "POST"
+        assert path == "/api/generate"
+        assert headers == {"Content-Type": "application/json"}
+        data = json.loads(body)
+        assert data["model"] == "model:1b"
+        assert data["stream"] is False
+        assert data["options"]["num_predict"] == 160
+        prompt = json.loads(data["prompt"])
+        assert prompt["facts"] == [["INTRO-OCTOPUS", context.approved_text]]
+        assert set(prompt) == {"locale", "category", "facts", "approved_utterance"}
+        assert req.requestId not in data["prompt"]
+        response.read.assert_called_once_with(16385)
+        conn.close.assert_called_once()

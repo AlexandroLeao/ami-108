@@ -18,6 +18,9 @@ services:
       context: services/ai
     environment:
       AMI_AI_INTERNAL_TOKEN: ${AMI_AI_INTERNAL_TOKEN:-}
+      AMI_AI_PROVIDER: ${AMI_AI_PROVIDER:-}
+      AMI_OLLAMA_URL: ${AMI_OLLAMA_URL:-}
+      AMI_OLLAMA_MODEL: ${AMI_OLLAMA_MODEL:-}
     ports: ["127.0.0.1:8000:8000"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
