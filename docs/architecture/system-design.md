@@ -1,7 +1,7 @@
 # System design
 
 **AMI-002 · reviewed design, merged in PR #17; implementation is incremental**  
-Canonical narrative: Documento Mestre v1.11 / Roteiro Interativo v1.9 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
+Canonical narrative: Documento Mestre v1.12 / Roteiro Interativo v1.10 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
 
 ## C4 level 1 — system context
 

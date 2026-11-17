@@ -4,7 +4,7 @@
 
 ## Source and boundaries
 
-- Current private source: Documento Mestre v1.11 and Roteiro Interativo v1.9, with the November 16 opening addendum taking precedence only for presentation. The original script is preserved. The asset preparation ZIP remains v1.9 until the owner requests an updated backup.
+- Current private source: Documento Mestre v1.12 and Roteiro Interativo v1.10, with the November 17 cumulative addendum taking precedence only for the explicitly approved changes. The original script is preserved. The asset preparation ZIP remains v1.9 until the owner requests an updated backup.
 - `apps/api/src/narrative/catalog.ts` contains the five chapter titles and twelve narrative scene identifiers, plus the complete Chapter 1 dialogue sequence. The catalog is private server code; no complete source document or reference sheet is committed. CENA-01, 02 and 03 are the only scene images used in Chapter 1.
 - Composite IDs preserve canonical scene/line identifiers, including L24–L25 removal, SILENCE and L01a/L01b as editorial subdivisions. L33 remains the authored free RANDOM fallback. The original dialogue is retained except for explicitly approved presentation edits; the unchanged tutorial is labelled as information. The owner-requested revisions add localized departure/arrival narration and street/robot reveals, subdivide long beats, revise the Bobo exchange and use AMI-108 as the revealed speaker. E-JOIN uses second-person narration on a dark field, followed by information and a narrated return to the street. FB-D1 uses seven short dark narration beats and a blink return. The original PR #20 catalog had 75 presentation beats; the accepted PR #22 catalog has 77; original stable IDs are retained. No new plot events. Do not add explanations of Bobo, the planet, the injury, the past, or any other future reveal.
 - Merged PR #20 finished at the Chapter 2 cartela; merged PR #22 connects that stable handoff through the dog and terminal, ending at the Chapter 3 card. See [encounter engine](encounter-engine.md).
@@ -38,7 +38,7 @@ Main now includes the accepted playable local Chapters 1–2. Final branch [CI 4
 
 ## November 17 owner presentation amendments (merged PR #22; chronological record)
 
-77 Chapter 1 beats (two extra information beats), revised E-JOIN wording, three information cards and no other Chapter 1 dialogue edits. Existing IDs and narrative version retained so prior saves resume. Chapter 2 has three additional dark approach beats, one-shot startle cue and two warning narration beats. No back action at active decisions. See [encounter engine](encounter-engine.md) for persistent chapter replay and [UI design](ui-design.md) for approved-requested presentation changes. The private sources remain v1.11/v1.9 until owner acceptance and separate synchronization.
+77 Chapter 1 beats (two extra information beats), revised E-JOIN wording, three information cards and no other Chapter 1 dialogue edits. Existing IDs and narrative version retained so prior saves resume. Chapter 2 has three additional dark approach beats, one-shot startle cue and two warning narration beats. No back action at active decisions. See [encounter engine](encounter-engine.md) for persistent chapter replay and [UI design](ui-design.md) for approved-requested presentation changes. The historical refinement was subsequently accepted and synchronized into v1.12/v1.10.
 
 ### Second owner refinement — terminal arrival and memory
 
@@ -68,6 +68,6 @@ ARRIVAL-03: “Você observa AMI se conectar ao sistema enquanto emite breves so
 
 PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
 
-Private Master v1.11 / Script v1.9 remain the last synchronized private revisions; the November 17 owner-approved Chapter 1/2 amendments in PR #22 take precedence for the explicitly approved presentation, dialogue and chapter replay changes until a separate cumulative private-source update. No private file or asset ZIP is changed here.
+Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.
 
 For final wording, cues, geometry and replay rules, the [final accepted encounter baseline](encounter-engine.md#final-accepted-baseline-supersedes-earlier-refinement-details) and [UI design](ui-design.md) supersede historical refinement notes above. No other content or future reveals may be changed without owner authorization.

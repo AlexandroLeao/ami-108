@@ -1,6 +1,6 @@
 # Domain model and state transitions
 
-**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.11 / Script v1.9).
+**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
 
 ## ER diagram
 
