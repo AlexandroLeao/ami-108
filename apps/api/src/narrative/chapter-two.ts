@@ -63,7 +63,7 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S02/L17": { speaker: 'AMI', text: local("Informação não compreendida.", "Information not understood.") },
   "A02-S02/L18": { speaker: 'UNKNOWN', text: local("Tinha alguém falando comigo...", "Someone was talking to me...") },
   "A02-S02/L18b": { speaker: 'UNKNOWN', text: local("E disse o meu nome...", "And they said my name...") },
-  "A02-S02/L18c": { speaker: 'UNKNOWN', text: local("David... Eu me lembro, esse é o meu nome.", "David... I remember, that's my name.") },
+  "A02-S02/L18c": { speaker: 'UNKNOWN', text: local("David... eu me lembro, esse é o meu nome.", "David... I remember, that's my name.") },
   "A02-S02/L19": { speaker: 'AMI', text: local("Registro atualizado. David.", "Record updated. David.") },
   "A02-S02/L20": { speaker: 'AMI', text: local("Bobo.", "Bobo.") },
 };

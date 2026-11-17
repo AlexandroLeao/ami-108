@@ -19,8 +19,15 @@ Real provider reservation/finalization, bounded retries and RAG remain AMI-007. 
 
 ## Owner playtest refinement — November 17
 
-- Chapter 1 E-JOIN narration shortened and information divided into four localized beats (78 Chapter 1 steps including its card; original IDs preserved). Information uses red/coal and ivory arrows only.
+- Chapter 1 E-JOIN narration shortened and information divided into three localized beats (77 Chapter 1 steps including its card; original IDs preserved except the retired solar tutorial ID, normalized on resume/review). Information uses red/coal and ivory arrows only.
 - Chapter 2 begins with three dark second-person narration beats toward the maintenance terminal, noises among vehicles and closer observation. Reveal CENA-04 with a single 520ms impact cue after load; no repeated motion. Revised punctuation and two illustrated warning narration beats precede decisions.
 - Active decisions expose no PREVIOUS action. Consultation and outcome boundaries cannot be crossed backwards. Four choices retain order and outcome; consequences address the player and refer to the creature. Death card uses “VOCÊ NÃO SOBREVIVEU” / “YOU DID NOT SURVIVE” and an inline pixel skull on coal; successful consequence and A/B/C dialogue remain dark until terminal art.
 - Continue opens a submenu with exact resume or Chapters. The server projects only reached chapter titles, authorizes CHAPTER/RESTART/N under the normal revision/receipt lock and preserves the highest unlocked chapter, run-wide INTRO and immutable resolved slots. Chapter 1 resets its start state; Chapter 2 restores the canonical entry state (initial diagnostics and prior Chapter 1 events); Chapter 3 restores the reached chapter-start snapshot, presently a development boundary. Restart changes current resume position only after confirmation; no separate simultaneous save slots. Existing session cookies/rows remain compatible; previous candidate checkpoint L01 is retained. New Game remains a distinct run.
 - The normalized CP-DOG row is reused on chapter replay, and resolved slot rows are never duplicated or rerolled. A chapter replay may restore energy but consumes one bar for each reused consultation. No provider calls or new DB schema.
+
+## Second owner playtest refinement — November 17
+
+- Three red information cards; shorten the third to accurate answers and remove the solar tutorial. Existing solar dialogue and energy mechanics remain unchanged. Retired tutorial cursors normalize to adjacent surviving beats.
+- After any successful dog branch, three short second-person narration beats on coal describe reaching the terminal, placing AMI by the panel and the component search. Only then reveal CENA-05 with L01; no restoration occurs before the existing F1 interaction.
+- MEM-D2 starts with Ai!/Ow! and a one-shot 1050ms blink closing to coal, then dark pain, unlabeled ellipsis, familiar voice and AMI call. L15 restores the same terminal art using the existing wake cue. L18/L18b/L18c separate the recognition; E-NAME is applied at L18c exactly once. Existing saves at MEM-D2/F01/L18 or later remain readable; events already applied are not repeated. No new asset or event, change to choice/energy/replay rules, or DB migration.
+- Red pixel skull; energy label and three bars only (accessible count retained). All other UI/layout is unchanged.

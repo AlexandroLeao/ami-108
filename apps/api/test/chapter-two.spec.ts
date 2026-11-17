@@ -137,7 +137,7 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     state=forward(state);
     expect(projectNarrative(state)).toMatchObject({ text: 'E disse o meu nome...', speaker: '???' });
     state=forward(state);
-    expect(projectNarrative(state)).toMatchObject({ text: 'David... Eu me lembro, esse é o meu nome.', speaker: 'DAVID' });
+    expect(projectNarrative(state)).toMatchObject({ text: 'David... eu me lembro, esse é o meu nome.', speaker: 'DAVID' });
     expect(state.events.filter(event => event === 'E-NAME')).toHaveLength(1);
     while(state.stepId!=='A03-S01/CHAPTER_CARD' && count++<90) state=forward(state);
     expect(projectNarrative(state)).toMatchObject({chapter:3,phase:'CHAPTER_CARD',asset:null});
