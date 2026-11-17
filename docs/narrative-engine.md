@@ -47,3 +47,7 @@ The solar information card is retired; AMI's existing explanation in A02-S02 rem
 ### Third owner refinement
 
 ARRIVAL-03 describes observing AMI connect to the panel and emit brief electronic sounds while searching for a component. FOUND introduces “Componente localizado.” / “Component located.” and the terminal fade-in before the unchanged L01. The cake-related L04 variant becomes “Então vai parar de falar coisas aleatórias?”; the existing no-recipe bananas variant remains unchanged. FB-D2 familiar voice is now two dark beats F01 and F01b (“Sinto muito...” / “David...”); the dark MEM-D2 line uses the existing pain cue. Stable prior IDs and event effects retained. No change to SOL-01 or other transitions.
+
+### Fourth owner refinement
+
+ARRIVAL-03 now describes AMI examining the system, FOUND says “Encontrado.” / “Found.” and L01 identifies a compatible storage unit. FB-D1b–g, MEM-D2 and F01/F01b carry the continuous memory-shiver cue; L18c carries name-reveal without altering E-NAME or speaker state. No additional motion on unrelated beats. All IDs, action effects and existing saves retained.

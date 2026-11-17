@@ -256,6 +256,9 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const titleText = view ? (locale === 'pt-BR' ? 'CAPÍTULO ' : 'CHAPTER ') + view.chapter + ' — ' + view.chapterTitle.toLocaleUpperCase(locale) : '';
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
+  // Continuous memory motion applies across all measured pages of this beat.
+  const memoryShiver = view?.cue === 'memory-shiver';
+  const nameReveal = view?.cue === 'name-reveal';
   const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 
   return (
@@ -273,7 +276,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <p className="version-label">{labels.version}</p>
           </section>
         ) : (
-          <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'}>
+          <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'} data-dog-scene={view.asset?.url === '/api/game/asset?key=CENA-04'}>
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
@@ -300,8 +303,10 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               </div> : <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
                 {!showChapter && (
                   <>
-                    {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>{view.speaker ?? narrationLabel}</p>}
-                    <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '')}>{pageText}</p>
+                    {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
+                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">???</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
+                    </p>}
+                    <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '') + (memoryShiver ? ' campaign-memory-shiver' : '')}>{pageText}</p>
                   </>
                 )}
               </div>}

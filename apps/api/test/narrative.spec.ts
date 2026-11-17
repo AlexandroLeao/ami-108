@@ -175,7 +175,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     for (const [index, text] of texts.entries()) {
       state = next(state);
       expect(projectNarrative(state)).toMatchObject({ phase: 'FLASHBACK', asset: null, narration: true,
-        cue: index === 0 ? 'close-eyes' : 'none', text });
+        cue: index === 0 ? 'close-eyes' : 'memory-shiver', text });
       expect(currentAsset(state)).toBeNull();
     }
     state = next(state);
@@ -185,6 +185,13 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     expect(projectNarrative(state).text).toBe('Alguma irregularidade?');
     expect(state.diagnostics).toEqual(pain.diagnostics);
     expect(state.events).toEqual(['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1']);
+  });
+  it('limits continuous memory tremor to the six specified Chapter 1 beats in both languages', () => {
+    const expected = ['FB-D1b', 'FB-D1c', 'FB-D1d', 'FB-D1e', 'FB-D1f', 'FB-D1g'].map(id => 'A01-S03/' + id);
+    for (const locale of ['pt-BR', 'en'] as const) {
+      expect(CHAPTER_ONE.filter(step => step.cue === 'memory-shiver').map(step => step.id)).toEqual(expected);
+      for (const id of expected) expect(projectNarrative(reach(id, locale))).toMatchObject({ cue: 'memory-shiver', asset: null, phase: 'FLASHBACK' });
+    }
   });
   it('reviews every reached beat from the end through events without undoing state or revealing early diagnostics', () => {
     const original = reach('A02-S01/CHAPTER_CARD');

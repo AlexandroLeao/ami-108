@@ -21,7 +21,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-04': local('Criatura deformada entre veículos na rua residencial.', 'Deformed creature among vehicles on the residential street.'),
   'CENA-05': local('Terminal de manutenção pública.', 'Public maintenance terminal.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
@@ -122,12 +122,12 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L34', unknown, 'Maravilha.', 'Wonderful.', 'CENA-02'),
   dialogue(s3, 'MEM-D1', unknown, 'Ah... minha cabeça!', 'Ah... my head!', 'CENA-02', 'pain', 'MEM-D1'),
   narration(s3, 'FB-D1', 'Sua cabeça começa a doer bastante.', 'Your head starts to hurt badly.', null, { event: 'FB-D1', phase: 'FLASHBACK', cue: 'close-eyes' }),
-  narration(s3, 'FB-D1b', 'Imagens e sons desconexos invadem sua mente.', 'Disjointed images and sounds flood your mind.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1c', 'Risadas.', 'Laughter.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1d', 'Duas crianças correndo.', 'Two children running.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1e', 'Uma delas cai.', 'One of them falls.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1f', 'A outra volta correndo para ajudar.', 'The other runs back to help.', null, { phase: 'FLASHBACK' }),
-  narration(s3, 'FB-D1g', 'Tudo isso parece estranhamente familiar.', 'It all feels strangely familiar.', null, { phase: 'FLASHBACK' }),
+  narration(s3, 'FB-D1b', 'Imagens e sons desconexos invadem sua mente.', 'Disjointed images and sounds flood your mind.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1c', 'Risadas.', 'Laughter.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1d', 'Duas crianças correndo.', 'Two children running.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1e', 'Uma delas cai.', 'One of them falls.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1f', 'A outra volta correndo para ajudar.', 'The other runs back to help.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
+  narration(s3, 'FB-D1g', 'Tudo isso parece estranhamente familiar.', 'It all feels strangely familiar.', null, { phase: 'FLASHBACK', cue: 'memory-shiver' }),
   dialogue(s3, 'MEM-D1-RETURN', unknown, '...', '...', 'CENA-02', 'wake'),
   dialogue(s3, 'L35', ami, 'Alguma irregularidade?', 'Any irregularities?', 'CENA-02'),
   dialogue(s3, 'L36', unknown, 'Não... Acho que lembrei de alguma coisa.', 'No... I think I remembered something.', 'CENA-02'),

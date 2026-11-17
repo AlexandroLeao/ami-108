@@ -38,9 +38,9 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S01/C2": { speaker: 'AMI', text: local("Logo adiante. Recuperar meus arquivos continua sendo uma prioridade.", "Just ahead. Recovering my files remains a priority.") },
   "A02-S02/ARRIVAL-01": { speaker: 'NARRATION', text: local("Vocês chegam ao terminal de manutenção indicado por AMI.", "You reach the maintenance terminal AMI directed you to.") },
   "A02-S02/ARRIVAL-02": { speaker: 'NARRATION', text: local("Você retira AMI da mochila e o posiciona junto ao painel.", "You take AMI out of your backpack and position him beside the panel.") },
-  "A02-S02/ARRIVAL-03": { speaker: 'NARRATION', text: local("Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto busca um componente.", "You watch AMI connect to the panel, emitting brief electronic sounds as he searches for a component.") },
-  "A02-S02/FOUND": { speaker: 'AMI', text: local("Componente localizado.", "Component located.") },
-  "A02-S02/L01": { speaker: 'AMI', text: local("Identifiquei um componente compatível com meu sistema de armazenamento.", "I have identified a component compatible with my storage system.") },
+  "A02-S02/ARRIVAL-03": { speaker: 'NARRATION', text: local("Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto examina o sistema.", "You watch AMI connect to the panel, emitting brief electronic sounds as he examines the system.") },
+  "A02-S02/FOUND": { speaker: 'AMI', text: local("Encontrado.", "Found.") },
+  "A02-S02/L01": { speaker: 'AMI', text: local("Identifiquei uma unidade compatível com meu sistema de armazenamento.", "I have identified a unit compatible with my storage system.") },
   "A02-S02/L02": { speaker: 'UNKNOWN', text: local("Finalmente. Vamos ver se isso funciona.", "Finally. Let's see if this works.") },
   "A02-S02/L03": { speaker: 'AMI', text: local("Restauração concluída. A integridade dos meus arquivos aumentou significativamente.", "Restoration complete. The integrity of my files has increased significantly.") },
   "A02-S02/L04": { speaker: 'UNKNOWN', text: local("Então vai parar de falar coisas aleatórias?", "So you'll stop saying random things?") },
@@ -156,7 +156,8 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
     if (id === terminalId('FOUND')) cue = 'fade-in';
     if (id === terminalId('L04') && !c.dog.recipeSeen) text = local('Então você vai parar de me falar de bananas?', "So you'll stop talking to me about bananas?");
     if (id === terminalId('MEM-D2-PAIN')) cue = 'blink-black';
-    if (id === terminalId('MEM-D2')) cue = 'pain';
+    if (id === terminalId('MEM-D2') || id === terminalId('F01') || id === terminalId('F01b')) cue = 'memory-shiver';
+    if (id === terminalId('L18c')) cue = 'name-reveal';
     if (id === terminalId('MEM-D2') || id === terminalId('MEM-D2-SILENCE') || id === terminalId('F01') || id === terminalId('F01b') || id === terminalId('MEM-D2-CALL')) phase = 'FLASHBACK';
     if (id === terminalId('L15')) cue = 'wake';
   }

@@ -108,13 +108,13 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(state.stepId).toBe('A02-S01/'+variant+'1');
     let count=0;
     while(state.stepId!=='A02-S02/ARRIVAL-01' && count++<30) state=forward(state);
-    for (const text of ['Vocês chegam ao terminal de manutenção indicado por AMI.', 'Você retira AMI da mochila e o posiciona junto ao painel.', 'Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto busca um componente.']) {
+    for (const text of ['Vocês chegam ao terminal de manutenção indicado por AMI.', 'Você retira AMI da mochila e o posiciona junto ao painel.', 'Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto examina o sistema.']) {
       expect(projectNarrative(state)).toMatchObject({ text, asset: null, narration: true });
       state=forward(state);
     }
-    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Componente localizado.', cue: 'fade-in', asset: { url: '/api/game/asset?key=CENA-05' } });
+    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Encontrado.', cue: 'fade-in', asset: { url: '/api/game/asset?key=CENA-05' } });
     state=forward(state);
-    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Identifiquei um componente compatível com meu sistema de armazenamento.', cue: 'none', asset: { url: '/api/game/asset?key=CENA-05' } });
+    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Identifiquei uma unidade compatível com meu sistema de armazenamento.', cue: 'none', asset: { url: '/api/game/asset?key=CENA-05' } });
     while(state.stepId!=='A02-S02/L04' && count++<30) state=forward(state);
     expect(state.stepId).toBe('A02-S02/L04');
     expect(state.diagnostics).toEqual({energy:category==='NONE'?3:2,med:35,bio:42,hist:53,personal:5,personalUnlocked:false});
@@ -130,10 +130,10 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(state.diagnostics?.energy).toBe(3);
     const expected = [
       { text: 'Ai!', speaker: '???', cue: 'blink-black' },
-      { text: 'Minha cabeça de novo!', speaker: '???', cue: 'pain' },
+      { text: 'Minha cabeça de novo!', speaker: '???', cue: 'memory-shiver' },
       { text: '...', speaker: null, cue: 'none', narration: false },
-      { text: 'Sinto muito...', speaker: 'Voz familiar', cue: 'none' },
-      { text: 'David...', speaker: 'Voz familiar', cue: 'none' },
+      { text: 'Sinto muito...', speaker: 'Voz familiar', cue: 'memory-shiver' },
+      { text: 'David...', speaker: 'Voz familiar', cue: 'memory-shiver' },
       { text: 'Bobo? Está tudo bem?', speaker: 'AMI-108', cue: 'none' },
     ];
     for (const beat of expected) {
@@ -147,8 +147,11 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     state=forward(state);
     expect(projectNarrative(state)).toMatchObject({ text: 'E disse o meu nome...', speaker: '???' });
     state=forward(state);
-    expect(projectNarrative(state)).toMatchObject({ text: 'David... eu me lembro, esse é o meu nome.', speaker: 'DAVID' });
+    expect(projectNarrative(state)).toMatchObject({ text: 'David... eu me lembro, esse é o meu nome.', speaker: 'DAVID', cue: 'name-reveal' });
     expect(state.events.filter(event => event === 'E-NAME')).toHaveLength(1);
+    const translated = changeNarrativeLocale(state, 'en', state.revision);
+    expect(projectNarrative(translated)).toMatchObject({ speaker: 'DAVID', cue: 'name-reveal' });
+    expect(projectNarrative(forward(translated)).cue).toBe('none');
     while(state.stepId!=='A03-S01/CHAPTER_CARD' && count++<90) state=forward(state);
     expect(projectNarrative(state)).toMatchObject({chapter:3,phase:'CHAPTER_CARD',asset:null});
     expect(projectNarrative(state).actions.map(x=>x.kind)).toEqual(['PREVIOUS']);

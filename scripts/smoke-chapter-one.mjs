@@ -2,9 +2,20 @@
 // No AI provider, browser automation, or cloud deployment is involved.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 
+const manifest = JSON.parse(await readFile(new URL('../apps/api/assets/scenes/manifest.json', import.meta.url), 'utf8'));
+assert.equal(manifest.scenes.length, 12);
+const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+for (const scene of manifest.scenes) {
+  const bytes = await readFile(new URL('../apps/api/assets/scenes/' + scene.file, import.meta.url));
+  assert.equal(sha256(bytes), scene.sha256, scene.id + ' manifest hash');
+  assert.equal(bytes.readUInt32BE(16), 1536, scene.id + ' width');
+  assert.equal(bytes.readUInt32BE(20), 864, scene.id + ' height');
+}
+const expectedHashes = new Map(manifest.scenes.map(scene => [scene.id, scene.sha256]));
 const webOrigin = 'http://127.0.0.1:3000';
 const apiOrigin = 'http://127.0.0.1:3001';
 const env = { ...process.env, AMI_DEV_PREVIEW: '1', API_URL: apiOrigin, AMI_PUBLIC_ORIGIN: webOrigin };
@@ -44,6 +55,16 @@ try {
   assert.equal(view.phase, 'CHAPTER_CARD');
   assert.equal(view.asset, null);
   assert.equal((await call('asset?key=CENA-01')).status, 404);
+  const verifiedAssets = new Set();
+  const verifyCurrentArtwork = async () => {
+    if (!view.asset) return;
+    const key = new URL(webOrigin + view.asset.url).searchParams.get('key');
+    const response = await fetch(webOrigin + view.asset.url, { headers: { Cookie: cookie } });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('content-type'), 'image/png');
+    assert.equal(sha256(Buffer.from(await response.arrayBuffer())), expectedHashes.get(key), key + ' HTTP hash');
+    verifiedAssets.add(key);
+  };
   const send = async (action) => {
     const body = { commandId: randomUUID(), expectedRevision: view.revision, actionId: action.id };
     const result = await call('commands', 'POST', body);
@@ -51,6 +72,7 @@ try {
     const outcome = await result.json();
     assert.equal(outcome.status, 'APPLIED');
     view = outcome.view;
+    await verifyCurrentArtwork();
     return body;
   };
   for (let i = 0; i < 4; i++) await send(view.actions[0]);
@@ -94,7 +116,8 @@ try {
   for (let i = 0; i < 60 && view.chapter !== 3; i++) await send(view.actions[0]);
   assert.equal(view.chapter, 3);
   assert.deepEqual(view.diagnostics, { energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
-  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, stable image bytes, locale, resume, dog encounter and Chapter 2 boundary.');
+  assert.deepEqual([...verifiedAssets].sort(), ['CENA-01', 'CENA-02', 'CENA-03', 'CENA-04', 'CENA-05']);
+  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 5 reached assets, locale, resume, dog encounter and Chapter 2 boundary.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
 }
