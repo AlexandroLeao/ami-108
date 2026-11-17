@@ -184,6 +184,22 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(view.diagnostics).toEqual({ energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
     expect(await prisma.gameCheckpoint.count({ where: { sessionId: row.id } })).toBe(1);
     expect((await prisma.gameSession.findUniqueOrThrow({ where: { id: row.id } })).state).toMatchObject({ events: expect.arrayContaining(['F1', 'SOL-01', 'MEM-D2', 'FB-D2', 'E-NAME']) });
+    expect(view.chapters?.map(c => c.number)).toEqual([1,2,3]);
+    view = await command(cookie, view, 'CHAPTER/RESTART/1');
+    expect(view.chapter).toBe(1);
+    expect(view.chapters?.map(c => c.number)).toEqual([1,2,3]);
+    await request(app.getHttpServer()).get('/game/view').set('Cookie', cookie).expect(200, view);
+    view = await command(cookie, view, 'CHAPTER/RESTART/2');
+    expect(view.chapter).toBe(2);
+    for (let i = 0; i < 15 && view.phase !== 'ENCOUNTER'; i++) view = await command(cookie, view);
+    view = await command(cookie, view, view.actions.find(x => x.kind === 'CONSULT')!.id);
+    view = await command(cookie, view);
+    expect(view.text).toBe(answer);
+    expect(await prisma.gameConsultationSlot.count({ where: { sessionId: row.id } })).toBe(1);
+    view = await command(cookie, view, 'CHAPTER/RESTART/3');
+    expect(view.chapter).toBe(3);
+    expect(view.diagnostics?.bio).toBe(42);
+    await request(app.getHttpServer()).post('/game/commands').set('Cookie', cookie).send({commandId: randomUUID(), expectedRevision: view.revision, actionId: 'CHAPTER/RESTART/4'}).expect(403);
   }, 30000);
 
   it('does not expose integration routes without explicit local flag', async () => {

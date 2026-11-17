@@ -10,7 +10,7 @@ function CurrentArtwork({ asset, cue, missing }: { asset: NonNullable<CampaignVi
   return (
     <>
       {!failed && <Image src={asset.url} alt={asset.alt} width={1536} height={864} unoptimized loading="eager"
-        className="scene-art" style={{ visibility: loaded ? 'visible' : 'hidden' }}
+        className="scene-art" data-startle={loaded && cue === 'startle'} style={{ visibility: loaded ? 'visible' : 'hidden' }}
         onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />}
       {failed && <div className="scene-missing" role="status">{missing}</div>}
       {loaded && !failed && cue === 'wake' && (

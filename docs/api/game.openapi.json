@@ -604,9 +604,32 @@
               "wake",
               "memory-cut",
               "fade-black",
-              "close-eyes"
+              "close-eyes",
+              "startle"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
+          },
+          "chapters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "number": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "number",
+                "title"
+              ]
+            },
+            "description": "Only chapters reached by this session, including earlier chapters after replay. No future chapter titles."
           }
         },
         "required": [
@@ -624,7 +647,8 @@
           "pending",
           "cue",
           "narration",
-          "information"
+          "information",
+          "chapters"
         ]
       },
       "CreateSession": {
@@ -657,7 +681,8 @@
           },
           "actionId": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Current authorized action ID or CHAPTER/RESTART/N for a previously unlocked chapter. Server validates progress and revision."
           }
         },
         "required": [
