@@ -42,7 +42,7 @@ curl -fsS http://localhost:3001/health/ready
 curl -fsS http://localhost:8000/health
 ```
 
-In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. Local Compose sets AMI_DEV_PREVIEW=1, so the root opens the integrated Chapter 1 game with server-controlled progress. `/preview` retains the isolated visual fixture. Health endpoints remain available; without the flag, the root is diagnostic. AI health is not evidence of real model inference. See [asset preview and disk recovery](assets.md).
+In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. Local Compose sets AMI_DEV_PREVIEW=1, so the root opens the integrated Chapters 1–2 game with server-controlled progress. `/preview` retains the isolated visual fixture. Health endpoints remain available; without the flag, the root is diagnostic. AI health is not evidence of real model inference. See [asset preview and disk recovery](assets.md).
 
 For local Compose, the example values are development-only; replace the password using a URL-safe value (or URL-encode it in the database URL). Never commit `.env`. PostgreSQL is not exposed to the host. Prisma migrations are applied by the API container on startup; the new migration is additive and preserves existing rows.
 
@@ -62,7 +62,7 @@ mkdir -p ~/ami-108-backups
 chmod 700 ~/ami-108-backups
 (
   umask 077
-  backup="$HOME/ami-108-backups/chapter1-$(date +%Y%m%d-%H%M%S).sql"
+  backup="$HOME/ami-108-backups/chapter2-$(date +%Y%m%d-%H%M%S).sql"
   if docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > "$backup.tmp" && test -s "$backup.tmp"; then
     mv "$backup.tmp" "$backup"
     printf 'Backup saved: %s\n' "$backup"
@@ -77,13 +77,13 @@ Verify the backup command succeeds before stopping. Then use `docker compose sto
 
 ## Chapter 1 integration checks
 
-CI uses an ephemeral PostgreSQL 17 service, applies both migrations, runs API integration tests and starts the built Next.js/NestJS applications for an HTTP smoke test. `AMI_TEST_DATABASE_URL` opts into real database tests; use a dedicated disposable database, not player data. The smoke test needs DATABASE_URL and a migrated database, and ports 3000/3001 free. No provider inference or real deployment is involved.
+CI uses an ephemeral PostgreSQL 17 service, applies all three migrations, runs API integration tests and starts the built Next.js/NestJS applications for an HTTP smoke test. `AMI_TEST_DATABASE_URL` opts into real database tests; use a dedicated disposable database, not player data. The smoke test needs DATABASE_URL and a migrated database, and ports 3000/3001 free. No provider inference or real deployment is involved.
 
 For Chapter 1 validation after PR #20, switch to `main` on a clean worktree, pull with `git pull --ff-only origin main`, ensure `.env` exists, then run `docker compose --parallel 1 up --build -d --wait`. Open port 3000 root (not `/preview`), test the complete first chapter, reload/Continue game, language switching, previous/next, art, the HUD and mobile long-text pages. Use the same browser and origin; an expired cookie or a replaced Cloud Shell VM can prevent resume. Do not delete volumes. See [narrative engine](narrative-engine.md).
 
 ## Current limitations
 
-Chapter 1 sessions, state and command receipts are persisted; the remaining encounters, snapshots, consultation slots, restorations and real inference are not implemented in this increment. All 12 derived assets remain on the API side. Only the current authorized scene is served by the game API; the isolated preview still serves CENA-01 alone. No model/provider, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
+Chapters 1–2 sessions, state and command receipts are persisted, including CP-DOG, resolved consultation slots, F1 and SOL-01. Later encounters/checkpoints/slots, F2/F3, SOL-02 and real inference remain unimplemented. All 12 derived assets remain on the API side. Only the current authorized scene is served by the game API; the isolated preview still serves CENA-01 alone. No model/provider, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
 
 ## Day 1 UI verification (2026-11-16)
 
@@ -99,9 +99,13 @@ Chapter 1 sessions, state and command receipts are persisted; the remaining enco
 - Owner confirmed the Next.js development screen in Web Preview on port 3000, displaying `API, database and AI service reachable.`
 - These are development integration checks, not evidence of game completion, real inference, production deployment or Codespaces validation.
 
-## Chapter 2 candidate playtest (PR #22)
+## Chapter 2 accepted playtest (PR #22)
 
-After the candidate CI passes, switch to `feat/dog-encounter` with a clean worktree, pull, and rebuild sequentially. A third additive migration creates CP-DOG and resolved slot tables; the prior Chapter 1 session/version remains compatible. Use private Web Preview on port 3000, not `/preview`. Resume the Chapter 2 card if available; otherwise play from a new run only after protecting any existing resume target. Verify direct choice, all three death/return paths, three consultation debits and cached reuse, no consult at zero, F1 without recharge, independent SOL-01, MEM-D2, E-NAME, both locales and reload. Do not expose safe-choice IDs in player-facing UI. Back up local player data before switching branches; do not delete volumes. Full owner acceptance and browser verification remain pending.
+PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
+
+The following records the historical playtest procedure and acceptance checks; the current stable branch is `main`.
+
+After the candidate CI passes, switch to `feat/dog-encounter` with a clean worktree, pull, and rebuild sequentially. A third additive migration creates CP-DOG and resolved slot tables; the prior Chapter 1 session/version remains compatible. Use private Web Preview on port 3000, not `/preview`. Resume the Chapter 2 card if available; otherwise play from a new run only after protecting any existing resume target. Verify direct choice, all three death/return paths, three consultation debits and cached reuse, no consult at zero, F1 without recharge, independent SOL-01, MEM-D2, E-NAME, both locales and reload. Do not expose safe-choice IDs in player-facing UI. Back up local player data before switching branches; do not delete volumes. Owner confirmed PT-BR, EN and mobile playtests; independent automated browser/accessibility verification remains AMI-010.
 
 Owner refinement: test Continue → Continue where you left off / Chapters; only reached chapters appear. Restart Chapter 1, then Chapter 2, then Chapter 3 if reached, verify high-water access, exact restored entry state, persisted slot reuse and reload. Also check the stable header Menu during navigation, three red information cards, dark dog approach, one-shot reveal, no backward action at the decision, no clipped choices at standard portrait/landscape, skull death card and dark success branch. Keep existing volumes; no schema migration beyond the earlier CP-DOG/slot migration.
 
@@ -112,3 +116,7 @@ Third refinement checks: main Continue and submenu Continue game / Chapters, num
 Fourth refinement checks: verify the terminal wording, continuous subtle tremor only on FB-D1b–g, MEM-D2/F01/F01b and one-shot ??? → DAVID on L18c (reduced motion supported). Check that CENA-04 dialogue and choice geometry matches the pre-fourth-refinement layout, all choices visible and original CENA-05 stable across adjacent beats. Smoke now checks all 12 disk asset hashes and all illustrated HTTP beats through Chapter 2 against the manifest. No new asset or migration.
 
 Owner correction checks: compare the normal CENA-04 dialogue frame and decision screen with b9da1be; the added dog-wide sizing rule and marker are removed. All three success branches use the same L04 text in PT-BR/EN, and the one-shot name crossfade lasts 1800ms. Preserve the scoped continuous memory motion and asset hash smoke.
+
+## Resume after Day 2
+
+After the verified database backup and stop procedure above, reopen Cloud Shell, `cd ~/ami-108`, check `git status`, switch to `main`, `git pull --ff-only origin main`, then `docker compose --parallel 1 up --build -d --wait` and `docker compose ps`. Use the same private port 3000 preview and browser/origin when possible. A changed VM/volume or expired cookie may require recovery; do not promise resume from a dump alone. Keep private documents and dumps outside Git. New AMI-007/008 work begins on a separate branch after verifying the stable baseline.

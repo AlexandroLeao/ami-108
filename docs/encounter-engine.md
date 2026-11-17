@@ -1,8 +1,12 @@
 # Encounter engine — AMI-005 / AMI-006
 
-November 17, 2026 · Day 2. Draft PR #22 connects the local campaign through Chapter 2. Owner playtest and CI are required before acceptance.
+November 17, 2026 · Day 2. PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
 
-## Implemented candidate
+Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.
+
+The refinement notes below retain the chronology; the final acceptance summary supersedes earlier timing, text and layout descriptions.
+
+## Implemented and accepted local subset
 
 - Server-only DOG definition and bilingual Chapter 2 beats transcribed from Master v1.11 / Script v1.9. Existing Chapter 1 IDs/version and handoff retained; old Chapter 1 saves do not require reset.
 - Four ordered choices, authored consequences, 15% CORRECT threshold, free INTRO separate from three encounter slots. Fallback only; no real inference yet.
@@ -11,7 +15,7 @@ November 17, 2026 · Day 2. Draft PR #22 connects the local campaign through Cha
 - Additive Prisma migration records immutable checkpoint and unique resolved slot rows in the same locked transaction as JSON progress and command receipt. The current JSON includes the checkpoint and slot cache for pure transition functions; normalized rows are durable transactional records. No provider reservation yet.
 - F1 is applied once on terminal interaction (35/42/53/5 locked, no recharge); SOL-01 restores 3 bars independently. MEM-D2/FB-D2 and E-NAME are authorized authored beats. Ends at Chapter 3 card; no simulated Chapter 3.
 - CENA-04/05 served only at the authorized current view. Decision and retry buttons appear in the dialogue frame, not over the art. Consultation occupies its own row; portrait decision frame grows without cropping the image, with internal scrolling as a short-viewport fallback. No automatic selection on right-arrow; explicit button activation only.
-- Domain tests, PostgreSQL HTTP tests and built HTTP smoke extended. Full browser visual, mobile/zoom and accessibility checks remain owner playtest/AMI-010.
+- Domain tests, PostgreSQL HTTP tests and built HTTP smoke extended. Owner PT-BR/EN/mobile playtests passed; independent browser automation, extreme viewport/zoom and comprehensive accessibility checks remain AMI-010.
 
 ## Remaining boundaries
 
@@ -53,3 +57,9 @@ Energy indicator gently appears on the first tutorial card and stays visible on 
 ## Latest owner refinement — November 17
 
 Only ARRIVAL-03 wording, FOUND dark/L01 terminal fade-in, dog reveal timing and L18c name animation change. The same original CENA-04 and CENA-05 files remain authorized at their illustrated beats; no duplicate art, layout, energy, event or persistence changes. Tests assert dark FOUND and stable CENA-05 across adjacent illustrated beats.
+
+## Final accepted baseline (supersedes earlier refinement details)
+
+- Chapter 1: 77 beats, three red information cards; the first reveals the energy-only HUD with two gentle pulses. Dog: original CENA-04 on L01, 1450ms veil/shake with 435ms initial dark hold after load; same asset on L02 and following illustrated beats, normal approved geometry, no persistent motion. Decision-only compact grid, no PREVIOUS. Red pixel skull and explicit retry; success consequence/branches dark.
+- Terminal: exact ARRIVAL-03 “Você observa AMI se conectar ao sistema enquanto emite breves sons eletrônicos.”; FOUND “Encontrado.” remains dark; original CENA-05 appears on L01 with 700ms veil. All L04 variants use “Então vai parar de falar coisas aleatórias?”. F1 35/42/53/5 locked; SOL-01 independent on entry to L09 after L08b. Continuous tremor only FB-D1b–g, MEM-D2, F01/F01b; name reveal at L18c alternates over 1500ms. Chapter 3 boundary only.
+- All original 12 PNGs/manifest unchanged. Chapter selection keeps unlocked progress and cached slots; restart replaces resume position only after confirmation. AMI-005 accepted and issue #7 closed completed. AMI-006 remains partial; real inference is AMI-007, rat/lab and F2/SOL-02/MEM-D3 are AMI-008.

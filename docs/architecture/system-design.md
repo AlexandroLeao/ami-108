@@ -1,7 +1,7 @@
 # System design
 
 **AMI-002 · reviewed design, merged in PR #17; implementation is incremental**  
-Canonical narrative: Documento Mestre v1.10 / Roteiro Interativo v1.8 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
+Canonical narrative: Documento Mestre v1.12 / Roteiro Interativo v1.10 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
 
 ## C4 level 1 — system context
 
@@ -48,7 +48,7 @@ flowchart TD
   Queries --> Assets["Asset authorization"]
 ```
 
-AMI-004 began with pure deterministic domain functions in apps/api/src/narrative (PR #19). The tested core is now wrapped by the persisted session/receipt service, authorized NestJS endpoints and Next.js same-origin facade in merged PR #20. Later encounters, checkpoint/slot tables, restoration and real inference remain planned. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
+AMI-004 began with pure deterministic domain functions in apps/api/src/narrative (PR #19). The tested core is now wrapped by the persisted session/receipt service, authorized NestJS endpoints and Next.js same-origin facade in merged PR #20. Merged PR #22 adds the dog encounter, CP-DOG/slot tables, F1/SOL-01 and chapter replay. Later encounters/restorations and real inference remain planned. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
 
 ## Deployment and environments
 
@@ -116,3 +116,5 @@ This is a conceptual state machine, not an implementation. The concrete allowed 
 - Rate limit by session and conservative IP policy; cap session creation, body size and provider calls. No user-entered prompt field.
 - Use correlation IDs, status/error codes and timing metrics without logging session tokens, prompt bodies or protected content.
 - Liveness checks only process health; game readiness must not require an online LLM. AMI-001 readiness checks AI connectivity as a diagnostic; adjust degraded-mode policy during implementation.
+
+Day 2 observed baseline: PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes). No production resources or real model provider have been provisioned. Continue with the pending provider reservation/finalization design and later encounters.

@@ -1,6 +1,6 @@
 # Domain model and state transitions
 
-**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. The ER diagram remains the target for later encounter/checkpoint/slot models, not a claim that every table exists. The design preserves the canonical script (Master v1.11 / Script v1.9).
+**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
 
 ## ER diagram
 
@@ -81,7 +81,7 @@ erDiagram
   }
 ```
 
-### Chapter 1 implemented subset
+### Chapters 1–2 implemented subset
 
 The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. PR #22 adds dedicated transactional checkpoint and resolved-slot tables for CP-DOG; the pure engine retains a JSON checkpoint and slot cache persisted atomically with normalized records and receipts. Provider reservation/finalization and later encounters remain pending.
 
@@ -140,3 +140,5 @@ Use 12 narrative scene IDs and 12 separate image IDs. Reuse images within scenes
 ## Testing strategy
 
 Pure engine tests: all 12 choices, every required event, restoration values, random bounds, zero energy, invalid action. Integration tests: duplicate command IDs, conflicting revision, simultaneous consultation/choice, cross-session access, pending timeout, snapshot restoration and restart. Contract tests: strictly typed request and sanitized response; provider offline/invalid fallback. E2E: both languages, all deaths, direct success, mixed consultations, final credits. Do not claim execution before corresponding code exists.
+
+Day 2 acceptance: PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes). The additive CP-DOG/slot migration and row-locked receipt transaction are verified; replay retains unlocked high-water and resolved slots. F1/SOL-01 are implemented, later F2/F3/SOL-02, rat/boar and provider reservation/finalization remain pending. AMI-006 is not complete.
