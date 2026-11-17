@@ -160,7 +160,7 @@ async def generate(
         )
     except TimeoutError:
         return fallback(request, "TIMEOUT")
-    except Exception:
+    except Exception:  # noqa: BLE001 - untrusted provider boundary must fail closed
         # No provider exception content or secret is returned.
         return fallback(request, "UNAVAILABLE")
 
