@@ -10,3 +10,7 @@ November 17, 2026. Draft, isolated from accepted Chapters 1–2. Canonical sourc
 - Add real PostgreSQL transactional verification for CP-RAT, slot cache, F2/SOL-02 and replay, authorized current art, no future data and bilingual traversal. Coordinate actual inference/fallback with AMI-007. Owner playtest before merge.
 
 No Chapter 3 playability, real inference, migration or acceptance is claimed by this preparatory branch.
+
+## Integrated candidate
+
+The catalog is now connected to the existing Chapter 3 card via CONTINUE. The pure chapter-three engine presents the five mandatory dark text records, time title, dark FB-D3 and return; CP-RAT and resolved slots use the existing generic encounter rules and tables. F2 and SOL-02 require explicit interactions; the original CENA-06/07/05 assets are authorized only at their illustrated beats. Chapter 4 is a development boundary; chapter replay preserves prior cache/high-water. Three short presentation-only narration beats describe the second component, route and solar exposure per the source prose; no new character dialogue. Existing Chapters 1–2 rules and geometry retained. Real AI integration and owner playtest remain required. Tests cover bilingual progression, all branches/retry/cache, real PG persistence, replay and built HTTP asset hashes. No new migration or asset.

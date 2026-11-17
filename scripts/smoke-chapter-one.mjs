@@ -116,8 +116,21 @@ try {
   for (let i = 0; i < 60 && view.chapter !== 3; i++) await send(view.actions[0]);
   assert.equal(view.chapter, 3);
   assert.deepEqual(view.diagnostics, { energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
-  assert.deepEqual([...verifiedAssets].sort(), ['CENA-01', 'CENA-02', 'CENA-03', 'CENA-04', 'CENA-05']);
-  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 5 reached assets, locale, resume, dog encounter and Chapter 2 boundary.');
+  assert.equal((await call('asset?key=CENA-06')).status, 404);
+  await send(view.actions[0]);
+  assert.equal(view.asset.url, '/api/game/asset?key=CENA-06');
+  assert.equal((await call('asset?key=CENA-07')).status, 404);
+  for(let i=0;i<65 && view.phase!=='ENCOUNTER';i++) await send(view.actions[0]);
+  assert.equal(view.sceneId,'A03-S02');
+  assert.equal(view.asset.url,'/api/game/asset?key=CENA-07');
+  await send(view.actions.find(action=>action.kind==='CONSULT'));
+  for(let i=0;i<4 && view.phase!=='ENCOUNTER';i++) await send(view.actions[0]);
+  await send(view.actions.find(action=>action.id==='RAT-02'));
+  for(let i=0;i<25 && view.chapter!==4;i++) await send(view.actions[0]);
+  assert.equal(view.chapter,4);
+  assert.deepEqual(view.diagnostics,{energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
+  assert.deepEqual([...verifiedAssets].sort(), ['CENA-01', 'CENA-02', 'CENA-03', 'CENA-04', 'CENA-05', 'CENA-06', 'CENA-07']);
+  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 7 reached assets, locale, resume, dog and rat encounters, F2/SOL-02 and Chapter 4 boundary.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
 }

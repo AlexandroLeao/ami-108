@@ -202,6 +202,57 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     await request(app.getHttpServer()).post('/game/commands').set('Cookie', cookie).send({commandId: randomUUID(), expectedRevision: view.revision, actionId: 'CHAPTER/RESTART/4'}).expect(403);
   }, 30000);
 
+  it('persists rat checkpoint, cache, F2 and SOL-02 and chapter replay', async () => {
+    const { cookie, view: initial } = await create();
+    let view = initial;
+    for (let i=0; i<100 && view.phase!=='ENCOUNTER'; i++) view=await command(cookie,view);
+    view=await command(cookie,view,'DOG-04');
+    for (let i=0; i<65 && view.chapter!==3; i++) view=await command(cookie,view);
+    expect(view.chapter).toBe(3);
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-06').set('Cookie',cookie).expect(404);
+    view=await command(cookie,view);
+    expect(view.asset?.url).toBe('/api/game/asset?key=CENA-06');
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-07').set('Cookie',cookie).expect(404);
+    for (let i=0; i<65 && view.phase!=='ENCOUNTER'; i++) view=await command(cookie,view);
+    expect(view.sceneId).toBe('A03-S02');
+    expect(view.asset?.url).toBe('/api/game/asset?key=CENA-07');
+    const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
+    const cp=await prisma.gameCheckpoint.findUniqueOrThrow({where:{sessionId_checkpointId:{sessionId:row.id,checkpointId:'CP-RAT'}}});
+    expect(cp.snapshot).toMatchObject({stepId:'A03-S02/L01',diagnostics:{energy:3,bio:42}});
+    const action=view.actions.find(x=>x.kind==='CONSULT')!;
+    const body={commandId:randomUUID(),expectedRevision:view.revision,actionId:action.id};
+    const send=()=>request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send(body);
+    const pair=await Promise.all([send(),send()]);
+    expect(pair.map(x=>x.status)).toEqual([200,200]);
+    expect(pair.map(x=>x.body.status).sort()).toEqual(['APPLIED','REPLAYED']);
+    view=pair[0].body.view;
+    expect(view.diagnostics?.energy).toBe(2);
+    const slot=await prisma.gameConsultationSlot.findUniqueOrThrow({where:{sessionId_encounterId_slotIndex:{sessionId:row.id,encounterId:'RAT',slotIndex:1}}});
+    await app.close(); await open();
+    await request(app.getHttpServer()).get('/game/view').set('Cookie',cookie).expect(200,view);
+    for(let i=0;i<4 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    view=await command(cookie,view,'RAT-01');
+    view=await command(cookie,view);
+    view=await command(cookie,view,view.actions.find(x=>x.kind==='RETRY')!.id);
+    expect(view.diagnostics?.energy).toBe(3);
+    for(let i=0;i<12 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    view=await command(cookie,view,view.actions.find(x=>x.kind==='CONSULT')!.id);
+    expect(await prisma.gameConsultationSlot.findUniqueOrThrow({where:{sessionId_encounterId_slotIndex:{sessionId:row.id,encounterId:'RAT',slotIndex:1}}})).toEqual(slot);
+    for(let i=0;i<4 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    view=await command(cookie,view,'RAT-02');
+    for(let i=0;i<25 && view.chapter!==4;i++) view=await command(cookie,view);
+    expect(view.chapter).toBe(4);
+    expect(view.diagnostics).toEqual({energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
+    expect(await prisma.gameCheckpoint.count({where:{sessionId:row.id}})).toBe(2);
+    expect((await prisma.gameSession.findUniqueOrThrow({where:{id:row.id}})).state).toMatchObject({events:expect.arrayContaining(['E-ARCHIVE','MEM-D3','FB-D3','E-PLANET','E-PARTNER','CP-RAT','F2','SOL-02','E-ESCAPE-ROUTE'])});
+    view=await command(cookie,view,'CHAPTER/RESTART/3');
+    expect(view.chapter).toBe(3);
+    expect(view.diagnostics?.bio).toBe(42);
+    view=await command(cookie,view,'CHAPTER/RESTART/4');
+    expect(view.chapter).toBe(4);
+    expect(view.diagnostics?.bio).toBe(85);
+  }, 30000);
+
   it('does not expose integration routes without explicit local flag', async () => {
     delete process.env.AMI_DEV_PREVIEW;
     try { await request(app.getHttpServer()).post('/game/session').send({ locale: 'en' }).expect(404); }
