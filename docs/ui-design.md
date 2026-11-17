@@ -60,7 +60,9 @@ Replace the in-art diagnostics overlay with a compact status strip centered betw
 
 PR #20 merged at `3cf942a` after the owner's local playtest and final refinement approval. Post-merge CI passed. The final header and arrow rules above are authoritative for the implemented Chapter 1 presentation; the isolated preview remains unchanged. The private cumulative source revisions v1.11/v1.9 were synchronized on November 17; the asset ZIP remains unchanged. Full browser E2E, independent viewport/zoom checks and accessibility review remain AMI-010.
 
-## Chapter 2 candidate (PR #22)
+## Chapter 2 refinements (PR #22, chronological record)
+
+The final accepted baseline below supersedes earlier refinement descriptions.
 
 Keep the accepted Chapter 1 shell and header. Show CENA-04 for the dog and CENA-05 for the terminal only when authorized. Decision buttons occupy the dialogue frame; consultation occupies its own row above four equally styled choices; two columns where space allows, one on portrait screens. The portrait decision frame grows to accommodate the controls without cropping the 16:9 image. Internal scrolling remains a fallback on short/zoomed viewports. Chapter 1 layout is unchanged. Show only legal CONSULT and four fixed CHOOSE actions, no success hints or arrow captions. Death consequence on coal, then red VOCÊ MORREU/YOU DIED and explicit checkpoint-return button. Do not bind a generic forward arrow to a choice or retry. F1 and SOL-01 advance through existing interaction arrows; the header reflects applied values on illustrated beats. MEM-D2 uses the dark voice beat and wake return. This layout requires owner playtest and independent responsive validation.
 
@@ -91,3 +93,13 @@ The first information card (TUTORIAL) alone has `energy-reveal`: show the existi
 ### Latest owner refinement
 
 ARRIVAL-03 and FOUND remain dark; reveal CENA-05 only on L01 through a 700ms coal veil, leaving the original PNG untransformed. Dog L01 holds the coal veil for the first 435ms of its 1450ms reveal after load, letting dialogue appear first; brief existing layer shake settles before the end. Subsequent beats use the same mounted image with no effect. L18c alternates ???/DAVID more distinctly over 1500ms. No changes to approved layout, other cues or assets.
+
+## Final accepted presentation — November 17
+
+PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
+
+- Preserve the approved pre-resize normal dialogue and decision geometry, original 16:9 art, palette, typography and arrow positions. No unapproved dimension changes or duplicate artwork. Decision-only compact 2x2 grid plus consultation, no back arrow; no internal scrolling at standard viewport; extreme viewport/zoom accessibility remains later work.
+- Three red information cards, black text, ivory arrows. First card shows energy label/three bars with a 1900ms fade and two gentle pulses; later information cards steady. Energy-only centered header, no numerical fraction or memory percentages. Menu stays visually stable. Continue → Continue game / Chapters; chapter buttons show number only and reached chapters only.
+- Dog L01: three preceding dark narration beats, then text first, original CENA-04 appears with 435ms initial dark hold after load and 1450ms one-shot veil/brief layer shake; L02 reuses the same unfiltered original with no repeated effect. Success branches dark. Red skull and VOCÊ NÃO SOBREVIVEU / YOU DID NOT SURVIVE on defeat.
+- Terminal ARRIVAL-03 shortened, FOUND dark; L01 introduces original CENA-05 via 700ms coal veil only. MEM-D2 dark blink/voice/call then wake at L15; scoped continuous text tremor on FB-D1b–g/MEM-D2/F01/F01b. L18c ???/DAVID alternates over 1500ms, settles on DAVID. Reduced motion supported. Earlier timing/geometry notes are historical only.
+- Owner confirmed both languages and mobile; independent automated browser/accessibility/security and extreme viewport checks remain AMI-010. Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.

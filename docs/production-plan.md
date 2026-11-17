@@ -3,8 +3,8 @@
 **Project:** AMI-108  
 **Planning baseline:** November 15, 2026  
 **Production target:** November 16–22, 2026 (seven calendar days).  
-**Canonical sources:** Documento Mestre v1.11 and Roteiro Interativo v1.9, retained privately.  
-**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 and AMI-003 completed on November 16 (PRs #17 and #18 merged; owner accepted desktop/mobile preview). AMI-004 started on Day 1 ahead of the original Day 2 target; PR #19 merged the pure narrative core at `5fa75b6`. PR #20 merged the owner-approved local Chapter 1 campaign (75 presentation beats) and prerequisite AMI-006 session persistence at `3cf942a`; post-merge CI passed. AMI-004 issue #6 closed on November 17. No full campaign or real inference yet.
+**Canonical sources:** Documento Mestre v1.12 and Roteiro Interativo v1.10, retained privately.  
+**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 and AMI-003 completed on November 16 (PRs #17 and #18 merged; owner accepted desktop/mobile preview). AMI-004 started on Day 1 ahead of the original Day 2 target; PR #19 merged the pure narrative core at `5fa75b6`. PR #20 merged the owner-approved local Chapter 1 campaign (75 presentation beats) and prerequisite AMI-006 session persistence at `3cf942a`; post-merge CI passed. AMI-004 issue #6 closed on November 17. Day 2: PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes). AMI-005 complete (issue #7 closed); AMI-006 Chapter 2 subset complete, remaining work open. No full campaign or real inference yet.
 
 The target is ambitious, not a guaranteed release date. Preserve all approved requirements; record blockers and revise the schedule rather than silently reducing scope. Work is performed in active development sessions, not autonomously between them.
 
@@ -18,7 +18,7 @@ The target is ambitious, not a guaranteed release date. Preserve all approved re
 | 6 | Nov 21 | AMI-011, 012: deployment and technical documentation | Reproducible deployment where free conditions are verified; evidence and documentation |
 | 7 | Nov 22 | AMI-013: release validation | Owner approves v1.0.0 only after mandatory release gates pass |
 
-Day 1 acceptance: #2, #4 and #5 closed. Chapter 1 integration and owner playtest accepted; PR #20 merged at `3cf942a` with [post-merge CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passing. AMI-004 issue #6 is closed after owner acceptance; AMI-006 issue #8 remains open for checkpoints, consultation slots, restoration and solar events. Next implementation: AMI-005 and remaining AMI-006 work for Chapter 2. The Day 2–7 targets and release gates are unchanged. See [narrative core](narrative-engine.md).
+Day 1 acceptance: #2, #4 and #5 closed. Chapter 1 integration and owner playtest accepted; PR #20 merged at `3cf942a` with [post-merge CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passing. AMI-004 issue #6 is closed after owner acceptance; AMI-006 issue #8 remains open for checkpoints, consultation slots, restoration and solar events. Day 1 next implementation was AMI-005 and the Chapter 2 subset of AMI-006; both are now integrated in PR #22. The Day 2–7 targets and release gates are unchanged. See [narrative core](narrative-engine.md).
 
 Tests, security, documentation and deployment preparation start early. Evaluate provider access and costs on day 1; use authored fallback for development, not as a substitute for demonstrating real AI.
 
@@ -40,4 +40,12 @@ Tests, security, documentation and deployment preparation start early. Evaluate 
 - Reproducible execution, verified free deployment conditions, AWS integration only when authorized and viable; clearly distinguish simulation from real deployment.
 - No unresolved critical defects, owner approval, and honest documentation. No release solely because the target date has arrived.
 
-Day 2 increment: draft PR #22 connects the dog, CP-DOG, resolved consultation slots, F1, SOL-01, MEM-D2/FB-D2 and E-NAME. CI and owner acceptance are pending; do not mark AMI-005/006 complete. Real inference and later chapters remain separate.
+## Day 2 acceptance and next session
+
+PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
+
+Formal tracker: 5/13 closed (38.5%). AMI-006 remains open for later snapshots, slots, F2/F3, SOL-02 and provider-related recovery. Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.
+
+Next session: (1) private source synchronization completed; (2) implement AMI-007 server-authorized fact retrieval, generation, validation, deadline/fallback and idempotent reservation/finalization; verify actual inference with a zero-mandatory-cost provider only after cost/eligibility review; (3) implement AMI-008 Chapter 3 in a new feature branch, including laboratory/rat, CP-RAT, F2, SOL-02, MEM-D3 and canonical success branches; preserve the exact approved Chapters 1–2 behavior. Validate deterministic rules, real PostgreSQL, both locales, resume, all choices and owner playtest before merge. No new story scope or date-pressure shortcuts.
+
+Day 2 continuation checkup: #7 closed completed after accepted merge and CI; #8 first two criteria checked, last criterion remains open. 5/13 (38.5%). Private revisions v1.12/v1.10 verified in Drive, ZIP unchanged. Documentation PR #23 first head `6585839` passed CI 44124948855; this docs-only synchronization update requires exact-head CI and owner merge.

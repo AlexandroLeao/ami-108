@@ -21,7 +21,7 @@ Status: design merged in AMI-002 (PR #17). These decisions operationalize the ap
 **Context:** retries, duplicate requests, concurrent tabs and checkpoint rollback can cause extra debits, rerolls or inconsistent progress.  
 **Decision:** versioned state, transaction boundaries, unique receipts and slot constraints; checkpoint snapshots restore only reversible gameplay state. Reserve/finalize inference outside long transactions, deadline-bound recovery using fallback.  
 **Alternatives:** localStorage or in-memory state are not durable/authoritative; event sourcing adds unnecessary complexity.  
-**Consequences:** Chapter 1 uses an additive session/receipt migration, JSON progress and row locks with real PostgreSQL integration tests. Later snapshots, consultation slots and race-condition tests are required; keep a simple audit history rather than full event sourcing.
+**Consequences:** Chapter 1 uses an additive session/receipt migration, JSON progress and row locks with real PostgreSQL integration tests. PR #22 adds the CP-DOG snapshot, resolved slot rows and real PostgreSQL duplicate-debit/retry tests; later snapshots, provider reservations and further race-condition tests are required; keep a simple audit history rather than full event sourcing.
 
 ## ADR-004 — Anonymous scoped session and same-origin facade
 
@@ -43,3 +43,5 @@ Status: design merged in AMI-002 (PR #17). These decisions operationalize the ap
 **Decision:** Compose and GitHub Actions first; Google Cloud Shell for manual validation. Keep optional Codespaces configuration. Use external provider/hosting/AWS only after verifying free eligibility, quotas, data policy and owner approval. Document simulation versus real deployment.  
 **Alternatives:** paid infrastructure or permanently running a Cloud Shell VM are not approved.  
 **Consequences:** public demo availability depends on verified free resources; keep reproducible local execution, no scope reduction to meet a date.
+
+Day 2 implementation evidence: PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes). No new ADR, stack or deployment decision; production retention/rate limiting and real inference remain pending.
