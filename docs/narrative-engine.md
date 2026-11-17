@@ -1,5 +1,14 @@
 # Narrative engine — AMI-004
 
+## Current implemented scope
+
+Chapter 3 uses `chapter-three-catalog.ts` and `chapter-three.ts`. Mandatory archive → MEM-D3/FB-D3 → CP-RAT → F2 → route → Chapter 4. Preserve stable IDs, current-only projection, read-only review, replay high-water and immutable slots. F1/F2 restore energy with memory; retired SOL steps normalize without new events. F3 and Chapters 4–5 pending. Historical implementation notes below are superseded where inconsistent.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+
+---
+
+
 **Scope:** Chapter 1 domain core and persisted campaign (PRs #19/#20), extended through Chapter 2 by owner-approved merged PR #22 (`76946f9`, November 17, 2026). Not the full campaign or a production deployment.
 
 ## Source and boundaries

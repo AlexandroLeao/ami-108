@@ -1,5 +1,16 @@
 # AMI-108 — Engineering instructions
 
+## Current authoritative instructions (PR #25)
+
+- F1/F2 atomically restore all three energy bars and memory; future F3 must do the same with PERSONAL unlock. No separate sunlight or SOL events. Retain retired IDs only for legacy saves.
+- Preserve approved code/dialogue, 11 red/ivory untitled archive beats, dark FB-D3 with continuous subtle text tremor and F09 familiar-voice/HOWARD reveal, original wake/fade cues and geometry. Dog and rat startle immediately on load, shake only for 650ms, no veil.
+- PR #24 remains draft, separate and conflicts with main. Reconcile persistence/tests against approved main, authorize RAT facts, verify real inference, budgets and safe response variation before merge. No paid resource or provider activation. Formal tracker 5/13 closed; #8/#9/#10 open. Next AMI-007 then AMI-009. Do not modify approved gameplay without authorization.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+
+---
+
+
 ## Source of truth and scope
 - Use the approved Documento Mestre v1.12 and Roteiro Interativo v1.10; the November 16 cumulative addenda take precedence over the historical source pages; the November 17 owner-approved PR #22 amendments take precedence for the specifically approved changes now incorporated in the November 17 cumulative private-source supplement. Do not invent or rewrite dialogue, outcomes, encounters, assets, or story reveals. If the source is unavailable, ask for the relevant authorized excerpt before implementing that content.
 - Five chapters (Bananas; Registro Atualizado; Pensamento Positivo; AMI-108 & David; De nada, Bobo), 12 narrative scenes, 12 scene assets and 9 internal reference sheets. Preserve stable narrative IDs. Chapter 1 title and its banana dialogue are fixed.
@@ -10,7 +21,7 @@
 ## Architecture and rules
 - Next.js/React renders the authorized current scene. NestJS is authoritative for state, transitions, choices, energy, memory, checkpoints and persistence. PostgreSQL/Prisma persists progress. Python/FastAPI/Pydantic generates and validates only permitted AMI dialogue.
 - Three encounters in order: dog (chapter 2), rat (chapter 3), boar (chapter 5). Lizard is flashback only. Four choices per encounter, one safe, three lethal. Outcomes are deterministic, never chosen by the LLM.
-- Energy starts at 3 after E-JOIN; each encounter consultation costs one, at most three; SOL-01 and SOL-02 recharge to 3 outside encounters. No negative energy; zero energy does not block choices. Ordinary dialogue, flashbacks, restorations, and INTRO-RANDOM cost no energy.
+- Energy starts at 3 after E-JOIN; each encounter consultation costs one, at most three; F1/F2 (and planned F3) restore energy to 3 atomically with memory. No negative energy; zero energy does not block choices. Ordinary dialogue, flashbacks, restorations, and INTRO-RANDOM cost no energy.
 - F1/F2/F3 are fixed, idempotent restoration events. Initial BIO-02 15%, F1 42%, F3 100%; these are approved initial CORRECT probabilities for dog, rat and boar respectively. PERSONAL stays locked until F3.
 - Roll back checkpoint state only on explicit return; keep consultation slot categories and cache outside rollback. Duplicate requests cannot debit twice; language changes cannot reroll. Maximum nine encounter slots plus one INTRO-RANDOM per run.
 - NestJS selects CORRECT/RANDOM, FastAPI retrieves only authorized encounter facts and generates/validates the wording. Use authored localized fallback on invalid/unavailable generation. CORRECT is guaranteed for the boar. Never send future spoilers, unrelated private facts or secrets to a provider.
