@@ -1,12 +1,16 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { randomUUID } from 'node:crypto';
+import { createServer } from 'node:http';
+import { once } from 'node:events';
+import type { Prisma } from '@prisma/client';
 import request from 'supertest';
 import { PrismaService } from '../src/prisma.service';
 import { GameController } from '../src/game/game.controller';
 import { SessionService, digest } from '../src/game/session.service';
 import { CHAPTER_ONE } from '../src/narrative/catalog';
-import type { CurrentView } from '../src/narrative/engine';
+import { advanceNarrative, type CurrentView, type NarrativeState } from '../src/narrative/engine';
+import { generationRequest } from '../src/game/ai-client';
 
 const databaseUrl = process.env.AMI_TEST_DATABASE_URL;
 const integration = databaseUrl ? describe : describe.skip;
@@ -201,6 +205,96 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(view.diagnostics?.bio).toBe(42);
     await request(app.getHttpServer()).post('/game/commands').set('Cookie', cookie).send({commandId: randomUUID(), expectedRevision: view.revision, actionId: 'CHAPTER/RESTART/4'}).expect(403);
   }, 30000);
+
+  it('reserves one AI call, blocks conflicting mutations and atomically finalizes the same command', async () => {
+    const previous = { flag: process.env.AMI_AI_GENERATION, token: process.env.AMI_AI_INTERNAL_TOKEN, url: process.env.AI_SERVICE_URL };
+    delete process.env.AMI_AI_GENERATION;
+    const { cookie, view: initial } = await create();
+    let view = initial;
+    for (let i=0;i<100 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    expect(view.phase).toBe('ENCOUNTER');
+    const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
+    let requests=0;
+    let announce!: () => void;
+    let release!: () => void;
+    const entered=new Promise<void>(resolve=>{announce=resolve;});
+    const gate=new Promise<void>(resolve=>{release=resolve;});
+    const server=createServer((req,res)=>{
+      let raw='';
+      req.on('data',(chunk:Buffer)=>{raw+=chunk.toString();});
+      req.on('end',()=>{
+        requests++;
+        const body=JSON.parse(raw) as {requestId:string};
+        announce();
+        void gate.then(()=>{
+          res.writeHead(200,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({requestId:body.requestId,status:'FALLBACK_REQUIRED',reason:'UNAVAILABLE'}));
+        });
+      });
+    });
+    server.listen(0,'127.0.0.1'); await once(server,'listening');
+    const address=server.address();
+    if (!address || typeof address==='string') throw new Error('Mock server address');
+    process.env.AMI_AI_GENERATION='1';
+    process.env.AMI_AI_INTERNAL_TOKEN='test-only';
+    process.env.AI_SERVICE_URL='http://127.0.0.1:'+address.port;
+    try {
+      const body={commandId:randomUUID(),expectedRevision:view.revision,actionId:view.actions.find(x=>x.kind==='CONSULT')!.id};
+      const send=()=>request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send(body);
+      const first=send().then(x=>x);
+      await entered;
+      const pending=await prisma.gamePendingGeneration.findUniqueOrThrow({where:{sessionId:row.id}});
+      expect(pending.commandId).toBe(body.commandId);
+      expect((await prisma.gameSession.findUniqueOrThrow({where:{id:row.id}})).revision).toBe(view.revision);
+      expect(await prisma.gameConsultationSlot.count({where:{sessionId:row.id}})).toBe(0);
+      const second=send().then(x=>x);
+      await request(app.getHttpServer()).patch('/game/locale').set('Cookie',cookie).send({commandId:randomUUID(),expectedRevision:view.revision,locale:'en'}).expect(409);
+      release();
+      const pair=await Promise.all([first,second]);
+      expect(pair.map(x=>x.status)).toEqual([200,200]);
+      expect(pair.map(x=>x.body.status).sort()).toEqual(['APPLIED','REPLAYED']);
+      expect(pair[0].body.view.diagnostics.energy).toBe(2);
+      expect(requests).toBe(1);
+      expect(await prisma.gamePendingGeneration.count({where:{sessionId:row.id}})).toBe(0);
+      expect(await prisma.gameConsultationSlot.count({where:{sessionId:row.id}})).toBe(1);
+      expect(await prisma.gameCommandReceipt.findUniqueOrThrow({where:{sessionId_commandId:{sessionId:row.id,commandId:body.commandId}}})).toMatchObject({generationStatus:'FALLBACK_REQUIRED',generationReason:'UNAVAILABLE'});
+    } finally {
+      release();
+      server.closeAllConnections();
+      await new Promise<void>(resolve=>server.close(()=>resolve()));
+      for (const [key,value] of [['AMI_AI_GENERATION',previous.flag],['AMI_AI_INTERNAL_TOKEN',previous.token],['AI_SERVICE_URL',previous.url]] as const) {
+        if(value===undefined) delete process.env[key]; else process.env[key]=value;
+      }
+    }
+  },30000);
+
+  it('recovers an expired reservation after restart, with no reroll, double debit or provider call', async () => {
+    const {cookie,view:initial}=await create();
+    let view=initial;
+    for(let i=0;i<100 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
+    const state=row.state as unknown as NarrativeState;
+    const action=view.actions.find(x=>x.kind==='CONSULT')!;
+    const commandId=randomUUID();
+    const next=advanceNarrative(state,action.id,state.revision,()=>0);
+    const gen=generationRequest(state,next,commandId)!;
+    await prisma.gamePendingGeneration.create({data:{
+      sessionId:row.id,commandId,requestDigest:digest(JSON.stringify(['action',state.revision,action.id])),
+      nextState:JSON.parse(JSON.stringify(next)) as Prisma.InputJsonObject,
+      request:JSON.parse(JSON.stringify(gen)) as Prisma.InputJsonObject,
+      deadlineAt:new Date(Date.now()-1000),
+    }});
+    await app.close(); await open();
+    const recovered=await request(app.getHttpServer()).get('/game/view').set('Cookie',cookie).expect(200);
+    expect(recovered.body.diagnostics.energy).toBe(2);
+    expect(recovered.body.revision).toBe(state.revision+1);
+    expect(await prisma.gameConsultationSlot.findUniqueOrThrow({where:{sessionId_encounterId_slotIndex:{sessionId:row.id,encounterId:'DOG',slotIndex:1}}})).toMatchObject({category:'CORRECT'});
+    expect(await prisma.gamePendingGeneration.count({where:{sessionId:row.id}})).toBe(0);
+    const replay=await request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send({commandId,expectedRevision:state.revision,actionId:action.id}).expect(200);
+    expect(replay.body.status).toBe('REPLAYED');
+    expect(replay.body.view).toEqual(recovered.body);
+    expect(await prisma.gameCommandReceipt.findUniqueOrThrow({where:{sessionId_commandId:{sessionId:row.id,commandId}}})).toMatchObject({generationStatus:'FALLBACK_REQUIRED',generationReason:'TIMEOUT'});
+  },30000);
 
   it('does not expose integration routes without explicit local flag', async () => {
     delete process.env.AMI_DEV_PREVIEW;
