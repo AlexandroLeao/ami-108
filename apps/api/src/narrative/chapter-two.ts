@@ -2,7 +2,7 @@
 // The existing Chapter 1 state version and handoff ID are deliberately retained.
 import { CHAPTERS, OPENING_ASSETS, local, type Cue, type EventId, type Localized, type OpeningAsset } from './catalog';
 import { DOG, chooseEncounter, consultEncounter, retryEncounter, startEncounter, successVariant, type EncounterState } from './encounter';
-import { NarrativeError, type CurrentView, type NarrativeAction, type NarrativeState } from './engine';
+import { NarrativeError, type CurrentView, type Diagnostics, type NarrativeAction, type NarrativeState } from './engine';
 
 const DOG_SCENE = 'A02-S01';
 const TERMINAL = 'A02-S02';
@@ -54,6 +54,7 @@ const beats: Readonly<Record<string, Beat>> = {
 };
 export type ChapterTwoState = Readonly<{
   dog: EncounterState;
+  checkpoint: Readonly<{ stepId: string; diagnostics: Diagnostics; events: readonly EventId[] }>;
   // Only reached beats in the current attempt, including the successful continuation.
   trail: readonly string[];
 }>;
@@ -70,8 +71,9 @@ const previous = (state: NarrativeState, id: string) => action(id + '/PREVIOUS',
 
 export function beginChapterTwo(state: NarrativeState): NarrativeState {
   if (!state.diagnostics || state.diagnostics.energy !== 3 || state.diagnostics.bio !== 15) return invalid();
+  const events: readonly EventId[] = [...state.events, 'CP-DOG'];
   return { ...state, stepId: FIRST, reviewStepId: null, revision: state.revision + 1,
-    events: [...state.events, 'CP-DOG'], chapterTwo: { dog: startEncounter(DOG, state.diagnostics.energy), trail: [FIRST] } };
+    events, chapterTwo: { dog: startEncounter(DOG, state.diagnostics.energy), checkpoint: { stepId: FIRST, diagnostics: state.diagnostics, events }, trail: [FIRST] } };
 }
 function actions(state: NarrativeState, id: string): NarrativeAction[] {
   const c = get(state);
@@ -91,6 +93,11 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
   if (id === terminalId('L08')) return [next(state, id, 'INTERACT', local('Recarregar energia', 'Recharge energy')), ...back];
   return [next(state, id), ...back];
 }
+export function chapterTwoAsset(state: NarrativeState): OpeningAsset | null {
+  const id = visible(state);
+  if (id === END || id === terminalId('F01') || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
+  return id.startsWith(DOG_SCENE + '/') ? 'CENA-04' : 'CENA-05';
+}
 export function chapterTwoView(state: NarrativeState): CurrentView {
   const c = get(state);
   const id = visible(state);
@@ -98,7 +105,7 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
   const locale = state.locale;
   const chapter = id === END ? 3 : 2;
   const sceneId = id.split('/')[0];
-  let asset: OpeningAsset | null = sceneId === DOG_SCENE ? 'CENA-04' : 'CENA-05';
+  let asset = chapterTwoAsset(state);
   let phase: CurrentView['phase'] = 'NARRATIVE';
   let cue: Cue = 'none';
   let narration = false;
@@ -148,7 +155,7 @@ function move(state: NarrativeState, id: string, dog = get(state).dog, event?: E
   // After the encounter, energy is independent of the encounter's historical usage.
   if (state.events.includes('SOL-01')) diagnostics = { ...diagnostics, energy: 3 };
   return { ...state, stepId: id, reviewStepId: null, revision: state.revision + 1, diagnostics, events,
-    chapterTwo: { dog, trail: [...c.trail, id] } };
+    chapterTwo: { ...c, dog, trail: [...c.trail, id] } };
 }
 export function advanceChapterTwo(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
   const c = get(state);
@@ -163,8 +170,8 @@ export function advanceChapterTwo(state: NarrativeState, actionId: string, rando
   if (allowed.kind === 'RETRY') {
     const dog = retryEncounter(c.dog);
     if (!state.diagnostics) return invalid();
-    return { ...state, stepId: FIRST, revision: state.revision + 1, reviewStepId: null,
-      diagnostics: { ...state.diagnostics, energy: dog.energy }, chapterTwo: { dog, trail: [FIRST] } };
+    return { ...state, stepId: c.checkpoint.stepId, revision: state.revision + 1, reviewStepId: null,
+      events: c.checkpoint.events, diagnostics: c.checkpoint.diagnostics, chapterTwo: { ...c, dog, trail: [c.checkpoint.stepId] } };
   }
   if (allowed.kind === 'CONSULT') {
     const { state: dog, slot } = consultEncounter(c.dog, DOG, random);

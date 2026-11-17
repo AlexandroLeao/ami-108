@@ -2,7 +2,7 @@
 // Persistence and transactional command receipts must wrap these functions.
 import { CHAPTERS, CHAPTER_ONE, INTRO_FALLBACK, NARRATIVE_VERSION, OPENING_ASSETS, local, type Cue, type EventId, type Locale, type Localized, type OpeningAsset } from './catalog';
 
-import { beginChapterTwo, chapterTwoView, advanceChapterTwo, type ChapterTwoState } from './chapter-two';
+import { beginChapterTwo, chapterTwoView, chapterTwoAsset, advanceChapterTwo, type ChapterTwoState } from './chapter-two';
 import type { Energy } from './encounter';
 
 const HANDOFF = 'A02-S01/CHAPTER_CARD';
@@ -83,7 +83,7 @@ function visibleIndex(state: NarrativeState): number {
 }
 
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
-  if (state.chapterTwo) return chapterTwoView(state).asset?.url.split('key=')[1] as OpeningAsset | undefined ?? null;
+  if (state.chapterTwo) { chapterTwoView(state); return chapterTwoAsset(state); }
   return CHAPTER_ONE[visibleIndex(state)]?.asset ?? null;
 }
 

@@ -74,7 +74,27 @@ try {
   assert.deepEqual(await (await call('view')).json(), view);
   const resumed = await fetch(webOrigin, { headers: { Cookie: cookie } });
   assert.equal(resumed.status, 200);
-  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, stable image bytes, locale and resume.');
+  for (let i = 0; i < 90 && view.phase !== 'ENCOUNTER'; i++) {
+    await send(view.actions.find(action => action.kind === 'CONTINUE' || action.kind === 'INTERACT'));
+  }
+  assert.equal(view.phase, 'ENCOUNTER');
+  assert.equal(view.actions.filter(action => action.kind === 'CHOOSE').length, 4);
+  assert.equal((await call('asset?key=CENA-04')).status, 200);
+  assert.equal((await call('asset?key=CENA-05')).status, 404);
+  await send(view.actions.find(action => action.kind === 'CONSULT'));
+  assert.equal(view.diagnostics.energy, 2);
+  for (let i = 0; i < 4 && view.phase !== 'ENCOUNTER'; i++) await send(view.actions[0]);
+  await send(view.actions.find(action => action.id === 'DOG-01'));
+  assert.equal(view.phase, 'DEAD');
+  await send(view.actions[0]);
+  await send(view.actions.find(action => action.kind === 'RETRY'));
+  assert.equal(view.diagnostics.energy, 3);
+  for (let i = 0; i < 4; i++) await send(view.actions[0]);
+  await send(view.actions.find(action => action.id === 'DOG-04'));
+  for (let i = 0; i < 60 && view.chapter !== 3; i++) await send(view.actions[0]);
+  assert.equal(view.chapter, 3);
+  assert.deepEqual(view.diagnostics, { energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
+  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, stable image bytes, locale, resume, dog encounter and Chapter 2 boundary.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
 }

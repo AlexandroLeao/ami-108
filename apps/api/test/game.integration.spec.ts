@@ -138,6 +138,53 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(reviewed.state).toMatchObject({ stepId: 'A02-S01/CHAPTER_CARD', events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'] });
   });
 
+  it('persists dog checkpoint and slots, serializes debit/retry, and reaches Chapter 3', async () => {
+    const { cookie, view: initial } = await create();
+    let view = initial;
+    for (let i = 0; i <= CHAPTER_ONE.length; i++) view = await command(cookie, view);
+    const row = await prisma.gameSession.findUniqueOrThrow({ where: { tokenDigest: digest(cookie.split('=')[1]) } });
+    const cp = await prisma.gameCheckpoint.findUniqueOrThrow({ where: { sessionId_checkpointId: { sessionId: row.id, checkpointId: 'CP-DOG' } } });
+    expect(cp.snapshot).toMatchObject({ stepId: 'A02-S01/L01', diagnostics: { energy: 3, bio: 15 } });
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-04').set('Cookie', cookie).expect(200);
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-05').set('Cookie', cookie).expect(404);
+    for (let i = 0; i < 4; i++) view = await command(cookie, view);
+    const consult = view.actions.find(x => x.kind === 'CONSULT')!;
+    const body = { commandId: randomUUID(), expectedRevision: view.revision, actionId: consult.id };
+    const send = () => request(app.getHttpServer()).post('/game/commands').set('Cookie', cookie).send(body);
+    const responses = await Promise.all([send(), send()]);
+    expect(responses.map(x => x.status)).toEqual([200, 200]);
+    expect(responses.map(x => x.body.status).sort()).toEqual(['APPLIED', 'REPLAYED']);
+    view = responses[0].body.view;
+    expect(view.diagnostics?.energy).toBe(2);
+    const slot = await prisma.gameConsultationSlot.findUniqueOrThrow({ where: { sessionId_encounterId_slotIndex: { sessionId: row.id, encounterId: 'DOG', slotIndex: 1 } } });
+    expect(await prisma.gameConsultationSlot.count({ where: { sessionId: row.id } })).toBe(1);
+    await app.close(); await open();
+    await request(app.getHttpServer()).get('/game/view').set('Cookie', cookie).expect(200, view);
+    view = await command(cookie, view);
+    const answer = view.text;
+    for (let i = 0; i < 3 && view.phase !== 'ENCOUNTER'; i++) view = await command(cookie, view);
+    expect(view.phase).toBe('ENCOUNTER');
+    view = await command(cookie, view, 'DOG-01');
+    expect(view.phase).toBe('DEAD');
+    expect(view.diagnostics?.energy).toBe(2);
+    view = await command(cookie, view);
+    view = await command(cookie, view, view.actions.find(x => x.kind === 'RETRY')!.id);
+    expect(view.diagnostics?.energy).toBe(3);
+    for (let i = 0; i < 4; i++) view = await command(cookie, view);
+    view = await command(cookie, view, view.actions.find(x => x.kind === 'CONSULT')!.id);
+    view = await command(cookie, view);
+    expect(view.text).toBe(answer);
+    expect(view.diagnostics?.energy).toBe(2);
+    expect(await prisma.gameConsultationSlot.findUniqueOrThrow({ where: { sessionId_encounterId_slotIndex: { sessionId: row.id, encounterId: 'DOG', slotIndex: 1 } } })).toEqual(slot);
+    for (let i = 0; i < 3 && view.phase !== 'ENCOUNTER'; i++) view = await command(cookie, view);
+    view = await command(cookie, view, 'DOG-04');
+    for (let i = 0; i < 60 && view.chapter !== 3; i++) view = await command(cookie, view);
+    expect(view.chapter).toBe(3);
+    expect(view.diagnostics).toEqual({ energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false });
+    expect(await prisma.gameCheckpoint.count({ where: { sessionId: row.id } })).toBe(1);
+    expect((await prisma.gameSession.findUniqueOrThrow({ where: { id: row.id } })).state).toMatchObject({ events: expect.arrayContaining(['F1', 'SOL-01', 'MEM-D2', 'FB-D2', 'E-NAME']) });
+  }, 30000);
+
   it('does not expose integration routes without explicit local flag', async () => {
     delete process.env.AMI_DEV_PREVIEW;
     try { await request(app.getHttpServer()).post('/game/session').send({ locale: 'en' }).expect(404); }

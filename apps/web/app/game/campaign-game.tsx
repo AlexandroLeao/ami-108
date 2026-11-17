@@ -12,8 +12,8 @@ import { paginateText } from './pagination';
 type Overlay = 'none' | 'pause' | 'language' | 'extras';
 type PageState = { key: string; pages: string[]; index: number };
 const messages = {
-  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 1 concluído nesta versão. O Capítulo 2 será integrado na próxima etapa.', locked: 'Bloqueado' },
-  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 1 complete in this version. Chapter 2 will be integrated next.', locked: 'Locked' },
+  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 2 concluído nesta versão. O Capítulo 3 será integrado na próxima etapa.', locked: 'Bloqueado' },
+  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 2 complete in this version. Chapter 3 will be integrated next.', locked: 'Locked' },
 } as const;
 type Notice = 'connection' | 'stale' | 'expired';
 
@@ -78,7 +78,9 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const narrationLabel = view?.information ? (locale === 'pt-BR' ? 'INFORMAÇÃO' : 'INFORMATION')
     : view?.narration ? (locale === 'pt-BR' ? 'NARRAÇÃO' : 'NARRATION') : null;
   const robotDialogue = view?.speaker === 'AMI-108' || view?.speaker === 'Robô' || view?.speaker === 'Robot';
-  const nextAction = view?.actions.find((action) => action.kind !== 'PREVIOUS');
+  const nextAction = view?.actions.find((action) => action.kind === 'CONTINUE' || action.kind === 'INTERACT');
+  const explicitActions = view?.actions.filter((action) => action.kind === 'CONSULT' || action.kind === 'CHOOSE' || action.kind === 'RETRY') ?? [];
+  const choiceMode = explicitActions.length > 0;
   const previousAction = view?.actions.find((action) => action.kind === 'PREVIOUS');
 
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
@@ -123,7 +125,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     schedule();
     void document.fonts.ready.then(() => { if (active) schedule(); });
     return () => { active = false; observer.disconnect(); cancelAnimationFrame(raf); };
-  }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter]);
+  }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter, choiceMode]);
 
   const accept = useCallback((next: CampaignView) => {
     setView(next);
@@ -194,13 +196,13 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     void run(() => mutate(view, { actionId: nextAction.id }));
   }, [view, nextAction, overlay, chapterReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
   const previous = useCallback(() => {
-    if (!view || !chapterReady || busyRef.current || overlay !== 'none' || !pageReady) return;
+    if (!view || !chapterReady || busyRef.current || overlay !== 'none' || (!choiceMode && !pageReady)) return;
     if (pageIndex > 0) {
       setPagination((old) => ({ ...old, index: Math.max(0, old.index - 1) }));
       return;
     }
     if (previousAction) void run(() => mutate(view, { actionId: previousAction.id }));
-  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate]);
+  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate, choiceMode]);
   const closeOverlay = useCallback(() => setOverlay(overlay === 'language' && view ? 'pause' : 'none'), [overlay, view]);
   const chooseLanguage = async (value: Locale) => {
     if (busyRef.current) return;
@@ -244,7 +246,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const titleText = view ? (locale === 'pt-BR' ? 'CAPÍTULO ' : 'CHAPTER ') + view.chapter + ' — ' + view.chapterTitle.toLocaleUpperCase(locale) : '';
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis';
-  const advanceLabel = chapter ? labels.continue : labels.next;
+  const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 
   return (
     <main className="game-viewport" lang={locale}>
@@ -274,18 +276,24 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} aria-busy={busy}>
-              <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
+              {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text}>
+                {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
+                <div className="campaign-choice-list">
+                  {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" disabled={busy}
+                    onClick={() => void run(() => mutate(view, { actionId: action.id }))}>{action.label}</button>)}
+                </div>
+              </div> : <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
                 {!showChapter && (
                   <>
                     {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>{view.speaker ?? narrationLabel}</p>}
                     <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '')}>{pageText}</p>
                   </>
                 )}
-              </div>
+              </div>}
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
               <div className="dialogue-navigation">
-                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || !pageReady || (!previousAction && pageIndex === 0)}
+                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
                   aria-label={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
                 <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || (!chapter && !pageReady)}
                   aria-label={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
