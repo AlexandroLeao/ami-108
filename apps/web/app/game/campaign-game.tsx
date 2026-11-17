@@ -293,7 +293,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={view.cue === 'archive-record'} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
               {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
                 <div className="campaign-choice-list">
@@ -304,7 +304,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 {!showChapter && (
                   <>
                     {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
-                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">???</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
+                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">{view.speaker === 'HOWARD' ? (locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice') : '???'}</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
                     </p>}
                     <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '') + (memoryShiver ? ' campaign-memory-shiver' : '')}>{pageText}</p>
                   </>

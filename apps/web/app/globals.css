@@ -514,3 +514,9 @@ button:focus-visible, a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .campaign-energy[data-energy-reveal="true"] { animation: none; }
 }
+
+/* Chapter 3 archive only: retain the existing frame geometry and arrow positions. */
+.campaign-dialogue[data-archive-record="true"] { background: var(--alert); color: var(--ivory); border-color: var(--ivory); }
+.campaign-dialogue[data-archive-record="true"] .advance-control { background: var(--alert); color: var(--ivory); }
+.campaign-dialogue[data-archive-record="true"] .pixel-arrow { background: var(--ivory); }
+.campaign-dialogue[data-archive-record="true"] .advance-control:hover:not(:disabled) { background: var(--coal); }

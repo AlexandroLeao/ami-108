@@ -610,7 +610,8 @@
               "fade-in",
               "memory-shiver",
               "name-reveal",
-              "energy-reveal"
+              "energy-reveal",
+              "archive-record"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
           },

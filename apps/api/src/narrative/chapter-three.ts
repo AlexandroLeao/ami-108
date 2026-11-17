@@ -1,6 +1,6 @@
 // AMI-008: server-only Chapter 3 transitions. Existing Chapters 1–2 stay intact.
 import { CHAPTERS, OPENING_ASSETS, local, type Cue, type EventId, type Localized, type OpeningAsset } from './catalog';
-import { ARRIVAL_MEMORY, LAB_AFTER_RECORDS, LAB_ENTRY, LAB_RECORDS, LAB_RETURN, LAB_TIME, PARTNER_LABEL, RAT, RAT_ENTRY, RAT_QUESTION, RAT_REACTIONS, RAT_SUCCESS, SECOND_FRAGMENT } from './chapter-three-catalog';
+import { ARRIVAL_MEMORY, LAB_AFTER_RECORDS, LAB_APPROACH, LAB_CONNECT, LAB_ENTRY, LAB_RECORDS, LAB_RETURN, PARTNER_LABEL, RAT, RAT_ENTRY, RAT_QUESTION, RAT_REACTIONS, RAT_SUCCESS, SECOND_FRAGMENT } from './chapter-three-catalog';
 import { chooseEncounter, consultEncounter, retryEncounter, startEncounter, successVariant, type EncounterState } from './encounter';
 import { NarrativeError, type CurrentView, type Diagnostics, type NarrativeAction, type NarrativeState } from './engine';
 
@@ -22,14 +22,13 @@ export type ChapterThreeState = Readonly<{
   checkpoint?: Readonly<{ stepId: string; diagnostics: Diagnostics; events: readonly EventId[] }>;
 }>;
 
-const labOrder = [...LAB_ENTRY, ...LAB_RECORDS, LAB_TIME, ...LAB_AFTER_RECORDS, ...ARRIVAL_MEMORY, ...LAB_RETURN];
+const labOrder = [...LAB_APPROACH, ...LAB_ENTRY, ...LAB_CONNECT, ...LAB_RECORDS, ...LAB_AFTER_RECORDS, ...ARRIVAL_MEMORY, ...LAB_RETURN];
 const labSteps = labOrder.map(beat => lab(beat.id));
 const archiveOrder = SECOND_FRAGMENT.map(beat => archive(beat.id));
 // These are presentation instructions grounded in the existing scene descriptions,
 // not added character dialogue or new plot facts.
 const restore = local('AMI identifica o segundo componente em um equipamento compatível.', 'AMI identifies the second component in a compatible device.');
-const sun = local('Na área externa, você expõe AMI à luz solar.', 'Outside, you expose AMI to sunlight.');
-const route = local('O painel indica a rota para a instalação militar.', 'The panel indicates the route to the military facility.');
+const route = local('Com a rota para a instalação militar identificada, vocês sabem para onde seguir.', 'With the route to the military facility identified, you know where to go next.');
 
 function action(state: NarrativeState, id: string, kind: NarrativeAction['kind'], label: Localized): NarrativeAction {
   return { id, kind, label: label[state.locale] };
@@ -55,20 +54,19 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
   }
   if (id === lab('L05')) return [next(state, id, 'INTERACT', local('Conectar AMI', 'Connect AMI')), ...back];
   if (id === archive('RESTORE')) return [next(state, id, 'INTERACT', local('Restaurar memória', 'Restore memory')), ...back];
-  if (id === archive('SOL-02')) return [next(state, id, 'INTERACT', local('Recarregar energia', 'Recharge energy')), ...back];
   return [next(state, id), ...back];
 }
 
 export function beginChapterThree(state: NarrativeState): NarrativeState {
-  if (!state.chapterTwo || !state.diagnostics || state.diagnostics.energy !== 3 || state.diagnostics.bio !== 42 || !state.events.includes('F1') || !state.events.includes('SOL-01') || !state.events.includes('E-NAME')) return invalid();
-  return { ...state, stepId: lab('L01'), reviewStepId: null, revision: state.revision + 1,
-    chapterThree: { trail: [lab('L01')] } };
+  if (!state.chapterTwo || !state.diagnostics || state.diagnostics.energy !== 3 || state.diagnostics.bio !== 42 || !state.events.includes('F1') || !state.events.includes('E-NAME')) return invalid();
+  return { ...state, stepId: lab('PRE-01'), reviewStepId: null, revision: state.revision + 1,
+    chapterThree: { trail: [lab('PRE-01')] } };
 }
 
 export function chapterThreeAsset(state: NarrativeState): OpeningAsset | null {
   const id = visible(state);
-  if (id === CHAPTER_FOUR_CARD || /^A03-S01\/(LAB-|F0[1-9]$)/.test(id) || id === lab('MEM-D3')
-    || /^A03-S02\/[ABC]\d$/.test(id) || [rat('DEATH'), rat('DEAD-CARD'), rat('SUCCESS'), archive('SOL-02'), archive('SOL-02-L01'), archive('SOL-02-L02'), archive('ROUTE')].includes(id)) return null;
+  if (id === CHAPTER_FOUR_CARD || /^A03-S01\/(PRE-|LAB-|F0[1-9]$|EXIT-)/.test(id) || id === lab('MEM-D3')
+    || /^A03-S02\/[ABC]\d$/.test(id) || [rat('DEATH'), rat('DEAD-CARD'), rat('SUCCESS'), archive('DEPART'), archive('ROUTE')].includes(id)) return null;
   if (id.startsWith(LAB + '/')) return 'CENA-06';
   if (id.startsWith(RAT_SCENE + '/')) return 'CENA-07';
   return id === archive('RESTORE') ? 'CENA-06' : 'CENA-05';
@@ -96,8 +94,8 @@ export function chapterThreeView(state: NarrativeState): CurrentView {
     if (id === rat('DEATH')) phase = 'DEAD';
   } else if (id === rat('DEAD-CARD')) {
     phase = 'DEAD'; text = local('VOCÊ NÃO SOBREVIVEU', 'YOU DID NOT SURVIVE');
-  } else if (id === archive('RESTORE') || id === archive('SOL-02') || id === archive('ROUTE')) {
-    text = id === archive('RESTORE') ? restore : id === archive('SOL-02') ? sun : route; narration = true;
+  } else if (id === archive('RESTORE') || id === archive('ROUTE')) {
+    text = id === archive('RESTORE') ? restore : route; narration = true;
   } else {
     const key = id.split('/')[1];
     const slotBeat = id.match(/^A03-S02\/(Q|ANSWER|R)-(\d)$/);
@@ -109,13 +107,16 @@ export function chapterThreeView(state: NarrativeState): CurrentView {
       beat = (sceneId === LAB ? labOrder : sceneId === RAT_SCENE ? [...RAT_ENTRY, ...Object.values(RAT_SUCCESS).flat()] : SECOND_FRAGMENT).find(item => item.id === key) ?? invalid();
     }
     text = beat.text;
-    speaker = beat.speaker === 'PARTNER' ? PARTNER_LABEL[locale] : beat.speaker === 'RECORD' ? local('REGISTRO', 'RECORD')[locale] : beat.speaker === 'TITLE' ? null : beat.speaker;
-    if (beat.speaker === 'TITLE') narration = true;
-    if (id === lab('L01')) cue = 'fade-in';
+    speaker = beat.speaker === 'PARTNER' ? PARTNER_LABEL[locale] : beat.speaker === 'RECORD' || beat.speaker === 'NARRATION' ? null : beat.speaker;
+    if (beat.speaker === 'NARRATION') narration = true;
+    if (beat.speaker === 'RECORD') cue = 'archive-record';
+    if (id === lab('L01') || id === lab('L06a')) cue = 'fade-in';
     if (id === rat('L01')) cue = 'startle';
     if (id === lab('MEM-D3')) { cue = 'blink-black'; phase = 'FLASHBACK'; }
     if (/^A03-S01\/F0[1-9]$/.test(id)) phase = 'FLASHBACK';
-    if (id === lab('RETURN-01')) cue = 'wake';
+    if (id === lab('F09')) cue = 'name-reveal';
+    if (id === lab('RETURN-00')) cue = 'wake';
+    if (id === lab('EXIT-01')) cue = 'fade-black';
     if (id === archive('L01')) cue = 'fade-in';
   }
   return { revision: state.revision, locale, phase, chapter, chapterTitle: CHAPTERS[chapter - 1].title[locale], sceneId,
@@ -168,26 +169,26 @@ export function advanceChapterThree(state: NarrativeState, actionId: string, ran
   }
   const labIndex = labSteps.indexOf(id);
   if (labIndex >= 0) {
-    if (id === lab('RETURN-02')) {
+    if (id === lab('EXIT-03')) {
       if (!state.events.includes('E-ARCHIVE') || !state.events.includes('E-PARTNER') || diagnostics.energy !== 3 || diagnostics.bio !== 42) return invalid();
       const events: readonly EventId[] = [...state.events, 'CP-RAT'];
       const encounter = { ...startEncounter(RAT, diagnostics.energy), slots: state.savedRatSlots ?? [] };
       return move(state, rat('L01'), { events: ['CP-RAT'], encounter, checkpoint: { stepId: rat('L01'), diagnostics, events } });
     }
     const target = labSteps[labIndex + 1];
-    const events: EventId[] = target === lab('LAB-01') ? ['E-ARCHIVE'] : target === lab('MEM-D3') ? ['MEM-D3'] : target === lab('F01') ? ['FB-D3'] : target === lab('RETURN-01') ? ['E-PLANET', 'E-PARTNER'] : [];
+    const events: EventId[] = target === lab('CONNECT-01') ? ['E-ARCHIVE'] : target === lab('MEM-D3') ? ['MEM-D3'] : target === lab('F01') ? ['FB-D3'] : target === lab('RETURN-00') ? ['E-PLANET', 'E-PARTNER'] : [];
     return move(state, target, { events });
   }
-  const ratLine = id.match(/^A03-S02\/L0([1-5])$/);
-  if (ratLine) return move(state, Number(ratLine[1]) === 5 ? decision(0) : rat('L0' + (Number(ratLine[1]) + 1)));
+  if (id === rat('L01')) return move(state, rat('L02'));
+  if (id === rat('L02')) return move(state, rat('WARNING'));
+  if (id === rat('WARNING')) return move(state, decision(0));
   const branch = id.match(/^A03-S02\/([ABC])([12])$/);
   if (branch) return move(state, branch[2] === '1' ? rat(branch[1] + '2') : archive('RESTORE'));
-  if (id === archive('RESTORE')) return move(state, archive('L01'), { events: ['F2'], diagnostics: { ...diagnostics, med: 75, bio: 85, hist: 78 } });
+  if (id === archive('RESTORE')) return move(state, archive('L01'), { events: ['F2'], diagnostics: { ...diagnostics, energy: 3, med: 75, bio: 85, hist: 78 } });
   if (id === archive('L07')) return move(state, archive('ROUTE'));
-  if (id === archive('ROUTE')) return move(state, archive('SOL-02'));
-  if (id === archive('SOL-02')) return move(state, archive('SOL-02-L01'), { events: ['SOL-02'], diagnostics: { ...diagnostics, energy: 3 } });
-  if (id === archive('SOL-02-L02')) {
-    if (!state.events.includes('F2') || !state.events.includes('SOL-02')) return invalid();
+  if (id === archive('ROUTE')) return move(state, archive('DEPART'));
+  if (id === archive('DEPART')) {
+    if (!state.events.includes('F2')) return invalid();
     return move(state, CHAPTER_FOUR_CARD, { events: ['E-ESCAPE-ROUTE'] });
   }
   const index = archiveOrder.indexOf(id);

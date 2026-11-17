@@ -4,12 +4,17 @@
 import { local, type Localized } from './catalog';
 import type { EncounterDefinition } from './encounter';
 
-type Speaker = 'AMI-108' | 'DAVID' | 'PARTNER' | 'HOWARD' | 'RECORD' | 'TITLE';
+type Speaker = 'AMI-108' | 'DAVID' | 'PARTNER' | 'HOWARD' | 'RECORD' | 'NARRATION';
 type Beat = Readonly<{ id: string; speaker: Speaker; text: Localized }>;
 const beat = (id: string, speaker: Speaker, pt: string, en: string): Beat => ({
   id, speaker, text: local(pt, en),
 });
 
+export const LAB_APPROACH: readonly Beat[] = [
+  beat('PRE-01', 'NARRATION', 'Vocês deixam o terminal de manutenção e seguem adiante.', 'You leave the maintenance terminal and move on.'),
+  beat('PRE-02', 'NARRATION', 'AMI indica o caminho até o centro de pesquisa.', 'AMI directs you toward the research facility.'),
+  beat('PRE-03', 'NARRATION', 'Vocês entram com cautela e chegam ao laboratório.', 'You enter cautiously and reach the laboratory.'),
+];
 export const LAB_ENTRY: readonly Beat[] = [
   beat('L01', 'AMI-108', 'Detectei uma interface de comunicação compatível.', 'I have detected a compatible communication interface.'),
   beat('L02', 'DAVID', 'Quer que eu conecte você nisso?', 'You want me to plug you into that?'),
@@ -19,18 +24,28 @@ export const LAB_ENTRY: readonly Beat[] = [
 ];
 
 // Public records deliberately exclude all actionable biological weaknesses.
-export const LAB_RECORDS: readonly Beat[] = [
-  beat('LAB-01', 'RECORD', 'REGISTRO DE PESQUISA — Tratamento experimental contra uma doença humana. Testes em animais iniciados.', 'RESEARCH LOG — Experimental treatment for a human disease. Animal testing initiated.'),
-  beat('LAB-02', 'RECORD', 'ANOMALIAS — Crescimento anormal e aumento de agressividade. Projeto suspenso.', 'ANOMALIES — Abnormal growth and increased aggression. Project suspended.'),
-  beat('LAB-03', 'RECORD', 'FALHA DE CONTENÇÃO. Pessoal autorizado: evacuação imediata.', 'CONTAINMENT FAILURE. Authorized personnel: evacuate immediately.'),
-  beat('LAB-04', 'RECORD', 'As autoridades solicitam que os cidadãos permaneçam em suas residências. Não se aproximem de animais que apresentem comportamento agressivo ou alterações físicas. Novos ataques foram registrados.', 'Authorities are asking citizens to remain in their homes. Do not approach animals displaying aggressive behavior or physical abnormalities. Further attacks have been reported.'),
-  beat('LAB-05', 'RECORD', 'As equipes de contenção não conseguem mais garantir a segurança da população. TRANSMISSÃO INTERROMPIDA.', 'Containment teams can no longer guarantee public safety. TRANSMISSION INTERRUPTED.'),
+export const LAB_CONNECT: readonly Beat[] = [
+  beat('CONNECT-01', 'NARRATION', 'Você aguarda enquanto AMI se conecta ao sistema.', 'You wait while AMI connects to the system.'),
+  beat('CONNECT-02', 'NARRATION', 'Imagens começam a surgir na tela que forma seu rosto.', 'Images begin to appear on the screen that forms his face.'),
 ];
-export const LAB_TIME = beat('LAB-TIME', 'TITLE', '20 ANOS ATRÁS', '20 YEARS AGO');
+export const LAB_RECORDS: readonly Beat[] = [
+  beat('LAB-01', 'RECORD', 'REGISTRO DE PESQUISA — Tratamento experimental em progresso.', 'RESEARCH LOG — Experimental treatment in progress.'),
+  beat('LAB-01b', 'RECORD', 'Testes em animais iniciados.', 'Animal testing initiated.'),
+  beat('LAB-02', 'RECORD', 'ERRO CRÍTICO', 'CRITICAL ERROR'),
+  beat('LAB-02b', 'RECORD', 'Crescimento anormal, mutações e aumento de agressividade. Projeto suspenso.', 'Abnormal growth, mutations and increased aggression. Project suspended.'),
+  beat('LAB-03', 'RECORD', 'FALHA DE CONTENÇÃO. Pessoal autorizado: evacuação imediata.', 'CONTAINMENT FAILURE. Authorized personnel: evacuate immediately.'),
+  beat('LAB-04', 'RECORD', 'As autoridades solicitam que os cidadãos permaneçam em suas residências.', 'Authorities are asking citizens to remain in their homes.'),
+  beat('LAB-04b', 'RECORD', 'Não se aproximem de animais que apresentem comportamento agressivo ou alterações físicas.', 'Do not approach animals displaying aggressive behavior or physical abnormalities.'),
+  beat('LAB-04c', 'RECORD', 'Novos ataques registrados.', 'Further attacks have been reported.'),
+  beat('LAB-05', 'RECORD', 'As equipes de contenção não conseguem mais garantir a segurança da população.', 'Containment teams can no longer guarantee public safety.'),
+  beat('LAB-05b', 'RECORD', 'FUJAM!', 'RUN!'),
+  beat('LAB-05c', 'RECORD', 'TRANSMISSÃO INTERROMPIDA.', 'TRANSMISSION INTERRUPTED.'),
+];
 
 export const LAB_AFTER_RECORDS: readonly Beat[] = [
+  beat('L06a', 'DAVID', 'Puta merda...', 'Holy shit...'),
   beat('L06', 'DAVID', 'Então tudo começou aqui?', 'So it all started here?'),
-  beat('L07', 'AMI-108', 'Afirmativo. Os primeiros organismos modificados foram registrados nesta instalação.', 'Affirmative. The first modified organisms were recorded at this facility.'),
+  beat('L07', 'AMI-108', 'Afirmativo. Os primeiros organismos modificados foram registrados nesta instalação 20 anos atrás.', 'Affirmative. The first modified organisms were recorded at this facility 20 years ago.'),
   beat('L08', 'DAVID', 'E os humanos? Também acabavam se transformando nessas coisas?', 'What about humans? Did they turn into those things too?'),
   beat('L09', 'AMI-108', 'Negativo. As alterações eram transmissíveis entre outras espécies animais, mas não provocavam a mesma mutação nos humanos.', 'Negative. The changes were transmissible between other animal species, but did not cause the same mutation in humans.'),
   beat('L10', 'DAVID', 'Então eles simplesmente mataram todo mundo.', 'So they just killed everyone.'),
@@ -49,14 +64,19 @@ export const ARRIVAL_MEMORY: readonly Beat[] = [
   beat('F04', 'DAVID', 'É. Tem esse pequeno detalhe.', "Yeah. There's that little detail."),
   beat('F05', 'PARTNER', 'Precisamos encontrar alguma coisa boa, David. Não dá pra continuar vivendo desse jeito.', "We need to find something good, David. We can't keep living like this."),
   beat('F06', 'DAVID', 'Howard, Howard... O que eu sempre digo?', 'Howard, Howard... What do I always say?'),
-  beat('F07', 'HOWARD', '...', '...'),
   beat('F08', 'DAVID', 'Pensamento positivo, cara. A gente sempre consegue.', 'Stay positive, man. We always figure something out.'),
   beat('F09', 'HOWARD', 'Espero que sim.', 'I hope so.'),
 ];
-export const PARTNER_LABEL = local('Parceiro', 'Partner');
+export const PARTNER_LABEL = local('Voz familiar', 'Familiar voice');
 export const LAB_RETURN: readonly Beat[] = [
-  beat('RETURN-01', 'DAVID', 'Eu vim até aqui... com alguém. É por isso que sei lidar com esses equipamentos.', "I came here... with someone. That's why I know how to work with this equipment."),
-  beat('RETURN-02', 'AMI-108', 'Recuperar suas memórias continua sendo um progresso.', 'Recovering your memories remains a sign of progress.'),
+  beat('RETURN-00', 'DAVID', '...', '...'),
+  beat('RETURN-01', 'DAVID', 'Eu vim até aqui...', 'I came here...'),
+  beat('RETURN-01b', 'DAVID', 'com alguém.', 'with someone.'),
+  beat('RETURN-01c', 'DAVID', 'Howard...', 'Howard...'),
+  beat('RETURN-02', 'AMI-108', 'Recuperar suas memórias continua sendo um progresso, Bobo.', 'Recovering your memories remains a sign of progress, Bobo.'),
+  beat('EXIT-01', 'NARRATION', 'Ainda confuso com a lembrança, você recoloca AMI na mochila, decidido a sair dali.', 'Still confused by the memory, you put AMI back in your backpack, determined to get out of there.'),
+  beat('EXIT-02', 'NARRATION', 'A caminho do arquivo central, vocês escutam um ruído vindo do corredor.', 'On your way to the central archive, you hear a noise from the corridor.'),
+  beat('EXIT-03', 'NARRATION', 'Você observa com atenção o que se move à sua frente.', 'You look closely at what is moving ahead of you.'),
 ];
 
 // Generic encounter rules are reused without modifying DOG or the accepted engine.
@@ -74,11 +94,9 @@ export const RAT: EncounterDefinition = {
   ],
 };
 export const RAT_ENTRY: readonly Beat[] = [
-  beat('L01', 'DAVID', 'Isso era um rato?', 'Was that a rat?'),
+  beat('L01', 'DAVID', 'Caralho! Isso é um rato?!', 'Fuck! Is that a rat?!'),
   beat('L02', 'AMI-108', 'Aparentemente.', 'Apparently.'),
-  beat('L03', 'DAVID', 'Aparentemente?', 'Apparently?'),
-  beat('L04', 'AMI-108', 'Suas dimensões excedem consideravelmente os parâmetros habituais.', 'Its dimensions considerably exceed the usual parameters.'),
-  beat('L05', 'DAVID', 'É. Eu percebi.', 'Yeah. I noticed.'),
+  beat('WARNING', 'NARRATION', 'Escolha corretamente como deve passar pela criatura para sobreviver.', 'Choose the right way to get past the creature to survive.'),
 ];
 export const RAT_QUESTION = beat('Q-RAT', 'DAVID', 'Alguma ideia de como tirar essa coisa do caminho?', 'Any idea how to get that thing out of the way?');
 export const RAT_REACTIONS = [
@@ -107,8 +125,7 @@ export const SECOND_FRAGMENT: readonly Beat[] = [
   beat('L05', 'DAVID', 'E qual é a chance de ainda funcionar?', 'And what are the chances one still works?'),
   beat('L06', 'AMI-108', 'Insuficiência de dados.', 'Insufficient data.'),
   beat('L07', 'DAVID', 'Pensamento positivo, AMI.', 'Stay positive, AMI.'),
-  beat('SOL-02-L01', 'AMI-108', 'Energia de processamento restaurada.', 'Processing energy restored.'),
-  beat('SOL-02-L02', 'DAVID', 'Então vamos nessa.', "Then let's go."),
+  beat('DEPART', 'DAVID', 'Então vamos nessa.', "Then let's go."),
 ];
 
 // Canonical gate metadata only; no event is applied until engine integration.
@@ -121,7 +138,7 @@ export const CHAPTER_THREE_GATES = {
   ratEntry: { energy: 3, med: 35, bio: 42, hist: 53, personal: 5, personalUnlocked: false },
   fragment: 'F2',
   restoredMemory: { med: 75, bio: 85, hist: 78, personal: 5, personalUnlocked: false },
-  solar: 'SOL-02',
+  recharge: 'F2',
   route: 'E-ESCAPE-ROUTE',
   next: 'A04-S01/CHAPTER_CARD',
 } as const;

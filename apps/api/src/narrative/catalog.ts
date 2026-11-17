@@ -23,7 +23,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-06': local('Centro de pesquisa abandonado.', 'Abandoned research facility.'),
   'CENA-07': local('Criatura no corredor de contenção.', 'Creature in the containment corridor.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal' | 'archive-record';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME' | 'E-ARCHIVE' | 'MEM-D3' | 'FB-D3' | 'E-PLANET' | 'E-PARTNER' | 'CP-RAT' | 'F2' | 'SOL-02' | 'E-ESCAPE-ROUTE';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
