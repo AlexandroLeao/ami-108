@@ -121,7 +121,7 @@ describe('server-only Chapter 1 catalog and transition core', () => {
     const joined = next(before);
     expect(joined.events).toEqual(['E-JOIN']);
     expect(projectNarrative(joined).diagnostics).toEqual({ energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false });
-    expect(projectNarrative(next(joined)).text).toContain('Consultar AMI consome uma barra.');
+    expect(projectNarrative(next(joined)).text).toBe('Consultar AMI consome sua energia.');
   });
   it('uses one free fixed RANDOM fallback and keeps it when changing locale', () => {
     const state = reach('A01-S03/L33');

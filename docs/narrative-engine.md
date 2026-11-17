@@ -35,3 +35,7 @@
 4. Continue AMI-005/006: dog encounter, CP-DOG, choices, slots/energy, F1, SOL-01, E-NAME and persistence. Then real AI/RAG and remaining chapters per the production plan.
 
 Main now includes the accepted playable local Chapter 1. Final branch [CI 43934104792](https://github.com/AlexandroLeao/ami-108/actions/runs/43934104792) passed 42 tests (24 API, 17 web, 1 Python), lint, type checks, migrations, builds and built HTTP smoke; [post-merge CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passed. Do not enable the local development flag in production or expose a public catalog route. No paid services or new dependencies are required. Private master/script revisions were synchronized on November 17; the asset ZIP v1.9 remains unchanged.
+
+## November 17 owner presentation amendment (draft PR #22)
+
+78 Chapter 1 beats (three extra information beats), revised E-JOIN wording, four information cards and no other Chapter 1 dialogue edits. Existing IDs and narrative version retained so prior saves resume. Chapter 2 has three additional dark approach beats, one-shot startle cue and two warning narration beats. No back action at active decisions. See [encounter engine](encounter-engine.md) for persistent chapter replay and [UI design](ui-design.md) for approved-requested presentation changes. The private sources remain v1.11/v1.9 until owner acceptance and separate synchronization.

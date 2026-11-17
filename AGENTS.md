@@ -27,3 +27,5 @@
 - Prefer simple modular solutions and pinned dependencies with lockfiles. No paid mandatory services, no cloud resource creation or billing changes without approval. Verify quota and eligibility before deployment.
 - Use environment variables for secrets; .env.example contains placeholders only. Do not commit credentials, local artifacts, or personal/private files.
 - Update technical docs and ADRs as decisions are made; preserve narrative sources and originals. Do not mark unimplemented capabilities as complete.
+
+- November 17 owner refinement in PR #22: concise E-JOIN narration and four red information cards, three dark dog approach beats and a single loaded-art startle cue, two warning beats, no PREVIOUS at active decisions, dark consequences/branches, pixel skull death card and persistent chapter selection under Continue. Preserve unlocked high-water mark and immutable consultation slots on explicit chapter restart; no new story events, assets or mechanics beyond this authorized presentation/replay amendment. See docs/encounter-engine.md and docs/ui-design.md. Private cumulative source update follows owner acceptance.

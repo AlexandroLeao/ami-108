@@ -141,10 +141,17 @@ function projectCurrent(state: NarrativeState): CurrentView {
   };
 }
 
+function retainedSlots(state: NarrativeState): readonly Slot[] {
+  const cached = state.savedDogSlots ?? [];
+  const current = state.chapterTwo?.dog.slots ?? [];
+  // All slots are immutable and allocated sequentially. A restored earlier
+  // chapter snapshot can have a shorter prefix than the run-wide cache.
+  return current.length > cached.length ? current : cached;
+}
 function rememberProgress(state: NarrativeState): NarrativeState {
   const archive = state.stepId === 'A03-S01/CHAPTER_CARD' && state.chapterTwo && state.diagnostics
     ? { chapterTwo: state.chapterTwo, diagnostics: state.diagnostics, events: state.events } : state.chapterThreeStart;
-  return { ...state, unlockedChapter: unlocked(state), savedDogSlots: state.chapterTwo?.dog.slots ?? state.savedDogSlots ?? [], ...(archive ? { chapterThreeStart: archive } : {}) };
+  return { ...state, unlockedChapter: unlocked(state), savedDogSlots: retainedSlots(state), ...(archive ? { chapterThreeStart: archive } : {}) };
 }
 function restartChapter(state: NarrativeState, chapter: number): NarrativeState {
   if (chapter < 1 || chapter > unlocked(state)) throw new NarrativeError('ACTION_NOT_ALLOWED');
@@ -157,7 +164,7 @@ function restartChapter(state: NarrativeState, chapter: number): NarrativeState 
     events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: state.intro ?? { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
   const snapshot = remembered.chapterThreeStart;
   if (!snapshot) throw new NarrativeError('ACTION_NOT_ALLOWED');
-  return { ...common, ...snapshot, stepId: 'A03-S01/CHAPTER_CARD' };
+  return { ...common, ...snapshot, chapterTwo: { ...snapshot.chapterTwo, dog: { ...snapshot.chapterTwo.dog, slots: retainedSlots(remembered) } }, stepId: 'A03-S01/CHAPTER_CARD' };
 }
 export function advanceNarrative(state: NarrativeState, actionId: string, expectedRevision: number, random: () => number = Math.random): NarrativeState {
   checkRevision(state, expectedRevision);

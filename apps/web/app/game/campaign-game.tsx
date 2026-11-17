@@ -134,7 +134,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     setHasSave(true);
     setLocale(next.locale);
   }, []);
-  const run = useCallback(async (operation: () => Promise<void>) => {
+  const run = useCallback(async (operation: () => Promise<unknown>) => {
     if (busyRef.current) return false;
     busyRef.current = true;
     setBusy(true);

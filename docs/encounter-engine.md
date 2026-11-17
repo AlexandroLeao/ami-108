@@ -16,3 +16,11 @@ November 17, 2026 · Day 2. Draft PR #22 connects the local campaign through Cha
 ## Remaining boundaries
 
 Real provider reservation/finalization, bounded retries and RAG remain AMI-007. Later rat/boar checkpoints, F2/F3, SOL-02, later memories and complete campaign are not implemented. No new artwork, inventory, paid service or production deployment.
+
+## Owner playtest refinement — November 17
+
+- Chapter 1 E-JOIN narration shortened and information divided into four localized beats (78 Chapter 1 steps including its card; original IDs preserved). Information uses red/coal and ivory arrows only.
+- Chapter 2 begins with three dark second-person narration beats toward the maintenance terminal, noises among vehicles and closer observation. Reveal CENA-04 with a single 520ms impact cue after load; no repeated motion. Revised punctuation and two illustrated warning narration beats precede decisions.
+- Active decisions expose no PREVIOUS action. Consultation and outcome boundaries cannot be crossed backwards. Four choices retain order and outcome; consequences address the player and refer to the creature. Death card uses “VOCÊ NÃO SOBREVIVEU” / “YOU DID NOT SURVIVE” and an inline pixel skull on coal; successful consequence and A/B/C dialogue remain dark until terminal art.
+- Continue opens a submenu with exact resume or Chapters. The server projects only reached chapter titles, authorizes CHAPTER/RESTART/N under the normal revision/receipt lock and preserves the highest unlocked chapter, run-wide INTRO and immutable resolved slots. Chapter 1 resets its start state; Chapter 2 restores the canonical entry state (initial diagnostics and prior Chapter 1 events); Chapter 3 restores the reached chapter-start snapshot, presently a development boundary. Restart changes current resume position only after confirmation; no separate simultaneous save slots. Existing session cookies/rows remain compatible; previous candidate checkpoint L01 is retained. New Game remains a distinct run.
+- The normalized CP-DOG row is reused on chapter replay, and resolved slot rows are never duplicated or rerolled. A chapter replay may restore energy but consumes one bar for each reused consultation. No provider calls or new DB schema.

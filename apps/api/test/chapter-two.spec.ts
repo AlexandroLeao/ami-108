@@ -59,11 +59,21 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     state = consult(state, rng);
     expect(rng).not.toHaveBeenCalled();
     expect(state.chapterTwo?.dog.slots[0]).toEqual(slot);
+    state = consult(state, () => 0);
+    const second = state.chapterTwo!.dog.slots[1];
     state = choose(state, 'CHAPTER/RESTART/3');
+    expect(state.chapterTwo?.dog.slots[1]).toEqual(second);
     expect(state.stepId).toBe('A03-S01/CHAPTER_CARD');
     expect(state.diagnostics?.bio).toBe(42);
     expect(state.diagnostics?.energy).toBe(3);
     expect(() => choose(state, 'CHAPTER/RESTART/4')).toThrow('ACTION_NOT_ALLOWED');
+    state = choose(state, 'CHAPTER/RESTART/2');
+    for (let i = 0; i < 15 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
+    const noReroll = jest.fn(() => 0.99);
+    state = consult(state, noReroll);
+    state = consult(state, noReroll);
+    expect(noReroll).not.toHaveBeenCalled();
+    expect(state.chapterTwo?.dog.slots[1]).toEqual(second);
   });
   it.each(['pt-BR','en'] as const)('preserves handoff and four ordered choices in %s', locale => {
     const state = reachDog(locale);
