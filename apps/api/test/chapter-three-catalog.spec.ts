@@ -16,7 +16,7 @@ describe('Chapter 3 source catalog — not yet integrated', () => {
       expect(beat.text['pt-BR'].length).toBeLessThanOrEqual(56);
       expect(beat.text.en.length).toBeLessThanOrEqual(56);
     }
-    expect(SECOND_FRAGMENT.at(-1)?.text).toEqual({ 'pt-BR': 'Ok, AMI, vamos nessa.', en: "OK, AMI, let's go." });
+    expect(SECOND_FRAGMENT.at(-1)?.text).toEqual({ 'pt-BR': 'Ok AMI, vamos nessa.', en: "OK, AMI, let's go." });
     expect(LAB_RETURN.map(beat => beat.id)).toEqual(['RETURN-00','RETURN-01','RETURN-01b','RETURN-01c','RETURN-02','EXIT-01','EXIT-01b','EXIT-02','EXIT-03']);
     const all = [...LAB_ENTRY, ...LAB_RECORDS, ...LAB_AFTER_RECORDS,
       ...ARRIVAL_MEMORY, ...LAB_RETURN, ...RAT_ENTRY, RAT_QUESTION, ...RAT_REACTIONS,

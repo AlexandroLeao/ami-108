@@ -130,7 +130,7 @@ export const SECOND_FRAGMENT: readonly Beat[] = [
   beat('L05', 'DAVID', 'E qual é a chance de ainda funcionar?', 'And what are the chances one still works?'),
   beat('L06', 'AMI-108', 'Insuficiência de dados.', 'Insufficient data.'),
   beat('L07', 'DAVID', 'Pensamento positivo, AMI.', 'Stay positive, AMI.'),
-  beat('DEPART', 'DAVID', 'Ok, AMI, vamos nessa.', "OK, AMI, let's go."),
+  beat('DEPART', 'DAVID', 'Ok AMI, vamos nessa.', "OK, AMI, let's go."),
 ];
 
 // Canonical gate metadata only; no event is applied until engine integration.

@@ -129,7 +129,7 @@ describe('Chapter 3 integrated progression', () => {
     s=reach(s,x=>x.stepId==='A03-S03/ROUTE');
     const old={...s,stepId:'A03-S03/SOL-02',diagnostics:{...s.diagnostics!,energy:2 as const},
       chapterThree:{...s.chapterThree!,trail:[...s.chapterThree!.trail,'A03-S03/SOL-02']}};
-    expect(projectNarrative(old)).toMatchObject({text:'Ok, AMI, vamos nessa.',diagnostics:{energy:3}});
+    expect(projectNarrative(old)).toMatchObject({text:'Ok AMI, vamos nessa.',diagnostics:{energy:3}});
     const resumed=step(old);
     expect(resumed.stepId).toBe('A04-S01/CHAPTER_CARD');
     expect(resumed.savedRatSlots).toEqual(s.savedRatSlots);
