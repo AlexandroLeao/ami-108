@@ -3,7 +3,7 @@
   "info": {
     "title": "AMI-108 Game API",
     "version": "0.1.0-proposed",
-    "description": "Local Chapters 1–2 merged; Chapter 2 encounter/checkpoint and restoration accepted in PR #22. Later campaign, pending inference, rate limits and deployment remain proposals. Session ownership and state are server-authoritative; responses never disclose future narrative or solution data."
+    "description": "Owner-approved local bilingual Chapters 1–3 merged in PR #25 at 985cb60; Chapter 4 card is current boundary. Authoritative game endpoints, DOG/RAT checkpoints/cache and F1/F2 restoration-linked recharge implemented. Real inference/pending generation, later chapters, production rate limits and deployment remain proposals on main. Responses never expose future narrative or solution data."
   },
   "servers": [
     {

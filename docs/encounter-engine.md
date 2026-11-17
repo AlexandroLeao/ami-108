@@ -1,5 +1,14 @@
 # Encounter engine — AMI-005 / AMI-006
 
+## Current encounter rules
+
+DOG and RAT each have four deterministic choices, three lethal and one safe, checkpoint retry, three immutable cached slots and one energy debit per consult. CORRECT probabilities 15%/42%/100% (boar planned); zero energy allows choices. F1 (35/42/53/5 locked) and F2 (75/85/78/5 locked) restore three bars atomically; future F3 restores memory/energy and unlocks PERSONAL. No solar actions. Dog and rat appear immediately upon load with 650ms decaying shake. Preserve approved outcomes, dialogue and geometry. CP-RAT/F2 implemented; CP-BOAR/F3 and real provider integration pending.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+
+---
+
+
 November 17, 2026 · Day 2. PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
 
 Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.

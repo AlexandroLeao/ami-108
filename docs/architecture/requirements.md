@@ -1,5 +1,14 @@
 # Game requirements and traceability
 
+## Current traceability
+
+FR-10 updated to restoration-linked energy. Chapters 1–3 passed automated transition and persistence checks plus owner playtests; full campaign, real inference, independent accessibility/security and deployment release gates open.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 **AMI-002 · specification, not implementation evidence**  
 Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7 (November 15). Current private sources: v1.12 and v1.10 (November 17 cumulative addenda); narrative sections 1–11 and visual annexes remain unchanged except the approved opening presentation. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
 
@@ -16,7 +25,7 @@ Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1
 | FR-07 | Consult only during active encounters; debit one bar, up to three per attempt. Zero energy does not block choosing. | Q-DOG, Q-RAT, Q-BOAR | Bounds, blocked consultation, zero-energy success |
 | FR-08 | Determine CORRECT/RANDOM in NestJS; initial probabilities 15%, 42%, 100%. Persist category and result per encounter slot; no rerolls on retry or locale change. | BIO-02, F1, F3; Q-* | Seeded RNG boundary tests, cache and locale tests |
 | FR-09 | After lethal choice, display specific consequence and death screen. Restore the checkpoint only on explicit return; preserve slot results and audit history outside rollback. | CP-* | All nine lethal choices; restored state and no extra inference |
-| FR-10 | Mandatory F1, F2, F3 restore the approved percentages; PERSONAL remains locked until atomic F3. Solar recharge events SOL-01/SOL-02 separately restore three bars outside encounters. | F1/F2/F3; SOL-01/02 | Event order, duplicate handling and atomic unlock |
+| FR-10 | Mandatory F1, F2, F3 atomically restore approved percentages and three energy bars; PERSONAL remains locked until atomic F3. | F1/F2/F3 | Event order, duplicate handling and atomic unlock |
 | FR-11 | Use deterministic authored flashbacks, including four headache/black transitions for David; no new images, sound, mechanics or inference. | MEM-D1–D4; FB-D1–D5 (D4/D5 continuous) | Transition and side-effect assertions |
 | FR-12 | Reveal records and identities only at the specified milestones; restrict the current player projection and asset authorization. | E-NAME, E-ARCHIVE, E-PLANET, E-PARTNER, E-F3, E-FAMILY, E-BETRAYAL | Inspect API/client payloads, invalid asset requests |
 | FR-13 | INTRO-RANDOM is fixed RANDOM, optional generation, no energy cost, cached once. Fixed authored reactions remain unchanged. | A01-S03/L33; INTRO-RANDOM | No debit, no reroll, localized fallback |
