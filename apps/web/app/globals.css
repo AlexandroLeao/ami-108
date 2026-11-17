@@ -374,35 +374,25 @@ button:focus-visible, a:focus-visible {
 .campaign-dialogue[data-information="true"] .advance-control:hover:not(:disabled) { background: var(--coal); }
 .campaign-dialogue[data-information="true"] .advance-control:focus-visible { outline-color: var(--coal); }
 
-/* Cinematic dog reveal: fade a coal veil and briefly shake the containing
-   visual layer, never transform, scale or filter the original PNG itself.
-   The loaded image remains mounted by asset URL across the next dialogue.
-   No fill on the shake: the layer returns to its original rendering state. */
+/* Creature startle: show the loaded original image immediately, with only
+   a brief shake of the containing visual layer. The image stays mounted
+   across the next dialogue; no veil, fade, delay or persistent transform. */
 .campaign-scene[data-cue="startle"] .scene-visual:has(.scene-art[data-startle="true"]) {
-  animation: campaign-startle 1450ms ease-out;
-}
-.campaign-scene[data-cue="startle"] .scene-visual:has(.scene-art[data-startle="true"])::after {
-  content: ''; position: absolute; inset: 0; background: var(--coal); pointer-events: none;
-  animation: campaign-startle-veil 1450ms ease-out both;
-}
-@keyframes campaign-startle-veil {
-  0%, 30% { opacity: 1; }
-  55% { opacity: .55; }
-  84%, 100% { opacity: 0; visibility: hidden; }
+  animation: campaign-startle 650ms ease-out;
 }
 @keyframes campaign-startle {
-  0%, 45% { transform: none; }
-  56% { transform: translate(-14px, 4px); }
-  64% { transform: translate(12px, -3px); }
-  72% { transform: translate(-8px, 2px); }
-  80% { transform: translate(5px, -1px); }
-  88%, 100% { transform: none; }
+  0% { transform: none; }
+  12% { transform: translate(-14px, 4px); }
+  25% { transform: translate(12px, -3px); }
+  38% { transform: translate(-8px, 2px); }
+  51% { transform: translate(5px, -1px); }
+  66% { transform: translate(-3px, 1px); }
+  82%, 100% { transform: none; }
 }
 .campaign-skull { color: var(--alert); width: min(32%, 144px); height: auto; z-index: 1; animation: campaign-skull-reveal 420ms ease-out both; }
 @keyframes campaign-skull-reveal { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .campaign-scene[data-cue="startle"] .scene-visual:has(.scene-art[data-startle="true"]), .campaign-skull { animation: none; }
-  .campaign-scene[data-cue="startle"] .scene-visual::after { display: none; }
 }
 
 /* Decision-only frame, with a full-width consult and a compact 2x2 choice grid.
