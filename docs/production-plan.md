@@ -3,8 +3,8 @@
 **Project:** AMI-108  
 **Planning baseline:** November 15, 2026  
 **Production target:** November 16–22, 2026 (seven calendar days).  
-**Canonical sources:** Documento Mestre v1.10 and Roteiro Interativo v1.8, retained privately.  
-**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 and AMI-003 completed on November 16 (PRs #17 and #18 merged; owner accepted desktop/mobile preview). AMI-004 started on Day 1 ahead of the original Day 2 target; PR #19 merged the pure narrative core at `5fa75b6`. PR #20 merged the owner-approved local Chapter 1 campaign (75 presentation beats) and prerequisite AMI-006 session persistence at `3cf942a`; post-merge CI passed. Formal AMI-004 issue closure remains pending. No full campaign or real inference yet.
+**Canonical sources:** Documento Mestre v1.11 and Roteiro Interativo v1.9, retained privately.  
+**Status:** AMI-001 completed ahead of schedule on November 15: PR #16 merged, final CI passed, four Compose services healthy and preview validated. AMI-002 and AMI-003 completed on November 16 (PRs #17 and #18 merged; owner accepted desktop/mobile preview). AMI-004 started on Day 1 ahead of the original Day 2 target; PR #19 merged the pure narrative core at `5fa75b6`. PR #20 merged the owner-approved local Chapter 1 campaign (75 presentation beats) and prerequisite AMI-006 session persistence at `3cf942a`; post-merge CI passed. AMI-004 issue #6 closed on November 17. No full campaign or real inference yet.
 
 The target is ambitious, not a guaranteed release date. Preserve all approved requirements; record blockers and revise the schedule rather than silently reducing scope. Work is performed in active development sessions, not autonomously between them.
 
@@ -18,7 +18,7 @@ The target is ambitious, not a guaranteed release date. Preserve all approved re
 | 6 | Nov 21 | AMI-011, 012: deployment and technical documentation | Reproducible deployment where free conditions are verified; evidence and documentation |
 | 7 | Nov 22 | AMI-013: release validation | Owner approves v1.0.0 only after mandatory release gates pass |
 
-Day 1 acceptance: #2, #4 and #5 closed. Chapter 1 integration and owner playtest accepted; PR #20 merged at `3cf942a` with [post-merge CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passing. AMI-004 issue #6 is still open for formal closure; AMI-006 issue #8 remains open for checkpoints, consultation slots, restoration and solar events. Next implementation: AMI-005 and remaining AMI-006 work for Chapter 2. The Day 2–7 targets and release gates are unchanged. See [narrative core](narrative-engine.md).
+Day 1 acceptance: #2, #4 and #5 closed. Chapter 1 integration and owner playtest accepted; PR #20 merged at `3cf942a` with [post-merge CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passing. AMI-004 issue #6 is closed after owner acceptance; AMI-006 issue #8 remains open for checkpoints, consultation slots, restoration and solar events. Next implementation: AMI-005 and remaining AMI-006 work for Chapter 2. The Day 2–7 targets and release gates are unchanged. See [narrative core](narrative-engine.md).
 
 Tests, security, documentation and deployment preparation start early. Evaluate provider access and costs on day 1; use authored fallback for development, not as a substitute for demonstrating real AI.
 

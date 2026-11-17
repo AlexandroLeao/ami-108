@@ -19,7 +19,7 @@ Keep the approved visual shell, same 16:9 art and chapter/scene geometry. The ro
 
 ## Opening sequence
 
-The owner approved a presentation-only revision of A01-S01/L01: add an initial silent ellipsis, then split the initial sentence into two dialogue beats without renumbering subsequent canonical dialogue IDs. Preserve the remaining lines verbatim. The approved UI presentation is synchronized in the November 16 addenda of private Documento Mestre v1.10 and Roteiro Interativo v1.8.
+The owner approved a presentation-only revision of A01-S01/L01: add an initial silent ellipsis, then split the initial sentence into two dialogue beats without renumbering subsequent canonical dialogue IDs. Preserve the remaining lines verbatim. The approved UI presentation is synchronized in the November 16 addenda of private Documento Mestre v1.11 and Roteiro Interativo v1.9.
 
 | Beat | PT-BR | EN | Visual |
 | --- | --- | --- | --- |
@@ -58,4 +58,4 @@ Replace the in-art diagnostics overlay with a compact status strip centered betw
 
 ## Acceptance and source synchronization
 
-PR #20 merged at `3cf942a` after the owner's local playtest and final refinement approval. Post-merge CI passed. The final header and arrow rules above are authoritative for the implemented Chapter 1 presentation; the isolated preview remains unchanged. These technical records do not revise the private Documento Mestre v1.10, Roteiro Interativo v1.8 or asset ZIP. Full browser E2E, independent viewport/zoom checks and accessibility review remain AMI-010.
+PR #20 merged at `3cf942a` after the owner's local playtest and final refinement approval. Post-merge CI passed. The final header and arrow rules above are authoritative for the implemented Chapter 1 presentation; the isolated preview remains unchanged. The private cumulative source revisions v1.11/v1.9 were synchronized on November 17; the asset ZIP remains unchanged. Full browser E2E, independent viewport/zoom checks and accessibility review remain AMI-010.
