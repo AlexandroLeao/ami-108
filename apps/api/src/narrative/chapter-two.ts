@@ -38,11 +38,12 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S01/C2": { speaker: 'AMI', text: local("Logo adiante. Recuperar meus arquivos continua sendo uma prioridade.", "Just ahead. Recovering my files remains a priority.") },
   "A02-S02/ARRIVAL-01": { speaker: 'NARRATION', text: local("Vocês chegam ao terminal de manutenção indicado por AMI.", "You reach the maintenance terminal AMI directed you to.") },
   "A02-S02/ARRIVAL-02": { speaker: 'NARRATION', text: local("Você retira AMI da mochila e o posiciona junto ao painel.", "You take AMI out of your backpack and position him beside the panel.") },
-  "A02-S02/ARRIVAL-03": { speaker: 'NARRATION', text: local("Ele precisa encontrar um componente capaz de restaurar seus arquivos de memória.", "He needs to find a component capable of restoring his memory files.") },
+  "A02-S02/ARRIVAL-03": { speaker: 'NARRATION', text: local("Você observa AMI se conectar ao painel, emitindo breves sons eletrônicos enquanto busca um componente.", "You watch AMI connect to the panel, emitting brief electronic sounds as he searches for a component.") },
+  "A02-S02/FOUND": { speaker: 'AMI', text: local("Componente localizado.", "Component located.") },
   "A02-S02/L01": { speaker: 'AMI', text: local("Identifiquei um componente compatível com meu sistema de armazenamento.", "I have identified a component compatible with my storage system.") },
   "A02-S02/L02": { speaker: 'UNKNOWN', text: local("Finalmente. Vamos ver se isso funciona.", "Finally. Let's see if this works.") },
   "A02-S02/L03": { speaker: 'AMI', text: local("Restauração concluída. A integridade dos meus arquivos aumentou significativamente.", "Restoration complete. The integrity of my files has increased significantly.") },
-  "A02-S02/L04": { speaker: 'UNKNOWN', text: local("Então você vai parar de me ensinar a fazer bolo?", "So you'll stop teaching me how to bake a cake?") },
+  "A02-S02/L04": { speaker: 'UNKNOWN', text: local("Então vai parar de falar coisas aleatórias?", "So you'll stop saying random things?") },
   "A02-S02/L05": { speaker: 'AMI', text: local("Não posso garantir.", "I cannot guarantee that.") },
   "A02-S02/L06": { speaker: 'AMI', text: local("Recuperei o mapa desta região. Existe um centro de pesquisa nas proximidades.", "I have recovered a map of this area. There is a research facility nearby.") },
   "A02-S02/L07": { speaker: 'UNKNOWN', text: local("Pode ter mais peças pra você lá?", "Think there might be more parts for you there?") },
@@ -56,7 +57,8 @@ const beats: Readonly<Record<string, Beat>> = {
   "A02-S02/MEM-D2-PAIN": { speaker: 'UNKNOWN', text: local("Ai!", "Ow!") },
   "A02-S02/MEM-D2": { speaker: 'UNKNOWN', text: local("Minha cabeça de novo!", "My head again!") },
   "A02-S02/MEM-D2-SILENCE": { speaker: 'NONE', text: local("...", "...") },
-  "A02-S02/F01": { speaker: 'VOICE', text: local("Sinto muito... David...", "I'm sorry... David...") },
+  "A02-S02/F01": { speaker: 'VOICE', text: local("Sinto muito...", "I'm sorry...") },
+  "A02-S02/F01b": { speaker: 'VOICE', text: local("David...", "David...") },
   "A02-S02/MEM-D2-CALL": { speaker: 'AMI', text: local("Bobo? Está tudo bem?", "Bobo? Are you all right?") },
   "A02-S02/L15": { speaker: 'AMI', text: local("Você está apresentando sinais de desconforto.", "You are exhibiting signs of discomfort.") },
   "A02-S02/L16": { speaker: 'UNKNOWN', text: local("David...", "David...") },
@@ -111,7 +113,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
 }
 export function chapterTwoAsset(state: NarrativeState): OpeningAsset | null {
   const id = visible(state);
-  if (id === END || ['ARRIVAL-01', 'ARRIVAL-02', 'ARRIVAL-03', 'MEM-D2-PAIN', 'MEM-D2', 'MEM-D2-SILENCE', 'F01', 'MEM-D2-CALL'].some(step => id === terminalId(step)) || darkIntro.includes(id) || /^A02-S01\/[ABC]\d$/.test(id) || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
+  if (id === END || ['ARRIVAL-01', 'ARRIVAL-02', 'ARRIVAL-03', 'MEM-D2-PAIN', 'MEM-D2', 'MEM-D2-SILENCE', 'F01', 'F01b', 'MEM-D2-CALL'].some(step => id === terminalId(step)) || darkIntro.includes(id) || /^A02-S01\/[ABC]\d$/.test(id) || [dogId('DEATH'), dogId('DEAD-CARD'), dogId('SUCCESS')].includes(id)) return null;
   return id.startsWith(DOG_SCENE + '/') ? 'CENA-04' : 'CENA-05';
 }
 export function chapterTwoView(state: NarrativeState): CurrentView {
@@ -151,9 +153,11 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
     narration = beat.speaker === 'NARRATION';
     speaker = narration || beat.speaker === 'NONE' ? null : beat.speaker === 'AMI' ? 'AMI-108' : beat.speaker === 'VOICE' ? local('Voz familiar', 'Familiar voice')[locale] : named ? 'DAVID' : '???';
     if (id === FIRST) cue = 'startle';
+    if (id === terminalId('FOUND')) cue = 'fade-in';
     if (id === terminalId('L04') && !c.dog.recipeSeen) text = local('Então você vai parar de me falar de bananas?', "So you'll stop talking to me about bananas?");
     if (id === terminalId('MEM-D2-PAIN')) cue = 'blink-black';
-    if (id === terminalId('MEM-D2') || id === terminalId('MEM-D2-SILENCE') || id === terminalId('F01') || id === terminalId('MEM-D2-CALL')) phase = 'FLASHBACK';
+    if (id === terminalId('MEM-D2')) cue = 'pain';
+    if (id === terminalId('MEM-D2') || id === terminalId('MEM-D2-SILENCE') || id === terminalId('F01') || id === terminalId('F01b') || id === terminalId('MEM-D2-CALL')) phase = 'FLASHBACK';
     if (id === terminalId('L15')) cue = 'wake';
   }
   return { revision: state.revision, locale, phase, chapter, chapterTitle: CHAPTERS[chapter - 1].title[locale], sceneId,
@@ -220,11 +224,13 @@ export function advanceChapterTwo(state: NarrativeState, actionId: string, rando
   }
   if (id === terminalId('ARRIVAL-01')) return move(state, terminalId('ARRIVAL-02'));
   if (id === terminalId('ARRIVAL-02')) return move(state, terminalId('ARRIVAL-03'));
-  if (id === terminalId('ARRIVAL-03')) return move(state, terminalId('L01'));
+  if (id === terminalId('ARRIVAL-03')) return move(state, terminalId('FOUND'));
+  if (id === terminalId('FOUND')) return move(state, terminalId('L01'));
   if (id === terminalId('MEM-D2-PAIN')) return move(state, terminalId('MEM-D2'));
   if (id === terminalId('MEM-D2')) return move(state, terminalId('MEM-D2-SILENCE'));
   if (id === terminalId('MEM-D2-SILENCE')) return move(state, terminalId('F01'), c.dog, 'FB-D2');
-  if (id === terminalId('F01')) return move(state, terminalId('MEM-D2-CALL'));
+  if (id === terminalId('F01')) return move(state, terminalId('F01b'));
+  if (id === terminalId('F01b')) return move(state, terminalId('MEM-D2-CALL'));
   if (id === terminalId('MEM-D2-CALL')) return move(state, terminalId('L15'));
   if (id === terminalId('L18')) return move(state, terminalId('L18b'));
   if (id === terminalId('L18b')) return move(state, terminalId('L18c'), c.dog, 'E-NAME');

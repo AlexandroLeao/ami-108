@@ -293,35 +293,25 @@ button:focus-visible, a:focus-visible {
   min-width: 0; width: 100%; height: 44px; display: grid;
   align-items: center; justify-items: center; container-type: inline-size;
 }
-.campaign-diagnostics { width: 100%; max-width: 440px; min-width: 0; }
-.campaign-diagnostics-content {
-  display: grid; grid-template-columns: max-content minmax(0, 1fr);
-  align-items: center; gap: 8px; font-size: 16px; line-height: 1;
-}
-.campaign-energy, .campaign-bars { display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
-.campaign-bars > span { width: 12px; height: 8px; border: 1px solid var(--ivory); }
+/* Energy is the only visible diagnostic. Memory values stay server-side. */
+.campaign-diagnostics { width: 100%; min-width: 0; }
+.campaign-energy, .campaign-bars { display: flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; }
+.campaign-energy { font-size: clamp(18px, 2.8vw, 26px); line-height: 1; }
+.campaign-bars { gap: 4px; }
+.campaign-bars > span { width: 21px; height: 13px; border: 2px solid var(--ivory); }
 .campaign-bars > span[data-filled="true"] { background: var(--ivory); }
-.campaign-memory {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px 7px; align-items: center; justify-items: center; white-space: nowrap;
+@container (max-width: 155px) {
+  .campaign-energy { font-size: 18px; gap: 4px; }
+  .campaign-bars { gap: 3px; }
+  .campaign-bars > span { width: 14px; height: 10px; border-width: 1px; }
 }
-.campaign-personal { display: inline-flex; align-items: center; gap: 2px; }
-.campaign-lock-icon { width: .58em; height: .7em; flex: none; }
-@container (max-width: 325px) {
-  .campaign-diagnostics-content { grid-template-columns: minmax(0, 1fr); gap: 2px; font-size: 13px; }
-  .campaign-memory { gap: 1px 4px; }
-  .campaign-bars > span { width: 9px; height: 7px; }
-}
-@container (max-width: 150px) {
-  .campaign-diagnostics-content { font-size: 11px; }
-  .campaign-memory { gap: 1px 2px; }
-  .campaign-bars > span { width: 8px; height: 6px; }
-}
-/* Very narrow or zoomed viewports may scroll within the status strip rather
-   than overlap the menu or change the scene height. */
 @container (max-width: 112px) {
-  .campaign-diagnostics { overflow-x: auto; }
-  .campaign-diagnostics-content { min-width: 112px; }
+  .campaign-energy { flex-direction: column; font-size: 16px; gap: 3px; }
+  .campaign-bars > span { width: 12px; height: 8px; }
+}
+@media (min-width: 480px) {
+  .campaign-header .stage-header { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); }
+  .campaign-header .campaign-menu-control { justify-self: end; }
 }
 .campaign-dialogue .dialogue-copy { overflow: hidden; max-height: 100%; }
 .campaign-measure { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; animation: none !important; }
@@ -444,4 +434,11 @@ button:focus-visible, a:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .campaign-scene[data-cue="blink-black"] .scene-visual { visibility: hidden; }
+}
+
+/* Terminal arrival only: a quiet one-shot reveal after the image loads. */
+.scene-art[data-fade-in="true"] { animation: campaign-terminal-reveal 700ms ease-out both; }
+@keyframes campaign-terminal-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .scene-art[data-fade-in="true"] { animation: none; }
 }

@@ -606,7 +606,8 @@
               "fade-black",
               "close-eyes",
               "startle",
-              "blink-black"
+              "blink-black",
+              "fade-in"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
           },

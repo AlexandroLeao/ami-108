@@ -12,36 +12,21 @@ import { paginateText } from './pagination';
 type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
 type PageState = { key: string; pages: string[]; index: number };
 const messages = {
-  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 2 concluído nesta versão. O Capítulo 3 será integrado na próxima etapa.', locked: 'Bloqueado', resumeAt: 'Continuar de onde parou', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
-  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 2 complete in this version. Chapter 3 will be integrated next.', locked: 'Locked', resumeAt: 'Continue where you left off', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
+  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 2 concluído nesta versão. O Capítulo 3 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
+  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 2 complete in this version. Chapter 3 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
 } as const;
 type Notice = 'connection' | 'stale' | 'expired';
 
-function Diagnostics({ view }: { view: CampaignView }) {
+function EnergyIndicator({ view }: { view: CampaignView }) {
   const d = view.diagnostics;
   if (!d) return null;
-  const personalLabel = view.locale === 'pt-BR' ? 'PESSOAL' : 'PERSONAL';
+  const label = view.locale === 'pt-BR' ? 'Energia' : 'Energy';
   return (
-    <div className="campaign-diagnostics" role="group" aria-label={copy[view.locale].diagnostics}>
-      <div className="campaign-diagnostics-content">
-        <div className="campaign-energy">
-          <span>{view.locale === 'pt-BR' ? 'Energia' : 'Energy'}</span>
-          <span className="campaign-bars" role="img" aria-label={view.locale === 'pt-BR' ? `${d.energy} de 3 barras` : `${d.energy} of 3 bars`}>
-            {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
-          </span>
-        </div>
-        <div className="campaign-memory">
-          <span>MED-01 {d.med}%</span><span>BIO-02 {d.bio}%</span>
-          <span>HIST-03 {d.hist}%</span>
-          <span className="campaign-personal" aria-label={personalLabel + ' ' + d.personal + '%' + (!d.personalUnlocked ? ' · ' + messages[view.locale].locked : '')}>
-            {personalLabel} {d.personal}%
-            {!d.personalUnlocked && <svg className="campaign-lock-icon" viewBox="0 0 10 12" fill="none" aria-hidden="true">
-              <path d="M2.5 5V3.5a2.5 2.5 0 0 1 5 0V5M1 5h8v6H1z" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M5 7v2" stroke="currentColor" strokeWidth="1.4" />
-            </svg>}
-          </span>
-        </div>
-      </div>
+    <div className="campaign-diagnostics campaign-energy" role="group" aria-label={label}>
+      <span>{label}</span>
+      <span className="campaign-bars" role="img" aria-label={view.locale === 'pt-BR' ? `${d.energy} de 3 barras` : `${d.energy} of 3 bars`}>
+        {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
+      </span>
     </div>
   );
 }
@@ -281,7 +266,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <GameWordmark />
             <nav aria-label={labels.menu} className="menu-options">
               <button className="game-control" disabled={busy} onClick={start}>{labels.newGame}</button>
-              <button className="game-control" disabled={busy || !hasSave} onClick={openResume}>{labels.continueGame}</button>
+              <button className="game-control" disabled={busy || !hasSave} onClick={openResume}>{labels.continue}</button>
               <button className="game-control" disabled={busy} onClick={() => setOverlay('language')}>{labels.language}</button>
               <button className="game-control" disabled={busy} onClick={() => { setExtrasPage(0); setOverlay('extras'); }}>{labels.extras}</button>
             </nav>
@@ -292,7 +277,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
-                <div className="campaign-header-middle">{view.asset && <Diagnostics view={view} />}</div>
+                <div className="campaign-header-middle">{view.asset && <EnergyIndicator view={view} />}</div>
                 <button className="small-control campaign-menu-control" aria-disabled={busy} onClick={() => { if (!busyRef.current) setOverlay('pause'); }}>{labels.menu}</button>
               </div>
             </header>
@@ -333,10 +318,10 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       </div>
       {overlay !== 'none' && (
         <div ref={panelRef} className="game-overlay" role="dialog" aria-modal="true"
-          aria-label={overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : overlay === 'resume' ? labels.continueGame : overlay === 'chapters' ? messages[locale].chapters : labels.extras}>
+          aria-label={overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : overlay === 'resume' ? labels.continue : overlay === 'chapters' ? messages[locale].chapters : labels.extras}>
           {overlay === 'resume' && (
             <section className="menu-screen">
-              <h1>{labels.continueGame}</h1>
+              <h1>{labels.continue}</h1>
               <div className="menu-options">
                 <button className="game-control" disabled={busy} onClick={resume}>{messages[locale].resumeAt}</button>
                 <button className="game-control" disabled={busy || !menuSave?.chapters?.length} onClick={() => setOverlay('chapters')}>{messages[locale].chapters}</button>
@@ -349,7 +334,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               <h1>{messages[locale].chapters}</h1>
               <div className="menu-options">
                 {menuSave?.chapters?.map(item => <button key={item.number} className="game-control" disabled={busy} onClick={() => restartChapter(item.number)}>
-                  {locale === 'pt-BR' ? 'Capítulo ' : 'Chapter '}{item.number} — {item.title}
+                  {locale === 'pt-BR' ? 'Capítulo ' : 'Chapter '}{item.number}
                 </button>)}
                 <button className="game-control" disabled={busy} onClick={closeOverlay}>{labels.back}</button>
               </div>
