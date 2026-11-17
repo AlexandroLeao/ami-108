@@ -1,13 +1,13 @@
 # Proposed API contracts
 
-The two OpenAPI 3.1 JSON documents are design contracts, not generated runtime specifications. The bootstrap health endpoints, isolated development preview asset and local Chapter 1 game routes are implemented in merged PR #20 (`3cf942a`); draft PR #22 extends these routes through Chapter 2. The remaining campaign and AI contracts remain proposals. Implement and verify against these contracts incrementally in AMI-004–007; adjust with reviewed ADRs when necessary.
+The two OpenAPI 3.1 JSON documents are design contracts, not generated runtime specifications. The bootstrap health endpoints, isolated development preview asset and local Chapter 1 game routes are implemented in merged PR #20 (`3cf942a`); merged PR #22 extends these routes through Chapter 2. The remaining campaign and AI contracts remain proposals. Implement and verify against these contracts incrementally in AMI-004–007; adjust with reviewed ADRs when necessary.
 
 - [Game API](game.openapi.json): session creation/resume, current projection, commands and protected asset.
 - [AI internal API](ai.openapi.json): authorized generation request and candidate result/fallback signal. Never expose to the browser.
 
 ## Implementation boundary
 
-The Chapter 1 baseline implements POST session, GET view, POST commands, PATCH locale and GET asset through the local same-origin facade. PR #22 uses the same routes for Chapter 2; checkpoint/slot rows and receipts are committed atomically. Session ownership, row-locked receipt transactions, strict input validation, bounded history and protected current-step art are implemented. CONSULT, CHOOSE and RETRY are implemented in the Chapter 2 candidate; later encounters/action kinds, pending inference, production rate limits and deployment remain proposals. See [narrative engine](../narrative-engine.md).
+The Chapter 1 baseline implements POST session, GET view, POST commands, PATCH locale and GET asset through the local same-origin facade. PR #22 uses the same routes for Chapter 2; checkpoint/slot rows and receipts are committed atomically. Session ownership, row-locked receipt transactions, strict input validation, bounded history and protected current-step art are implemented. CONSULT, CHOOSE and RETRY are implemented in the accepted Chapter 2 subset; later encounters/action kinds, pending inference, production rate limits and deployment remain proposals. See [narrative engine](../narrative-engine.md).
 
 ## Conventions
 
@@ -20,3 +20,7 @@ The Chapter 1 baseline implements POST session, GET view, POST commands, PATCH l
 - The local facade uses a 10-second upstream timeout and rejects cross-origin mutations. Rate limits, retention cleanup, expiry policy and production deployment remain unverified. Local integration only: do not enable the development flag in production.
 
 Chapter replay uses the existing POST commands endpoint with server-validated `CHAPTER/RESTART/N`, normal session capability, expected revision and idempotency receipt. The projection includes `chapters` (reached number/title only); no locked chapter title or snapshot/cache data is exposed. Replays preserve highest reached chapter and slot cache; restart replaces the current resume position. The `startle` cue is presentation-only.
+
+PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
+
+The existing API contract is unchanged by this documentation update. Chapter 3 is still the development boundary; provider reservation/pending inference and later encounters are not implemented.
