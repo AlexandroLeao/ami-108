@@ -13,16 +13,18 @@ export const CHAPTERS = [
   { number: 5, title: local('De nada, Bobo', 'You’re Welcome, Bobo'), scenes: ['A05-S01', 'A05-S02'] },
 ] as const;
 
-export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03' | 'CENA-04' | 'CENA-05';
+export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03' | 'CENA-04' | 'CENA-05' | 'CENA-06' | 'CENA-07';
 export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-01': local('Depósito industrial em ruínas, com caixas e luz pelas janelas.', 'Ruined industrial warehouse, with crates and light through the windows.'),
   'CENA-02': local('Rua residencial em ruínas.', 'Ruined residential street.'),
   'CENA-03': local('Robô danificado junto à janela da residência abandonada.', 'Damaged robot by the window of the abandoned residence.'),
   'CENA-04': local('Criatura deformada entre veículos na rua residencial.', 'Deformed creature among vehicles on the residential street.'),
   'CENA-05': local('Terminal de manutenção pública.', 'Public maintenance terminal.'),
+  'CENA-06': local('Centro de pesquisa abandonado.', 'Abandoned research facility.'),
+  'CENA-07': local('Criatura no corredor de contenção.', 'Creature in the containment corridor.'),
 };
 export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal';
-export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME';
+export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME' | 'E-ARCHIVE' | 'MEM-D3' | 'FB-D3' | 'E-PLANET' | 'E-PARTNER' | 'CP-RAT' | 'F2' | 'SOL-02' | 'E-ESCAPE-ROUTE';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
   id: string;

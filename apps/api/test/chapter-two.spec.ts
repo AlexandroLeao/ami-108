@@ -167,7 +167,7 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(projectNarrative(forward(translated)).cue).toBe('none');
     while(state.stepId!=='A03-S01/CHAPTER_CARD' && count++<90) state=forward(state);
     expect(projectNarrative(state)).toMatchObject({chapter:3,phase:'CHAPTER_CARD',asset:null});
-    expect(projectNarrative(state).actions.map(x=>x.kind)).toEqual(['PREVIOUS']);
+    expect(projectNarrative(state).actions.map(x=>x.kind)).toEqual(['CONTINUE','PREVIOUS']);
     expect(state.events.filter(x=>x==='F1')).toHaveLength(1);
     expect(state.events.filter(x=>x==='SOL-01')).toHaveLength(1);
   });

@@ -101,7 +101,7 @@ function actions(state: NarrativeState, id: string): NarrativeAction[] {
   const back = index > 0 && !barrier(id) && !barrier(c.trail[index - 1]) ? [previous(state, id)] : [];
   // Historical decision screens cannot issue a new choice or debit energy.
   if (state.reviewStepId) return [next(state, id), ...back];
-  if (id === END) return back;
+  if (id === END) return [next(state, id), ...back];
   if (id === dogId('DEAD-CARD')) return [action(id + '/RETRY', 'RETRY', local('Retornar ao checkpoint', 'Return to checkpoint'), state)];
   if (id.startsWith(dogId('DECISION-'))) {
     const available: NarrativeAction[] = DOG.choices.map(choice => action(choice.id, 'CHOOSE', choice.label, state));
