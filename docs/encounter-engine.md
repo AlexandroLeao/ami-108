@@ -40,4 +40,8 @@ Real provider reservation/finalization, bounded retries and RAG remain AMI-007. 
 
 ## Fourth owner refinement — November 17
 
-Remove repeated component wording; localized ARRIVAL-03/FOUND/L01 only. Continuous memory text motion is limited to the six specified Chapter 1 memory beats and the three specified Chapter 2 beats. Animate ??? to DAVID on L18c with unchanged server name/event. Stabilize CENA-04 geometry across illustrated dialogue and decision layouts. No original asset changes, database/dependency changes or solar timing changes. Verify all scene hashes and current HTTP asset bytes in smoke; browser verification pending.
+Remove repeated component wording; localized ARRIVAL-03/FOUND/L01 only. Continuous memory text motion is limited to the six specified Chapter 1 memory beats and the three specified Chapter 2 beats. Animate ??? to DAVID on L18c with unchanged server name/event. The experimental CENA-04 geometry override was reverted after owner review; keep the approved pre-refinement layout. No original asset changes, database/dependency changes or solar timing changes. Verify all scene hashes and current HTTP asset bytes in smoke; browser verification pending.
+
+## Owner correction — November 17
+
+Revert the dog-wide geometry override exactly to the approved b9da1be layout. Use the same owner-approved L04 text for every success variant (no bananas substitution); keep all A/B/C branch logic and cache intact. Slow name-reveal to 1800ms, preserve memory-shiver scope and image hash verification. No other story, layout, state or asset changes.

@@ -51,3 +51,7 @@ ARRIVAL-03 describes observing AMI connect to the panel and emit brief electroni
 ### Fourth owner refinement
 
 ARRIVAL-03 now describes AMI examining the system, FOUND says “Encontrado.” / “Found.” and L01 identifies a compatible storage unit. FB-D1b–g, MEM-D2 and F01/F01b carry the continuous memory-shiver cue; L18c carries name-reveal without altering E-NAME or speaker state. No additional motion on unrelated beats. All IDs, action effects and existing saves retained.
+
+### Owner correction
+
+A02-S02/L04 uses “Então vai parar de falar coisas aleatórias?” / “So you'll stop saying random things?” for all three successful dog branches, without a recipe-dependent bananas override. Preserve the prior branch dialogue, recipe exposure data, event IDs and effects. The name reveal is presentation-only, now 1800ms. No other narrative changes.

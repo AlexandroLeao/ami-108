@@ -276,7 +276,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <p className="version-label">{labels.version}</p>
           </section>
         ) : (
-          <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'} data-dog-scene={view.asset?.url === '/api/game/asset?key=CENA-04'}>
+          <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'}>
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>

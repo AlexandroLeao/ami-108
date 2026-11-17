@@ -101,7 +101,7 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(rng).not.toHaveBeenCalled();
     expect(state.diagnostics?.energy).toBe(2);
   });
-  it.each([{category:'NONE',variant:'C',recipe:false},{category:'CORRECT',variant:'B',recipe:false},{category:'RANDOM',variant:'A',recipe:true}])('completes F1, SOL-01, memory and name for $category', ({category,variant,recipe}) => {
+  it.each([{category:'NONE',variant:'C'},{category:'CORRECT',variant:'B'},{category:'RANDOM',variant:'A'}])('completes F1, SOL-01, memory and name for $category', ({category,variant}) => {
     let state=reachDog();
     if(category!=='NONE') state=consult(state,()=>category==='CORRECT'?0:0.9);
     state=choose(state,'DOG-04');state=forward(state);
@@ -118,7 +118,8 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     while(state.stepId!=='A02-S02/L04' && count++<30) state=forward(state);
     expect(state.stepId).toBe('A02-S02/L04');
     expect(state.diagnostics).toEqual({energy:category==='NONE'?3:2,med:35,bio:42,hist:53,personal:5,personalUnlocked:false});
-    expect(projectNarrative(state).text).toContain(recipe?'coisas aleatórias':'bananas');
+    expect(projectNarrative(state).text).toBe('Então vai parar de falar coisas aleatórias?');
+    expect(projectNarrative(changeNarrativeLocale(state, 'en', state.revision)).text).toBe("So you'll stop saying random things?");
     // Solar behavior is deliberately unchanged: F1 did not recharge, SOL-01 does.
     while(state.stepId!=='A02-S02/L08' && count++<45) state=forward(state);
     expect(state.diagnostics?.energy).toBe(category==='NONE'?3:2);

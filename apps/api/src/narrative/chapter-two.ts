@@ -154,7 +154,6 @@ export function chapterTwoView(state: NarrativeState): CurrentView {
     speaker = narration || beat.speaker === 'NONE' ? null : beat.speaker === 'AMI' ? 'AMI-108' : beat.speaker === 'VOICE' ? local('Voz familiar', 'Familiar voice')[locale] : named ? 'DAVID' : '???';
     if (id === FIRST) cue = 'startle';
     if (id === terminalId('FOUND')) cue = 'fade-in';
-    if (id === terminalId('L04') && !c.dog.recipeSeen) text = local('Então você vai parar de me falar de bananas?', "So you'll stop talking to me about bananas?");
     if (id === terminalId('MEM-D2-PAIN')) cue = 'blink-black';
     if (id === terminalId('MEM-D2') || id === terminalId('F01') || id === terminalId('F01b')) cue = 'memory-shiver';
     if (id === terminalId('L18c')) cue = 'name-reveal';

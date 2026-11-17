@@ -34,4 +34,6 @@
 
 - Third owner refinement: abbreviated Continue/Chapter labels, energy-only enlarged HUD (memory rules and persisted values unchanged), revised ARRIVAL-03, FOUND fade-in, revised cake-related L04, split F01/F01b and MEM-D2 pain text. Preserve SOL-01 timing and planned SOL-02, no unapproved solar mechanics or other story/UI changes.
 
-- Fourth owner refinement: reduce repeated storage-component wording, continuous memory-shiver only FB-D1b–g/MEM-D2/F01/F01b, one-shot name-reveal on L18c, fixed illustrated CENA-04 geometry across decisions, manifest and HTTP artwork hashes checked. Preserve original art, stable IDs, event effects, chapter replay and solar mechanics.
+- Fourth owner refinement: reduce repeated storage-component wording, continuous memory-shiver only FB-D1b–g/MEM-D2/F01/F01b, one-shot name-reveal on L18c, original approved CENA-04 geometry (experimental override reverted after owner review), manifest and HTTP artwork hashes checked. Preserve original art, stable IDs, event effects, chapter replay and solar mechanics.
+
+- Owner correction: preserve the exact b9da1be layout for normal dialogue and choices; do not adjust image or frame dimensions without specific owner approval. A02-S02/L04 has one localized text for all success variants; no recipe-dependent alternative. Name reveal 1800ms; no unrelated changes.

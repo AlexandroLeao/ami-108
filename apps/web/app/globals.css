@@ -457,28 +457,12 @@ button:focus-visible, a:focus-visible {
    is exposed to assistive tech; the old label is a visual transition. */
 .campaign-name-reveal { display: inline-grid; vertical-align: top; }
 .campaign-name-reveal > span { grid-area: 1 / 1; }
-.campaign-name-before { animation: campaign-name-out 650ms ease-out both; }
-.campaign-name-after { animation: campaign-name-in 650ms ease-out both; }
-@keyframes campaign-name-out { 0%, 30% { opacity: 1; } 62%, 100% { opacity: 0; } }
-@keyframes campaign-name-in { 0%, 30% { opacity: 0; } 100% { opacity: 1; } }
+.campaign-name-before { animation: campaign-name-out 1800ms ease-in-out both; }
+.campaign-name-after { animation: campaign-name-in 1800ms ease-in-out both; }
+@keyframes campaign-name-out { 0%, 25% { opacity: 1; } 65%, 100% { opacity: 0; } }
+@keyframes campaign-name-in { 0%, 35% { opacity: 0; } 100% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .campaign-dialogue .campaign-memory-shiver { animation: none !important; }
   .campaign-name-before { animation: none; opacity: 0; }
   .campaign-name-after { animation: none; opacity: 1; }
-}
-/* Stable dog geometry, even when the four choices or consultation appear.
-   All illustrated CENA-04 beats reserve the same decision-sized row. Do not
-   alter any other scene or the isolated preview. Keep the original 16:9 art
-   contained, never cropped or re-encoded. */
-.game-stage[data-dog-scene="true"] { grid-template-rows: auto minmax(0, 1fr) clamp(200px, 34dvh, 238px); }
-@media (orientation: portrait) {
-  .game-stage[data-dog-scene="true"] { height: 100%; align-self: stretch; grid-template-rows: auto minmax(0, 1fr) 238px; }
-  .game-stage[data-dog-scene="true"] .scene-frame { height: 100%; aspect-ratio: auto; }
-}
-@media (max-height: 460px) and (orientation: landscape) {
-  .game-stage[data-dog-scene="true"] { width: min(100%, 860px); grid-template-rows: auto minmax(0, 1fr) 180px; }
-}
-/* Keep the short dialogue and consultation controls usable on narrow screens. */
-@media (max-width: 360px) and (orientation: portrait) {
-  .game-stage[data-dog-scene="true"] { grid-template-rows: auto minmax(0, 1fr) 260px; }
 }
