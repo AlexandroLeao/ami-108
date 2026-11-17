@@ -95,7 +95,7 @@ export const RAT: EncounterDefinition = {
     { id: 'RAT-01', label: local('Ativar o sistema de emissão ultrassônica.', 'Activate the ultrasonic emission system.'), consequence: local('A criatura ignora o estímulo e ataca David quando ele tenta atravessar.', 'The creature ignores the stimulus and attacks David as he tries to cross.'), outcome: 'DEAD' },
     { id: 'RAT-02', label: local('Ativar a iluminação de contenção.', 'Activate the containment lighting.'), consequence: local('A luz intensa força a criatura a recuar para o abrigo escuro. David atravessa.', 'Intense light forces the creature into its dark shelter. David crosses.'), outcome: 'SUCCESS' },
     { id: 'RAT-03', label: local('Acionar a ventilação de emergência.', 'Activate the emergency ventilation.'), consequence: local('O fluxo de ar não afasta o organismo; David é atacado.', 'The airflow does not drive the organism away; David is attacked.'), outcome: 'DEAD' },
-    { id: 'RAT-04', label: local('Atravessar pelo corredor mantendo silêncio.', 'Cross the corridor in silence.'), consequence: local('O rato detecta David. A estratégia usada contra o cão não funciona.', 'The rat detects David. The strategy used against the dog does not work.'), outcome: 'DEAD' },
+    { id: 'RAT-04', label: local('Atravessar pelo corredor mantendo silêncio.', 'Cross the corridor in silence.'), consequence: local('O rato detecta sua presença, mesmo em silêncio, e ataca.', 'The rat detects your presence, even in silence, and attacks.'), outcome: 'DEAD' },
   ],
 };
 export const RAT_ENTRY: readonly Beat[] = [
