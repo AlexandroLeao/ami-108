@@ -1,5 +1,5 @@
-// AMI-009 isolated Chapter 4 domain increment. Not yet connected to engine.ts.
-// The authoritative session transaction will persist a complete returned state atomically.
+// AMI-009 Chapter 4 domain; engine.ts owns session dispatch.
+// The authoritative session transaction persists a complete returned state atomically.
 import { local, type Locale, type Localized } from './catalog';
 import type { Diagnostics } from './engine';
 import { AMI_MEMORY_FRAGMENTS, BETRAYAL_DIALOGUE, BETRAYAL_RETURN, DAVID_MEMORY_TRIGGER, FAMILY_RETURN, FINAL_RESTORATION, MANUAL_RECORDS, RESTORATION_DIALOGUE } from './chapter-four-catalog';
@@ -27,26 +27,30 @@ const sequence: readonly Beat[] = [
   narration(CARD, local('CAPÍTULO 4 — AMI-108 & DAVID', 'CHAPTER 4 — AMI-108 & DAVID'), null, 'CHAPTER_CARD'),
   ...r.slice(0, 2),
   { ...narration(s1 + '/INSTALL', local('Você instala o componente compatível diretamente em AMI.', 'You install the compatible component directly in AMI.'), 'CENA-05'), interaction: true },
-  { ...r[2], event: ['F3'] },
+  // The panels show the restoration in order; the authoritative F3 state
+  // already commits all four indexes and energy in one transaction.
+  { ...narration(s1 + '/F3-INDEXES', local('MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%', 'MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%'), null), record: true, event: ['F3'] },
+  { ...narration(s1 + '/F3-PERSONAL', local('PERSONAL — DESBLOQUEADO\nPERSONAL — 100%', 'PERSONAL — UNLOCKED\nPERSONAL — 100%'), null), record: true },
+  r[2],
   ...MANUAL_RECORDS.map((text,i): Beat => ({ ...narration(s1 + '/MANUAL-' + (i+1), text, null), record: true })),
   ...r.slice(3),
   narration(f('FB-A1'), local('Uma criança se aproxima de AMI, ainda com todos os seus membros.', 'A child approaches AMI, still with all his limbs.'), 'CENA-08', 'FLASHBACK'),
   ...AMI_MEMORY_FRAGMENTS[0].dialogue.map(b => line(s2,b,'CENA-08','FLASHBACK')),
   narration(f('FB-A1-LAUGH'), local('A criança ri.', 'The child laughs.'), 'CENA-08', 'FLASHBACK'),
   narration(f('FB-A2'), local('AMI canta enquanto a criança adormece.', 'AMI sings as the child falls asleep.'), 'CENA-08', 'FLASHBACK'),
-  narration(f('FB-A3'), local('Alarmes soam enquanto a família tenta sair.', 'Alarms sound as the family tries to leave.'), 'CENA-12', 'FLASHBACK'),
+  narration(f('FB-A3'), local('Alarmes soam enquanto a família tenta sair. Um lagarto mutante se aproxima.', 'Alarms sound as the family tries to leave. A mutant lizard approaches.'), 'CENA-12', 'FLASHBACK'),
   narration(f('FB-A3-PROTECT'), local('AMI se coloca entre a família e a criatura, estendendo os membros para protegê-la.', 'AMI steps between the family and the creature, extending his limbs to protect them.'), 'CENA-12', 'FLASHBACK'),
   narration(f('FB-A4'), local('Interferência. Membros danificados. Um forte impacto.', 'Interference. Damaged limbs. A heavy impact.'), null, 'FLASHBACK'),
   ...AMI_MEMORY_FRAGMENTS[3].dialogue.map(b => line(s2,b,null,'FLASHBACK')),
   narration(f('FB-A4-END'), local('REGISTRO INTERROMPIDO', 'RECORD INTERRUPTED'), null, 'FLASHBACK'),
-  narration(f('FAMILY-PAUSE'), local('David permanece ao lado de AMI.', 'David remains beside AMI.'), 'CENA-05'),
+  narration(f('FAMILY-PAUSE'), local('Os olhos de AMI reaparecem tristes. David permanece ao lado dele.', 'AMI’s eyes reappear, sad. David remains beside him.'), 'CENA-05'),
   ...family,
   narration(f('FAMILY-END'), local('AMI não responde. David permanece ao lado dele.', 'AMI does not respond. David remains beside him.'), 'CENA-05', 'NARRATIVE', ['E-FAMILY']),
   narration(f('MEM-D4-APPROACH'), local('Você examina um compartimento de alimentação cujo símbolo lembra o do depósito.', 'You examine a power compartment whose symbol resembles the one in the warehouse.'), 'CENA-05'),
   { ...line(s2,DAVID_MEMORY_TRIGGER[0],null,'FLASHBACK'), event: ['MEM-D4'] },
   narration(f('FB-D4'), local('David e Howard encontram o núcleo raro no depósito.', 'David and Howard find the rare core in the warehouse.'), 'CENA-01', 'FLASHBACK', ['FB-D4']),
   ...memory.slice(0,8),
-  narration(f('FB-D5'), local('Howard atinge David com a barra de ferro.', 'Howard strikes David with the iron bar.'), 'CENA-11', 'FLASHBACK', ['FB-D5']),
+  narration(f('FB-D5'), local('Howard atinge a cabeça de David com a mesma barra de ferro vista na abertura.', 'Howard strikes David’s head with the same iron bar seen in the opening.'), 'CENA-11', 'FLASHBACK', ['FB-D5']),
   memory[8],
   narration(f('FB-D5-END'), local('A barra cai no chão. Howard leva o núcleo e seus passos se afastam.', 'The bar falls to the floor. Howard takes the core and his footsteps fade away.'), null, 'FLASHBACK'),
   narration(f('FB-D1-RECALL'), local('As duas crianças daquela lembrança eram David e Howard.', 'The two children in that memory were David and Howard.'), null, 'FLASHBACK'),
