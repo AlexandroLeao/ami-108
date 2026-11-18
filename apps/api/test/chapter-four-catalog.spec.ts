@@ -1,4 +1,4 @@
-import { AMI_MEMORY_FRAGMENTS, BETRAYAL_DIALOGUE, BETRAYAL_RETURN, DAVID_MEMORY_TRIGGER, FAMILY_RETURN, FINAL_RESTORATION, MANUAL_RECORDS, RESTORATION_DIALOGUE } from '../src/narrative/chapter-four-catalog';
+import { CHAPTER_FOUR_GATES, AMI_MEMORY_FRAGMENTS, BETRAYAL_DIALOGUE, BETRAYAL_RETURN, DAVID_MEMORY_TRIGGER, FAMILY_RETURN, FINAL_RESTORATION, MANUAL_RECORDS, RESTORATION_DIALOGUE } from '../src/narrative/chapter-four-catalog';
 
 describe('Chapter 4 server-only source catalog', () => {
   it('preserves the canonical dialogue and manual sequence in both languages', () => {
@@ -22,6 +22,19 @@ describe('Chapter 4 server-only source catalog', () => {
     ]);
     expect(AMI_MEMORY_FRAGMENTS[0].dialogue.map(x => x.text['pt-BR'])).toEqual(['Bobo!', 'Robô.', 'Bobo!']);
     expect(AMI_MEMORY_FRAGMENTS[3].dialogue.map(x => x.text.en)).toEqual(['Bobo!']);
+  });
+
+  it('orders the restoration, manual, family and David memory gates without premature reveals', () => {
+    const index = (gate: typeof CHAPTER_FOUR_GATES[number]) => CHAPTER_FOUR_GATES.indexOf(gate);
+    expect(index('A04-S01/INSTALL')).toBeLessThan(index('F3'));
+    expect(index('F3')).toBeLessThan(index('UI-MANUAL'));
+    expect(index('UI-MANUAL')).toBeLessThan(index('FB-A1'));
+    expect(index('FB-A4')).toBeLessThan(index('E-FAMILY'));
+    expect(index('E-FAMILY')).toBeLessThan(index('MEM-D4'));
+    expect(index('MEM-D4')).toBeLessThan(index('FB-D4'));
+    expect(index('FB-D5')).toBeLessThan(index('E-BETRAYAL'));
+    expect(index('E-PAST-RESTORED')).toBeLessThan(index('A05-S01/CHAPTER_CARD'));
+    expect(new Set(CHAPTER_FOUR_GATES).size).toBe(CHAPTER_FOUR_GATES.length);
   });
 
   it('defines F3 with restored energy and all personal memory unlocked', () => {
