@@ -280,13 +280,13 @@ function fourProgress(state: NarrativeState): ChapterFourProgress {
 function projectFour(state: NarrativeState): CurrentView {
   const view = viewFour(fourProgress(state));
   const chapter = view.stepId === CHAPTER_FIVE_BOUNDARY ? 5 : 4;
-  const cue: Cue = view.record ? 'archive-record' : view.stepId === 'A04-S02/MEM-D4' ? 'blink-black'
-    : view.stepId === 'A04-S02/FB-D5' ? 'memory-cut' : view.stepId === 'A04-S02/FB-D5-END' ? 'fade-black' : 'none';
+  const cue: Cue = view.cue ?? (view.record ? 'archive-record' : view.stepId === 'A04-S02/MEM-D4' ? 'blink-black'
+    : view.stepId === 'A04-S02/FB-D5' ? 'memory-cut' : view.stepId === 'A04-S02/FB-D5-END' ? 'fade-black' : 'none');
   return { revision:view.revision, locale:view.locale, phase:view.phase, chapter,
     chapterTitle:CHAPTERS[chapter-1].title[state.locale], sceneId:view.stepId.split('/')[0],
     speaker:view.speaker, text:view.text, asset:view.asset ? {url:`/api/game/asset?key=${view.asset}`,alt:OPENING_ASSETS[view.asset][state.locale]} : null,
     diagnostics:view.diagnostics, actions:view.actions, pending:false, cue,
-    narration:view.speaker===null && !view.record && view.phase!=='CHAPTER_CARD', information:false };
+    narration:view.text!=='' && view.speaker===null && !view.record && view.phase!=='CHAPTER_CARD', information:false };
 }
 function applyFour(state: NarrativeState, progress: ChapterFourProgress): NarrativeState {
   const events = [...state.events];
