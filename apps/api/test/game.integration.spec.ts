@@ -259,6 +259,55 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     expect(view.diagnostics?.bio).toBe(85);
   }, 30000);
 
+  it('persists Chapter 4 F3 and authorizes only reached art, including legacy card resume', async () => {
+    const { cookie, view: initial } = await create();
+    let view = initial;
+    for(let i=0;i<120 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    view=await command(cookie,view,'DOG-04');
+    for(let i=0;i<150 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    expect(view.sceneId).toBe('A03-S02');
+    view=await command(cookie,view,'RAT-02');
+    for(let i=0;i<40 && view.chapter!==4;i++) view=await command(cookie,view);
+    expect(view.chapter).toBe(4);
+    expect(view.diagnostics?.personalUnlocked).toBe(false);
+    const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
+    expect(row.state).not.toHaveProperty('chapterFour');
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-08').set('Cookie',cookie).expect(404);
+    for(let i=0;i<10 && !view.actions.some(a=>a.kind==='INTERACT');i++) view=await command(cookie,view);
+    const install=view.actions.find(a=>a.kind==='INTERACT')!;
+    expect(install.id).toBe('A04-S01/INSTALL/NEXT');
+    const body={commandId:randomUUID(),expectedRevision:view.revision,actionId:install.id};
+    const send=()=>request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send(body);
+    const pair=await Promise.all([send(),send()]);
+    expect(pair.map(x=>x.status)).toEqual([200,200]);
+    expect(pair.map(x=>x.body.status).sort()).toEqual(['APPLIED','REPLAYED']);
+    view=pair[0].body.view;
+    expect(view.diagnostics).toEqual({energy:3,med:100,bio:100,hist:100,personal:100,personalUnlocked:true});
+    const stored=await prisma.gameSession.findUniqueOrThrow({where:{id:row.id}});
+    expect(stored.state).toMatchObject({chapterFour:true,diagnostics:view.diagnostics,events:expect.arrayContaining(['F2','F3'])});
+    expect((stored.state as {events:string[]}).events.filter(x=>x==='F3')).toHaveLength(1);
+    await app.close(); await open();
+    await request(app.getHttpServer()).get('/game/view').set('Cookie',cookie).expect(200,view);
+    for(let i=0;i<30 && view.asset?.url!=='/api/game/asset?key=CENA-08';i++) view=await command(cookie,view);
+    expect(view.asset?.url).toBe('/api/game/asset?key=CENA-08');
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-08').set('Cookie',cookie).expect(200);
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-11').set('Cookie',cookie).expect(404);
+    const assets=new Set<string>();
+    for(let i=0;i<100 && view.chapter!==5;i++){
+      if(view.asset) assets.add(view.asset.url);
+      view=await command(cookie,view);
+    }
+    expect(view.chapter).toBe(5);
+    expect(assets.has('/api/game/asset?key=CENA-11')).toBe(true);
+    expect(assets.has('/api/game/asset?key=CENA-12')).toBe(true);
+    expect(view.diagnostics?.personalUnlocked).toBe(true);
+    expect(await prisma.gameCheckpoint.count({where:{sessionId:row.id}})).toBe(2);
+    view=await command(cookie,view,'CHAPTER/RESTART/4');
+    expect(view.chapter).toBe(4);
+    expect(view.diagnostics).toEqual({energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
+    await request(app.getHttpServer()).get('/game/asset?key=CENA-08').set('Cookie',cookie).expect(404);
+  }, 60000);
+
   it('reserves one AI call, blocks conflicting mutations and atomically finalizes the same command', async () => {
     const previous = { flag: process.env.AMI_AI_GENERATION, token: process.env.AMI_AI_INTERNAL_TOKEN, url: process.env.AI_SERVICE_URL };
     delete process.env.AMI_AI_GENERATION;
