@@ -36,6 +36,9 @@ async def main() -> None:
                 factIds=facts,
                 deadlineMs=2500,
             )
+            context = retrieve(request)
+            if context is None:
+                raise RuntimeError("Evaluation case has no authorized context")
             started = time.monotonic()
             result = await generate(request, provider)
             successes += int(result.status == "VALIDATED")
@@ -46,7 +49,7 @@ async def main() -> None:
                 "status": result.status,
                 "elapsedMs": round((time.monotonic() - started) * 1000),
                 "reason": getattr(result, "reason", None),
-                "alternative": result.status == "VALIDATED" and result.text != retrieve(request).approved_text,
+                "alternative": result.status == "VALIDATED" and result.text != context.approved_text,
             }))
     print(json.dumps({"validated": successes, "total": len(cases) * len(locales)}))
     if successes == 0:
