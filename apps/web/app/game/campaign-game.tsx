@@ -65,10 +65,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const cinematicReady = (!requiresImage || readyImage===cinematicKey) && (!counting || countProgress>=1);
   const markImageReady = useCallback((key:string)=>setReadyImage(key), []);
   useEffect(() => {
-    if (!requiresImage) setReadyImage('');
-  }, [requiresImage]);
-  useEffect(() => {
-    if (!counting) { setCount({key:'',progress:0}); return; }
+    if (!counting) return;
     const start=performance.now();
     let frame=0;
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -140,6 +137,9 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter, choiceMode]);
 
   const accept = useCallback((next: CampaignView) => {
+    const key=beatKey(next);
+    setReadyImage(old=>imageGateMs(next)>0 && old===key?old:'');
+    setCount(old=>next.cue==='f3-count' && old.key===key?old:{key:'',progress:0});
     setView(next);
     setHasSave(true);
     setLocale(next.locale);
