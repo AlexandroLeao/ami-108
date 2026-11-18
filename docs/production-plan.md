@@ -1,6 +1,10 @@
 # Production plan
 
-## End-of-session handoff — November 17
+## Current handoff — November 18
+
+**Current accepted baseline — November 18, 2026:** PR #24 merged at `d587be9` after owner acceptance on desktop/mobile and explicit merge approval. AMI-001–005, 007 and 008 complete (7/13 = 53.8%); AMI-006 remains open for F3 and CP-BOAR. Chapters 1–3 complete (3/5); Chapter 4 card is the boundary. Strict warmed Qwen2.5:1.5b benchmark 20/20 (PT/EN), 160–1919 ms; isolated real HTTP/PostgreSQL online/offline E2E and owner browser checklist 8/8 passed. [Exact-head CI 44314906072](https://github.com/AlexandroLeao/ami-108/actions/runs/44314906072) passed. AI is opt-in, bounded selection of authorized bilingual alternatives, not unrestricted generation. Existing saves, fixed dialogue, UI and art preserved; accepted Cloud Shell still needs backup and controlled migration/activation. Private Master v1.13 / Script v1.11 remain canonical; latest approved F3 recharge rule takes precedence. Next AMI-009, then QA, deployment and release. See [AI evidence](ai-local-evaluation.md).
+
+## Historical handoff — November 17
 
 Formal progress 5/13 closed (38.5%). Three of five chapters playable and approved (not a release percentage). AMI-008 #10: narrative and checkpoint/restoration criteria met; real AI remains open. AMI-006 #8: F1/F2, CP-DOG/CP-RAT and persistent slots implemented; F3/CP-BOAR and provider recovery remain. AMI-007 #9: draft PR #24 has internal NestJS/FastAPI reservation/finalization and local Ollama adapter, CI 44159065184 passed 104 tests on its old base, now conflicts with main; not merged or real-model tested. Issues #11–15 unchanged. Next: verify local save if VM changed; reconcile #24 with main, retain rat persistence and restoration rules, authorize RAT facts, prove real inference and bounded variation; then F3/boar/finale, QA, deployment and release. Private source synchronization remains separate. No date-pressure shortcuts.
 
