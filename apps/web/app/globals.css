@@ -567,3 +567,28 @@ button:focus-visible, a:focus-visible {
 @media (max-height:460px) and (orientation:landscape) {
   .campaign-dialogue[data-f3-count="true"] .dialogue-text {font-size:21px;line-height:1;}
 }
+
+/* Owner's final AMI memory polish. Independent of the original CRT opening:
+   the same artwork stays mounted and only its containing layer moves. */
+.campaign-memory-signal { position:absolute; inset:0; }
+.campaign-memory-signal:has(.scene-art[data-cinematic-loaded="true"]) {
+  animation:campaign-memory-signal-shake 1.35s steps(1,end) infinite;
+}
+.campaign-memory-signal:has(.scene-art[data-cinematic-loaded="true"])::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(23,23,23,.33) 3px 5px);
+  animation:campaign-memory-signal-noise 1.7s linear infinite;
+}
+@keyframes campaign-memory-signal-shake {
+  0%,100% {transform:none;} 15% {transform:translate(-1px,0);} 29% {transform:translate(1px,1px);}
+  43% {transform:translate(-2px,0);} 58% {transform:none;} 73% {transform:translate(1px,-1px);}
+  86% {transform:translate(-1px,1px);}
+}
+@keyframes campaign-memory-signal-noise {
+  0%,100% {opacity:.55;background-position:0 0;} 35% {opacity:.72;background-position:0 2px;}
+  68% {opacity:.42;background-position:0 4px;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .campaign-memory-signal:has(.scene-art[data-cinematic-loaded="true"]) {animation:none;transform:none;}
+  .campaign-memory-signal:has(.scene-art[data-cinematic-loaded="true"])::after {animation:none;opacity:.35;}
+}
