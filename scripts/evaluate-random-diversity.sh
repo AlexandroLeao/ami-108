@@ -6,8 +6,8 @@
   test "$(git branch --show-current)" = main
   test "$(git rev-parse --short HEAD)" = 119bd82
   test -z "$(git status --porcelain)"
-  git fetch origin feat/ai-rag-foundation
-  candidate=47c7621e473abc5ee0b89db0f259ebbd3729a1c3
+  git fetch origin test/ai-random-diversity
+  candidate=d8a3ea8d46ed1a35f50b2cc8aaf8c80bc72dbb20
   git cat-file -e "$candidate^{commit}"
   worktree=$(mktemp -d /tmp/ami108-eval.XXXXXX)
   tag="ami108-eval-$(printf '%s' "${worktree##*.}" | LC_ALL=C tr '[:upper:]' '[:lower:]')"
@@ -132,5 +132,11 @@ async def main():
         raise SystemExit("No validated real output")
 asyncio.run(main())
 PYTHON
+  echo '=== Bilingual regression: CORRECT and RANDOM ==='
+  docker run --rm --network "$net" \
+    -e AMI_AI_PROVIDER=ollama \
+    -e AMI_OLLAMA_URL=http://ollama:11434 \
+    -e AMI_OLLAMA_MODEL=qwen2.5:1.5b \
+    "$image" /app/.venv/bin/python -m app.evaluate_local
   echo '=== DIVERSITY AUDIT COMPLETE ==='
 )
