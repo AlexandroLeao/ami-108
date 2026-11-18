@@ -510,3 +510,52 @@ button:focus-visible, a:focus-visible {
 .campaign-dialogue[data-archive-record="true"] .advance-control { background: var(--alert); color: var(--ivory); }
 .campaign-dialogue[data-archive-record="true"] .pixel-arrow { background: var(--ivory); }
 .campaign-dialogue[data-archive-record="true"] .advance-control:hover:not(:disabled) { background: var(--coal); }
+
+/* Owner playtest refinements: original scene pixels are never replaced or duplicated. */
+.campaign-energy[data-energy-motion="tutorial"] { animation: campaign-energy-pulse 1.35s ease-in-out infinite; }
+.campaign-energy[data-energy-motion="settle"] { animation: campaign-energy-intro 1900ms ease-in-out both; }
+@keyframes campaign-energy-pulse { 0%,100% { opacity:1; } 50% { opacity:.28; } }
+
+.campaign-scene[data-cinematic-beat="A02-S01/L01/NEXT"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"])::after,
+.campaign-scene[data-cinematic-beat="A03-S02/L01/NEXT"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"])::after {
+  content:''; position:absolute; inset:0; pointer-events:none; background:var(--coal);
+  animation: campaign-terminal-reveal 850ms ease-out both;
+}
+.campaign-scene[data-cinematic-beat="A02-S01/L01/NEXT"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"])::after { animation-duration:450ms; }
+.campaign-scene[data-cinematic-beat="A03-S02/L01/NEXT"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"]) { animation:campaign-startle 650ms ease-out 450ms both; }
+
+/* CRT opening is a temporary overlay/mask on the existing visual layer. */
+.campaign-scene[data-cue="crt-reveal"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"]),
+.campaign-scene[data-cue="crt-startle"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"]) {
+  animation: campaign-crt-open 1650ms ease-out both;
+}
+.campaign-scene[data-cue="crt-startle"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"]) {
+  animation: campaign-crt-open 1650ms ease-out both, campaign-startle 650ms ease-out 950ms both;
+}
+.campaign-scene[data-cue="crt-reveal"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"])::after,
+.campaign-scene[data-cue="crt-startle"] .scene-visual:has(.scene-art[data-cinematic-loaded="true"])::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(23,23,23,.65) 3px 5px);
+  animation: campaign-crt-noise 1650ms ease-out both;
+}
+@keyframes campaign-crt-open {
+  0% {clip-path:inset(49% 50%);opacity:0;}
+  15% {clip-path:inset(48% 12%);opacity:.7;}
+  38% {clip-path:inset(42% 0);opacity:1;}
+  70% {clip-path:inset(10% 0);opacity:.85;}
+  100% {clip-path:inset(0);opacity:1;}
+}
+@keyframes campaign-crt-noise { 0%,35% {opacity:.85;transform:translateY(-3px);} 55% {opacity:.45;transform:translateY(4px);} 100% {opacity:0;transform:none;visibility:hidden;} }
+
+/* Open the eyes first, then retain a slow disoriented eyelid pulse until leaving. */
+.campaign-disoriented span:first-child {animation:blink-upper 1.4s ease-in-out both, campaign-dizzy-upper 2.8s ease-in-out 1.4s infinite;}
+.campaign-disoriented span:last-child {animation:blink-lower 1.4s ease-in-out both, campaign-dizzy-lower 2.8s ease-in-out 1.4s infinite;}
+@keyframes campaign-dizzy-upper {0%,100% {transform:translateY(-105%);} 35%,50% {transform:translateY(0);} 68% {transform:translateY(-65%);} 80% {transform:translateY(-105%);} }
+@keyframes campaign-dizzy-lower {0%,100% {transform:translateY(105%);} 35%,50% {transform:translateY(0);} 68% {transform:translateY(65%);} 80% {transform:translateY(105%);} }
+.campaign-dialogue[data-f3-count="true"] .dialogue-text {white-space:pre-line;font-variant-numeric:tabular-nums;}
+@media (prefers-reduced-motion: reduce) {
+  .campaign-energy[data-energy-motion] {animation:none !important;opacity:1;}
+  .campaign-scene[data-cinematic-beat] .scene-visual {animation:none !important;clip-path:none;opacity:1;}
+  .campaign-scene[data-cinematic-beat] .scene-visual::after {display:none;}
+  .campaign-disoriented {display:none;}
+}
