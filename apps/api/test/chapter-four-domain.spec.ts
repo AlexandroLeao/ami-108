@@ -29,8 +29,9 @@ describe('isolated Chapter 4 transitions',()=>{
     const restored=next(install);
     expect(restored.diagnostics).toEqual(FINAL_RESTORATION);
     expect(restored.events).toEqual(['F3']);
-    expect(viewFour(restored)).toMatchObject({stepId:'A04-S01/F3-INDEXES',record:true,asset:null});
-    expect(viewFour(next(restored))).toMatchObject({stepId:'A04-S01/F3-PERSONAL',record:true,asset:null});
+    expect(viewFour(restored)).toMatchObject({stepId:'A04-S01/FACE-UPDATE',asset:null});
+    expect(viewFour(next(restored))).toMatchObject({stepId:'A04-S01/F3-INDEXES',record:true,asset:null,cue:'f3-count'});
+    expect(viewFour(next(next(restored)))).toMatchObject({stepId:'A04-S01/F3-PERSONAL',record:true,asset:null});
     expect(next(restored).events).toEqual(['F3']);
     expect(install.diagnostics).toEqual(f2);
     expect(()=>advanceFour(restored,'A04-S01/INSTALL/NEXT',install.revision)).toThrow('STALE_REVISION');
@@ -49,7 +50,12 @@ describe('isolated Chapter 4 transitions',()=>{
     const events:string[]=[];
     for(let i=0;i<100;i++){
       const v=viewFour(s);
-      expect(v.text.trim()).not.toBe('');
+      if(v.stepId==='A04-S02/FB-A3-IMAGE') expect(v.text).toBe('');
+      else expect(v.text.trim()).not.toBe('');
+      if(v.stepId==='A04-S02/FB-A1/01') expect(v.asset).toBeNull();
+      if(v.stepId==='A04-S02/FB-A1/02') expect(v).toMatchObject({asset:'CENA-08',cue:'crt-reveal'});
+      if(v.stepId==='A04-S02/FB-A3-IMAGE') expect(v).toMatchObject({asset:'CENA-12',cue:'crt-startle'});
+      if(v.stepId==='A04-S02/F09') expect(v).toMatchObject({asset:'CENA-11',cue:'disoriented'});
       ids.push(v.stepId);
       if(v.asset) assets.add(v.asset);
       if(v.stepId.startsWith('A04-S01/MANUAL-')){
@@ -66,7 +72,7 @@ describe('isolated Chapter 4 transitions',()=>{
     expect(s.diagnostics).toEqual(FINAL_RESTORATION);
     expect(events).toEqual(['F3','E-FAMILY','MEM-D4','FB-D4','FB-D5','E-BETRAYAL','E-PAST-RESTORED']);
     expect(new Set(ids).size).toBe(ids.length);
-    expect([...assets].sort()).toEqual(['CENA-01','CENA-05','CENA-08','CENA-11','CENA-12']);
+    expect([...assets].sort()).toEqual(['CENA-08','CENA-11','CENA-12']);
     expect(viewFour(s).actions.map(a=>a.kind)).toEqual(['PREVIOUS']);
   });
   it('preserves a serialized save and projects the same reached beat in either language',()=>{
@@ -75,7 +81,8 @@ describe('isolated Chapter 4 transitions',()=>{
     expect(viewFour(saved)).toEqual(viewFour(reached));
     expect(viewFour(saved).speaker).toBe('CRIANÇA');
     expect(viewFour({...saved,locale:'en'}).speaker).toBe('CHILD');
-    expect(viewFour({...saved,locale:'en'}).asset).toBe('CENA-08');
+    expect(viewFour({...saved,locale:'en'}).asset).toBeNull();
+    expect(viewFour(next(saved))).toMatchObject({asset:'CENA-08',cue:'crt-reveal'});
     expect(saved.events).toEqual(['F3']);
   });
 });
