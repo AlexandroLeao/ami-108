@@ -21,6 +21,8 @@ async def main() -> None:
         ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS"]),
         ("Q-DOG", "CORRECT", ["DOG-VISION", "DOG-HEARING", "DOG-WAIT"]),
         ("Q-DOG", "RANDOM", ["DOG-RECIPE"]),
+        ("Q-RAT", "CORRECT", ["RAT-LIGHT", "RAT-CONTAINMENT"]),
+        ("Q-RAT", "RANDOM", ["RAT-RECIPE"]),
     ]
     locales: list[Locale] = ["pt-BR", "en"]
     successes = 0

@@ -321,16 +321,22 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     }
   },30000);
 
-  it('recovers an expired reservation after restart, with no reroll, double debit or provider call', async () => {
+  it.each(['DOG','RAT'] as const)('recovers an expired %s reservation after restart, with no reroll, double debit or provider call', async encounter => {
     const {cookie,view:initial}=await create();
     let view=initial;
     for(let i=0;i<100 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    if(encounter==='RAT') {
+      view=await command(cookie,view,'DOG-04');
+      for(let i=0;i<150 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+      expect(view.sceneId).toBe('A03-S02');
+    }
     const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
     const state=row.state as unknown as NarrativeState;
     const action=view.actions.find(x=>x.kind==='CONSULT')!;
     const commandId=randomUUID();
     const next=advanceNarrative(state,action.id,state.revision,()=>0);
     const gen=generationRequest(state,next,commandId)!;
+    expect(gen.questionId).toBe('Q-'+encounter);
     await prisma.gamePendingGeneration.create({data:{
       sessionId:row.id,commandId,requestDigest:digest(JSON.stringify(['action',state.revision,action.id])),
       nextState:JSON.parse(JSON.stringify(next)) as Prisma.InputJsonObject,
@@ -341,7 +347,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     const recovered=await request(app.getHttpServer()).get('/game/view').set('Cookie',cookie).expect(200);
     expect(recovered.body.diagnostics.energy).toBe(2);
     expect(recovered.body.revision).toBe(state.revision+1);
-    expect(await prisma.gameConsultationSlot.findUniqueOrThrow({where:{sessionId_encounterId_slotIndex:{sessionId:row.id,encounterId:'DOG',slotIndex:1}}})).toMatchObject({category:'CORRECT'});
+    expect(await prisma.gameConsultationSlot.findUniqueOrThrow({where:{sessionId_encounterId_slotIndex:{sessionId:row.id,encounterId:encounter,slotIndex:1}}})).toMatchObject({category:'CORRECT'});
     expect(await prisma.gamePendingGeneration.count({where:{sessionId:row.id}})).toBe(0);
     const replay=await request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send({commandId,expectedRevision:state.revision,actionId:action.id}).expect(200);
     expect(replay.body.status).toBe('REPLAYED');

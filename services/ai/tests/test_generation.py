@@ -75,6 +75,9 @@ def test_strict_input(changes: dict[str, object]) -> None:
         {"factIds": ["DOG-VISION", "DOG-HEARING", "DOG-WAIT", "FUTURE"]},
         {"category": "RANDOM"},
         {"questionId": "Q-RAT"},
+        {"questionId": "Q-RAT", "factIds": ["RAT-LIGHT"]},
+        {"questionId": "Q-RAT", "category": "RANDOM", "factIds": ["RAT-LIGHT", "RAT-CONTAINMENT"]},
+        {"questionId": "Q-DOG", "factIds": ["RAT-LIGHT", "RAT-CONTAINMENT"]},
         {"questionId": "Q-BOAR"},
         {"questionId": "INTRO-RANDOM", "category": "CORRECT"},
     ],
@@ -100,6 +103,8 @@ def test_retrieval_rejects_wrong_category_incomplete_or_future_facts(
     [
         ("Q-DOG", "CORRECT", ["DOG-VISION", "DOG-HEARING", "DOG-WAIT"]),
         ("Q-DOG", "RANDOM", ["DOG-RECIPE"]),
+        ("Q-RAT", "CORRECT", ["RAT-LIGHT", "RAT-CONTAINMENT"]),
+        ("Q-RAT", "RANDOM", ["RAT-RECIPE"]),
         ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS"]),
     ],
 )

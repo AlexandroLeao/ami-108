@@ -4,7 +4,7 @@ import type { Locale } from '../narrative/catalog';
 
 export const GENERATION_DEADLINE_MS = 2500;
 export type GenerationRequest = {
-  requestId: string; questionId: 'Q-DOG' | 'INTRO-RANDOM'; category: 'CORRECT' | 'RANDOM';
+  requestId: string; questionId: 'Q-DOG' | 'Q-RAT' | 'INTRO-RANDOM'; category: 'CORRECT' | 'RANDOM';
   locale: Locale; factIds: string[]; deadlineMs: number;
 };
 export type GenerationAudit = { generationStatus: 'VALIDATED' | 'FALLBACK_REQUIRED'; generationReason: string | null };
@@ -18,6 +18,15 @@ export function generationRequest(before: NarrativeState, after: NarrativeState,
   if (!before.intro && after.intro) {
     return { ...common, questionId: 'INTRO-RANDOM', category: 'RANDOM', factIds: ['INTRO-OCTOPUS'] };
   }
+  // Only newly resolved slots at the active consultation transition may call AI.
+  // Cached slots are retained across chapter restart and retry.
+  if (before.stepId.startsWith('A03-S02/DECISION-') && /^A03-S02\/Q-[123]$/.test(after.stepId)) {
+    const previous = before.savedRatSlots ?? before.chapterThree?.rat?.slots ?? [];
+    const slot = after.chapterThree?.rat?.slots.find(item => !previous.some(old => old.index === item.index));
+    if (!slot) return null;
+    return { ...common, questionId: 'Q-RAT', category: slot.category,
+      factIds: slot.category === 'CORRECT' ? ['RAT-LIGHT', 'RAT-CONTAINMENT'] : ['RAT-RECIPE'] };
+  }
   const previous = before.savedDogSlots ?? before.chapterTwo?.dog.slots ?? [];
   const slot = after.chapterTwo?.dog.slots.find(item => !previous.some(old => old.index === item.index));
   if (!slot) return null;
@@ -27,6 +36,7 @@ export function generationRequest(before: NarrativeState, after: NarrativeState,
 
 export function expectedText(request: GenerationRequest, next: NarrativeState): string | undefined {
   if (request.questionId === 'INTRO-RANDOM') return next.intro?.text[request.locale];
+  if (request.questionId === 'Q-RAT') return next.chapterThree?.rat?.slots.at(-1)?.text[request.locale];
   return next.chapterTwo?.dog.slots.at(-1)?.text[request.locale];
 }
 

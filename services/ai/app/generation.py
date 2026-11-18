@@ -90,7 +90,7 @@ class Rule:
 
 
 # The only enabled contexts are those already present in the accepted campaign.
-# Later questions are recognized by the wire contract but denied by retrieval.
+# Q-BOAR is recognized by the wire contract but denied until its narrative gate exists.
 _DOG_CORRECT = Rule(
     facts=(
         ("DOG-VISION", Localized("Visão comprometida.", "Impaired vision.")),
@@ -114,10 +114,40 @@ _DOG_RANDOM = Localized(
     "Três ovos. Duas xícaras de açúcar. Misture até obter uma consistência homogênea.",
     "Three eggs. Two cups of sugar. Mix until smooth.",
 )
+_RAT_CORRECT = Rule(
+    facts=(
+        (
+            "RAT-LIGHT",
+            Localized(
+                "Organismos da primeira geração são intolerantes à luz intensa.",
+                "First-generation organisms are intolerant of intense light.",
+            ),
+        ),
+        (
+            "RAT-CONTAINMENT",
+            Localized(
+                "A iluminação de contenção força o organismo a recuar.",
+                "Containment lighting forces the organism to retreat.",
+            ),
+        ),
+    ),
+    approved=Localized(
+        "Os organismos da primeira geração desenvolveram intolerância à luz intensa. "
+        "O sistema de iluminação de contenção deverá forçá-lo a recuar.",
+        "First-generation organisms developed an intolerance to intense light. "
+        "The containment lighting system should force it to retreat.",
+    ),
+)
+_RAT_RANDOM = Localized(
+    "Para remover a casca de um ovo cozido, recomenda-se mergulhá-lo em água fria.",
+    "To remove the shell from a boiled egg, immersing it in cold water is recommended.",
+)
 _INTRO_RANDOM = Localized("Os polvos têm três corações.", "Octopuses have three hearts.")
 _RULES: dict[tuple[Question, Category], Rule] = {
     ("Q-DOG", "CORRECT"): _DOG_CORRECT,
     ("Q-DOG", "RANDOM"): Rule((("DOG-RECIPE", _DOG_RANDOM),), _DOG_RANDOM),
+    ("Q-RAT", "CORRECT"): _RAT_CORRECT,
+    ("Q-RAT", "RANDOM"): Rule((("RAT-RECIPE", _RAT_RANDOM),), _RAT_RANDOM),
     ("INTRO-RANDOM", "RANDOM"): Rule((("INTRO-OCTOPUS", _INTRO_RANDOM),), _INTRO_RANDOM),
 }
 
