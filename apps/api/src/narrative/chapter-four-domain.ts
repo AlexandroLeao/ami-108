@@ -1,12 +1,12 @@
 // AMI-009 Chapter 4 domain; engine.ts owns session dispatch.
 // The authoritative session transaction persists a complete returned state atomically.
-import { local, type Locale, type Localized } from './catalog';
+import { local, type Locale, type Localized, type Cue } from './catalog';
 import type { Diagnostics } from './engine';
 import { AMI_MEMORY_FRAGMENTS, BETRAYAL_DIALOGUE, BETRAYAL_RETURN, DAVID_MEMORY_TRIGGER, FAMILY_RETURN, FINAL_RESTORATION, MANUAL_RECORDS, RESTORATION_DIALOGUE } from './chapter-four-catalog';
 
 type Asset = 'CENA-01' | 'CENA-05' | 'CENA-08' | 'CENA-11' | 'CENA-12';
 type Event = 'F3' | 'E-FAMILY' | 'MEM-D4' | 'FB-D4' | 'FB-D5' | 'E-BETRAYAL' | 'E-PAST-RESTORED';
-type Beat = Readonly<{ id: string; text: Localized; speaker: string | null; asset: Asset | null; phase: 'NARRATIVE' | 'FLASHBACK' | 'CHAPTER_CARD'; event?: readonly Event[]; interaction?: true; record?: true }>;
+type Beat = Readonly<{ id: string; text: Localized; speaker: string | null; asset: Asset | null; phase: 'NARRATIVE' | 'FLASHBACK' | 'CHAPTER_CARD'; event?: readonly Event[]; interaction?: true; record?: true; cue?: Cue }>;
 const line = (scene: string, b: {id: string; text: Localized; speaker: string}, asset: Asset | null, phase: Beat['phase'] = 'NARRATIVE'): Beat => ({
   id: scene + '/' + b.id, text: b.text, speaker: b.speaker === 'CHILD' ? 'CRIANÇA' : b.speaker, asset, phase,
 });
@@ -16,46 +16,62 @@ const narration = (id: string, text: Localized, asset: Asset | null, phase: Beat
 const s1 = 'A04-S01';
 const s2 = 'A04-S02';
 const f = (id: string) => s2 + '/' + id;
-const r = RESTORATION_DIALOGUE.map(b => line(s1, b, 'CENA-05'));
-const family = FAMILY_RETURN.map(b => line(s2, b, 'CENA-05'));
-const memory = BETRAYAL_DIALOGUE.map(b => line(s2, b, b.id === 'F09' ? null : 'CENA-01', 'FLASHBACK'));
-const returnBeats = BETRAYAL_RETURN.map(b => line(s2, b, 'CENA-05'));
+const r = RESTORATION_DIALOGUE.map(b => line(s1, b, null));
+const family = FAMILY_RETURN.map(b => line(s2, b, null));
+const memory = BETRAYAL_DIALOGUE.map(b => line(s2, b, null, 'FLASHBACK'));
+const returnBeats = BETRAYAL_RETURN.map(b => line(s2, b, null));
 const CARD = 'A04-S01/CHAPTER_CARD';
 export const CHAPTER_FIVE_BOUNDARY = 'A05-S01/CHAPTER_CARD';
-// Narration translates the source scene directions; no new character dialogue or facts.
+// Owner playtest amendments; all dark beats remain assetless.
+// Sound is described in text only; no audio or original image changes.
 const sequence: readonly Beat[] = [
   narration(CARD, local('CAPÍTULO 4 — AMI-108 & DAVID', 'CHAPTER 4 — AMI-108 & DAVID'), null, 'CHAPTER_CARD'),
+  narration(s1+'/APPROACH-01', local('Com a rota recuperada no arquivo central, vocês deixam o complexo para trás e seguem em direção à instalação militar. As ruas estão desertas, e cada desvio exige cuidado.', 'With the route recovered from the central archive, you leave the complex behind and head toward the military facility. The streets are deserted, and every detour calls for caution.'), null),
+  narration(s1+'/APPROACH-02', local('Ao chegarem, vocês atravessam os corredores silenciosos até encontrar um terminal de manutenção protegido. AMI examina o equipamento em busca do último componente de que precisa.', 'Upon arrival, you cross the silent corridors until you find a protected maintenance terminal. AMI scans the equipment for the final component he needs.'), null),
   ...r.slice(0, 2),
-  { ...narration(s1 + '/INSTALL', local('Você instala o componente compatível diretamente em AMI.', 'You install the compatible component directly in AMI.'), 'CENA-05'), interaction: true },
-  // The panels show the restoration in order; the authoritative F3 state
-  // already commits all four indexes and energy in one transaction.
-  { ...narration(s1 + '/F3-INDEXES', local('MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%', 'MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%'), null), record: true, event: ['F3'] },
-  { ...narration(s1 + '/F3-PERSONAL', local('PERSONAL — DESBLOQUEADO\nPERSONAL — 100%', 'PERSONAL — UNLOCKED\nPERSONAL — 100%'), null), record: true },
-  r[2],
+  { ...narration(s1 + '/INSTALL', local('Com o componente encaixado, você observa AMI iniciar a atualização. Pequenos ruídos eletrônicos quebram o silêncio enquanto ele reconstrói seus arquivos.', 'With the component fitted, you watch AMI begin the update. Soft electronic sounds break the silence as he reconstructs his files.'), null), interaction: true },
+  narration(s1+'/FACE-UPDATE', local('Você observa a tela que forma o rosto de AMI se transformar. No lugar de seus olhos, surgem os indicadores de recuperação.', 'You watch the screen that forms AMI’s face change. Recovery indicators appear where his eyes were.'), null),
+  // The F3 transaction commits all indexes and energy together. The animation is presentation only.
+  { ...narration(s1 + '/F3-INDEXES', local('MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%', 'MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%'), null), record: true, cue:'f3-count', event: ['F3'] },
+  { ...narration(s1 + '/F3-PERSONAL', local('MEMÓRIAS RESTAURADAS — 100%', 'MEMORIES RESTORED — 100%'), null), record: true },
+  { ...narration(s1+'/L03', local('ARQUIVOS PESSOAIS DISPONÍVEIS', 'PERSONAL FILES AVAILABLE'), null), record:true },
   ...MANUAL_RECORDS.map((text,i): Beat => ({ ...narration(s1 + '/MANUAL-' + (i+1), text, null), record: true })),
-  ...r.slice(3),
-  narration(f('FB-A1'), local('Uma criança se aproxima de AMI, ainda com todos os seus membros.', 'A child approaches AMI, still with all his limbs.'), 'CENA-08', 'FLASHBACK'),
-  ...AMI_MEMORY_FRAGMENTS[0].dialogue.map(b => line(s2,b,'CENA-08','FLASHBACK')),
+  ...r.slice(2),
+  narration(f('FB-A1'), local('O rosto de AMI começa a falhar. Linhas de interferência atravessam sua tela, como se uma gravação antiga tentasse voltar à vida.', 'AMI’s face begins to glitch. Lines of interference cross his screen, as though an old recording were struggling back to life.'), null, 'FLASHBACK'),
+  line(s2,AMI_MEMORY_FRAGMENTS[0].dialogue[0],null,'FLASHBACK'),
+  { ...line(s2,AMI_MEMORY_FRAGMENTS[0].dialogue[1],'CENA-08','FLASHBACK'), cue:'crt-reveal' },
+  line(s2,AMI_MEMORY_FRAGMENTS[0].dialogue[2],'CENA-08','FLASHBACK'),
   narration(f('FB-A1-LAUGH'), local('A criança ri.', 'The child laughs.'), 'CENA-08', 'FLASHBACK'),
   narration(f('FB-A2'), local('AMI canta enquanto a criança adormece.', 'AMI sings as the child falls asleep.'), 'CENA-08', 'FLASHBACK'),
-  narration(f('FB-A3'), local('Alarmes soam enquanto a família tenta sair. Um lagarto mutante se aproxima.', 'Alarms sound as the family tries to leave. A mutant lizard approaches.'), 'CENA-12', 'FLASHBACK'),
-  narration(f('FB-A3-PROTECT'), local('AMI se coloca entre a família e a criatura, estendendo os membros para protegê-la.', 'AMI steps between the family and the creature, extending his limbs to protect them.'), 'CENA-12', 'FLASHBACK'),
-  narration(f('FB-A4'), local('Interferência. Membros danificados. Um forte impacto.', 'Interference. Damaged limbs. A heavy impact.'), null, 'FLASHBACK'),
-  ...AMI_MEMORY_FRAGMENTS[3].dialogue.map(b => line(s2,b,null,'FLASHBACK')),
-  narration(f('FB-A4-END'), local('REGISTRO INTERROMPIDO', 'RECORD INTERRUPTED'), null, 'FLASHBACK'),
-  narration(f('FAMILY-PAUSE'), local('Os olhos de AMI reaparecem tristes. David permanece ao lado dele.', 'AMI’s eyes reappear, sad. David remains beside him.'), 'CENA-05'),
+  narration(f('FB-A2-RECOGNIZE'), local('Você reconhece a melodia. É a mesma que ouviu quando chegou à residência onde encontrou AMI.', 'You recognize the melody. It is the same one you heard when you reached the house where you found AMI.'), 'CENA-08', 'FLASHBACK'),
+  narration(f('FB-A3'), local('As imagens no rosto de AMI mudam.', 'The images on AMI’s face change.'), null, 'FLASHBACK'),
+  narration(f('FB-A3-ALARMS'), local('Sons de alarmes e gritos ecoam na gravação.', 'Alarms and screams echo through the recording.'), null, 'FLASHBACK'),
+  narration(f('FB-A3-PROTECT'), local('Entre as falhas da gravação, você percebe AMI enfrentando algo, estendendo seus membros para proteger as pessoas atrás dele. A julgar pelos registros anteriores, aquela era sua família.', 'Through the gaps in the recording, you make out AMI facing something, extending his limbs to protect the people behind him. Judging by the earlier recordings, they were his family.'), null, 'FLASHBACK'),
+  line(s2,AMI_MEMORY_FRAGMENTS[3].dialogue[0],null,'FLASHBACK'),
+  { ...narration(f('FB-A3-IMAGE'), local('',''),'CENA-12','FLASHBACK'), cue:'crt-startle' },
+  { ...narration(f('FB-A4'), local('FORTE IMPACTO. MEMÓRIA COMPROMETIDA. ERRO. ERRO. MEMBROS DANIFICADOS.', 'HEAVY IMPACT. MEMORY COMPROMISED. ERROR. ERROR. LIMBS DAMAGED.'), null, 'FLASHBACK'), record:true },
+  { ...narration(f('FB-A4-END'), local('REGISTRO INTERROMPIDO', 'RECORD INTERRUPTED'), null, 'FLASHBACK'), record:true },
+  narration(f('FAMILY-PAUSE'), local('Os olhos de AMI reaparecem na tela, mas dessa vez estão claramente tristes.', 'AMI’s eyes reappear on the screen, but this time they are clearly sad.'), null),
   ...family,
-  narration(f('FAMILY-END'), local('AMI não responde. David permanece ao lado dele.', 'AMI does not respond. David remains beside him.'), 'CENA-05', 'NARRATIVE', ['E-FAMILY']),
-  narration(f('MEM-D4-APPROACH'), local('Você examina um compartimento de alimentação cujo símbolo lembra o do depósito.', 'You examine a power compartment whose symbol resembles the one in the warehouse.'), 'CENA-05'),
+  narration(f('FAMILY-END'), local('AMI não responde. Você permanece ao seu lado.', 'AMI does not respond. You remain by his side.'), null, 'NARRATIVE', ['E-FAMILY']),
+  narration(f('MEM-D4-APPROACH'), local('Até que, novamente, aquela dor intensa retorna à sua cabeça.', 'Until, once again, that intense pain returns to your head.'), null),
   { ...line(s2,DAVID_MEMORY_TRIGGER[0],null,'FLASHBACK'), event: ['MEM-D4'] },
-  narration(f('FB-D4'), local('David e Howard encontram o núcleo raro no depósito.', 'David and Howard find the rare core in the warehouse.'), 'CENA-01', 'FLASHBACK', ['FB-D4']),
-  ...memory.slice(0,8),
-  narration(f('FB-D5'), local('Howard atinge a cabeça de David com a mesma barra de ferro vista na abertura.', 'Howard strikes David’s head with the same iron bar seen in the opening.'), 'CENA-11', 'FLASHBACK', ['FB-D5']),
-  memory[8],
-  narration(f('FB-D5-END'), local('A barra cai no chão. Howard leva o núcleo e seus passos se afastam.', 'The bar falls to the floor. Howard takes the core and his footsteps fade away.'), null, 'FLASHBACK'),
-  narration(f('FB-D1-RECALL'), local('As duas crianças daquela lembrança eram David e Howard.', 'The two children in that memory were David and Howard.'), null, 'FLASHBACK'),
+  narration(f('FB-D4'), local('Você abre os olhos e percebe que está de volta ao depósito onde acordou sem memória.', 'You open your eyes and realize you are back in the warehouse where you woke up without your memories.'), null, 'FLASHBACK', ['FB-D4']),
+  narration(f('FB-D4-SEARCH'), local('Howard está com você. Vocês vasculham o depósito à procura de algo valioso.', 'Howard is with you. You search the warehouse for something valuable.'), null, 'FLASHBACK'),
+  narration(f('FB-D4-FIND'), local('Com dificuldade, você consegue abrir um compartimento metálico emperrado. Por um instante, não acredita no que acaba de encontrar.', 'With difficulty, you manage to pry open a jammed metal compartment. For a moment, you cannot believe what you have just found.'), null, 'FLASHBACK'),
+  line(s2,{id:'F00a',speaker:'DAVID',text:local('Puta merda, Howard! Você não vai acreditar no que eu achei!', 'Holy shit, Howard! You won’t believe what I found!')},null,'FLASHBACK'),
+  line(s2,{id:'F00b',speaker:'DAVID',text:local('Um núcleo energético de alta densidade! Estamos ricos, cara!', 'A high-density energy core! We’re rich, man!')},null,'FLASHBACK'),
+  ...memory.slice(0,7),
+  line(s2,{id:'F07b',speaker:'HOWARD',text:local('...','...')},null,'FLASHBACK'),
+  memory[7],
+  narration(f('FB-D5'), local('Enquanto você se abaixa para guardar o núcleo energético, sente um forte impacto na cabeça. Sua visão escurece e você perde os sentidos.', 'As you bend down to pack the energy core, you feel a heavy blow to your head. Your vision darkens and you lose consciousness.'), null, 'FLASHBACK', ['FB-D5']),
+  { ...memory[8], asset:'CENA-11', cue:'disoriented' },
+  narration(f('FB-D5-END'), local('Você escuta um som metálico caindo no chão.', 'You hear a metallic object fall to the floor.'), null, 'FLASHBACK'),
+  narration(f('FB-D5-RESTORED'), local('Suas memórias retornam por completo.', 'Your memories return in full.'), null, 'FLASHBACK'),
+  narration(f('FB-D1-RECALL'), local('Você se dá conta de que as duas crianças brincando naquela lembrança eram você e Howard, seu amigo de infância. A raiva cresce dentro de você ao compreender a traição.', 'You realize that the two children playing in that memory were you and Howard, your childhood friend. Anger grows within you as you understand the betrayal.'), null, 'FLASHBACK'),
   ...returnBeats,
-  narration(f('PAST-RESTORED'), local('David olha para o chão. AMI não insiste.', 'David looks down. AMI does not press him.'), 'CENA-05', 'NARRATIVE', ['E-BETRAYAL','E-PAST-RESTORED']),
+  narration(f('PAST-RESTORED'), local('Você olha para AMI, determinado, e o acomoda novamente na parte da frente da mochila, junto ao peito.', 'You look at AMI with determination and settle him back against your chest, on the front of your backpack.'), null, 'NARRATIVE', ['E-BETRAYAL','E-PAST-RESTORED']),
+  narration(f('DEPART'), local('Com suas memórias recuperadas e a rota em mãos, vocês deixam a instalação militar e seguem em direção à área de evacuação.', 'With your memories restored and the route in hand, you leave the military facility and head toward the evacuation area.'), null),
   narration(CHAPTER_FIVE_BOUNDARY, local('CAPÍTULO 5 — DE NADA, BOBO', 'CHAPTER 5 — YOU’RE WELCOME, BOBO'), null, 'CHAPTER_CARD'),
 ];
 export type ChapterFourProgress = Readonly<{
@@ -79,12 +95,12 @@ export function viewFour(state: ChapterFourProgress) {
   const b=sequence[visible];
   const actions: {id:string; kind:'CONTINUE'|'INTERACT'|'PREVIOUS'; label:string}[]=[];
   if (visible<sequence.length-1) actions.push({id:b.id+'/NEXT',kind:!state.reviewStepId && b.interaction?'INTERACT':'CONTINUE',
-    label:(!state.reviewStepId&&b.interaction?local('Instalar componente','Install component'):local('Continuar','Continue'))[state.locale]});
+    label:(!state.reviewStepId&&b.interaction?local('Iniciar atualização','Start update'):local('Continuar','Continue'))[state.locale]});
   // Never expose future steps or reapply effects in review.
   if(visible>0) actions.push({id:b.id+'/PREVIOUS',kind:'PREVIOUS',label:local('Fala anterior','Previous dialogue')[state.locale]});
   return {revision:state.revision,locale:state.locale,stepId:b.id,phase:b.phase,
     speaker:b.speaker==='CRIANÇA'&&state.locale==='en'?'CHILD':b.speaker,
-    text:b.text[state.locale],asset:b.asset,record:b.record===true,diagnostics:state.diagnostics,actions,
+    text:b.text[state.locale],asset:b.asset,record:b.record===true,cue:b.cue,diagnostics:state.diagnostics,actions,
     reached:sequence[reached].id};
 }
 export function advanceFour(state: ChapterFourProgress, actionId: string, revision: number): ChapterFourProgress {
