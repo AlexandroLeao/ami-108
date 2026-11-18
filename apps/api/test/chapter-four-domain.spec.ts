@@ -29,6 +29,9 @@ describe('isolated Chapter 4 transitions',()=>{
     const restored=next(install);
     expect(restored.diagnostics).toEqual(FINAL_RESTORATION);
     expect(restored.events).toEqual(['F3']);
+    expect(viewFour(restored)).toMatchObject({stepId:'A04-S01/F3-INDEXES',record:true,asset:null});
+    expect(viewFour(next(restored))).toMatchObject({stepId:'A04-S01/F3-PERSONAL',record:true,asset:null});
+    expect(next(restored).events).toEqual(['F3']);
     expect(install.diagnostics).toEqual(f2);
     expect(()=>advanceFour(restored,'A04-S01/INSTALL/NEXT',install.revision)).toThrow('STALE_REVISION');
     expect(()=>advanceFour(restored,'A04-S01/INSTALL/NEXT',restored.revision)).toThrow('ACTION_NOT_ALLOWED');
