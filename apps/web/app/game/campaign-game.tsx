@@ -189,6 +189,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       retry.current = null;
       setReadyCard(null);
       setReadyImage('');
+      setCount({key:'',progress:0});
       accept(next);
     });
   };
@@ -205,6 +206,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       retry.current = null;
       setReadyCard(null);
       setReadyImage('');
+      setCount({key:'',progress:0});
       if (current.locale !== preference) await mutate(current, { locale: preference });
       else accept(current);
       setOverlay('none');
@@ -217,6 +219,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       retry.current = null;
       setReadyCard(null);
       setReadyImage('');
+      setCount({key:'',progress:0});
       const next = await mutate(current, { actionId: 'CHAPTER/RESTART/' + number });
       if (next.locale !== preference) await mutate(next, { locale: preference });
       setOverlay('none');
@@ -247,7 +250,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const mainMenu = () => {
     if (busyRef.current) return;
     retry.current = null;
-    setView(null); setOverlay('none'); setNotice(null); setReadyCard(null); setReadyImage('');
+    setView(null); setOverlay('none'); setNotice(null); setReadyCard(null); setReadyImage(''); setCount({key:'',progress:0});
   };
 
   useEffect(() => {
