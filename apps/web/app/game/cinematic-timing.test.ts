@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { beatKey, countF3, energyMotion, imageGateMs } from './cinematic-timing';
+import { beatKey, countF3, energyMotion, imageGateMs, hasMemorySignal } from './cinematic-timing';
 import type { CampaignView } from './client';
 
 const view = (id:string,cue:CampaignView['cue'],asset=true):CampaignView => ({
@@ -27,6 +27,17 @@ describe('owner-requested cinematic timing',()=>{
     for(const id of ['TUTORIAL','TUTORIAL-b','TUTORIAL-c']) expect(energyMotion(view('A01-S03/'+id,'none',false))).toBe('tutorial');
     expect(energyMotion(view('A01-S03/RETURN-STREET','none',false))).toBe('settle');
     expect(energyMotion(view('A01-S03/L38','none'))).toBe('none');
+  });
+  it('retains CRT signal only on the two Chapter 4 AMI memory images',()=>{
+    const memory={...view('A04-S02/FB-A1/02','crt-reveal'),chapter:4,phase:'FLASHBACK' as const};
+    for(const key of ['CENA-08','CENA-12']) {
+      const asset={url:'/api/game/asset?key='+key,alt:''};
+      expect(hasMemorySignal({...memory,asset})).toBe(true);
+      expect(hasMemorySignal({...memory,asset,cue:'none'})).toBe(true);
+      expect(hasMemorySignal({...memory,asset,chapter:3})).toBe(false);
+    }
+    expect(hasMemorySignal({...memory,asset:null})).toBe(false);
+    expect(hasMemorySignal({...memory,asset:{url:'/api/game/asset?key=CENA-11',alt:''}})).toBe(false);
   });
   it('counts from the actual F2 indexes to precisely 100 without modifying saved state',()=>{
     const text='MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%';
