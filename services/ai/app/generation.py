@@ -82,6 +82,7 @@ class AuthorizedContext:
     facts: tuple[tuple[str, str], ...]
     approved_text: str
     alternatives: tuple[str, ...] = ()
+    selection_options: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -216,6 +217,9 @@ def retrieve(request: GenerationRequest) -> AuthorizedContext | None:
         facts=tuple((fact_id, fact.text(request.locale)) for fact_id, fact in rule.facts),
         approved_text=rule.approved.text(request.locale),
         alternatives=tuple(text.text(request.locale) for text in rule.alternatives),
+        # The same bilingual rule supplies a compact shared selection language.
+        # Index ordering is identical to the requested localized utterances.
+        selection_options=(rule.approved.en, *(text.en for text in rule.alternatives)),
     )
 
 
