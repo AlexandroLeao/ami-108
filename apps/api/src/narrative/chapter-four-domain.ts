@@ -30,9 +30,9 @@ const sequence: readonly Beat[] = [
   narration(s1+'/APPROACH-02', local('Ao chegarem, vocês atravessam os corredores silenciosos até encontrar um terminal de manutenção protegido. AMI examina o equipamento em busca do último componente de que precisa.', 'Upon arrival, you cross the silent corridors until you find a protected maintenance terminal. AMI scans the equipment for the final component he needs.'), null),
   ...r.slice(0, 2),
   { ...narration(s1 + '/INSTALL', local('Com o componente encaixado, você observa AMI iniciar a atualização. Pequenos ruídos eletrônicos quebram o silêncio enquanto ele reconstrói seus arquivos.', 'With the component fitted, you watch AMI begin the update. Soft electronic sounds break the silence as he reconstructs his files.'), null), interaction: true },
-  narration(s1+'/FACE-UPDATE', local('Você observa a tela que forma o rosto de AMI se transformar. No lugar de seus olhos, surgem os indicadores de recuperação.', 'You watch the screen that forms AMI’s face change. Recovery indicators appear where his eyes were.'), null),
+  { ...narration(s1+'/FACE-UPDATE', local('Você observa a tela que forma o rosto de AMI se transformar. No lugar de seus olhos, surgem os indicadores de recuperação.', 'You watch the screen that forms AMI’s face change. Recovery indicators appear where his eyes were.'), null), event:['F3'] },
   // The F3 transaction commits all indexes and energy together. The animation is presentation only.
-  { ...narration(s1 + '/F3-INDEXES', local('MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%', 'MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%'), null), record: true, cue:'f3-count', event: ['F3'] },
+  { ...narration(s1 + '/F3-INDEXES', local('MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%', 'MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%'), null), record: true, cue:'f3-count' },
   { ...narration(s1 + '/F3-PERSONAL', local('MEMÓRIAS RESTAURADAS — 100%', 'MEMORIES RESTORED — 100%'), null), record: true },
   { ...narration(s1+'/L03', local('ARQUIVOS PESSOAIS DISPONÍVEIS', 'PERSONAL FILES AVAILABLE'), null), record:true },
   ...MANUAL_RECORDS.map((text,i): Beat => ({ ...narration(s1 + '/MANUAL-' + (i+1), text, null), record: true })),
