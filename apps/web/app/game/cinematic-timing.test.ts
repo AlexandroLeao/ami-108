@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { beatKey, countF3, energyMotion, imageGateMs, hasMemorySignal, hasDavidMemoryShiver } from './cinematic-timing';
+import { beatKey, countF3, energyMotion, imageGateMs, hasMemorySignal, hasDavidMemoryShiver, showEnergyIndicator } from './cinematic-timing';
 import type { CampaignView } from './client';
 
 const view = (id:string,cue:CampaignView['cue'],asset=true):CampaignView => ({
@@ -49,6 +49,18 @@ describe('owner-requested cinematic timing',()=>{
     expect(imageGateMs(memory('FB-D5-END','fade-black'))).toBe(0);
     const betrayal={...memory('F09','disoriented'),asset:{url:'/api/game/asset?key=CENA-11',alt:''}};
     expect(imageGateMs(betrayal)).toBe(1450);
+  });
+  it('hides energy throughout Chapter 4 while preserving existing HUD conditions elsewhere',()=>{
+    for(const id of ['FB-A1/02','FB-A3-IMAGE','F09']) {
+      expect(showEnergyIndicator({...view('A04-S02/'+id,'none'),chapter:4,phase:'FLASHBACK'})).toBe(false);
+    }
+    expect(showEnergyIndicator({...view('A04-S01/F3-INDEXES','f3-count',false),chapter:4,information:true})).toBe(false);
+    for(const chapter of [1,2,3,5]) {
+      expect(showEnergyIndicator({...view('A01-S01/L02','wake'),chapter})).toBe(true);
+      expect(showEnergyIndicator({...view('A01-S01/L02','none',false),chapter})).toBe(false);
+    }
+    expect(showEnergyIndicator({...view('A01-S03/TUTORIAL','energy-reveal',false),information:true})).toBe(true);
+    expect(showEnergyIndicator(view('A01-S03/RETURN-STREET','none',false))).toBe(true);
   });
   it('counts from the actual F2 indexes to precisely 100 without modifying saved state',()=>{
     const text='MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%';
