@@ -33,6 +33,7 @@
   trap cleanup EXIT
   git worktree add --detach "$worktree" "$candidate"
   df -h /
+  test "$(df -Pk / | awk 'NR==2 {print $4}')" -ge 10485760 || { echo 'Less than 10 GiB free; aborting before builds.'; exit 1; }
   docker build -t "$image" "$worktree/services/ai"
   docker build -f "$worktree/infra/node.Dockerfile" --target api -t "$apiimage" "$worktree"
   docker build -f "$worktree/infra/node.Dockerfile" --target web -t "$webimage" "$worktree"
@@ -73,7 +74,7 @@
     -v "$dbvolume:/var/lib/postgresql/data" postgres:17-alpine
   ready=0
   for i in $(seq 1 60); do
-    if docker exec "$db" pg_isready -U ami_test -d ami_test >/dev/null 2>&1; then ready=1; break; fi
+    if docker exec "$db" pg_isready -h 127.0.0.1 -U ami_test -d ami_test >/dev/null 2>&1; then ready=1; break; fi
     sleep 1
   done
   test "$ready" = 1
@@ -257,4 +258,7 @@ NODE
   docker stop "$server" >/dev/null
   drive offline
   echo 'ISOLATED E2E PASSED'
+  echo '=== Accepted stack (read-only) ==='
+  docker compose ps
+  docker compose exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT count(*) FROM \"GameSession\";"'
 )
