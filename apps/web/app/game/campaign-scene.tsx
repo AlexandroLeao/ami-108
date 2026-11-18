@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { CampaignView } from './client';
-import { beatKey, imageGateMs } from './cinematic-timing';
+import { beatKey, imageGateMs, hasMemorySignal } from './cinematic-timing';
 import { copy } from '../preview/copy';
 
 function CurrentArtwork({ asset, cue, missing, gate, duration, onReady }: { asset: NonNullable<CampaignView['asset']>; cue: CampaignView['cue']; missing: string; gate: string; duration: number; onReady?: (key: string) => void }) {
@@ -41,10 +41,11 @@ export function CampaignScene({ view, children, onReady }: { view: CampaignView;
   const [last, setLast] = useState({ key, asset: view.asset });
   if (last.key !== key) setLast({ key, asset: view.asset ?? (closing && last.key.startsWith('/api/game/asset?') ? last.asset : null) });
   const artwork = view.asset ?? (closing ? last.asset : null);
+  const currentArtwork = artwork && <CurrentArtwork key={artwork.url} asset={artwork} cue={view.cue} missing={copy[view.locale].missingArt} gate={gate} duration={duration} onReady={onReady} />;
   return (
     <div className="scene-frame campaign-scene" data-visible={view.asset !== null} data-cue={view.cue} data-cinematic-beat={gate}>
       <div className="scene-visual" aria-hidden={view.asset === null}>
-        {artwork && <CurrentArtwork key={artwork.url} asset={artwork} cue={view.cue} missing={copy[view.locale].missingArt} gate={gate} duration={duration} onReady={onReady} />}
+        {hasMemorySignal(view) ? <div className="campaign-memory-signal">{currentArtwork}</div> : currentArtwork}
         {artwork && (view.cue === 'close-eyes' || view.cue === 'blink-black') && (
           <div className={'eyelids ' + (view.cue === 'blink-black' ? 'campaign-blink-black' : 'campaign-close-eyes')} aria-hidden="true"><span /><span /></div>
         )}
