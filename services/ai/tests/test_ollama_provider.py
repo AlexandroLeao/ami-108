@@ -68,7 +68,8 @@ def test_transport_uses_bounded_nonstreaming_authorized_context() -> None:
         assert data["stream"] is False
         assert data["options"]["num_predict"] == 4
         prompt = json.loads(data["prompt"])
-        assert prompt["options"] == {"0": context.approved_text, "1": context.alternatives[0]}
+        assert prompt["options"] == {"0": "Octopuses have three hearts.", "1": "Penguins cannot fly."}
+        assert prompt["locale"] == "en"
         assert set(prompt) == {"locale", "category", "options"}
         assert req.requestId not in data["prompt"]
         response.read.assert_called_once_with(16385)
@@ -109,3 +110,27 @@ def test_maps_only_current_context(output: str, index: int) -> None:
         result = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
         assert result.status == "VALIDATED"
         assert result.text == (context.approved_text, *context.alternatives)[index]
+
+
+@pytest.mark.parametrize("locale", ["pt-BR", "en"])
+def test_shared_prompt_maps_to_requested_language(locale: str) -> None:
+    req = GenerationRequest.model_validate({
+        "requestId": str(uuid4()), "questionId": "Q-DOG", "category": "RANDOM",
+        "locale": locale, "factIds": ["DOG-RECIPE", "DOG-SATURN", "DOG-LAUNDRY"],
+        "deadlineMs": 2500,
+    })
+    context = retrieve(req)
+    assert context is not None
+    with patch("app.ollama_provider.http.client.HTTPConnection") as constructor:
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"done": True, "response": "2"}
+        ).encode()
+        result = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
+        assert result.status == "VALIDATED"
+        assert result.text == context.alternatives[1]
+        prompt = json.loads(json.loads(conn.request.call_args.args[2])["prompt"])
+        assert prompt["locale"] == "en"
+        assert prompt["options"]["2"] == "To remove stains from light fabrics, mild soap is recommended."
+        assert prompt["options"]["0"] == "Three eggs. Two cups of sugar. Mix until smooth."
