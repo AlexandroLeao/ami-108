@@ -9,10 +9,10 @@ function CurrentArtwork({ asset, cue, missing, gate, duration, onReady }: { asse
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
-    if (!gate || (!loaded && !failed)) return;
+    if (!gate || !loaded || failed) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // A missing image keeps its existing error status; do not permanently trap the player.
-    const timer = window.setTimeout(() => onReady?.(gate), failed || reduced ? 0 : duration);
+    // Unlock only after successful load and the scoped effect. Failed art offers a retry.
+    const timer = window.setTimeout(() => onReady?.(gate), reduced ? 0 : duration);
     return () => window.clearTimeout(timer);
   }, [loaded, failed, gate, duration, onReady]);
   return (
@@ -20,7 +20,7 @@ function CurrentArtwork({ asset, cue, missing, gate, duration, onReady }: { asse
       {!failed && <Image src={asset.url} alt={asset.alt} width={1536} height={864} unoptimized loading="eager"
         className="scene-art" data-startle={loaded && cue === 'startle'} data-fade-in={loaded && cue === 'fade-in'} data-cinematic-loaded={loaded} style={{ visibility: loaded ? 'visible' : 'hidden' }}
         onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />}
-      {failed && <div className="scene-missing" role="status">{missing}</div>}
+      {failed && <div className="scene-missing" role="status">{missing}{gate && <button type="button" className="game-control" onClick={() => { setLoaded(false); setFailed(false); }}>{asset.alt && missing === copy['pt-BR'].missingArt ? 'Tentar novamente' : 'Try again'}</button>}</div>}
       {loaded && !failed && (cue === 'wake' || cue === 'disoriented') && (
         <>
           <div className="wake-optics" aria-hidden="true" />
