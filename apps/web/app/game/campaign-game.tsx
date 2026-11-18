@@ -322,14 +322,14 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={(view.cue === 'archive-record' || view.cue === 'f3-count')} data-f3-count={counting} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={(view.cue === 'archive-record' || view.cue === 'f3-count')} data-f3-count={counting} data-chapter-four-record={view.chapter===4 && (view.cue==='archive-record' || counting)} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
               {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
                 <div className="campaign-choice-list">
                   {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" data-kind={action.kind} disabled={busy}
                     onClick={() => void run(() => mutate(view, { actionId: action.id }))}>{action.label}</button>)}
                 </div>
-              </div> : <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
+              </div> : <div className="dialogue-copy" aria-live={counting && !cinematicReady ? 'off' : 'polite'} aria-atomic="true">
                 {!showChapter && (
                   <>
                     {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
