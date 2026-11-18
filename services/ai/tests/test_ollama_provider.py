@@ -49,7 +49,10 @@ def test_transport_uses_bounded_nonstreaming_authorized_context() -> None:
     )
     context = retrieve(req)
     assert context is not None
-    with patch("app.ollama_provider.http.client.HTTPConnection") as constructor:
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom"),
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
         conn = constructor.return_value
         response = MagicMock()
         response.status = 200
@@ -82,7 +85,10 @@ def test_invalid_index_fails_closed(output: str) -> None:
         requestId=str(uuid4()), questionId="INTRO-RANDOM", category="RANDOM",
         locale="en", factIds=["INTRO-OCTOPUS", "INTRO-PENGUIN"], deadlineMs=2500,
     )
-    with patch("app.ollama_provider.http.client.HTTPConnection") as constructor:
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom"),
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
         conn = constructor.return_value
         conn.getresponse.return_value.status = 200
         conn.getresponse.return_value.read.return_value = json.dumps(
@@ -101,7 +107,10 @@ def test_maps_only_current_context(output: str, index: int) -> None:
     )
     context = retrieve(req)
     assert context is not None
-    with patch("app.ollama_provider.http.client.HTTPConnection") as constructor:
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom"),
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
         conn = constructor.return_value
         conn.getresponse.return_value.status = 200
         conn.getresponse.return_value.read.return_value = json.dumps(
@@ -121,7 +130,10 @@ def test_shared_prompt_maps_to_requested_language(locale: str) -> None:
     })
     context = retrieve(req)
     assert context is not None
-    with patch("app.ollama_provider.http.client.HTTPConnection") as constructor:
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom"),
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
         conn = constructor.return_value
         conn.getresponse.return_value.status = 200
         conn.getresponse.return_value.read.return_value = json.dumps(
@@ -134,3 +146,53 @@ def test_shared_prompt_maps_to_requested_language(locale: str) -> None:
         assert prompt["locale"] == "en"
         assert prompt["options"]["2"] == "To remove stains from light fabrics, mild soap is recommended."
         assert prompt["options"]["0"] == "Three eggs. Two cups of sugar. Mix until smooth."
+
+
+@pytest.mark.parametrize("locale", ["pt-BR", "en"])
+def test_random_permutation_maps_index_to_same_authorized_bilingual_option(locale: str) -> None:
+    req = GenerationRequest.model_validate({
+        "requestId": str(uuid4()), "questionId": "Q-DOG", "category": "RANDOM",
+        "locale": locale, "factIds": ["DOG-RECIPE", "DOG-SATURN", "DOG-LAUNDRY"],
+        "deadlineMs": 2500,
+    })
+    context = retrieve(req)
+    assert context is not None
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom") as rng,
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
+        rng.return_value.shuffle.side_effect = lambda order: order.reverse()
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"done": True, "response": "0"}
+        ).encode()
+        result = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
+        assert result.status == "VALIDATED"
+        assert result.text == context.alternatives[1]
+        prompt = json.loads(json.loads(conn.request.call_args.args[2])["prompt"])
+        assert prompt["options"]["0"] == context.selection_options[2]
+        assert prompt["options"]["2"] == context.selection_options[0]
+        rng.return_value.shuffle.assert_called_once()
+
+
+def test_correct_order_is_not_shuffled() -> None:
+    req = GenerationRequest(
+        requestId=str(uuid4()), questionId="Q-DOG", category="CORRECT", locale="en",
+        factIds=["DOG-VISION", "DOG-HEARING", "DOG-WAIT"], deadlineMs=2500,
+    )
+    context = retrieve(req)
+    assert context is not None
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom") as rng,
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"done": True, "response": "1"}
+        ).encode()
+        result = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
+        assert result.status == "VALIDATED"
+        assert result.text == context.alternatives[0]
+        rng.assert_not_called()
