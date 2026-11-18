@@ -85,3 +85,14 @@ export const FINAL_RESTORATION = {
 // Planned gates, not active transitions: installation -> F3 -> manual -> AMI memories
 // -> E-FAMILY -> MEM-D4 -> FB-D4/FB-D5 -> E-BETRAYAL/E-PAST-RESTORED -> Chapter 5.
 // Existing original art only: CENA-05, CENA-08, CENA-12, CENA-01, CENA-11.
+
+// Explicit order of future presentation gates, not yet connected to the engine.
+// F3 is committed at the component installation boundary, before the manual.
+export const CHAPTER_FOUR_GATES = [
+  'A04-S01/CHAPTER_CARD', 'A04-S01/L01', 'A04-S01/L02',
+  'A04-S01/INSTALL', 'F3', 'A04-S01/L03', 'UI-MANUAL',
+  'A04-S01/L04', 'A04-S01/L05', 'A04-S01/L06', 'A04-S01/L07', 'A04-S01/L08',
+  'FB-A1', 'FB-A2', 'FB-A3', 'FB-A4', 'FAMILY-RETURN', 'E-FAMILY',
+  'MEM-D4', 'FB-D4', 'FB-D5', 'BETRAYAL-RETURN', 'E-BETRAYAL', 'E-PAST-RESTORED',
+  'A05-S01/CHAPTER_CARD',
+] as const;
