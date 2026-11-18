@@ -25,73 +25,13 @@ Candidate: Qwen2.5:1.5b, advertised 986 MB quantized model, Apache-2.0, PT/EN; s
 
 Use a detached worktree and unique test-only Docker objects. The evaluator calls the existing Python provider/validator directly; no API, web, PostgreSQL, `.env`, credentials, saved sessions or full private documents are mounted. The only external activity is downloading the official image, locked dependencies and public model. The benchmark server has no published port and is moved to an internal-only network before sending evaluation prompts. This procedure does not enable gameplay inference. Official references: https://docs.ollama.com/docker and https://docs.ollama.com/faq.
 
-The following is a proposed manual procedure, not yet executed on Cloud Shell. Inspect outputs and stop on failure. The exact tested code is pinned to `7d9ef512a92ede0e99c5418e0ddcc3fec9774a01`; the Ollama image ID and model listing must be recorded for reproducibility. The command runs two passes without altering the 2500 ms application deadline (the provider itself uses a 2 s HTTP timeout). The first includes cold startup; the second is a repeat, not a guaranteed warm measurement if the first failed.
+The first Cloud Shell attempt stopped before building or downloading the model: the randomly generated Docker image name contained uppercase letters. The corrected script normalizes the temporary suffix to lowercase and is pinned below for review and execution. Real model evaluation has not yet run. Inspect outputs and stop on failure. The exact tested code is pinned to `7d9ef512a92ede0e99c5418e0ddcc3fec9774a01`; the Ollama image ID and model listing must be recorded for reproducibility. The command runs two passes without altering the 2500 ms application deadline (the provider itself uses a 2 s HTTP timeout). The first includes cold startup; the second is a repeat, not a guaranteed warm measurement if the first failed.
 
 ```bash
-(
-  set -euo pipefail
-  cd ~/ami-108
-  test "$(git branch --show-current)" = main
-  test "$(git rev-parse --short HEAD)" = af212f0
-  test -z "$(git status --porcelain)"
-  git fetch origin feat/ai-rag-foundation
-  candidate=7d9ef512a92ede0e99c5418e0ddcc3fec9774a01
-  git cat-file -e "$candidate^{commit}"
-  worktree=$(mktemp -d /tmp/ami108-eval.XXXXXX)
-  tag="ami108-eval-${worktree##*.}"
-  net="$tag-net"
-  server="$tag-ollama"
-  volume="$tag-models"
-  image="$tag-ai"
-  cleanup() {
-    docker rm -f "$server" >/dev/null 2>&1 || true
-    docker network rm "$net" >/dev/null 2>&1 || true
-    docker volume rm "$volume" >/dev/null 2>&1 || true
-    git worktree remove "$worktree" >/dev/null 2>&1 || true
-  }
-  trap cleanup EXIT
-  git worktree add --detach "$worktree" "$candidate"
-  docker build -t "$image" "$worktree/services/ai"
-  docker pull ollama/ollama
-  ollama_image=$(docker image inspect --format '{{.Id}}' ollama/ollama)
-  printf 'Candidate: %s\nOllama image: %s\n' "$candidate" "$ollama_image"
-  docker image inspect --format '{{json .RepoDigests}}' "$ollama_image"
-  docker volume create "$volume"
-  docker network create --internal "$net"
-  docker run -d --name "$server" --network bridge \
-    -e OLLAMA_NO_CLOUD=1 -e OLLAMA_HOST=0.0.0.0:11434 \
-    -e OLLAMA_NUM_PARALLEL=1 -e OLLAMA_MAX_LOADED_MODELS=1 \
-    -v "$volume:/root/.ollama" "$ollama_image"
-  ready=0
-  for i in $(seq 1 30); do
-    if docker exec "$server" ollama list >/dev/null 2>&1; then
-      ready=1; break
-    fi
-    sleep 2
-  done
-  test "$ready" = 1
-  docker logs "$server" 2>&1 | grep -i 'cloud disabled: true'
-  docker exec "$server" ollama --version
-  docker exec "$server" ollama pull qwen2.5:1.5b
-  docker exec "$server" ollama list
-  docker network connect --alias ollama "$net" "$server"
-  docker network disconnect bridge "$server"
-  docker inspect --format '{{json .NetworkSettings.Networks}}' "$server"
-  docker network inspect --format '{{.Internal}}' "$net"
-  evaluate() {
-    docker run --rm --network "$net" \
-      -e AMI_AI_PROVIDER=ollama \
-      -e AMI_OLLAMA_URL=http://ollama:11434 \
-      -e AMI_OLLAMA_MODEL=qwen2.5:1.5b \
-      "$image" /app/.venv/bin/python -m app.evaluate_local
-  }
-  status=0
-  echo 'PASS 1 (cold candidate)'
-  evaluate || status=1
-  echo 'PASS 2 (repeat)'
-  evaluate || status=1
-  exit "$status"
-)
+cd ~/ami-108
+git fetch origin feat/ai-rag-foundation
+git show 30ee343fbf2b3cf35783a0fb398d1447aed34026:scripts/evaluate-local-ai.sh > /tmp/ami108-evaluate-local-ai.sh
+bash -n /tmp/ami108-evaluate-local-ai.sh && bash /tmp/ami108-evaluate-local-ai.sh
 ```
 
 The EXIT trap removes only the uniquely named evaluation server/network/model volume and detached worktree. It does not remove any game container or game volume. The downloaded Docker image and build cache may remain in ephemeral VM storage; do not prune shared Docker resources. Model download is repeated in a new benchmark because its disposable volume is removed.
