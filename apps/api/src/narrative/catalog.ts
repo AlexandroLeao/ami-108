@@ -26,7 +26,7 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-11': local('Depósito industrial visto a partir do chão.', 'Industrial warehouse seen from the floor.'),
   'CENA-12': local('AMI entre uma criança e uma criatura.', 'AMI between a child and a creature.'),
 };
-export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal' | 'archive-record';
+export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal' | 'archive-record' | 'crt-reveal' | 'crt-startle' | 'disoriented' | 'f3-count';
 export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME' | 'E-ARCHIVE' | 'MEM-D3' | 'FB-D3' | 'E-PLANET' | 'E-PARTNER' | 'CP-RAT' | 'F2' | 'SOL-02' | 'E-ESCAPE-ROUTE' | 'F3' | 'E-FAMILY' | 'MEM-D4' | 'FB-D4' | 'FB-D5' | 'E-BETRAYAL' | 'E-PAST-RESTORED';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
@@ -87,7 +87,7 @@ export const CHAPTER_ONE: readonly Step[] = [
   dialogue(s3, 'L04', robot, 'Não localizado.', 'Not found.', 'CENA-03'),
   dialogue(s3, 'L05', unknown, 'Ótimo.', 'Great.', 'CENA-03'),
   dialogue(s3, 'L06', unknown, 'AMI-108? Esse é o seu nome?', 'AMI-108? Is that your name?', 'CENA-03'),
-  dialogue(s3, 'L07', ami, 'A informação parece consistente.', 'The information appears consistent.', 'CENA-03'),
+  dialogue(s3, 'L07', ami, 'A informação parece consistente.', 'The information appears consistent.', 'CENA-03', 'name-reveal'),
   dialogue(s3, 'L08', unknown, 'Certo. Vou chamar você de AMI.', "All right. I'll call you AMI.", 'CENA-03'),
   dialogue(s3, 'L09', unknown, "Preciso descobrir onde estou.", "I need to find out where I am.", 'CENA-03'),
   dialogue(s3, 'L09b', unknown, "E, de preferência, quem diabos eu sou.", "And preferably who the hell I am.", 'CENA-03'),
