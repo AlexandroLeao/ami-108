@@ -1,0 +1,30 @@
+import { AMI_MEMORY_FRAGMENTS, BETRAYAL_DIALOGUE, BETRAYAL_RETURN, DAVID_MEMORY_TRIGGER, FAMILY_RETURN, FINAL_RESTORATION, MANUAL_RECORDS, RESTORATION_DIALOGUE } from '../src/narrative/chapter-four-catalog';
+
+describe('Chapter 4 server-only source catalog', () => {
+  it('preserves the canonical dialogue and manual sequence in both languages', () => {
+    expect(RESTORATION_DIALOGUE.map(x => x.id)).toEqual(['L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L07', 'L08']);
+    expect(MANUAL_RECORDS).toHaveLength(5);
+    expect(MANUAL_RECORDS[2]).toEqual({ 'pt-BR': 'ASSISTENTE MODULAR INFANTIL', en: 'AUTOMATED MINDER FOR INFANTS' });
+    expect(FAMILY_RETURN.map(x => x.id)).toEqual(['L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L07']);
+    expect(DAVID_MEMORY_TRIGGER[0].id).toBe('MEM-D4');
+    expect(BETRAYAL_DIALOGUE.map(x => x.id)).toEqual(['F01', 'F02', 'F03', 'F04', 'F05', 'F06', 'F07', 'F08', 'F09']);
+    expect(BETRAYAL_DIALOGUE[8].text).toEqual({ 'pt-BR': 'São apenas negócios.', en: "It's just business." });
+    expect(BETRAYAL_RETURN.map(x => x.id)).toEqual(['L08', 'L09', 'L10', 'L11', 'L12', 'L13']);
+    for (const beat of [...RESTORATION_DIALOGUE, ...FAMILY_RETURN, ...DAVID_MEMORY_TRIGGER, ...BETRAYAL_DIALOGUE, ...BETRAYAL_RETURN]) {
+      expect(beat.text['pt-BR'].trim()).not.toBe('');
+      expect(beat.text.en.trim()).not.toBe('');
+    }
+  });
+
+  it('retains the four family fragments, approved art and interrupted final record', () => {
+    expect(AMI_MEMORY_FRAGMENTS.map(x => [x.id, x.asset])).toEqual([
+      ['FB-A1', 'CENA-08'], ['FB-A2', 'CENA-08'], ['FB-A3', 'CENA-12'], ['FB-A4', null],
+    ]);
+    expect(AMI_MEMORY_FRAGMENTS[0].dialogue.map(x => x.text['pt-BR'])).toEqual(['Bobo!', 'Robô.', 'Bobo!']);
+    expect(AMI_MEMORY_FRAGMENTS[3].dialogue.map(x => x.text.en)).toEqual(['Bobo!']);
+  });
+
+  it('defines F3 with restored energy and all personal memory unlocked', () => {
+    expect(FINAL_RESTORATION).toEqual({ energy: 3, med: 100, bio: 100, hist: 100, personal: 100, personalUnlocked: true });
+  });
+});
