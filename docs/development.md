@@ -139,3 +139,8 @@ Owner correction checks: compare the normal CENA-04 dialogue frame and decision 
 ## Resume after Day 2
 
 After the verified database backup and stop procedure above, reopen Cloud Shell, `cd ~/ami-108`, check `git status`, switch to `main`, `git pull --ff-only origin main`, then `docker compose --parallel 1 up --build -d --wait` and `docker compose ps`. Use the same private port 3000 preview and browser/origin when possible. A changed VM/volume or expired cookie may require recovery; do not promise resume from a dump alone. Keep private documents and dumps outside Git. New AMI-007/008 work begins on a separate branch after verifying the stable baseline.
+
+
+## Resume verification — November 18 (later session)
+
+Cloud Shell replaced the ephemeral VM (Docker initially empty). Owner restored checksum-verified `day3-final-20261118-140919.dump` into a newly created empty PostgreSQL volume; custom archive full read and single-transaction restore succeeded. Rebuild at `d587be9` succeeded, four migrations current, four services healthy, one original session retained; owner confirmed Continue in port 3000. No repeat restore. New VM: 7.8 GiB total RAM, 4.7 GiB available after startup, 27 GB root free, 1.7 GB persistent home free. Generation still disabled. Re-evaluate the pinned warmed provider in isolation under current resource constraints before live opt-in. Prior benchmark script hardcodes historical pre-merge `af212f0`; adapt only the temporary script guard to `d587be9` and bound the experimental Ollama container to 3 GiB. Do not change deadlines, main runtime or player database. Previous real model performance does not establish performance on this VM.
