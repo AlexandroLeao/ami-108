@@ -29,7 +29,7 @@ export type NarrativeState = Readonly<{
   chapterThree?: ChapterThreeState;
   chapterFourStart?: Readonly<{ chapterTwo: ChapterTwoState; chapterThree: ChapterThreeState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   chapterThreeStart?: Readonly<{ chapterTwo: ChapterTwoState; diagnostics: Diagnostics; events: readonly EventId[] }>;
-  intro: Readonly<{ category: 'RANDOM'; source: 'fallback'; text: Localized }> | null;
+  intro: Readonly<{ category: 'RANDOM'; source: 'fallback' | 'generated'; text: Localized }> | null;
 }>;
 export type NarrativeAction = Readonly<{ id: string; kind: 'CONTINUE' | 'INTERACT' | 'PREVIOUS' | 'CONSULT' | 'CHOOSE' | 'RETRY'; label: string }>;
 export type ChapterOption = Readonly<{ number: number; title: string }>;

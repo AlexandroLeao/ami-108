@@ -43,7 +43,7 @@ def test_transport_uses_bounded_nonstreaming_authorized_context() -> None:
         questionId="INTRO-RANDOM",
         category="RANDOM",
         locale="pt-BR",
-        factIds=["INTRO-OCTOPUS"],
+        factIds=["INTRO-OCTOPUS", "INTRO-PENGUIN"],
         deadlineMs=2500,
     )
     context = retrieve(req)
@@ -67,8 +67,8 @@ def test_transport_uses_bounded_nonstreaming_authorized_context() -> None:
         assert data["stream"] is False
         assert data["options"]["num_predict"] == 160
         prompt = json.loads(data["prompt"])
-        assert prompt["facts"] == [["INTRO-OCTOPUS", context.approved_text]]
-        assert set(prompt) == {"locale", "category", "facts", "approved_utterance"}
+        assert prompt["facts"] == [["INTRO-OCTOPUS", context.approved_text], ["INTRO-PENGUIN", context.alternatives[0]]]
+        assert set(prompt) == {"locale", "category", "facts", "approved_utterance", "alternatives"}
         assert req.requestId not in data["prompt"]
         response.read.assert_called_once_with(16385)
         conn.close.assert_called_once()

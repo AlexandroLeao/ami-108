@@ -81,12 +81,14 @@ class AuthorizedContext:
     locale: Locale
     facts: tuple[tuple[str, str], ...]
     approved_text: str
+    alternatives: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
 class Rule:
     facts: tuple[tuple[str, Localized], ...]
     approved: Localized
+    alternatives: tuple[Localized, ...] = ()
 
 
 # The only enabled contexts are those already present in the accepted campaign.
@@ -108,6 +110,14 @@ _DOG_CORRECT = Rule(
         "auditiva. Permaneça imóvel até que ela abandone a área.",
         "The mutation impaired its vision but significantly heightened its hearing. "
         "Remain still until it leaves the area.",
+    ),
+    alternatives=(
+        Localized(
+            "A visão da criatura está comprometida e sua audição foi ampliada. "
+            "Permaneça imóvel até que ela abandone a área.",
+            "The creature's vision is impaired and its hearing is heightened. "
+            "Remain still until it leaves the area.",
+        ),
     ),
 )
 _DOG_RANDOM = Localized(
@@ -137,18 +147,58 @@ _RAT_CORRECT = Rule(
         "First-generation organisms developed an intolerance to intense light. "
         "The containment lighting system should force it to retreat.",
     ),
+    alternatives=(
+        Localized(
+            "Organismos da primeira geração são intolerantes à luz intensa. "
+            "A iluminação de contenção deverá forçá-lo a recuar.",
+            "First-generation organisms are intolerant of intense light. "
+            "The containment lighting should force it to retreat.",
+        ),
+    ),
 )
 _RAT_RANDOM = Localized(
     "Para remover a casca de um ovo cozido, recomenda-se mergulhá-lo em água fria.",
     "To remove the shell from a boiled egg, immersing it in cold water is recommended.",
 )
 _INTRO_RANDOM = Localized("Os polvos têm três corações.", "Octopuses have three hearts.")
+_INTRO_PENGUIN = Localized(
+    "Os pinguins não sabem voar.",
+    "Penguins cannot fly.",
+)
+_DOG_SATURN = Localized(
+    "Saturno possui um sistema de anéis composto principalmente por partículas de gelo.",
+    "Saturn has a ring system composed primarily of ice particles.",
+)
+_DOG_LAUNDRY = Localized(
+    "Para remover manchas de tecidos claros, recomenda-se utilizar sabão neutro.",
+    "To remove stains from light fabrics, mild soap is recommended.",
+)
+_RAT_LAUNDRY = Localized(
+    "Recomenda-se dobrar a roupa imediatamente após a secagem.",
+    "Folding clothes immediately after drying is recommended.",
+)
+_RAT_PENGUIN = Localized(
+    "Os pinguins são incapazes de voar.",
+    "Penguins are incapable of flight.",
+)
 _RULES: dict[tuple[Question, Category], Rule] = {
     ("Q-DOG", "CORRECT"): _DOG_CORRECT,
-    ("Q-DOG", "RANDOM"): Rule((("DOG-RECIPE", _DOG_RANDOM),), _DOG_RANDOM),
+    ("Q-DOG", "RANDOM"): Rule(
+        (("DOG-RECIPE", _DOG_RANDOM), ("DOG-SATURN", _DOG_SATURN), ("DOG-LAUNDRY", _DOG_LAUNDRY)),
+        _DOG_RANDOM,
+        (_DOG_SATURN, _DOG_LAUNDRY),
+    ),
     ("Q-RAT", "CORRECT"): _RAT_CORRECT,
-    ("Q-RAT", "RANDOM"): Rule((("RAT-RECIPE", _RAT_RANDOM),), _RAT_RANDOM),
-    ("INTRO-RANDOM", "RANDOM"): Rule((("INTRO-OCTOPUS", _INTRO_RANDOM),), _INTRO_RANDOM),
+    ("Q-RAT", "RANDOM"): Rule(
+        (("RAT-RECIPE", _RAT_RANDOM), ("RAT-LAUNDRY", _RAT_LAUNDRY), ("RAT-PENGUIN", _RAT_PENGUIN)),
+        _RAT_RANDOM,
+        (_RAT_LAUNDRY, _RAT_PENGUIN),
+    ),
+    ("INTRO-RANDOM", "RANDOM"): Rule(
+        (("INTRO-OCTOPUS", _INTRO_RANDOM), ("INTRO-PENGUIN", _INTRO_PENGUIN)),
+        _INTRO_RANDOM,
+        (_INTRO_PENGUIN,),
+    ),
 }
 
 
@@ -165,6 +215,7 @@ def retrieve(request: GenerationRequest) -> AuthorizedContext | None:
         locale=request.locale,
         facts=tuple((fact_id, fact.text(request.locale)) for fact_id, fact in rule.facts),
         approved_text=rule.approved.text(request.locale),
+        alternatives=tuple(text.text(request.locale) for text in rule.alternatives),
     )
 
 
@@ -194,12 +245,11 @@ async def generate(
         # No provider exception content or secret is returned.
         return fallback(request, "UNAVAILABLE")
 
-    # Conservative first increment: accept only the canonical localized utterance
-    # (outer whitespace is harmless). A reviewed paraphrase validator and real
-    # provider evaluation remain separate acceptance gates. Never let a model
-    # invent a solution or leak a future fact.
+    # Only the authorized localized fallback or an exact, pre-reviewed
+    # alternative is admissible. Never accept a new fact or solution.
     if not isinstance(candidate, str) or len(candidate) > 500:
         return fallback(request, "INVALID_OUTPUT")
-    if candidate.strip() != context.approved_text:
+    candidate = candidate.strip()
+    if candidate not in (context.approved_text, *context.alternatives):
         return fallback(request, "INVALID_OUTPUT")
-    return Validated(requestId=request.requestId, text=context.approved_text)
+    return Validated(requestId=request.requestId, text=candidate)

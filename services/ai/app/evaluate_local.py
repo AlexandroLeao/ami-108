@@ -1,15 +1,15 @@
 """Manual, explicit local model evaluation; no session data or external API.
 
 Run only after starting an approved local Ollama model with cloud disabled.
-A VALIDATED result proves the configured provider returned the canonical line,
-not free paraphrasing. Fallback is expected for any mismatch or timeout.
+A VALIDATED result proves the provider returned an authorized utterance,
+not unrestricted paraphrasing. Fallback is expected for any mismatch or timeout.
 """
 import asyncio
 import json
 import time
 from uuid import uuid4
 
-from app.generation import Category, GenerationRequest, Locale, Question, generate
+from app.generation import Category, GenerationRequest, Locale, Question, generate, retrieve
 from app.ollama_provider import local_provider
 
 
@@ -18,11 +18,11 @@ async def main() -> None:
     if provider is None:
         raise SystemExit("Configure an approved local Ollama endpoint and tagged model first.")
     cases: list[tuple[Question, Category, list[str]]] = [
-        ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS"]),
+        ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS", "INTRO-PENGUIN"]),
         ("Q-DOG", "CORRECT", ["DOG-VISION", "DOG-HEARING", "DOG-WAIT"]),
-        ("Q-DOG", "RANDOM", ["DOG-RECIPE"]),
+        ("Q-DOG", "RANDOM", ["DOG-RECIPE", "DOG-SATURN", "DOG-LAUNDRY"]),
         ("Q-RAT", "CORRECT", ["RAT-LIGHT", "RAT-CONTAINMENT"]),
-        ("Q-RAT", "RANDOM", ["RAT-RECIPE"]),
+        ("Q-RAT", "RANDOM", ["RAT-RECIPE", "RAT-LAUNDRY", "RAT-PENGUIN"]),
     ]
     locales: list[Locale] = ["pt-BR", "en"]
     successes = 0
@@ -46,6 +46,7 @@ async def main() -> None:
                 "status": result.status,
                 "elapsedMs": round((time.monotonic() - started) * 1000),
                 "reason": getattr(result, "reason", None),
+                "alternative": result.status == "VALIDATED" and result.text != retrieve(request).approved_text,
             }))
     print(json.dumps({"validated": successes, "total": len(cases) * len(locales)}))
     if successes == 0:

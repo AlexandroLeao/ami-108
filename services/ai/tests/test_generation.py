@@ -102,10 +102,10 @@ def test_retrieval_rejects_wrong_category_incomplete_or_future_facts(
     ("question", "category", "facts"),
     [
         ("Q-DOG", "CORRECT", ["DOG-VISION", "DOG-HEARING", "DOG-WAIT"]),
-        ("Q-DOG", "RANDOM", ["DOG-RECIPE"]),
+        ("Q-DOG", "RANDOM", ["DOG-RECIPE", "DOG-SATURN", "DOG-LAUNDRY"]),
         ("Q-RAT", "CORRECT", ["RAT-LIGHT", "RAT-CONTAINMENT"]),
-        ("Q-RAT", "RANDOM", ["RAT-RECIPE"]),
-        ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS"]),
+        ("Q-RAT", "RANDOM", ["RAT-RECIPE", "RAT-LAUNDRY", "RAT-PENGUIN"]),
+        ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS", "INTRO-PENGUIN"]),
     ],
 )
 def test_localized_authorized_context_only(
@@ -151,6 +151,29 @@ def test_failed_candidate_is_not_returned(
         "reason": reason,
     }
     assert len(provider.calls) == 1
+
+
+@pytest.mark.parametrize("locale", ["pt-BR", "en"])
+@pytest.mark.parametrize(
+    ("question", "category", "facts"),
+    [
+        ("Q-DOG", "CORRECT", ["DOG-VISION", "DOG-HEARING", "DOG-WAIT"]),
+        ("Q-DOG", "RANDOM", ["DOG-RECIPE", "DOG-SATURN", "DOG-LAUNDRY"]),
+        ("Q-RAT", "CORRECT", ["RAT-LIGHT", "RAT-CONTAINMENT"]),
+        ("Q-RAT", "RANDOM", ["RAT-RECIPE", "RAT-LAUNDRY", "RAT-PENGUIN"]),
+        ("INTRO-RANDOM", "RANDOM", ["INTRO-OCTOPUS", "INTRO-PENGUIN"]),
+    ],
+)
+def test_exact_authorized_alternative(locale: str, question: str, category: str, facts: list[str]) -> None:
+    body = payload(questionId=question, category=category, factIds=facts, locale=locale)
+    context = retrieve(GenerationRequest.model_validate(body))
+    assert context is not None and context.alternatives
+    provider = FakeProvider(context.alternatives[0])
+    with TestClient(create_app(provider, TOKEN)) as client:
+        result = client.post("/internal/generate", json=body, headers=HEADERS)
+    assert result.json() == {
+        "requestId": body["requestId"], "status": "VALIDATED", "text": context.alternatives[0],
+    }
 
 
 def test_unconfigured_provider_requires_authored_fallback() -> None:
