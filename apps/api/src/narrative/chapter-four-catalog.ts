@@ -44,7 +44,7 @@ export const FAMILY_RETURN: readonly Beat[] = [
   beat("L04", "AMI-108", "Eu não consegui.", "I couldn't."),
   beat("L05", "DAVID", "Você fez tudo o que podia, AMI.", "You did everything you could, AMI."),
   beat("L06", "AMI-108", "Não foi suficiente.", "It wasn't enough."),
-  beat("L07", "DAVID", "Não foi sua culpa.", "It wasn't your fault."),
+  beat("L07", "DAVID", "Eu sinto muito, AMI.", "I’m so sorry, AMI."),
 ];
 
 export const DAVID_MEMORY_TRIGGER: readonly Beat[] = [
