@@ -563,3 +563,7 @@ button:focus-visible, a:focus-visible {
 /* Preserve line breaks in these textual panels without changing existing cards. */
 .campaign-dialogue[data-f3-count="true"] .dialogue-text {font-size:clamp(19px, 4vw, 28px);line-height:1;}
 .campaign-dialogue[data-chapter-four-record="true"] .dialogue-text {white-space:pre-line;}
+
+@media (max-height:460px) and (orientation:landscape) {
+  .campaign-dialogue[data-f3-count="true"] .dialogue-text {font-size:21px;line-height:1;}
+}
