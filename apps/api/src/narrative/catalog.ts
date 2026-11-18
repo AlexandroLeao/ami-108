@@ -13,7 +13,7 @@ export const CHAPTERS = [
   { number: 5, title: local('De nada, Bobo', 'You’re Welcome, Bobo'), scenes: ['A05-S01', 'A05-S02'] },
 ] as const;
 
-export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03' | 'CENA-04' | 'CENA-05' | 'CENA-06' | 'CENA-07';
+export type OpeningAsset = 'CENA-01' | 'CENA-02' | 'CENA-03' | 'CENA-04' | 'CENA-05' | 'CENA-06' | 'CENA-07' | 'CENA-08' | 'CENA-11' | 'CENA-12';
 export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-01': local('Depósito industrial em ruínas, com caixas e luz pelas janelas.', 'Ruined industrial warehouse, with crates and light through the windows.'),
   'CENA-02': local('Rua residencial em ruínas.', 'Ruined residential street.'),
@@ -22,9 +22,12 @@ export const OPENING_ASSETS: Readonly<Record<OpeningAsset, Localized>> = {
   'CENA-05': local('Terminal de manutenção pública.', 'Public maintenance terminal.'),
   'CENA-06': local('Centro de pesquisa abandonado.', 'Abandoned research facility.'),
   'CENA-07': local('Criatura no corredor de contenção.', 'Creature in the containment corridor.'),
+  'CENA-08': local('Quarto infantil com uma criança e AMI intacto.', 'Child’s bedroom with a child and intact AMI.'),
+  'CENA-11': local('Depósito industrial visto a partir do chão.', 'Industrial warehouse seen from the floor.'),
+  'CENA-12': local('AMI entre uma criança e uma criatura.', 'AMI between a child and a creature.'),
 };
 export type Cue = 'none' | 'pain' | 'ellipsis' | 'wake' | 'memory-cut' | 'fade-black' | 'close-eyes' | 'startle' | 'blink-black' | 'fade-in' | 'memory-shiver' | 'name-reveal' | 'energy-reveal' | 'archive-record';
-export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME' | 'E-ARCHIVE' | 'MEM-D3' | 'FB-D3' | 'E-PLANET' | 'E-PARTNER' | 'CP-RAT' | 'F2' | 'SOL-02' | 'E-ESCAPE-ROUTE';
+export type EventId = 'E-JOIN' | 'INTRO-RANDOM' | 'MEM-D1' | 'FB-D1' | 'CP-DOG' | 'F1' | 'SOL-01' | 'MEM-D2' | 'FB-D2' | 'E-NAME' | 'E-ARCHIVE' | 'MEM-D3' | 'FB-D3' | 'E-PLANET' | 'E-PARTNER' | 'CP-RAT' | 'F2' | 'SOL-02' | 'E-ESCAPE-ROUTE' | 'F3' | 'E-FAMILY' | 'MEM-D4' | 'FB-D4' | 'FB-D5' | 'E-BETRAYAL' | 'E-PAST-RESTORED';
 type ChapterOneScene = 'A01-S01' | 'A01-S02' | 'A01-S03';
 export type Step = Readonly<{
   id: string;
