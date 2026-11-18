@@ -26,11 +26,15 @@ class OllamaProvider:
         # No identity, secret, whole catalog, arbitrary prompt, or future facts.
         # The strict validator accepts only the finite authorized utterances.
         options = (context.approved_text, *context.alternatives)
+        # Select from the same authorized English representations in both locales.
+        # The result is still mapped exclusively to the requested locale.
+        if len(context.selection_options) != len(options):
+            return ""
         prompt = json.dumps(
             {
-                "locale": context.locale,
+                "locale": "en",
                 "category": context.category,
-                "options": {str(i): text for i, text in enumerate(options)},
+                "options": {str(i): text for i, text in enumerate(context.selection_options)},
             },
             ensure_ascii=False,
         )
