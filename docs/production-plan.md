@@ -1,5 +1,14 @@
 # Production plan
 
+## End-of-session handoff — November 17
+
+Formal progress 5/13 closed (38.5%). Three of five chapters playable and approved (not a release percentage). AMI-008 #10: narrative and checkpoint/restoration criteria met; real AI remains open. AMI-006 #8: F1/F2, CP-DOG/CP-RAT and persistent slots implemented; F3/CP-BOAR and provider recovery remain. AMI-007 #9: draft PR #24 has internal NestJS/FastAPI reservation/finalization and local Ollama adapter, CI 44159065184 passed 104 tests on its old base, now conflicts with main; not merged or real-model tested. Issues #11–15 unchanged. Next: verify local save if VM changed; reconcile #24 with main, retain rat persistence and restoration rules, authorize RAT facts, prove real inference and bounded variation; then F3/boar/finale, QA, deployment and release. Private source synchronization remains separate. No date-pressure shortcuts.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+
+---
+
+
 **Project:** AMI-108  
 **Planning baseline:** November 15, 2026  
 **Production target:** November 16–22, 2026 (seven calendar days).  
@@ -11,8 +20,8 @@ The target is ambitious, not a guaranteed release date. Preserve all approved re
 | Day | Date | Work | Exit gate |
 | --- | --- | --- | --- |
 | 1 | Nov 16 | AMI-002, 003: architecture, requirements, asset pipeline and initial UI; AMI-001 already completed | Reviewed architecture/contracts, verified initial narrative interface and prepared assets |
-| 2 | Nov 17 | AMI-004, 005, 006: narrative engine, localization, Chapters 1–2, dog encounter and persistence | Playable vertical slice with energy, four choices, checkpoint, F1 and SOL-01 |
-| 3 | Nov 18 | AMI-006, 007, 008: persistence, real AI/RAG and Chapter 3 | Real inference and fallback evidence; rat, F2 and SOL-02; durable session/cache |
+| 2 | Nov 17 | AMI-004, 005, 006: narrative engine, localization, Chapters 1–2, dog encounter and persistence | Playable vertical slice with energy, four choices, checkpoint and F1 recharge |
+| 3 | Nov 18 | AMI-006, 007, 008: persistence, real AI/RAG and Chapter 3 | Real inference and fallback evidence; rat, F2 recharge; durable session/cache |
 | 4 | Nov 19 | AMI-009: Chapters 4–5 | F3, personal archives, flashbacks, boar, launch and complete bilingual campaign |
 | 5 | Nov 20 | AMI-010: quality and security | Critical behavior, AI, accessibility, performance and security checks passed |
 | 6 | Nov 21 | AMI-011, 012: deployment and technical documentation | Reproducible deployment where free conditions are verified; evidence and documentation |
@@ -34,7 +43,7 @@ Tests, security, documentation and deployment preparation start early. Evaluate 
 ## Release gates
 
 - Five chapters, twelve narrative scenes, twelve approved scene images, two languages, four David memory transitions and one campaign ending.
-- Three encounters, twelve choices (nine lethal, three safe), three checkpoints, two solar recharges and three memory restorations; idempotent and durable game state.
+- Three encounters, twelve choices (nine lethal, three safe), three checkpoints and three memory restorations with atomic energy recharge; idempotent and durable game state.
 - Real LLM integration, authorized fact retrieval, category selection by NestJS, validated localized output, persistent consultation cache, tested fallbacks and spoiler/cost controls.
 - Next.js, NestJS, FastAPI, Prisma/PostgreSQL, Docker Compose, CI/CD; unit, integration, contract and E2E evidence; accessibility, performance and security validation.
 - Reproducible execution, verified free deployment conditions, AWS integration only when authorized and viable; clearly distinguish simulation from real deployment.

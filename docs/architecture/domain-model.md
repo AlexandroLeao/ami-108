@@ -1,5 +1,14 @@
 # Domain model and state transitions
 
+## Current domain status
+
+Existing GameCheckpoint and GameConsultationSlot tables hold CP-DOG and CP-RAT and DOG/RAT slots; Chapter 3/4 entry snapshots and replay cache/high-water persisted. F1/F2 recharge atomically, no new SOL events; F3 must do the same. Later boar and pending-generation migration in draft PR #24 not on main.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 **Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
 
 ## ER diagram
@@ -81,7 +90,7 @@ erDiagram
   }
 ```
 
-### Chapters 1–2 implemented subset
+### Chapters 1–3 implemented subset
 
 The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. PR #22 adds dedicated transactional checkpoint and resolved-slot tables for CP-DOG; the pure engine retains a JSON checkpoint and slot cache persisted atomically with normalized records and receipts. Provider reservation/finalization and later encounters remain pending.
 
@@ -105,10 +114,10 @@ The session's JSON state stores the current step, review cursor, locale, event f
 | A01-S02 | Follow described melody | A01-S03 |
 | A01-S03 | E-JOIN, orientation, INTRO-RANDOM, MEM-D1 / FB-D1 | A02-S01 / CP-DOG |
 | A02-S01 | Four DOG choices; safe DOG-04 | A02-S02 or dead → CP-DOG |
-| A02-S02 | F1, SOL-01, MEM-D2 / FB-D2, E-NAME | A03-S01 |
+| A02-S02 | F1 (memory and energy), MEM-D2 / FB-D2, E-NAME | A03-S01 |
 | A03-S01 | E-ARCHIVE, E-PLANET, E-PARTNER, MEM-D3 / FB-D3 | A03-S02 / CP-RAT |
 | A03-S02 | Four RAT choices; safe RAT-02 | A03-S03 or dead → CP-RAT |
-| A03-S03 | F2, SOL-02, E-ESCAPE-ROUTE | A04-S01 |
+| A03-S03 | F2 (memory and energy), E-ESCAPE-ROUTE | A04-S01 |
 | A04-S01 | F3, E-F3, manual / PERSONAL unlock | A04-S02 |
 | A04-S02 | E-FAMILY, MEM-D4 / FB-D4-D5, E-BETRAYAL, E-PAST-RESTORED | A05-S01 |
 | A05-S01 | E-SHIP, CP-BOAR, four BOAR choices; safe BOAR-04 / E-LAUNCH | A05-S02 or dead → CP-BOAR |
@@ -128,10 +137,10 @@ Order within each gate comes from the source script; this table does not reorder
 | Snapshot | Energy | Memory stage | Other prerequisites |
 | --- | ---: | --- | --- |
 | CP-DOG | 3 | Initial | E-JOIN |
-| CP-RAT | 3 | F1 | SOL-01, historical records |
-| CP-BOAR | 3 | F3 | SOL-02, E-SHIP, gate closed, propulsion off |
+| CP-RAT | 3 | F1 | F1 recharge, historical records |
+| CP-BOAR | 3 | F3 | F3 recharge, E-SHIP, gate closed, propulsion off |
 
-CORRECT probability uses the BIO-02 stage at encounter start: 15/42/100%. F3 guarantees CORRECT. The success variants are A (only RANDOM), B (at least one CORRECT), C (no consultations); boar cannot have A. SOL-01/SOL-02 set energy to 3 outside encounters; restoration does not itself recharge. INTRO-RANDOM is independent of the energy bar count and optional provider generation.
+CORRECT probability uses the BIO-02 stage at encounter start: 15/42/100%. F3 guarantees CORRECT. The success variants are A (only RANDOM), B (at least one CORRECT), C (no consultations); boar cannot have A. F1/F2 atomically restore energy to 3 with memory; planned F3 follows the same rule. SOL-01/SOL-02 are legacy-only. INTRO-RANDOM is independent of the energy bar count and optional provider generation.
 
 ## Catalog and asset authorization
 

@@ -1,5 +1,14 @@
 # Architecture decision records
 
+## ADR-007 — Restore energy with memory (accepted November 17)
+
+**Status:** owner approved, implemented for F1/F2 in PR #25, F3 planned. **Decision:** restoration atomically restores memory percentages and three energy bars; remove independent solar charging/dialogue. Preserve legacy SOL event/cursor compatibility without generating new SOL events. Consultation debit/checkpoint retry unchanged. No new assets or migrations.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+
+---
+
+
 Status: design merged in AMI-002 (PR #17). These decisions operationalize the approved stack and narrative without adding product scope. ADR-004 session expiry/retention and concrete integration details remain subject to implementation review. AMI-003 validated the local preview; PR #20 subsequently implemented and verified durable local Chapter 1 sessions. Production retention, rate limiting and deployment remain pending.
 
 ## ADR-001 — Authoritative modular NestJS API

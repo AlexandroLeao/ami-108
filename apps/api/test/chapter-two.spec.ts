@@ -36,7 +36,9 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(currentAsset(state)).toBe('CENA-04');
     const revealed = projectNarrative(state).asset;
     state = forward(state);
-    expect(projectNarrative(state)).toMatchObject({ cue: 'none', text: 'Olha a língua.', asset: revealed });
+    expect(projectNarrative(state)).toMatchObject({ cue: 'none', text: 'Um cachorrinho, bobo.', asset: revealed });
+    const translated = changeNarrativeLocale(state, 'en', state.revision);
+    expect(projectNarrative(translated)).toMatchObject({ cue: 'none', text: 'A little dog, Bobo.', asset: { url: revealed?.url } });
     for (let i = 0; i < 10 && projectNarrative(state).phase !== 'ENCOUNTER'; i++) state = forward(state);
     expect(projectNarrative(state).actions.some(a => a.kind === 'PREVIOUS')).toBe(false);
   });
@@ -102,7 +104,7 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(rng).not.toHaveBeenCalled();
     expect(state.diagnostics?.energy).toBe(2);
   });
-  it.each([{category:'NONE',variant:'C'},{category:'CORRECT',variant:'B'},{category:'RANDOM',variant:'A'}])('completes F1, SOL-01, memory and name for $category', ({category,variant}) => {
+  it.each([{category:'NONE',variant:'C'},{category:'CORRECT',variant:'B'},{category:'RANDOM',variant:'A'}])('completes F1 with immediate recharge, memory and name for $category', ({category,variant}) => {
     let state=reachDog();
     if(category!=='NONE') state=consult(state,()=>category==='CORRECT'?0:0.9);
     state=choose(state,'DOG-04');state=forward(state);
@@ -122,24 +124,15 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(projectNarrative(state)).toMatchObject({ cue: 'none', asset: terminalArtwork });
     while(state.stepId!=='A02-S02/L04' && count++<30) state=forward(state);
     expect(state.stepId).toBe('A02-S02/L04');
-    expect(state.diagnostics).toEqual({energy:category==='NONE'?3:2,med:35,bio:42,hist:53,personal:5,personalUnlocked:false});
+    expect(state.diagnostics).toEqual({energy:3,med:35,bio:42,hist:53,personal:5,personalUnlocked:false});
     expect(projectNarrative(state).text).toBe('Então vai parar de falar coisas aleatórias?');
     expect(projectNarrative(changeNarrativeLocale(state, 'en', state.revision)).text).toBe("So you'll stop saying random things?");
-    // Solar behavior is deliberately unchanged: F1 did not recharge, SOL-01 does.
     while(state.stepId!=='A02-S02/L08' && count++<45) state=forward(state);
-    expect(state.diagnostics?.energy).toBe(category==='NONE'?3:2);
-    expect(state.events).not.toContain('SOL-01');
-    state=forward(state);
-    expect(state.stepId).toBe('A02-S02/L08b');
-    expect(projectNarrative(state)).toMatchObject({ speaker: 'AMI-108', text: 'Quanto à minha energia, existe uma forma de recuperá-la.', cue: 'none' });
-    expect(state.diagnostics?.energy).toBe(category==='NONE'?3:2);
-    expect(state.events).not.toContain('SOL-01');
-    expect(projectNarrative(state).actions[0].kind).toBe('INTERACT');
-    state=forward(state);
-    expect(state.stepId).toBe('A02-S02/L09');
-    expect(state.events.filter(event => event === 'SOL-01')).toHaveLength(1);
     expect(state.diagnostics?.energy).toBe(3);
-    while(state.stepId!=='A02-S02/MEM-D2-PAIN' && count++<60) state=forward(state);
+    expect(state.events).not.toContain('SOL-01');
+    state=forward(state);
+    expect(state.stepId).toBe('A02-S02/MEM-D2-PAIN');
+    expect(state.events).toContain('MEM-D2');
     expect(state.diagnostics?.energy).toBe(3);
     const expected = [
       { text: 'Ai!', speaker: '???', cue: 'blink-black' },
@@ -167,9 +160,22 @@ describe('Chapter 2 integration in pure narrative engine', () => {
     expect(projectNarrative(forward(translated)).cue).toBe('none');
     while(state.stepId!=='A03-S01/CHAPTER_CARD' && count++<90) state=forward(state);
     expect(projectNarrative(state)).toMatchObject({chapter:3,phase:'CHAPTER_CARD',asset:null});
-    expect(projectNarrative(state).actions.map(x=>x.kind)).toEqual(['PREVIOUS']);
+    expect(projectNarrative(state).actions.map(x=>x.kind)).toEqual(['CONTINUE','PREVIOUS']);
     expect(state.events.filter(x=>x==='F1')).toHaveLength(1);
-    expect(state.events.filter(x=>x==='SOL-01')).toHaveLength(1);
+    expect(state.events).not.toContain('SOL-01');
+  });
+  it('resumes a legacy solar-dialogue save at the memory without a new debit', () => {
+    let state=consult(reachDog(),()=>0.9);
+    state=choose(state,'DOG-04');
+    while(state.stepId!=='A02-S02/L08') state=forward(state);
+    const old={...state,stepId:'A02-S02/L09',diagnostics:{...state.diagnostics!,energy:2 as const},
+      chapterTwo:{...state.chapterTwo!,trail:[...state.chapterTwo!.trail,'A02-S02/L08b','A02-S02/L09']}};
+    expect(projectNarrative(old)).toMatchObject({text:'Ai!',cue:'blink-black',diagnostics:{energy:3}});
+    const next=forward(old);
+    expect(next.stepId).toBe('A02-S02/MEM-D2');
+    expect(next.events).toContain('MEM-D2');
+    expect(next.chapterTwo?.dog.slots).toEqual(state.chapterTwo?.dog.slots);
+    expect(next.chapterTwo?.trail).not.toContain('A02-S02/L09');
   });
   it('never replays consultation on locale change or history review and permits choice at zero', () => {
     let state=reachDog();

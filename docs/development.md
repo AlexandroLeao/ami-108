@@ -1,5 +1,14 @@
 # Development foundation
 
+## Safe stop and restart — current accepted baseline
+
+Cloud Shell transcript confirms successful fast-forward to `985cb60`, successful Compose build, four healthy services. Earlier resource check: 15 GiB RAM, 12 GiB available, 27 GB available ephemeral root, 1.7 GB available persistent /home. Observations, not a guarantee of later VM resources or model suitability. Do not install/pull a model yet. Close game tabs, back up PostgreSQL to private persistent $HOME outside Git, then stop containers only after a successful nonempty verified dump. Optionally download privately. Do not run `down -v`, `volume rm`, or prune volumes. Docker volume is VM-local; use same browser/origin/cookie. Dump cannot restore lost cookie. On return check git status, pull main with --ff-only, rebuild if necessary. If a new empty database volume appears, stop and recover from verified dump; never overwrite a nonempty DB blindly. See historical shutdown procedure below.
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+
+---
+
+
 ## Prerequisites
 
 Node.js 22 (at least 22.12), pnpm 10.15.1 via Corepack, Python 3.12, uv and Docker Compose (the Docker CLI plugin). Google Cloud Shell is the verified manual development environment. Codespaces remains an optional alternative using `.devcontainer/devcontainer.json`; its startup has not been verified. Use a two-core Codespace only if available within your allowance. Keep previews private; this is not a production deployment.

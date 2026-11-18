@@ -1,8 +1,17 @@
 # AMI-108
 
+## Current project status
+
+AMI-001–005 complete (5/13, 38.5%); AMI-006 and AMI-008 partially complete. PR #24 contains unmerged durable AI integration and optional local Ollama adapter; not active on main and needs reconciliation. Next: evaluate local inference without paid resources, verify real AI/fallback, then Chapters 4–5. See [production plan](docs/production-plan.md), [Chapter 3](docs/chapter-three.md) and [development](docs/development.md).
+
+**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+
+---
+
+
 A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories.
 
-**Status:** AMI-001–004 complete; AMI-005 complete (issue #7 closed). AMI-006 partially complete. The owner-approved local bilingual Chapters 1–2 campaign is merged in PR #22 at `76946f9` (November 17, 2026), with persistent sessions, the dog encounter, checkpoint/cache, F1, SOL-01 and chapter replay. Chapter 1 has 77 presentation beats; Chapter 3 is a boundary only. No full campaign, real inference or production deployment.
+**Historical baseline:** PR #22 accepted Chapters 1–2; superseded by the PR #25 status above.
 
 ## Product
 
