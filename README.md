@@ -2,9 +2,7 @@
 
 ## Current project status
 
-AMI-001–005 complete (5/13, 38.5%); AMI-006 and AMI-008 partially complete. PR #24 contains unmerged durable AI integration and optional local Ollama adapter; not active on main and needs reconciliation. Next: evaluate local inference without paid resources, verify real AI/fallback, then Chapters 4–5. See [production plan](docs/production-plan.md), [Chapter 3](docs/chapter-three.md) and [development](docs/development.md).
-
-**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
+**Current accepted baseline — November 18, 2026:** PR #24 merged at `d587be9` after owner acceptance on desktop/mobile and explicit merge approval. AMI-001–005, 007 and 008 complete (7/13 = 53.8%); AMI-006 remains open for F3 and CP-BOAR. Chapters 1–3 complete (3/5); Chapter 4 card is the boundary. Strict warmed Qwen2.5:1.5b benchmark 20/20 (PT/EN), 160–1919 ms; isolated real HTTP/PostgreSQL online/offline E2E and owner browser checklist 8/8 passed. [Exact-head CI 44314906072](https://github.com/AlexandroLeao/ami-108/actions/runs/44314906072) passed. AI is opt-in, bounded selection of authorized bilingual alternatives, not unrestricted generation. Existing saves, fixed dialogue, UI and art preserved; accepted Cloud Shell still needs backup and controlled migration/activation. Private Master v1.13 / Script v1.11 remain canonical; latest approved F3 recharge rule takes precedence. Next AMI-009, then QA, deployment and release. See [AI evidence](docs/ai-local-evaluation.md).
 
 ---
 
@@ -32,7 +30,7 @@ The game must remain playable using authored fallbacks when the AI provider is u
 
 The repository is currently private. See [development setup](docs/development.md) for environment setup, initial dependency resolution, tests and Compose instructions. The bootstrap was merged in PR #16 after successful CI, four-container startup and Google Cloud Shell preview. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
 
-The canonical narrative sources are Documento Mestre v1.12 and Roteiro Interativo v1.10 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
+The canonical narrative sources are Documento Mestre v1.13 and Roteiro Interativo v1.11 (private backup). AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
 
 ## Approved game interface
 
