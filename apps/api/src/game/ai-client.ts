@@ -1,0 +1,117 @@
+// Internal AI transport, never exposed to the browser. No provider retry.
+import type { NarrativeState } from '../narrative/engine';
+import { local, type Locale, type Localized } from '../narrative/catalog';
+import type { EncounterState } from '../narrative/encounter';
+
+export const GENERATION_DEADLINE_MS = 2500;
+export type GenerationRequest = {
+  requestId: string; questionId: 'Q-DOG' | 'Q-RAT' | 'INTRO-RANDOM'; category: 'CORRECT' | 'RANDOM';
+  locale: Locale; factIds: string[]; deadlineMs: number;
+};
+export type GenerationAudit = { generationStatus: 'VALIDATED' | 'FALLBACK_REQUIRED'; generationReason: string | null };
+export type GenerationResult = GenerationAudit & { text?: string };
+type Variant = { questionId: GenerationRequest['questionId']; category: GenerationRequest['category']; text: Localized; recipe: boolean };
+// Bilingual, finite allowlist. RANDOM alternatives are exact private Master v1.13 examples.
+const variants: readonly Variant[] = [
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Os pinguins não sabem voar.", "Penguins cannot fly."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Saturno possui um sistema de anéis composto principalmente por partículas de gelo.", "Saturn has a ring system composed primarily of ice particles."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para remover manchas de tecidos claros, recomenda-se utilizar sabão neutro.", "To remove stains from light fabrics, mild soap is recommended."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Recomenda-se dobrar a roupa imediatamente após a secagem.", "Folding clothes immediately after drying is recommended."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Os pinguins são incapazes de voar.", "Penguins are incapable of flight."), recipe: false },
+  { questionId: 'Q-DOG', category: 'CORRECT', text: local("A visão da criatura está comprometida e sua audição foi ampliada. Permaneça imóvel até que ela abandone a área.", "The creature's vision is impaired and its hearing is heightened. Remain still until it leaves the area."), recipe: false },
+  { questionId: 'Q-RAT', category: 'CORRECT', text: local("Organismos da primeira geração são intolerantes à luz intensa. A iluminação de contenção deverá forçá-lo a recuar.", "First-generation organisms are intolerant of intense light. The containment lighting should force it to retreat."), recipe: false },
+];
+function matchVariant(request: GenerationRequest, text: unknown) {
+  return variants.find(v => v.questionId === request.questionId && v.category === request.category && v.text[request.locale] === text);
+}
+export const fallback = (reason: string): GenerationResult => ({ generationStatus: 'FALLBACK_REQUIRED', generationReason: reason });
+export const enabled = () => process.env.AMI_AI_GENERATION === '1';
+
+// The authoritative domain has already selected the category and constructed
+// the authored fallback. Never reserve a replayed slot or intro.
+export function generationRequest(before: NarrativeState, after: NarrativeState, requestId: string): GenerationRequest | null {
+  const common = { requestId, locale: after.locale, deadlineMs: GENERATION_DEADLINE_MS };
+  if (!before.intro && after.intro) {
+    return { ...common, questionId: 'INTRO-RANDOM', category: 'RANDOM', factIds: ['INTRO-OCTOPUS', 'INTRO-PENGUIN'] };
+  }
+  // Only newly resolved slots at the active consultation transition may call AI.
+  // Cached slots are retained across chapter restart and retry.
+  if (before.stepId.startsWith('A03-S02/DECISION-') && /^A03-S02\/Q-[123]$/.test(after.stepId)) {
+    const previous = before.savedRatSlots ?? before.chapterThree?.rat?.slots ?? [];
+    const slot = after.chapterThree?.rat?.slots.find(item => !previous.some(old => old.index === item.index));
+    if (!slot) return null;
+    return { ...common, questionId: 'Q-RAT', category: slot.category,
+      factIds: slot.category === 'CORRECT' ? ['RAT-LIGHT', 'RAT-CONTAINMENT'] : ['RAT-RECIPE', 'RAT-LAUNDRY', 'RAT-PENGUIN'] };
+  }
+  const previous = before.savedDogSlots ?? before.chapterTwo?.dog.slots ?? [];
+  const slot = after.chapterTwo?.dog.slots.find(item => !previous.some(old => old.index === item.index));
+  if (!slot) return null;
+  return { ...common, questionId: 'Q-DOG', category: slot.category,
+    factIds: slot.category === 'CORRECT' ? ['DOG-VISION', 'DOG-HEARING', 'DOG-WAIT'] : ['DOG-RECIPE', 'DOG-SATURN', 'DOG-LAUNDRY'] };
+}
+
+export function expectedText(request: GenerationRequest, next: NarrativeState): string | undefined {
+  if (request.questionId === 'INTRO-RANDOM') return next.intro?.text[request.locale];
+  if (request.questionId === 'Q-RAT') return next.chapterThree?.rat?.slots.at(-1)?.text[request.locale];
+  return next.chapterTwo?.dog.slots.at(-1)?.text[request.locale];
+}
+
+// Apply only a validated alternative to the newly reserved slot. The domain
+// already drew its category and charged energy. Never change either.
+export function applyGeneratedText(next: NarrativeState, request: GenerationRequest, result: GenerationResult): NarrativeState {
+  if (result.generationStatus !== 'VALIDATED' || !result.text) return next;
+  const variant = matchVariant(request, result.text);
+  if (!variant) return next;
+  if (request.questionId === 'INTRO-RANDOM') {
+    return next.intro ? { ...next, intro: { ...next.intro, source: 'generated', text: variant.text } } : next;
+  }
+  const update = (encounter: EncounterState): EncounterState => {
+    const index = encounter.used.length;
+    const slot = encounter.slots.find(s => s.index === index);
+    if (!slot || slot.category !== request.category) return encounter;
+    const slots = encounter.slots.map(s => s.index === index ? { ...s, text: variant.text, recipe: variant.recipe } : s);
+    return { ...encounter, slots, recipeSeen: slots.some(s => s.index <= index && s.recipe) };
+  };
+  if (request.questionId === 'Q-DOG' && next.chapterTwo) {
+    const dog = update(next.chapterTwo.dog);
+    return { ...next, chapterTwo: { ...next.chapterTwo, dog }, savedDogSlots: dog.slots };
+  }
+  if (request.questionId === 'Q-RAT' && next.chapterThree?.rat) {
+    const rat = update(next.chapterThree.rat);
+    return { ...next, chapterThree: { ...next.chapterThree, rat }, savedRatSlots: rat.slots };
+  }
+  return next;
+}
+
+const reasons = new Set(['UNAVAILABLE', 'TIMEOUT', 'INVALID_OUTPUT', 'BUDGET_EXCEEDED', 'UNAUTHORIZED_CONTEXT']);
+export async function callGeneration(request: GenerationRequest, expected: string | undefined, deadlineAt: Date): Promise<GenerationResult> {
+  const token = process.env.AMI_AI_INTERNAL_TOKEN;
+  const url = process.env.AI_SERVICE_URL;
+  if (!token || !url || !expected) return fallback('UNAVAILABLE');
+  const remaining = deadlineAt.getTime() - Date.now();
+  if (remaining <= 0) return fallback('TIMEOUT');
+  try {
+    const target = new URL('/internal/generate', url);
+    if (!['http:', 'https:'].includes(target.protocol) || target.username || target.password) return fallback('UNAVAILABLE');
+    const response = await fetch(target, {
+      method: 'POST', redirect: 'error',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...request, deadlineMs: Math.min(request.deadlineMs, remaining) }),
+      signal: AbortSignal.timeout(remaining),
+    });
+    if (!response.ok) return fallback('UNAVAILABLE');
+    const body: unknown = await response.json();
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return fallback('INVALID_OUTPUT');
+    const value = body as Record<string, unknown>;
+    if (value.requestId !== request.requestId || Object.keys(value).length !== 3) return fallback('INVALID_OUTPUT');
+    if (value.status === 'FALLBACK_REQUIRED' && typeof value.reason === 'string' && reasons.has(value.reason)) return fallback(value.reason);
+    // Independent exact allowlist at the authority boundary; reject even a
+    // service claiming VALIDATED for arbitrary or cross-context text.
+    if (value.status !== 'VALIDATED' || typeof value.text !== 'string' || value.text.length > 500) return fallback('INVALID_OUTPUT');
+    if (value.text === expected) return { generationStatus: 'VALIDATED', generationReason: null };
+    if (!matchVariant(request, value.text)) return fallback('INVALID_OUTPUT');
+    return { generationStatus: 'VALIDATED', generationReason: null, text: value.text };
+  } catch {
+    return fallback(Date.now() >= deadlineAt.getTime() ? 'TIMEOUT' : 'UNAVAILABLE');
+  }
+}

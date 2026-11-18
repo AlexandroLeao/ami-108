@@ -20,6 +20,7 @@ model GameSession {
   receipts         GameCommandReceipt[]
   checkpoints      GameCheckpoint[]
   consultationSlots GameConsultationSlot[]
+  pendingGeneration GamePendingGeneration?
 }
 
 model GameCommandReceipt {
@@ -27,6 +28,8 @@ model GameCommandReceipt {
   commandId       String      @db.Uuid
   requestDigest   String
   appliedRevision Int
+  generationStatus String?
+  generationReason String?
   createdAt       DateTime    @default(now())
   session         GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -54,4 +57,17 @@ model GameConsultationSlot {
   session       GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@id([sessionId, encounterId, slotIndex])
+}
+
+// One outstanding server-owned reservation per session. No network call is made
+// under the session lock. Expired reservations finalize with authored fallback.
+model GamePendingGeneration {
+  sessionId     String      @id @db.Uuid
+  commandId     String      @db.Uuid
+  requestDigest String
+  nextState     Json
+  request       Json
+  deadlineAt    DateTime
+  createdAt     DateTime    @default(now())
+  session       GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
