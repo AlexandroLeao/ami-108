@@ -2,9 +2,9 @@
 
 ## Current art authorization
 
-CENA-01–07 are reached in Chapters 1–3; CENA-05/06 reused as approved. Future CENA-08–12 remain inaccessible in campaign. All original PNGs/manifest identical. Creature reveal uses immediate loaded-art shake only, 650ms; laboratory/terminal fades unchanged.
+CENA-01–07 and CENA-08/11/12 are reached in Chapters 1–4; CENA-09/10 remain inaccessible until Chapter 5. All twelve original PNGs and manifest retained. Chapter 4 memory art uses coded CRT opening, continuous subtle interference and shake on the child/lizard images, and disoriented eyelids on the betrayal image. Dog/rat reveal gradually with existing tremor; only specified scenes gate forward navigation. No new or duplicated artwork. Reduced motion supported.
 
-**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through Chapter 4. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest unchanged. Current acceptance supersedes earlier historical notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain last synchronized; owner-approved PR #25 amendments take precedence pending private synchronization.
+**Current accepted baseline — November 18, 2026:** Chapter 4 PR #28 merged at `176e8c1`, visual refinements #32/#33 merged at `23b165e` / `eb13de4`; owner approved desktop/mobile and exact final frontend. CI 44390775809, 44395236226 and 44396622036 passed. All twelve original artwork files retained. Port 3000 updated and Continue confirmed; four migrations current. Main documentation handoff #31 merged at `3e4a2fe`. Chapters 1–4 approved (4/5); 7/13 formal AMI issues closed. Private Master v1.13 / Script v1.11 plus subsequent explicitly approved changes are authoritative. Chapter 5 draft #30 catalog CI passed; integration pending. Real AI integrated and evaluated, currently disabled in local gameplay. #29 tracks diversity and activation. Final pause backup still owner-run. Historical notes below do not override this baseline.
 
 ---
 
