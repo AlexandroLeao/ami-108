@@ -50,6 +50,8 @@ describe('isolated Chapter 4 transitions',()=>{
     const events:string[]=[];
     for(let i=0;i<100;i++){
       const v=viewFour(s);
+      if(v.stepId==='A04-S02/FB-A4') expect(v.text).toBe(locale==='pt-BR'?'FORTE IMPACTO. MEMÓRIA COMPROMETIDA. ERRO. ERRO. MEMBROS DANIFICADOS. ERRO. ERRO. ERRO.':'HEAVY IMPACT. MEMORY COMPROMISED. ERROR. ERROR. LIMBS DAMAGED. ERROR. ERROR. ERROR.');
+      if(v.stepId==='A04-S02/L07') expect(v.text).toBe(locale==='pt-BR'?'Eu sinto muito, AMI.':'I’m so sorry, AMI.');
       if(v.stepId==='A04-S02/FB-A3-IMAGE') expect(v.text).toBe('');
       else expect(v.text.trim()).not.toBe('');
       if(v.stepId==='A04-S02/FB-A1/01') expect(v.asset).toBeNull();
