@@ -44,3 +44,8 @@ export function hasDavidMemoryShiver(view: CampaignView): boolean {
   return view.chapter===4 && view.sceneId==='A04-S02' && view.phase==='FLASHBACK' &&
     davidMemoryBeats.has(beatKey(view).slice('A04-S02/'.length,-'/NEXT'.length));
 }
+
+// Chapter 4 is narrative-only; the restored energy remains in saved diagnostics.
+export function showEnergyIndicator(view: CampaignView): boolean {
+  return view.chapter!==4 && !!(view.asset || view.information || energyMotion(view)==='settle');
+}
