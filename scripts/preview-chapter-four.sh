@@ -7,7 +7,7 @@
   test "$(git rev-parse --short HEAD)" = d587be9
   test -z "$(git status --porcelain)"
   git fetch origin feat/chapter-four-catalog
-  candidate=5152a8bd31256ca30bad7131a96614f00e3a791e
+  candidate=9d1f1bdd427ec6f29841854f7630b354e54b9196
   git cat-file -e "$candidate^{commit}"
   worktree=$(mktemp -d /tmp/ami108-ch4.XXXXXX)
   tag="ami108-ch4-$(printf '%s' "${worktree##*.}" | LC_ALL=C tr '[:upper:]' '[:lower:]')"
