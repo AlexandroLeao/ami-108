@@ -1,5 +1,5 @@
 // Server-only Chapter 4 catalog, transcribed from private Master v1.13 §6.
-// New, not routed by the campaign engine. Do not expose future memories to the client or AI.
+// Owner-approved playtest amendments supersede the earlier source here. Do not expose future memories to the client or AI.
 // F3 uses the definitive restoration-linked energy rule, not legacy solar events.
 import { local, type Localized } from './catalog';
 
@@ -12,20 +12,14 @@ const beat = (id: string, speaker: Speaker, pt: string, en: string): Beat => ({
 export const RESTORATION_DIALOGUE: readonly Beat[] = [
   beat("L01", "AMI-108", "Detectei um componente compatível. Com ele, poderei reconstruir os índices que ainda não consigo acessar.", "I have detected a compatible component. With it, I can reconstruct the indexes I still cannot access."),
   beat("L02", "DAVID", "Então vamos terminar o que começamos.", "Then let's finish what we started."),
-  beat("L03", "AMI-108", "Sistemas restaurados. Arquivos pessoais disponíveis.", "Systems restored. Personal files available."),
   beat("L04", "DAVID", "Assistente Modular Infantil?", "Automated Minder for Infants?"),
-  beat("L05", "AMI-108", "Informação confirmada.", "Information confirmed."),
-  beat("L06", "DAVID", "Você era uma babá?", "You were a nanny?"),
-  beat("L07", "AMI-108", "Afirmativo.", "Affirmative."),
-  beat("L08", "AMI-108", "Eu cuidava de alguém.", "I took care of someone."),
+  beat("L06", "DAVID", "Tipo uma babá?", "Like a nanny?"),
 ];
 
 export const MANUAL_RECORDS: readonly Localized[] = [
-  local("REGISTRO DE FABRICAÇÃO RECUPERADO", "MANUFACTURING RECORD RECOVERED"),
-  local("MODELO: AMI / UNIDADE: 108", "MODEL: AMI / UNIT: 108"),
+  local("REGISTRO DE FABRICAÇÃO RECUPERADO\nMODELO: AMI / UNIDADE: 108", "MANUFACTURING RECORD RECOVERED\nMODEL: AMI / UNIT: 108"),
   local("ASSISTENTE MODULAR INFANTIL", "AUTOMATED MINDER FOR INFANTS"),
-  local("FUNÇÕES: EDUCAÇÃO; CUIDADOS DOMÉSTICOS; SEGURANÇA; ACOMPANHAMENTO FAMILIAR; PRIMEIROS SOCORROS.", "FUNCTIONS: EDUCATION; DOMESTIC CARE; SAFETY; FAMILY ASSISTANCE; FIRST AID."),
-  local("MEMÓRIA RESTAURADA. REGISTROS FAMILIARES DISPONÍVEIS.", "MEMORY RESTORED. FAMILY RECORDS AVAILABLE."),
+  local("FUNÇÕES: EDUCAÇÃO - CUIDADOS DOMÉSTICOS - SEGURANÇA - ACOMPANHAMENTO FAMILIAR - PRIMEIROS SOCORROS.", "FUNCTIONS: EDUCATION - DOMESTIC CARE - SAFETY - FAMILY ASSISTANCE - FIRST AID."),
 ];
 
 // The fragments are source-derived presentation metadata, not additional character dialogue.
@@ -39,7 +33,7 @@ export const AMI_MEMORY_FRAGMENTS = [
   { id: 'FB-A2', asset: 'CENA-08', dialogue: [] },
   { id: 'FB-A3', asset: 'CENA-12', dialogue: [] },
   { id: 'FB-A4', asset: null, dialogue: [
-    beat('FB-A4/01', 'CHILD', 'Bobo!', 'Bobo!'),
+    beat('FB-A4/01', 'CHILD', 'BOBO, SOCORRO!', 'BOBO, HELP!'),
   ] },
 ] as const;
 
@@ -58,15 +52,15 @@ export const DAVID_MEMORY_TRIGGER: readonly Beat[] = [
 ];
 
 export const BETRAYAL_DIALOGUE: readonly Beat[] = [
-  beat("F01", "DAVID", "Howard... Você tem noção de quanto isso vale?", "Howard... Do you have any idea what this is worth?"),
+  beat("F01", "DAVID", "Você tem noção de quanto isso vale?", "Do you have any idea what this is worth?"),
   beat("F02", "HOWARD", "Tenho.", "I do."),
   beat("F03", "DAVID", "Acabaram os nossos problemas, cara.", "Our problems are over, man."),
   beat("F04", "HOWARD", "É.", "Yeah."),
   beat("F05", "DAVID", "A gente só precisa levar isso até o comprador.", "We just need to get this to the buyer."),
   beat("F06", "HOWARD", "O de sempre.", "The usual one."),
-  beat("F07", "DAVID", "O próprio. Vamos guardar isso.", "That's the one. Let's pack this up."),
+  beat("F07", "DAVID", "O de sempre. Vamos guardar isso.", "The usual one. Let's pack this up."),
   beat("F08", "HOWARD", "Sinto muito, David.", "I'm sorry, David."),
-  beat("F09", "HOWARD", "São apenas negócios.", "It's just business."),
+  beat("F09", "HOWARD", "... São apenas negócios.", "... It's just business."),
 ];
 
 export const BETRAYAL_RETURN: readonly Beat[] = [
@@ -91,7 +85,7 @@ export const FINAL_RESTORATION = {
 export const CHAPTER_FOUR_GATES = [
   'A04-S01/CHAPTER_CARD', 'A04-S01/L01', 'A04-S01/L02',
   'A04-S01/INSTALL', 'F3', 'A04-S01/L03', 'UI-MANUAL',
-  'A04-S01/L04', 'A04-S01/L05', 'A04-S01/L06', 'A04-S01/L07', 'A04-S01/L08',
+  'A04-S01/L04', 'A04-S01/L06',
   'FB-A1', 'FB-A2', 'FB-A3', 'FB-A4', 'FAMILY-RETURN', 'E-FAMILY',
   'MEM-D4', 'FB-D4', 'FB-D5', 'BETRAYAL-RETURN', 'E-BETRAYAL', 'E-PAST-RESTORED',
   'A05-S01/CHAPTER_CARD',
