@@ -49,7 +49,7 @@ const sequence: readonly Beat[] = [
   narration(f('FB-A3-PROTECT'), local('Entre as falhas da gravação, você percebe AMI enfrentando algo, estendendo seus membros para proteger as pessoas atrás dele. A julgar pelos registros anteriores, aquela era sua família.', 'Through the gaps in the recording, you make out AMI facing something, extending his limbs to protect the people behind him. Judging by the earlier recordings, they were his family.'), null, 'FLASHBACK'),
   line(s2,AMI_MEMORY_FRAGMENTS[3].dialogue[0],null,'FLASHBACK'),
   { ...narration(f('FB-A3-IMAGE'), local('',''),'CENA-12','FLASHBACK'), cue:'crt-startle' },
-  { ...narration(f('FB-A4'), local('FORTE IMPACTO. MEMÓRIA COMPROMETIDA. ERRO. ERRO. MEMBROS DANIFICADOS.', 'HEAVY IMPACT. MEMORY COMPROMISED. ERROR. ERROR. LIMBS DAMAGED.'), null, 'FLASHBACK'), record:true },
+  { ...narration(f('FB-A4'), local('FORTE IMPACTO. MEMÓRIA COMPROMETIDA. ERRO. ERRO. MEMBROS DANIFICADOS. ERRO. ERRO. ERRO.', 'HEAVY IMPACT. MEMORY COMPROMISED. ERROR. ERROR. LIMBS DAMAGED. ERROR. ERROR. ERROR.'), null, 'FLASHBACK'), record:true },
   { ...narration(f('FB-A4-END'), local('REGISTRO INTERROMPIDO', 'RECORD INTERRUPTED'), null, 'FLASHBACK'), record:true },
   narration(f('FAMILY-PAUSE'), local('Os olhos de AMI reaparecem na tela, mas dessa vez estão claramente tristes.', 'AMI’s eyes reappear on the screen, but this time they are clearly sad.'), null),
   ...family,
