@@ -71,7 +71,7 @@ const sequence: readonly Beat[] = [
   narration(f('FB-D1-RECALL'), local('Você se dá conta de que as duas crianças brincando naquela lembrança eram você e Howard, seu amigo de infância. A raiva cresce dentro de você ao compreender a traição.', 'You realize that the two children playing in that memory were you and Howard, your childhood friend. Anger grows within you as you understand the betrayal.'), null, 'FLASHBACK'),
   ...returnBeats,
   narration(f('PAST-RESTORED'), local('Você olha para AMI, determinado, e o acomoda novamente na parte da frente da mochila, junto ao peito.', 'You look at AMI with determination and settle him back against your chest, on the front of your backpack.'), null, 'NARRATIVE', ['E-BETRAYAL','E-PAST-RESTORED']),
-  narration(f('DEPART'), local('Com suas memórias recuperadas e a rota em mãos, vocês deixam a instalação militar e seguem em direção à área de evacuação.', 'With your memories restored and the route in hand, you leave the military facility and head toward the evacuation area.'), null),
+  narration(f('DEPART'), local('Com suas memórias recuperadas e a rota em mãos, vocês deixam a sala de manutenção e seguem pelos corredores em direção ao hangar militar.', 'With your memories restored and the route in hand, you leave the maintenance room and follow the corridors toward the military hangar.'), null),
   narration(CHAPTER_FIVE_BOUNDARY, local('CAPÍTULO 5 — DE NADA, BOBO', 'CHAPTER 5 — YOU’RE WELCOME, BOBO'), null, 'CHAPTER_CARD'),
 ];
 export type ChapterFourProgress = Readonly<{
