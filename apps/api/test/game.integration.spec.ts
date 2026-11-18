@@ -321,6 +321,84 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     }
   },30000);
 
+  it.each(['DOG','RAT'] as const)('persists validated %s variation, translation and retry without a new call', async encounter => {
+    const previous={flag:process.env.AMI_AI_GENERATION,token:process.env.AMI_AI_INTERNAL_TOKEN,url:process.env.AI_SERVICE_URL};
+    delete process.env.AMI_AI_GENERATION;
+    const {cookie,view:initial}=await create();
+    let view=initial;
+    for(let i=0;i<120 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    if(encounter==='RAT') {
+      view=await command(cookie,view,'DOG-04');
+      for(let i=0;i<150 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+      expect(view.sceneId).toBe('A03-S02');
+    } else expect(view.sceneId).toBe('A02-S01');
+    const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
+    const variants={
+      DOG:{
+        CORRECT:{pt:'A visão da criatura está comprometida e sua audição foi ampliada. Permaneça imóvel até que ela abandone a área.',en:"The creature's vision is impaired and its hearing is heightened. Remain still until it leaves the area."},
+        RANDOM:{pt:'Saturno possui um sistema de anéis composto principalmente por partículas de gelo.',en:'Saturn has a ring system composed primarily of ice particles.'},
+      },
+      RAT:{
+        CORRECT:{pt:'Organismos da primeira geração são intolerantes à luz intensa. A iluminação de contenção deverá forçá-lo a recuar.',en:'First-generation organisms are intolerant of intense light. The containment lighting should force it to retreat.'},
+        RANDOM:{pt:'Recomenda-se dobrar a roupa imediatamente após a secagem.',en:'Folding clothes immediately after drying is recommended.'},
+      },
+    };
+    let requests=0;
+    let chosen: {pt:string;en:string}|undefined;
+    const server=createServer((req,res)=>{
+      let raw='';
+      req.on('data',(chunk:Buffer)=>{raw+=chunk.toString();});
+      req.on('end',()=>{
+        requests++;
+        const body=JSON.parse(raw) as {requestId:string;questionId:string;category:'CORRECT'|'RANDOM';locale:string};
+        if(body.questionId!=='Q-'+encounter || body.locale!=='pt-BR') {res.writeHead(400);res.end();return;}
+        chosen=variants[encounter][body.category];
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({requestId:body.requestId,status:'VALIDATED',text:chosen.pt}));
+      });
+    });
+    server.listen(0,'127.0.0.1'); await once(server,'listening');
+    const address=server.address();
+    if(!address || typeof address==='string') throw Error('Mock server address');
+    process.env.AMI_AI_GENERATION='1';
+    process.env.AMI_AI_INTERNAL_TOKEN='test-only';
+    process.env.AI_SERVICE_URL='http://127.0.0.1:'+address.port;
+    try {
+      const body={commandId:randomUUID(),expectedRevision:view.revision,actionId:view.actions.find(x=>x.kind==='CONSULT')!.id};
+      view=(await request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send(body).expect(200)).body.view as CurrentView;
+      expect(chosen).toBeDefined();
+      expect(view.diagnostics?.energy).toBe(2);
+      const key={sessionId_encounterId_slotIndex:{sessionId:row.id,encounterId:encounter,slotIndex:1}};
+      const slot=await prisma.gameConsultationSlot.findUniqueOrThrow({where:key});
+      expect(slot).toMatchObject({localizedText:{'pt-BR':chosen!.pt,en:chosen!.en},recipe:false});
+      expect(await prisma.gameCommandReceipt.findUniqueOrThrow({where:{sessionId_commandId:{sessionId:row.id,commandId:body.commandId}}})).toMatchObject({generationStatus:'VALIDATED',generationReason:null});
+      view=await command(cookie,view);
+      expect(view.text).toBe(chosen!.pt);
+      await app.close(); await open();
+      await request(app.getHttpServer()).get('/game/view').set('Cookie',cookie).expect(200,view);
+      view=(await request(app.getHttpServer()).patch('/game/locale').set('Cookie',cookie).send({commandId:randomUUID(),expectedRevision:view.revision,locale:'en'}).expect(200)).body.view as CurrentView;
+      expect(view.text).toBe(chosen!.en);
+      for(let i=0;i<4 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+      view=await command(cookie,view,encounter+'-01');
+      for(let i=0;i<3 && !view.actions.some(a=>a.kind==='RETRY');i++) view=await command(cookie,view);
+      view=await command(cookie,view,view.actions.find(a=>a.kind==='RETRY')!.id);
+      expect(view.diagnostics?.energy).toBe(3);
+      for(let i=0;i<15 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+      view=await command(cookie,view,view.actions.find(a=>a.kind==='CONSULT')!.id);
+      view=await command(cookie,view);
+      expect(view.text).toBe(chosen!.en);
+      expect(view.diagnostics?.energy).toBe(2);
+      expect(requests).toBe(1);
+      expect(await prisma.gameConsultationSlot.findUniqueOrThrow({where:key})).toEqual(slot);
+    } finally {
+      server.closeAllConnections();
+      await new Promise<void>(resolve=>server.close(()=>resolve()));
+      for(const [key,value] of [['AMI_AI_GENERATION',previous.flag],['AMI_AI_INTERNAL_TOKEN',previous.token],['AI_SERVICE_URL',previous.url]] as const) {
+        if(value===undefined) delete process.env[key]; else process.env[key]=value;
+      }
+    }
+  },30000);
+
   it.each(['DOG','RAT'] as const)('recovers an expired %s reservation after restart, with no reroll, double debit or provider call', async encounter => {
     const {cookie,view:initial}=await create();
     let view=initial;
