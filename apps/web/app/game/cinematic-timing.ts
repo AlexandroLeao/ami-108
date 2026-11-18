@@ -27,3 +27,9 @@ export function countF3(text: string, progress: number) {
   const initial: Record<string,number>={'MED-01':75,'BIO-02':85,'HIST-03':78};
   return text.replace(/(MED-01|BIO-02|HIST-03)(\s+—\s+)100%/g,(_match,id:string,separator:string)=>id+separator+Math.floor(initial[id]+(100-initial[id])*fraction)+'%');
 }
+
+// Only the two original AMI memory artworks retain the CRT signal after opening.
+export function hasMemorySignal(view: CampaignView): boolean {
+  return view.chapter===4 && view.sceneId==='A04-S02' && view.phase==='FLASHBACK' &&
+    (view.asset?.url==='/api/game/asset?key=CENA-08' || view.asset?.url==='/api/game/asset?key=CENA-12');
+}
