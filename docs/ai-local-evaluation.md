@@ -48,3 +48,9 @@ The EXIT trap removes only the uniquely named evaluation server/network/model vo
 ## Current verification status
 
 Existing CI 44307825385 passed at `7d9ef51` with simulated provider tests (148 total). This runbook adds no runtime code, dependencies, migration, assets or approved story changes. Shell procedure and actual model evaluation remain unexecuted; do not describe them as passed.
+
+## November 18 — first real benchmark and diagnosis
+
+Owner confirmed the restored session through Continue before testing. Corrected script `30ee343` built successfully at candidate `7d9ef51`. Ollama 0.40.16, image digest `sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592`, Qwen2.5:1.5b model ID `65ec06548149` (986 MB). Log confirms cloud disabled, internal-only network, no published port. Two passes: 0/20 validated, 20/20 TIMEOUT (2003–2037 ms), 0 alternatives. The HTTP client timeout is 2s; actual model completion latency and quality remain unknown. Do not claim a successful inference. Fallback signal worked in the direct evaluator; not an end-to-end gameplay test.
+
+Diagnostic-only script `2962c4f` reuses the exact runtime candidate and image digest, performs a warmup, evaluates two full-text cases and ten short numeric option-selection cases through the existing exact-text validator. The index is mapped only to the current authorized list; no runtime integration, new facts, probabilities, or deadline changes. Manual diagnostic timeout 28s / request 30s is not a proposed gameplay deadline. It stops after a timeout to avoid contaminating subsequent measurements. Record actual latency, validated/alternative counts and coverage before deciding whether to implement short selection. Results pending; main and all approved game files untouched.
