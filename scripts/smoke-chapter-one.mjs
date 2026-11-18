@@ -137,13 +137,14 @@ try {
   assert.equal(view.actions[0].id,'A04-S01/INSTALL/NEXT');
   const f3=await send(view.actions[0]);
   assert.deepEqual(view.diagnostics,{energy:3,med:100,bio:100,hist:100,personal:100,personalUnlocked:true});
-  assert.equal(view.cue,'archive-record');
-  assert.match(view.text,/MED-01/);
   const repeated=await (await call('commands','POST',f3)).json();
   assert.equal(repeated.status,'REPLAYED');
   assert.deepEqual(repeated.view,view);
   await send(view.actions[0]);
-  assert.match(view.text,/PERSONAL/);
+  assert.equal(view.cue,'f3-count');
+  assert.match(view.text,/MED-01/);
+  await send(view.actions[0]);
+  assert.match(view.text,/MEMORIES RESTORED/);
   assert.equal(view.cue,'archive-record');
   assert.equal((await call('asset?key=CENA-12')).status,404);
   for(let i=0;i<100 && view.chapter!==5;i++) await send(view.actions[0]);
