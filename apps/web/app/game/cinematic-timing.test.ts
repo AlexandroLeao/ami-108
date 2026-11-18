@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { beatKey, countF3, energyMotion, imageGateMs, hasMemorySignal } from './cinematic-timing';
+import { beatKey, countF3, energyMotion, imageGateMs, hasMemorySignal, hasDavidMemoryShiver } from './cinematic-timing';
 import type { CampaignView } from './client';
 
 const view = (id:string,cue:CampaignView['cue'],asset=true):CampaignView => ({
@@ -38,6 +38,17 @@ describe('owner-requested cinematic timing',()=>{
     }
     expect(hasMemorySignal({...memory,asset:null})).toBe(false);
     expect(hasMemorySignal({...memory,asset:{url:'/api/game/asset?key=CENA-11',alt:''}})).toBe(false);
+  });
+  it('shivers only the requested David memory range, without changing scene cues or gates',()=>{
+    const memory=(id:string,cue:CampaignView['cue']='none')=>({...view('A04-S02/'+id,cue,false),chapter:4,phase:'FLASHBACK' as const});
+    for(const id of ['FB-D4','FB-D4-SEARCH','FB-D4-FIND','F00a','F00b','F01','F02','F03','F04','F05','F06','F07','F07b','F08','FB-D5','F09','FB-D5-END','FB-D5-RESTORED','FB-D1-RECALL']) expect(hasDavidMemoryShiver(memory(id))).toBe(true);
+    for(const id of ['MEM-D4','MEM-D4-APPROACH','FB-A1/02','FAMILY-END','L08','L09','PAST-RESTORED','DEPART']) expect(hasDavidMemoryShiver(memory(id))).toBe(false);
+    expect(hasDavidMemoryShiver({...memory('FB-D4'),chapter:3})).toBe(false);
+    expect(hasDavidMemoryShiver({...memory('FB-D4'),phase:'NARRATIVE'})).toBe(false);
+    expect(hasDavidMemoryShiver(memory('FB-D5-END','fade-black'))).toBe(true);
+    expect(imageGateMs(memory('FB-D5-END','fade-black'))).toBe(0);
+    const betrayal={...memory('F09','disoriented'),asset:{url:'/api/game/asset?key=CENA-11',alt:''}};
+    expect(imageGateMs(betrayal)).toBe(1450);
   });
   it('counts from the actual F2 indexes to precisely 100 without modifying saved state',()=>{
     const text='MED-01 — 100%\nBIO-02 — 100%\nHIST-03 — 100%';

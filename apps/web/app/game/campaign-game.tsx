@@ -8,7 +8,7 @@ import { CHAPTER_REVEAL_MS } from '../preview/preview-state';
 import { CampaignScene } from './campaign-scene';
 import { gameRequest, RequestError, type CampaignView, type CommandBody, type CommandResult } from './client';
 import { paginateText } from './pagination';
-import { beatKey, imageGateMs, energyMotion, countF3, F3_COUNT_MS } from './cinematic-timing';
+import { beatKey, imageGateMs, energyMotion, countF3, F3_COUNT_MS, hasDavidMemoryShiver } from './cinematic-timing';
 
 type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
 type PageState = { key: string; pages: string[]; index: number };
@@ -289,7 +289,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
   // Continuous memory motion applies across all measured pages of this beat.
-  const memoryShiver = view?.cue === 'disoriented' || view?.cue === 'memory-shiver' || (view?.cue === 'name-reveal' && view.speaker === 'HOWARD');
+  const memoryShiver = (view && hasDavidMemoryShiver(view)) || view?.cue === 'disoriented' || view?.cue === 'memory-shiver' || (view?.cue === 'name-reveal' && view.speaker === 'HOWARD');
   const nameReveal = view?.cue === 'name-reveal';
   const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 

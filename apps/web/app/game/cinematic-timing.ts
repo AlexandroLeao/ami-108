@@ -33,3 +33,14 @@ export function hasMemorySignal(view: CampaignView): boolean {
   return view.chapter===4 && view.sceneId==='A04-S02' && view.phase==='FLASHBACK' &&
     (view.asset?.url==='/api/game/asset?key=CENA-08' || view.asset?.url==='/api/game/asset?key=CENA-12');
 }
+
+// David's final memory, inclusive of the first warehouse narration and childhood recall.
+// Preserve the existing scene cues, including the cut to black and disorientation.
+const davidMemoryBeats = new Set([
+  'FB-D4','FB-D4-SEARCH','FB-D4-FIND','F00a','F00b','F01','F02','F03','F04','F05','F06','F07','F07b','F08',
+  'FB-D5','F09','FB-D5-END','FB-D5-RESTORED','FB-D1-RECALL',
+]);
+export function hasDavidMemoryShiver(view: CampaignView): boolean {
+  return view.chapter===4 && view.sceneId==='A04-S02' && view.phase==='FLASHBACK' &&
+    davidMemoryBeats.has(beatKey(view).slice('A04-S02/'.length,-'/NEXT'.length));
+}
