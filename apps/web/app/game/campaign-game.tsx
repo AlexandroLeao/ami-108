@@ -8,7 +8,7 @@ import { CHAPTER_REVEAL_MS } from '../preview/preview-state';
 import { CampaignScene } from './campaign-scene';
 import { gameRequest, RequestError, type CampaignView, type CommandBody, type CommandResult } from './client';
 import { paginateText } from './pagination';
-import { beatKey, imageGateMs, energyMotion, countF3, F3_COUNT_MS, hasDavidMemoryShiver } from './cinematic-timing';
+import { beatKey, imageGateMs, energyMotion, countF3, F3_COUNT_MS, hasDavidMemoryShiver, showEnergyIndicator } from './cinematic-timing';
 
 type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
 type PageState = { key: string; pages: string[]; index: number };
@@ -312,7 +312,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
-                <div className="campaign-header-middle">{(view.asset || view.information || energyMotion(view)==='settle') && <EnergyIndicator view={view} />}</div>
+                <div className="campaign-header-middle">{showEnergyIndicator(view) && <EnergyIndicator view={view} />}</div>
                 <button className="small-control campaign-menu-control" aria-disabled={busy} onClick={() => { if (!busyRef.current) setOverlay('pause'); }}>{labels.menu}</button>
               </div>
             </header>
