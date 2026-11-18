@@ -132,7 +132,28 @@ try {
   assert.equal(view.chapter,4);
   assert.deepEqual(view.diagnostics,{energy:3,med:75,bio:85,hist:78,personal:5,personalUnlocked:false});
   assert.deepEqual([...verifiedAssets].sort(), ['CENA-01', 'CENA-02', 'CENA-03', 'CENA-04', 'CENA-05', 'CENA-06', 'CENA-07']);
-  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 7 reached assets, locale, resume, dog and rat encounters, F2 recharge and Chapter 4 boundary.');
+  assert.equal((await call('asset?key=CENA-08')).status, 404);
+  for(let i=0;i<10 && !view.actions.some(a=>a.kind==='INTERACT');i++) await send(view.actions[0]);
+  assert.equal(view.actions[0].id,'A04-S01/INSTALL/NEXT');
+  const f3=await send(view.actions[0]);
+  assert.deepEqual(view.diagnostics,{energy:3,med:100,bio:100,hist:100,personal:100,personalUnlocked:true});
+  assert.equal(view.cue,'archive-record');
+  assert.match(view.text,/MED-01/);
+  const repeated=await (await call('commands','POST',f3)).json();
+  assert.equal(repeated.status,'REPLAYED');
+  assert.deepEqual(repeated.view,view);
+  await send(view.actions[0]);
+  assert.match(view.text,/PERSONAL/);
+  assert.equal(view.cue,'archive-record');
+  assert.equal((await call('asset?key=CENA-12')).status,404);
+  for(let i=0;i<100 && view.chapter!==5;i++) await send(view.actions[0]);
+  assert.equal(view.chapter,5);
+  assert.deepEqual(view.diagnostics,{energy:3,med:100,bio:100,hist:100,personal:100,personalUnlocked:true});
+  assert.deepEqual([...verifiedAssets].sort(), ['CENA-01','CENA-02','CENA-03','CENA-04','CENA-05','CENA-06','CENA-07','CENA-08','CENA-11','CENA-12']);
+  assert.equal((await call('asset?key=CENA-09')).status,404);
+  assert.equal((await call('asset?key=CENA-10')).status,404);
+  assert.deepEqual(await (await call('view')).json(),view);
+  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 10 reached assets, locale, resume, dog and rat encounters, F2/F3 restoration and Chapter 5 boundary.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
 }
