@@ -6,6 +6,8 @@ import { beginChapterTwo, chapterTwoView, chapterTwoAsset, advanceChapterTwo, ty
 import type { Energy, Slot } from './encounter';
 import { beginChapterThree, chapterThreeView, chapterThreeAsset, advanceChapterThree, CHAPTER_FOUR_CARD, type ChapterThreeState } from './chapter-three';
 
+import { advanceFour, beginFour, viewFour, CHAPTER_FIVE_BOUNDARY, type ChapterFourProgress } from './chapter-four-domain';
+
 const HANDOFF = 'A02-S01/CHAPTER_CARD';
 export type Diagnostics = Readonly<{ energy: Energy; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean }>;
 const INITIAL_DIAGNOSTICS: Diagnostics = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false };
@@ -27,6 +29,8 @@ export type NarrativeState = Readonly<{
   savedDogSlots?: readonly Slot[];
   savedRatSlots?: readonly Slot[];
   chapterThree?: ChapterThreeState;
+  // Optional marker keeps existing saves compatible; the authoritative cursor/events remain shared.
+  chapterFour?: true;
   chapterFourStart?: Readonly<{ chapterTwo: ChapterTwoState; chapterThree: ChapterThreeState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   chapterThreeStart?: Readonly<{ chapterTwo: ChapterTwoState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   intro: Readonly<{ category: 'RANDOM'; source: 'fallback' | 'generated'; text: Localized }> | null;
@@ -136,7 +140,7 @@ function normalizeRetiredScenes(state: NarrativeState): NarrativeState {
         chapterTwo: {...c,trail:repaired.trail} };
     }
   }
-  if (state.chapterThree) {
+  if (state.chapterThree && !state.chapterFour) {
     const c=state.chapterThree;
     const replacement=retiredThree[state.stepId] ?? state.stepId;
     const needsTrail=c.trail.some(id=>Object.hasOwn(retiredThree,id));
@@ -152,6 +156,7 @@ function normalizeRetiredScenes(state: NarrativeState): NarrativeState {
 }
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
   state = normalizeRetiredScenes(state);
+  if (state.chapterFour) return viewFour(fourProgress(state)).asset;
   if (state.chapterThree) { chapterThreeView(state); return chapterThreeAsset(state); }
   if (state.chapterTwo) { chapterTwoView(state); return chapterTwoAsset(state); }
   return CHAPTER_ONE[visibleIndex(state)]?.asset ?? null;
@@ -174,7 +179,7 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
 }
 
 function unlocked(state: NarrativeState): number {
-  const reached = state.stepId === CHAPTER_FOUR_CARD ? 4 : state.chapterThree || state.stepId === 'A03-S01/CHAPTER_CARD' ? 3 : state.chapterTwo || state.stepId === HANDOFF ? 2 : 1;
+  const reached = state.chapterFour || state.stepId === CHAPTER_FOUR_CARD ? 4 : state.chapterThree || state.stepId === 'A03-S01/CHAPTER_CARD' ? 3 : state.chapterTwo || state.stepId === HANDOFF ? 2 : 1;
   return Math.min(4, Math.max(reached, state.unlockedChapter ?? 1));
 }
 export function projectNarrative(state: NarrativeState): CurrentView {
@@ -185,7 +190,14 @@ export function projectNarrative(state: NarrativeState): CurrentView {
 function projectCurrent(state: NarrativeState): CurrentView {
   ensureLocale(state.locale);
   if (state.version !== NARRATIVE_VERSION) throw new NarrativeError('INVALID_STATE');
-  if (state.chapterThree) return chapterThreeView(state);
+  if (state.chapterFour) return projectFour(state);
+  if (state.chapterThree) {
+    const view = chapterThreeView(state);
+    if (state.stepId === CHAPTER_FOUR_CARD && !state.reviewStepId) {
+      return { ...view, actions: [{ id: CHAPTER_FOUR_CARD + '/NEXT', kind: 'CONTINUE', label: actionLabel[state.locale] }, ...view.actions] };
+    }
+    return view;
+  }
   if (state.chapterTwo) return chapterTwoView(state);
   const index = visibleIndex(state);
   const step = CHAPTER_ONE[index];
@@ -253,7 +265,46 @@ export function advanceNarrative(state: NarrativeState, actionId: string, expect
   if (restart) return restartChapter(state, Number(restart[1]));
   return rememberProgress(advanceCurrent(state, actionId, random));
 }
+// Chapter 4 reuses the authoritative cursor, revision, diagnostics and events.
+// Only its marker is new persisted data; previous chapter snapshots are retained.
+const fourEvents = ['F3','E-FAMILY','MEM-D4','FB-D4','FB-D5','E-BETRAYAL','E-PAST-RESTORED'] as const;
+function isFourEvent(event: EventId): event is typeof fourEvents[number] {
+  return fourEvents.some(value => value === event);
+}
+function fourProgress(state: NarrativeState): ChapterFourProgress {
+  if (!state.chapterFour || !state.diagnostics || !state.chapterThree || !state.chapterTwo ||
+      !state.events.includes('F2') || !state.events.includes('E-ESCAPE-ROUTE')) throw new NarrativeError('INVALID_STATE');
+  return { stepId:state.stepId, reviewStepId:state.reviewStepId, revision:state.revision,
+    locale:state.locale, diagnostics:state.diagnostics, events:state.events.filter(isFourEvent) };
+}
+function projectFour(state: NarrativeState): CurrentView {
+  const view = viewFour(fourProgress(state));
+  const chapter = view.stepId === CHAPTER_FIVE_BOUNDARY ? 5 : 4;
+  const cue: Cue = view.cue ?? (view.record ? 'archive-record' : view.stepId === 'A04-S02/MEM-D4' ? 'blink-black'
+    : view.stepId === 'A04-S02/FB-D5' ? 'memory-cut' : view.stepId === 'A04-S02/FB-D5-END' ? 'fade-black' : 'none');
+  return { revision:view.revision, locale:view.locale, phase:view.phase, chapter,
+    chapterTitle:CHAPTERS[chapter-1].title[state.locale], sceneId:view.stepId.split('/')[0],
+    speaker:view.speaker, text:view.text, asset:view.asset ? {url:`/api/game/asset?key=${view.asset}`,alt:OPENING_ASSETS[view.asset][state.locale]} : null,
+    diagnostics:view.diagnostics, actions:view.actions, pending:false, cue,
+    narration:view.text!=='' && view.speaker===null && !view.record && view.phase!=='CHAPTER_CARD', information:false };
+}
+function applyFour(state: NarrativeState, progress: ChapterFourProgress): NarrativeState {
+  const events = [...state.events];
+  for (const event of progress.events) if (!events.includes(event)) events.push(event);
+  return {...state,chapterFour:true,stepId:progress.stepId,reviewStepId:progress.reviewStepId,
+    revision:progress.revision,diagnostics:progress.diagnostics,events};
+}
+
 function advanceCurrent(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
+  if (state.chapterFour) {
+    if (!projectFour(state).actions.some(action=>action.id===actionId)) throw new NarrativeError('ACTION_NOT_ALLOWED');
+    return applyFour(state,advanceFour(fourProgress(state),actionId,state.revision));
+  }
+  if (state.chapterThree && state.stepId===CHAPTER_FOUR_CARD && !state.reviewStepId && actionId===CHAPTER_FOUR_CARD+'/NEXT') {
+    if (!state.diagnostics || !state.chapterTwo) throw new NarrativeError('INVALID_STATE');
+    try { return applyFour(state,advanceFour(beginFour(state.diagnostics,state.events,state.locale,state.revision),actionId,state.revision)); }
+    catch { throw new NarrativeError('INVALID_STATE'); }
+  }
   if (state.chapterThree) return advanceChapterThree(state, actionId, random);
   if (state.chapterTwo && state.stepId === 'A03-S01/CHAPTER_CARD' && !state.reviewStepId && actionId === state.stepId + '/NEXT') return beginChapterThree(state);
   if (state.chapterTwo) return advanceChapterTwo(state, actionId, random);

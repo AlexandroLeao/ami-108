@@ -8,12 +8,13 @@ import { CHAPTER_REVEAL_MS } from '../preview/preview-state';
 import { CampaignScene } from './campaign-scene';
 import { gameRequest, RequestError, type CampaignView, type CommandBody, type CommandResult } from './client';
 import { paginateText } from './pagination';
+import { beatKey, imageGateMs, energyMotion, countF3, F3_COUNT_MS } from './cinematic-timing';
 
 type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
 type PageState = { key: string; pages: string[]; index: number };
 const messages = {
-  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 3 concluído nesta versão. O Capítulo 4 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
-  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 3 complete in this version. Chapter 4 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
+  'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 4 concluído nesta versão. O Capítulo 5 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
+  en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 4 complete in this version. Chapter 5 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
 } as const;
 type Notice = 'connection' | 'stale' | 'expired';
 
@@ -22,7 +23,7 @@ function EnergyIndicator({ view }: { view: CampaignView }) {
   if (!d) return null;
   const label = view.locale === 'pt-BR' ? 'Energia' : 'Energy';
   return (
-    <div className="campaign-diagnostics campaign-energy" data-energy-reveal={view.cue === 'energy-reveal'} role="group" aria-label={label}>
+    <div className="campaign-diagnostics campaign-energy" data-energy-reveal={view.cue === 'energy-reveal'} data-energy-motion={energyMotion(view)} role="group" aria-label={label}>
       <span>{label}</span>
       <span className="campaign-bars" role="img" aria-label={view.locale === 'pt-BR' ? `${d.energy} de 3 barras` : `${d.energy} of 3 bars`}>
         {[1, 2, 3].map((bar) => <span key={bar} data-filled={bar <= d.energy} />)}
@@ -39,6 +40,8 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const [overlay, setOverlay] = useState<Overlay>('none');
   const [extrasPage, setExtrasPage] = useState(0);
   const [readyCard, setReadyCard] = useState<string | null>(null);
+  const [readyImage, setReadyImage] = useState('');
+  const [count, setCount] = useState({key:'', progress:0});
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [pagination, setPagination] = useState<PageState>({ key: '', pages: [''], index: 0 });
@@ -55,11 +58,31 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const boundary = !!view && !view.actions.some((action) => action.kind !== 'PREVIOUS');
   const showChapter = chapter && !(boundary && chapterReady);
   const displayText = !view || showChapter ? '' : boundary ? messages[locale].boundary : view.text;
+  const cinematicKey = view ? beatKey(view) : '';
+  const requiresImage = !!view && imageGateMs(view)>0;
+  const counting = view?.cue === 'f3-count';
+  const countProgress = count.key === cinematicKey ? count.progress : 0;
+  const cinematicReady = (!requiresImage || readyImage===cinematicKey) && (!counting || countProgress>=1);
+  const markImageReady = useCallback((key:string)=>setReadyImage(key), []);
+  useEffect(() => {
+    if (!counting) return;
+    const start=performance.now();
+    let frame=0;
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tick=(now:number)=>{
+      const progress=reduced?1:Math.min(1,(now-start)/F3_COUNT_MS);
+      setCount({key:cinematicKey,progress});
+      if(progress<1) frame=requestAnimationFrame(tick);
+    };
+    frame=requestAnimationFrame(tick);
+    return ()=>cancelAnimationFrame(frame);
+  }, [cinematicKey,counting]);
   const pageKey = view ? (view.actions[0]?.id ?? 'boundary') + ':' + locale + ':' + displayText : '';
   const pageReady = pagination.key === pageKey;
   const pageIndex = pageReady ? pagination.index : 0;
   const pageCount = pageReady ? pagination.pages.length : 1;
-  const pageText = pageReady ? pagination.pages[pageIndex] : displayText;
+  const rawPageText = pageReady ? pagination.pages[pageIndex] : displayText;
+  const pageText = counting ? countF3(rawPageText,countProgress) : rawPageText;
   const narrationLabel = view?.information ? (locale === 'pt-BR' ? 'INFORMAÇÃO' : 'INFORMATION')
     : view?.narration ? (locale === 'pt-BR' ? 'NARRAÇÃO' : 'NARRATION') : null;
   const robotDialogue = view?.speaker === 'AMI-108' || view?.speaker === 'Robô' || view?.speaker === 'Robot';
@@ -114,6 +137,9 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   }, [pageKey, displayText, view?.speaker, narrationLabel, showChapter, choiceMode]);
 
   const accept = useCallback((next: CampaignView) => {
+    const key=beatKey(next);
+    setReadyImage(old=>imageGateMs(next)>0 && old===key?old:'');
+    setCount(old=>next.cue==='f3-count' && old.key===key?old:{key:'',progress:0});
     setView(next);
     setHasSave(true);
     setLocale(next.locale);
@@ -162,6 +188,8 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       const next = await gameRequest<CampaignView>('session', 'POST', { locale: preference });
       retry.current = null;
       setReadyCard(null);
+      setReadyImage('');
+      setCount({key:'',progress:0});
       accept(next);
     });
   };
@@ -177,6 +205,8 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       const current = await gameRequest<CampaignView>('view');
       retry.current = null;
       setReadyCard(null);
+      setReadyImage('');
+      setCount({key:'',progress:0});
       if (current.locale !== preference) await mutate(current, { locale: preference });
       else accept(current);
       setOverlay('none');
@@ -188,19 +218,21 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       const current = await gameRequest<CampaignView>('view');
       retry.current = null;
       setReadyCard(null);
+      setReadyImage('');
+      setCount({key:'',progress:0});
       const next = await mutate(current, { actionId: 'CHAPTER/RESTART/' + number });
       if (next.locale !== preference) await mutate(next, { locale: preference });
       setOverlay('none');
     });
   };
   const advance = useCallback(() => {
-    if (!view || !nextAction || busyRef.current || overlay !== 'none' || !chapterReady || (!chapter && !pageReady)) return;
+    if (!view || !nextAction || busyRef.current || overlay !== 'none' || !chapterReady || !cinematicReady || (!chapter && !pageReady)) return;
     if (!chapter && pageIndex + 1 < pageCount) {
       setPagination((old) => ({ ...old, index: Math.min(old.index + 1, old.pages.length - 1) }));
       return;
     }
     void run(() => mutate(view, { actionId: nextAction.id }));
-  }, [view, nextAction, overlay, chapterReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
+  }, [view, nextAction, overlay, chapterReady, cinematicReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
   const previous = useCallback(() => {
     if (!view || choiceMode || !chapterReady || busyRef.current || overlay !== 'none' || !pageReady) return;
     if (pageIndex > 0) {
@@ -218,7 +250,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const mainMenu = () => {
     if (busyRef.current) return;
     retry.current = null;
-    setView(null); setOverlay('none'); setNotice(null); setReadyCard(null);
+    setView(null); setOverlay('none'); setNotice(null); setReadyCard(null); setReadyImage(''); setCount({key:'',progress:0});
   };
 
   useEffect(() => {
@@ -229,7 +261,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       ?? panel?.querySelector<HTMLElement>('[data-primary]:not(:disabled)')
       ?? (view && overlay === 'none' ? panel?.querySelector<HTMLElement>('.dialogue-navigation button:not(:disabled)') : panel?.querySelector<HTMLElement>('button:not(:disabled)'));
     target?.focus({ preventScroll: true });
-  }, [view, overlay, chapterReady, busy]);
+  }, [view, overlay, chapterReady, cinematicReady, busy]);
 
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
@@ -257,7 +289,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const cue = pageIndex === 0 ? view?.cue : 'none';
   const tremor = cue === 'wake' || cue === 'pain' || cue === 'ellipsis' || cue === 'blink-black';
   // Continuous memory motion applies across all measured pages of this beat.
-  const memoryShiver = view?.cue === 'memory-shiver' || (view?.cue === 'name-reveal' && view.speaker === 'HOWARD');
+  const memoryShiver = view?.cue === 'disoriented' || view?.cue === 'memory-shiver' || (view?.cue === 'name-reveal' && view.speaker === 'HOWARD');
   const nameReveal = view?.cue === 'name-reveal';
   const advanceLabel = nextAction?.kind === 'INTERACT' ? nextAction.label : chapter ? labels.continue : labels.next;
 
@@ -280,11 +312,11 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             <header className="campaign-header">
               <div className="stage-header">
                 <span>AMI-108</span>
-                <div className="campaign-header-middle">{(view.asset || view.information) && <EnergyIndicator view={view} />}</div>
+                <div className="campaign-header-middle">{(view.asset || view.information || energyMotion(view)==='settle') && <EnergyIndicator view={view} />}</div>
                 <button className="small-control campaign-menu-control" aria-disabled={busy} onClick={() => { if (!busyRef.current) setOverlay('pause'); }}>{labels.menu}</button>
               </div>
             </header>
-            <CampaignScene view={view}>
+            <CampaignScene view={view} onReady={markImageReady}>
               {deathCard && <svg className="campaign-skull" viewBox="0 0 16 16" aria-hidden="true" shapeRendering="crispEdges">
                 <path fill="currentColor" d="M5 1h6v1h2v2h1v6h-2v2h-1v3H5v-3H4v-2H2V4h1V2h2z" />
                 <path fill="var(--coal)" d="M4 5h3v3H4zM9 5h3v3H9zM7 9h2v2H7zM6 12h1v3H6zM9 12h1v3H9z" />
@@ -293,18 +325,18 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <h1 className="chapter-title">{titleText}</h1>
               </div>
             </CampaignScene>
-            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={view.cue === 'archive-record'} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
+            <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={(view.cue === 'archive-record' || view.cue === 'f3-count')} data-f3-count={counting} data-chapter-four-record={view.chapter===4 && (view.cue==='archive-record' || counting)} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
               {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
                 <div className="campaign-choice-list">
                   {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" data-kind={action.kind} disabled={busy}
                     onClick={() => void run(() => mutate(view, { actionId: action.id }))}>{action.label}</button>)}
                 </div>
-              </div> : <div className="dialogue-copy" aria-live="polite" aria-atomic="true">
+              </div> : <div className="dialogue-copy" aria-live={counting && !cinematicReady ? 'off' : 'polite'} aria-atomic="true">
                 {!showChapter && (
                   <>
                     {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
-                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">{view.speaker === 'HOWARD' ? (locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice') : '???'}</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
+                      {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">{view.speaker === 'HOWARD' ? (locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice') : view.speaker === 'AMI-108' ? (locale === 'pt-BR' ? 'Robô' : 'Robot') : '???'}</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
                     </p>}
                     <p key={pageKey + ':' + pageIndex} className={'dialogue-text' + (tremor ? ' pain-text' : '') + (cue === 'ellipsis' ? ' ellipsis-text' : '') + (memoryShiver ? ' campaign-memory-shiver' : '')}>{pageText}</p>
                   </>
@@ -314,7 +346,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               <div className="dialogue-navigation" hidden={choiceMode}>
                 <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
                   aria-label={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
-                <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || (!chapter && !pageReady)}
+                <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || !cinematicReady || (!chapter && !pageReady)}
                   aria-label={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
               </div>
             </section>

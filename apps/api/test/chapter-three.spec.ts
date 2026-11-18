@@ -161,7 +161,7 @@ describe('Chapter 3 integrated progression', () => {
     s=reach(s,x=>x.stepId==='A04-S01/CHAPTER_CARD');
     expect(s.events).toEqual(expect.arrayContaining(['F2','E-ESCAPE-ROUTE']));
     expect(projectNarrative(s).chapters?.map(x=>x.number)).toEqual([1,2,3,4]);
-    expect(projectNarrative(s).actions.map(x=>x.kind)).toEqual(['PREVIOUS']);
+    expect(projectNarrative(s).actions.map(x=>x.kind)).toEqual(['CONTINUE','PREVIOUS']);
     expect(()=>step(s,'CHAPTER/RESTART/5')).toThrow('ACTION_NOT_ALLOWED');
     const saved=s.savedRatSlots;
     s=step(s,'CHAPTER/RESTART/3');
