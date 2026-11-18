@@ -1,6 +1,16 @@
 # Development foundation
 
-## Safe stop and restart — current accepted baseline
+## Day 3 pause and resume — November 18, 2026
+
+Accepted main `d587be9` (PR #24) is now installed in the owner's Cloud Shell: backup checksum and full archive read succeeded, fast-forward and build succeeded, all four migrations current, all four services healthy, original session count 1. Owner confirmed Continue resumed the original game. Real-model browser preview audit: 13/14 validated, one timeout safely fell back, all eight desktop/mobile checks passed. Production/local port 3000 is explicitly fallback-only for now; Ollama was used only in the isolated tests and preview. Do not confuse AI service health with active model inference.
+
+**Pause procedure:** close game tabs, confirm clean main, stop web/API to quiesce writes, save a new custom-format database dump in private persistent home, check nonempty, pg_restore list and full archive read, record SHA-256, then stop the remaining services. Preserve `.env`, cookie, origin and volumes; do not run down -v, delete volumes, prune or clear browser site data. Keep a private independent copy of the latest dump. If any step fails, do not remove containers/volumes or overwrite known-good backups; DB can remain running for recovery. Actual shutdown and new post-migration dump remain owner-run.
+
+**Resume:** check git status, current main and `.env` existence without printing secrets. Rebuild/start with generation explicitly disabled first; inspect migrations and session count. If volume was replaced and DB is empty, stop before beginning a new game and restore only after verifying the latest archive and recovery plan; never restore over a nonempty DB blindly. Use same browser/origin; database dump cannot restore a lost session cookie. Verify Continue before any AI activation. The main local provider activation is a separate task: install pinned Ollama/model on an internal network, use a private internal token, no published model port, no cloud inference, warm model and test only fresh eligible slots; existing cached slots must not reroll. No paid resources or production deployment.
+
+**Development handoff:** #24 merged, #9/#10 closed, #8 open for F3/CP-BOAR. Documentation PR #27 and draft #28 (Chapter 4 server-only catalog/tests, CI 44318687531 passed at `6055e39`) remain separate. Next implement gated F3 and manual/memory sequence, replay and original asset authorization; then Chapter 5 and QA. No new campaign work merged or deployed. Private Master v1.13 and Script v1.11 remain authoritative; do not edit approved art/dialogue.
+
+## Historical safe stop and restart — November 17
 
 Cloud Shell transcript confirms successful fast-forward to `985cb60`, successful Compose build, four healthy services. Earlier resource check: 15 GiB RAM, 12 GiB available, 27 GB available ephemeral root, 1.7 GB available persistent /home. Observations, not a guarantee of later VM resources or model suitability. Do not install/pull a model yet. Close game tabs, back up PostgreSQL to private persistent $HOME outside Git, then stop containers only after a successful nonempty verified dump. Optionally download privately. Do not run `down -v`, `volume rm`, or prune volumes. Docker volume is VM-local; use same browser/origin/cookie. Dump cannot restore lost cookie. On return check git status, pull main with --ff-only, rebuild if necessary. If a new empty database volume appears, stop and recover from verified dump; never overwrite a nonempty DB blindly. See historical shutdown procedure below.
 
