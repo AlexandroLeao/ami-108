@@ -1,5 +1,9 @@
 # AMI-007 — Isolated local inference evaluation
 
+**Accepted status (November 18):** PR #24 merged at `d587be9` after owner acceptance on desktop/mobile and explicit merge approval. AMI-001–005, 007 and 008 complete (7/13 = 53.8%); AMI-006 remains open for F3 and CP-BOAR. Chapters 1–3 complete (3/5); Chapter 4 card is the boundary. Strict warmed Qwen2.5:1.5b benchmark 20/20 (PT/EN), 160–1919 ms; isolated real HTTP/PostgreSQL online/offline E2E and owner browser checklist 8/8 passed. [Exact-head CI 44314906072](https://github.com/AlexandroLeao/ami-108/actions/runs/44314906072) passed. AI is opt-in, bounded selection of authorized bilingual alternatives, not unrestricted generation. Existing saves, fixed dialogue, UI and art preserved; accepted Cloud Shell still needs backup and controlled migration/activation. Private Master v1.13 / Script v1.11 remain canonical; latest approved F3 recharge rule takes precedence. Next AMI-009, then QA, deployment and release. See [AI evidence](ai-local-evaluation.md).
+
+Historical development notes below are retained as evidence and do not override the accepted status.
+
 November 18, 2026. Runbook for PR #24; not evidence of real inference or approval to deploy. The accepted Chapters 1–3 stay on main `af212f0`. The evaluation requires separate owner authorization to download and run a local model, after checking the restored save and available resources.
 
 ## 1. Confirm the accepted baseline first (read-only)
