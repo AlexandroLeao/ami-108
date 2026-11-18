@@ -554,8 +554,12 @@ button:focus-visible, a:focus-visible {
 @keyframes campaign-dizzy-lower {0%,100% {transform:translateY(105%);} 35%,50% {transform:translateY(0);} 68% {transform:translateY(65%);} 80% {transform:translateY(105%);} }
 .campaign-dialogue[data-f3-count="true"] .dialogue-text {white-space:pre-line;font-variant-numeric:tabular-nums;}
 @media (prefers-reduced-motion: reduce) {
-  .campaign-energy[data-energy-motion] {animation:none !important;opacity:1;}
-  .campaign-scene[data-cinematic-beat] .scene-visual {animation:none !important;clip-path:none;opacity:1;}
-  .campaign-scene[data-cinematic-beat] .scene-visual::after {display:none;}
+  .campaign-energy[data-energy-motion="tutorial"], .campaign-energy[data-energy-motion="settle"] {animation:none !important;opacity:1;}
+  .campaign-scene[data-cinematic-beat]:not([data-cinematic-beat=""]) .scene-visual {animation:none !important;clip-path:none;opacity:1;}
+  .campaign-scene[data-cinematic-beat]:not([data-cinematic-beat=""]) .scene-visual::after {display:none;}
   .campaign-disoriented {display:none;}
 }
+
+/* Preserve line breaks in these textual panels without changing existing cards. */
+.campaign-dialogue[data-f3-count="true"] .dialogue-text {font-size:clamp(19px, 4vw, 28px);line-height:1;}
+.campaign-dialogue[data-chapter-four-record="true"] .dialogue-text {white-space:pre-line;}
