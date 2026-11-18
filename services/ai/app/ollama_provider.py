@@ -25,13 +25,12 @@ class OllamaProvider:
     def _generate(self, context: AuthorizedContext) -> str:
         # No identity, secret, whole catalog, arbitrary prompt, or future facts.
         # The strict validator accepts only the finite authorized utterances.
+        options = (context.approved_text, *context.alternatives)
         prompt = json.dumps(
             {
                 "locale": context.locale,
                 "category": context.category,
-                "facts": list(context.facts),
-                "approved_utterance": context.approved_text,
-                "alternatives": list(context.alternatives),
+                "options": {str(i): text for i, text in enumerate(options)},
             },
             ensure_ascii=False,
         )
@@ -39,13 +38,11 @@ class OllamaProvider:
             {
                 "model": self.model,
                 "system": (
-                    "You are AMI-108. Return exactly one of approved_utterance or "
-                    "alternatives in the requested language. Vary your selection. "
-                    "Do not add, translate, explain or alter facts."
+                    "Select one allowed option. Output only its numeric index. No explanation."
                 ),
                 "prompt": prompt,
                 "stream": False,
-                "options": {"temperature": 0.5, "num_predict": 160},
+                "options": {"temperature": 0.5, "num_predict": 4},
                 "keep_alive": "5m",
             },
             ensure_ascii=False,
@@ -67,7 +64,11 @@ class OllamaProvider:
             text = result.get("response")
             if not isinstance(text, str):
                 raise TypeError("Invalid generation response")
-            return text
+            # Accept only an exact in-range index; the existing text validator and
+            # NestJS independently verify the mapped utterance. No new facts.
+            selected = text.strip()
+            allowed = {str(i): option for i, option in enumerate(options)}
+            return allowed.get(selected, "")
         finally:
             conn.close()
 
