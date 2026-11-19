@@ -6,11 +6,12 @@ import { GameWordmark } from '../preview/components';
 import { useLocale, setLocale } from '../preview/locale';
 import { CHAPTER_REVEAL_MS } from '../preview/preview-state';
 import { CampaignScene } from './campaign-scene';
+import { ContentWarning, campaignExtras, contentWarning } from './content-warning';
 import { gameRequest, RequestError, type CampaignView, type CommandBody, type CommandResult } from './client';
 import { paginateText } from './pagination';
 import { beatKey, imageGateMs, energyMotion, countF3, F3_COUNT_MS, hasDavidMemoryShiver, showEnergyIndicator } from './cinematic-timing';
 
-type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters';
+type Overlay = 'none' | 'pause' | 'language' | 'extras' | 'resume' | 'chapters' | 'warning';
 type PageState = { key: string; pages: string[]; index: number };
 const messages = {
   'pt-BR': { replace: 'Iniciar um novo jogo? O botão Continuar passará a recuperar a nova partida.', connection: 'Não foi possível concluir a ação. Tente novamente.', stale: 'O progresso foi atualizado. Continue a partir da fala atual.', expired: 'A sessão não está disponível. Inicie um novo jogo.', boundary: 'Capítulo 4 concluído nesta versão. O Capítulo 5 será integrado na próxima etapa.', resumeAt: 'Continuar jogo', chapters: 'Capítulos', restart: 'Recomeçar este capítulo? Seu ponto atual será substituído, mas os capítulos liberados e as consultas armazenadas serão preservados.' },
@@ -68,6 +69,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const measureRef = useRef<HTMLParagraphElement>(null);
   const locale = view?.locale ?? preference;
   const labels = copy[locale];
+  const extrasPages = campaignExtras(locale);
   const chapter = view?.phase === 'CHAPTER_CARD';
   const finalTitle = !!view?.complete && beatKey(view)==='A05-S02/ENDING/NEXT';
   const chapterKey = chapter && view ? String(view.chapter) : finalTitle ? 'ending' : null;
@@ -201,7 +203,10 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   }, [accept]);
 
   const start = () => {
-    if (busyRef.current || (hasSave && !window.confirm(messages[locale].replace))) return;
+    if (!busyRef.current) setOverlay('warning');
+  };
+  const confirmStart = () => {
+    if (overlay !== 'warning' || busyRef.current || (hasSave && !window.confirm(messages[locale].replace))) return;
     void run(async () => {
       const next = await gameRequest<CampaignView>('session', 'POST', { locale: preference });
       retry.current = null;
@@ -209,6 +214,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       setReadyImage('');
       setCount({key:'',progress:0});
       accept(next);
+      setOverlay('none');
     });
   };
   const openResume = () => {
@@ -381,7 +387,8 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
       </div>
       {overlay !== 'none' && (
         <div ref={panelRef} className="game-overlay" role="dialog" aria-modal="true"
-          aria-label={overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : overlay === 'resume' ? labels.continue : overlay === 'chapters' ? messages[locale].chapters : labels.extras}>
+          aria-label={overlay === 'warning' ? contentWarning[locale].title : overlay === 'pause' ? labels.menu : overlay === 'language' ? labels.language : overlay === 'resume' ? labels.continue : overlay === 'chapters' ? messages[locale].chapters : labels.extras}>
+          {overlay === 'warning' && <ContentWarning locale={locale} busy={busy} onContinue={confirmStart} onBack={closeOverlay} />}
           {overlay === 'resume' && (
             <section className="menu-screen">
               <h1>{labels.continue}</h1>
@@ -427,17 +434,17 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
           )}
           {overlay === 'extras' && (
             <section className="extras-screen">
-              <header><h1>{labels.extras}</h1><span>{extrasPage + 1}/3</span></header>
+              <header><h1>{labels.extras}</h1><span>{extrasPage + 1}/{extrasPages.length}</span></header>
               <article className="extras-card" aria-live="polite">
-                <h2>{labels.extrasPages[extrasPage].title}</h2>
-                {labels.extrasPages[extrasPage].paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                <h2>{extrasPages[extrasPage].title}</h2>
+                {extrasPages[extrasPage].paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
               </article>
               <footer>
                 <button className="small-control" onClick={closeOverlay}>{labels.back}</button>
                 <button className="small-control" disabled={extrasPage === 0} aria-label={labels.previous}
                   onClick={() => setExtrasPage((page) => Math.max(0, page - 1))}>‹</button>
-                <button className="small-control" disabled={extrasPage === 2} aria-label={labels.nextPage}
-                  onClick={() => setExtrasPage((page) => Math.min(2, page + 1))}>›</button>
+                <button className="small-control" disabled={extrasPage === extrasPages.length - 1} aria-label={labels.nextPage}
+                  onClick={() => setExtrasPage((page) => Math.min(extrasPages.length - 1, page + 1))}>›</button>
               </footer>
               <p className="version-label">{labels.version}</p>
             </section>
