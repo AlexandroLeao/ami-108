@@ -15,7 +15,7 @@ The private official backup contains 12 approved scene images and 9 internal ref
 
 ## Prepare the images
 
-Download the retained private asset backup ZIP v1.9 (the latest synchronized private documents are v1.12/v1.10; the ZIP intentionally remains v1.9) and upload it to your Cloud Shell home directory, outside the repository. From the repo root:
+Download the retained private asset backup ZIP v1.9 (the **historical November 17** private documents were v1.12/v1.10; **current** canonical sources are Master v1.14 / Script v1.12 plus accepted amendments; the art ZIP intentionally remains v1.9) and upload it to your Cloud Shell home directory, outside the repository. From the repo root:
 
 ```bash
 uv run --script scripts/prepare-assets.py "$HOME/AMI-108-Backup-v1.9.zip"
@@ -23,7 +23,7 @@ uv run --script scripts/prepare-assets.py "$HOME/AMI-108-Backup-v1.9.zip"
 
 The script uses Pillow 12.3.0, accepts only the exact approved scene filenames, converts to the three official colors without adding dithering, retains the original dimensions, and writes 12 indexed PNGs and a SHA-256 manifest to `apps/api/assets/scenes/`. It verifies palette, dimensions and file identities before publishing staged outputs. It does not extract or copy private documents or character sheets. Do not commit the source ZIP. Review all derived images for continuity and approve only the prepared game assets for the private repository.
 
-## Local integration preview
+## Historical isolated local asset preview (PR #18; current root is the five-chapter campaign)
 
 ```bash
 test -f .env || cp .env.example .env
@@ -33,7 +33,7 @@ curl -fsS http://localhost:3001/development/scene -o /tmp/ami-opening.png
 
 Open `/preview` on port 3000 for the isolated visual fixture. Historically, the local root opened the persisted Chapters 1–2 campaign (the current root runs all five accepted chapters) (merged PRs #20/#22), which uses the same visual direction. Choose Language, New game, then verify the cinematic chapter card, first three beats fully dark, one brief text tremor per waking beat, a single blink and blur-to-focus overlay on Where am I only, identical unfiltered art before/after stabilization, full stabilization at Blood (same mounted CENA-01), and the six approved opening dialogue steps; the chapter waits for manual advance with a dimmed, visible arrow that smoothly enables after the reveal. Test Extras, pause/resume, previous/next dialogue and keyboard controls. The chapter uses the same scene and dialogue frame; no layout jump. These opening checks describe the isolated fixture, not the persisted root. Continue game remains disabled in `/preview`; root enables it only for a server-confirmed session. For root, verify all 77 Chapter 1 beats and the complete Chapter 2, fixed-height energy-only header, dark transitions, both dialogue palettes and current-asset authorization. See [UI design](ui-design.md) and [development](development.md). The 12 derived PNGs and manifest are already committed; asset preparation is only needed if an approved original changes.
 
-Preview flags are enabled only in local Compose. The isolated development route serves CENA-01 exclusively. The local campaign has a separate session-authorized current-step route for CENA-01/02/03; it requires the current key and refuses stale/future keys. The remaining assets stay server-only. Production must not set AMI_DEV_PREVIEW.
+Preview flags are enabled only in local Compose. The isolated development route serves CENA-01 exclusively. The game has a session-authorized current-scene route for the full approved twelve-scene campaign; it requires the current key and refuses stale/future keys. Unreached assets stay server-only. Production must not set AMI_DEV_PREVIEW.
 
 ## Validation and boundaries
 
