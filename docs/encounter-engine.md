@@ -20,7 +20,7 @@ Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the c
 
 The refinement notes below retain the chronology; the final acceptance summary supersedes earlier timing, text and layout descriptions.
 
-## Implemented and accepted local subset
+## Historical Chapter 2 local subset (superseded by all three implemented encounters)
 
 - Server-only DOG definition and bilingual Chapter 2 beats transcribed from Master v1.11 / Script v1.9. Existing Chapter 1 IDs/version and handoff retained; old Chapter 1 saves do not require reset.
 - Four ordered choices, authored consequences, 15% CORRECT threshold, free INTRO separate from three encounter slots. Fallback only; no real inference yet.
@@ -68,11 +68,11 @@ Revert the dog-wide geometry override exactly to the approved b9da1be layout. Us
 
 Energy indicator gently appears on the first tutorial card and stays visible on the remaining information cards. Dog reveal uses a temporary coal veil and brief visual-layer translation rather than transforming the PNG; no layout resize. Insert L08b before solar explanation, retain SOL-01 application on entry to L09 with existing independent recharge semantics and stable L08/L09 IDs. Name alternates ???/DAVID over 2600ms and settles on DAVID. No other story, energy, asset, layout, cache or replay changes. Browser validation pending.
 
-## Latest owner refinement — November 17
+## Historical latest owner refinement — November 17
 
 Only ARRIVAL-03 wording, FOUND dark/L01 terminal fade-in, dog reveal timing and L18c name animation change. The same original CENA-04 and CENA-05 files remain authorized at their illustrated beats; no duplicate art, layout, energy, event or persistence changes. Tests assert dark FOUND and stable CENA-05 across adjacent illustrated beats.
 
-## Final accepted baseline (supersedes earlier refinement details)
+## Historical Chapter 2 accepted baseline (superseded by all five chapters)
 
 - Chapter 1: 77 beats, three red information cards; the first reveals the energy-only HUD with two gentle pulses. Dog: original CENA-04 on L01, 1450ms veil/shake with 435ms initial dark hold after load; same asset on L02 and following illustrated beats, normal approved geometry, no persistent motion. Decision-only compact grid, no PREVIOUS. Red pixel skull and explicit retry; success consequence/branches dark.
 - Terminal: exact ARRIVAL-03 “Você observa AMI se conectar ao sistema enquanto emite breves sons eletrônicos.”; FOUND “Encontrado.” remains dark; original CENA-05 appears on L01 with 700ms veil. All L04 variants use “Então vai parar de falar coisas aleatórias?”. F1 35/42/53/5 locked; SOL-01 independent on entry to L09 after L08b. Continuous tremor only FB-D1b–g, MEM-D2, F01/F01b; name reveal at L18c alternates over 1500ms. Chapter 3 boundary only.
