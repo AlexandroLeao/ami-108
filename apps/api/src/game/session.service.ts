@@ -111,6 +111,15 @@ export class SessionService {
         if (!priorRatSlots.some(item => item.index === slot.index)) await tx.gameConsultationSlot.create({ data: { sessionId, encounterId: 'RAT', slotIndex: slot.index, category: slot.category, localizedText: { ...slot.text }, recipe: slot.recipe } });
       }
     }
+    if (next.chapterFive?.checkpoint && !state.chapterFive?.checkpoint) {
+      await tx.gameCheckpoint.upsert({ where: { sessionId_checkpointId: { sessionId, checkpointId: 'CP-BOAR' } }, update: {}, create: { sessionId, checkpointId: 'CP-BOAR', snapshot: JSON.parse(JSON.stringify(next.chapterFive.checkpoint)) as Prisma.InputJsonObject } });
+    }
+    if (next.chapterFive?.boar) {
+      const prior = state.savedBoarSlots ?? state.chapterFive?.boar?.slots ?? [];
+      for (const slot of next.chapterFive.boar.slots) {
+        if (!prior.some(item => item.index === slot.index)) await tx.gameConsultationSlot.create({ data: { sessionId, encounterId: 'BOAR', slotIndex: slot.index, category: slot.category, localizedText: { ...slot.text }, recipe: slot.recipe } });
+      }
+    }
     await tx.gameSession.update({ where: { id: sessionId }, data: { state: jsonState(next), revision: next.revision } });
     await tx.gameCommandReceipt.create({ data: { sessionId, commandId, requestDigest: fingerprint, appliedRevision: next.revision, ...audit } });
     return { commandId, status: 'APPLIED' as const, view: projectNarrative(next) };
