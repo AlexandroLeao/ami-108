@@ -104,9 +104,9 @@ describe('Chapter 3 integrated progression', () => {
   it.each(['pt-BR','en'] as const)('projects each rat choice and its own consequence in %s', locale => {
     const s=ratDecision(chapter3(locale));
     const choices=[
-      ['RAT-01','Ativar o sistema de emissão ultrassônica.','Activate the ultrasonic emission system.','A criatura ignora o estímulo e ataca David quando ele tenta atravessar.','The creature ignores the stimulus and attacks David as he tries to cross.','DEAD'],
-      ['RAT-02','Ativar a iluminação de contenção.','Activate the containment lighting.','A luz intensa força a criatura a recuar para o abrigo escuro. David atravessa.','Intense light forces the creature into its dark shelter. David crosses.','SUCCESS'],
-      ['RAT-03','Acionar a ventilação de emergência.','Activate the emergency ventilation.','O fluxo de ar não afasta o organismo; David é atacado.','The airflow does not drive the organism away; David is attacked.','DEAD'],
+      ['RAT-01','Ativar o sistema de emissão ultrassônica.','Activate the ultrasonic emission system.','A criatura ignora o estímulo e ataca você quando tenta atravessar.','The creature ignores the stimulus and attacks you as you try to cross.','DEAD'],
+      ['RAT-02','Ativar a iluminação de contenção.','Activate the containment lighting.','A luz intensa força a criatura a recuar para o abrigo escuro. Você atravessa.','Intense light forces the creature into its dark shelter. You cross.','SUCCESS'],
+      ['RAT-03','Acionar a ventilação de emergência.','Activate the emergency ventilation.','O fluxo de ar não afasta o organismo. Você é atacado.','The airflow does not drive the organism away. You are attacked.','DEAD'],
       ['RAT-04','Atravessar pelo corredor mantendo silêncio.','Cross the corridor in silence.','O rato detecta sua presença, mesmo em silêncio, e ataca.','The rat detects your presence, even in silence, and attacks.','DEAD'],
     ] as const;
     expect(projectNarrative(s).actions.filter(action=>action.kind==='CHOOSE').map(action=>({id:action.id,label:action.label}))).toEqual(choices.map(([id,pt,en])=>({id,label:locale==='pt-BR'?pt:en})));
