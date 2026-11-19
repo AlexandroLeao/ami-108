@@ -348,7 +348,6 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                   <h2>AMI-108</h2>
                   {finalCredits[locale].map(group => <div key={group.title}><h2>{group.title}</h2>{group.lines.map(line => <p key={line}>{line}</p>)}</div>)}
                 </div>
-                <button className="game-control campaign-credits-menu" type="button" data-primary onClick={mainMenu}>{labels.mainMenu}</button>
               </div>}
             </CampaignScene>
             <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={(view.cue === 'archive-record' || view.cue === 'f3-count')} data-f3-count={counting} data-chapter-four-record={view.chapter===4 && (view.cue==='archive-record' || counting)} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
@@ -368,6 +367,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                   </>
                 )}
               </div>}
+              {credits && <button className="game-control campaign-credits-menu" type="button" data-primary onClick={mainMenu}>{labels.mainMenu}</button>}
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
               <div className="dialogue-navigation" hidden={choiceMode || credits}>
                 <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || (view.chapter===5 && !cinematicReady) || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
