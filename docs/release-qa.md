@@ -27,6 +27,10 @@ The owner approved the entire five-chapter campaign, desktop/mobile, and request
 6. Record performance with the approved hardware, browser viewport, configuration and sample size; no production capacity claim from Cloud Shell.
 7. Before any public hosting, complete production hardening and confirm verified zero mandatory cost; no cloud resources, billing or public visibility changes without owner authorization.
 
+## Content advisory and release classification
+
+Owner authorized a PT-BR/EN content warning before New game (violence, blood, strong language, horror); 16+ is a provisional editorial recommendation, not an official classification or age-verification gate. No date of birth or additional personal data collected. Extras makes the warning accessible and identifies AMI-108 as an original non-profit project. Confirm desktop/mobile, keyboard, cancellation with existing save, language selection, and unchanged Chapter 1 opening before merge. For release in Brazil, consult the [current MJSP guide, 5th edition (2025)](https://www.gov.br/mj/pt-br/assuntos/seus-direitos/classificacao-1/paginas-classificacao-indicativa/guia-de-classificacao), [games/apps guidance](https://www.gov.br/mj/pt-br/assuntos/seus-direitos/classificacao-1/paginas-classificacao-indicativa/jogos-e-apps) and [Portaria MJSP 1.048/2025, arts. 5 and 43–50](https://bibliotecadigital.mj.gov.br/bitstream/1/15993/2/PRT_GM_2025_1048.pdf). Article 45 specifies IARC or authorized self-classification for digital-only distribution; article 46 allows prior analysis. Free distribution is not automatically exempt. Review the complete game and all interactive elements, appropriate procedure for standalone web distribution, required symbols/descriptors and any applicable age-assurance obligations before public release. No official symbol or certificate has been claimed; the local warning is not a substitute for those requirements.
+
 ## Known release blockers
 
 - Local preview is intentionally gated by `AMI_DEV_PREVIEW=1`; production entry point and enforcement are not yet implemented.
