@@ -196,3 +196,41 @@ def test_correct_order_is_not_shuffled() -> None:
         assert result.status == "VALIDATED"
         assert result.text == context.alternatives[0]
         rng.assert_not_called()
+
+
+@pytest.mark.parametrize("locale", ["pt-BR", "en"])
+def test_expanded_pool_samples_three_and_maps_new_variant(locale: str) -> None:
+    facts = [
+        "RAT-RECIPE", "RAT-LAUNDRY", "RAT-PENGUIN", "RAT-KILOGRAM",
+        "RAT-BREAD", "RAT-FRUIT", "RAT-CALENDAR", "RAT-BOOKS",
+    ]
+    req = GenerationRequest.model_validate({
+        "requestId": str(uuid4()), "questionId": "Q-RAT", "category": "RANDOM",
+        "locale": locale, "factIds": facts, "deadlineMs": 2500,
+    })
+    context = retrieve(req)
+    assert context is not None
+    assert len(context.selection_options) == 8
+    assert retrieve(req.model_copy(update={"factIds": facts[:-1]})) is None
+    assert retrieve(req.model_copy(update={"factIds": facts[:3]})) is not None
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom") as rng,
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
+        rng.return_value.shuffle.side_effect = lambda order: order.reverse()
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"done": True, "response": "0"}
+        ).encode()
+        result = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
+        assert result.status == "VALIDATED"
+        assert result.text == context.alternatives[-1]
+        prompt = json.loads(json.loads(conn.request.call_args.args[2])["prompt"])
+        assert list(prompt["options"].values()) == list(reversed(context.selection_options))[:3]
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"done": True, "response": "7"}
+        ).encode()
+        invalid = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
+        assert invalid.status == "FALLBACK_REQUIRED"
+        assert invalid.reason == "INVALID_OUTPUT"
