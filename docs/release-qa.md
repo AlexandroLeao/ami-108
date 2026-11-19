@@ -1,5 +1,12 @@
 # Release QA and security evidence — AMI-010
 
+## Most recent owner acceptance and pause status — November 19, 2026
+
+The owner completed the full isolated PR #53 playtest at port 3002 (7/7 VALIDATED, zero timeouts; DOG/RAT each 2 distinct RANDOM texts from 2 slots; one intro only, so cross-session intro diversity not measured). Exact PR CI 44603955413 and post-merge main CI 44606120570 passed both jobs, 221 tests, existing four migrations and complete campaign with twelve original hashes; merged `14ea583`. Owner installed this commit at port 3000 with a verified private backup `pre-variety-20261119-201700.dump`, five sessions and zero pending at install, healthy web/API/AI/DB, pinned Qwen `Forever`, direct 10/10. The owner later confirmed a **fresh game** has the expected varied behavior; old Continue sessions intentionally retain cached responses. No new gameplay receipt audit was supplied for that fresh live game.
+
+Cloud Shell pause is requested. The safe [pause/resume runbook](cloud-shell-pause-resume.md) documents a new checkpoint and the ephemeral Docker-volume risk; final shutdown **not yet verified**. All PRs through #53 merged; formal issues #12–#15 stay open for remaining QA, production deployment and explicit launch approval. Security measures added by #51 and production gates documented by #52 are not a public deployment authorization.
+
+
 ## Scope and status
 
 **Earlier accepted increment:** PR #41 merged `9b76771` (CI 44582546867; wire-contract and facade rejection tests). Owner terminal audit verified `day4-final-20261119-153020.dump`, full restore to empty database, two sessions, four healthy services at `9b76771`, 27 GiB root free and 12 GiB RAM available; Continue confirmed. PR #42 merged `910b354` (exact approved `2bc43da`, [CI 44590534060](https://github.com/AlexandroLeao/ami-108/actions/runs/44590534060): 206 tests, 100 API/35 web/71 Python, four migrations, all 12 artwork hashes). Owner approved localized content advisory and spoiler-free Extras with nonprofit statement; no changes to story, artwork, rules, API, AI or database. Port 3000 frontend update and pinned-model reactivation verified (see live evidence below). 16+ is provisional editorial guidance, not a formal rating. All four release issues remain open.
