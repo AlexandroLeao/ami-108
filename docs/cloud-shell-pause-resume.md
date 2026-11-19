@@ -112,6 +112,21 @@ bash -n /tmp/ami108-check-resume.sh && bash /tmp/ami108-check-resume.sh
 
 A missing/corrupt checksum, missing private environment, unavailable Docker or changed working tree is a **stop-and-review** result, not permission to restore, prune, overwrite or recreate anything. If the newest dump is missing, inspect earlier known-good backups by name without overwriting them; the owner may have a later archive from the shutdown command, but no terminal evidence has been supplied yet. Share only the non-secret diagnostic output. Resume procedures below depend on which resources actually survived.
 
+## After verifying restored saves: optional local model preparation
+
+The owner has confirmed **6 restored sessions / 0 pending / 4 migrations**, all four services healthy and Continue working. The accepted runtime is still `14ea583`; the API was deliberately started with `AMI_AI_GENERATION=0`. Do not repeat the database restore. If sufficient RAM/disk is available and the owner wants live AI again, use the reviewed [pinned local model preparation script](../scripts/prepare-pinned-local-ollama.sh). It verifies this exact recovery baseline and existing healthy containers, pulls the *previously approved digest*, downloads the local model while it has network access (with **no host port published**), moves Ollama onto its internal-only network, connects the existing AI container, warms it, then runs **ten authenticated, bilingual requests directly against the AI service** without writing game data. It checks the six-session count before and after and leaves game inference disabled. The temporary bridge connection during download is removed before validation completes; if bootstrap fails before isolation, the script stops its own model container and leaves resources intact for operator review.
+
+To use without changing the game's local Git checkout:
+
+```bash
+cd ~/ami-108
+git fetch origin main
+git show origin/main:scripts/prepare-pinned-local-ollama.sh > /tmp/ami108-model-prepare.sh
+bash -n /tmp/ami108-model-prepare.sh && bash /tmp/ami108-model-prepare.sh
+```
+
+**Only** after `LOCAL MODEL PREPARED — GAME INFERENCE NOT YET ENABLED` and **10/10 VALIDATED** may the separate API-generation activation gate be considered, with the owner verifying unchanged saves and Continue. The model script is **not idempotent**: do not rerun it after any partial setup; instead inspect the model/network and request a targeted continuation. If memory/disk, private model settings, exact model ID, endpoints or saved-session count differ, it aborts rather than guessing. No cloud-model subscription, public deployment or new secrets.
+
 ## Resume without touching saved data
 
 1. Reopen normal (non-ephemeral) Google Cloud Shell; `cd ~/ami-108`; check `git status --short --branch`, `git rev-parse HEAD`, `df -h / /home`, `docker compose ps -a`, `docker volume ls` and `ls -lh ~/ami-108-backups/pause-ami108-*.dump`. Confirm `.env` exists privately without displaying its values.
