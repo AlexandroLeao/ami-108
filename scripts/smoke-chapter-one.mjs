@@ -72,6 +72,21 @@ try {
   await Promise.all([waitFor(apiOrigin + '/health'), waitFor(webOrigin + '/health')]);
   const home = await fetch(webOrigin);
   assert.equal(home.status, 200);
+  // Browser baseline applies to successful pages and facade rejection responses.
+  function assertBrowserHeaders(response) {
+    assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
+    assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
+    assert.equal(response.headers.get('permissions-policy'), 'camera=(), microphone=(), geolocation=()');
+    assert.equal(response.headers.get('x-powered-by'), null);
+  }
+  assertBrowserHeaders(home);
+  assertBrowserHeaders(await fetch(webOrigin + '/health'));
+  const unauthorized = await call('view');
+  assert.equal(unauthorized.status, 401);
+  assertBrowserHeaders(unauthorized);
+  const invalidOrigin = await call('session', 'POST', { locale: 'pt-BR' }, 'https://other.example');
+  assert.equal(invalidOrigin.status, 403);
+  assertBrowserHeaders(invalidOrigin);
   assert.match(await home.text(), /AMI-108/);
   assert.equal((await call('view')).status, 401);
   assert.equal((await call('session', 'POST', { locale: 'pt-BR' }, 'https://other.example')).status, 403);
@@ -136,6 +151,7 @@ try {
   const asset = await fetch(webOrigin + view.asset.url, { headers: { Cookie: cookie } });
   assert.equal(asset.status, 200);
   assert.equal(asset.headers.get('cache-control'), 'private, no-store');
+  assertBrowserHeaders(asset);
   const pixels = Buffer.from(await asset.arrayBuffer());
   assert.equal(pixels.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
   const body = await send(view.actions[0]);

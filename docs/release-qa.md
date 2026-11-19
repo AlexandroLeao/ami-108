@@ -35,6 +35,12 @@ Owner recovered token privately from existing AI container, validated pinned Qwe
 
 PR #49 merged `b48d35b` (exact CI 44598710033, main CI 44599594188 green); [browser accessibility/performance plan](accessibility-performance-qa.md) is documentation-only. Runtime remains `f89c342`; browser and measured performance evidence pending. No public deployment or paid resources.
 
+## Browser response hardening candidate — November 19
+
+Add Next.js baseline response headers: X-Content-Type-Options nosniff, Referrer-Policy no-referrer, Permissions-Policy disabling camera, microphone and geolocation, and remove Next.js X-Powered-By. Built HTTP smoke checks root, health, unauthorized view, cross-origin rejection and authorized artwork. No approved game or asset changes. Do not add frame restrictions to the Cloud Shell preview; CSP, frame-ancestors, HSTS and TLS policy require trusted production origin and actual deployment verification. These headers are not a production enablement switch or full security certification.
+
+Owner confirmed existing Continue, Tab/Shift+Tab, Enter, Escape, 200% zoom and mobile. Fresh-shell Compose config checks passed (generation enabled, shared token matches, local provider/model/endpoint). Local health timing n=10 per endpoint: web min/median/max 3.17/3.73/49.65 ms, API 5.26/5.69/6.58 ms, AI 2.63/2.94/3.87 ms. 4 vCPU, 15 GiB RAM, 11 GiB available, 15 GB disk free; Ollama 1.914/3 GiB at idle snapshot. Not gameplay latency, browser rendering or production load. Remaining: screen-reader/reduced-motion and automated browser review, fresh gameplay receipt, production origin/routing, ingress/quotas, retention and deployment. Owner approved seven manual checks, not all accessibility criteria.
+
 ## Runbook for evidence
 
 1. Verify local VM, backup integrity, exact git SHA, four migrations and restored Continue before tests; no restore over a nonempty DB. Use an isolated disposable test database for new regression runs.
