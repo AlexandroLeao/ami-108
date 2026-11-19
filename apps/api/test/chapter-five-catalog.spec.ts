@@ -3,14 +3,25 @@ import { chooseEncounter, consultEncounter, retryEncounter, startEncounter } fro
 
 describe('Chapter 5 source and guaranteed boar rules',()=>{
   it('preserves the complete bilingual source order and ending',()=>{
-    expect(HANGAR_DIALOGUE.map(b=>b.id)).toEqual(['L01','L02','L03','L06','L06b','L07','L07b','L08','L08b','L09','L10','L11','L12']);
+    expect(HANGAR_DIALOGUE.map(b=>b.id)).toEqual(['L01','L01a','L01b','L02','L03','L06','L06b','L07','L07b','L08','L08b','L09','L10','L11','L12']);
     expect(ORBIT_DIALOGUE.map(b=>b.id)).toEqual(Array.from({length:15},(_,i)=>'L'+String(i+1).padStart(2,'0')).filter(id=>id!=='L08'));
     expect(ORBIT_DIALOGUE.find(b=>b.id==='L09')?.text['pt-BR']).toBe('Afirmativo.');
     expect(ORBIT_DIALOGUE.find(b=>b.id==='L12')?.text).toEqual({'pt-BR':'...',en:'...'});
     expect(ORBIT_DIALOGUE.at(-1)!.text).toEqual({'pt-BR':'De nada, Bobo.',en:"You're welcome, Bobo."});
     expect(BOAR_QUESTION.id).toBe('Q-BOAR');
     expect(LAUNCH_DIALOGUE.map(b=>b.id)).toEqual(['B1','B2','B3','B4','B5','B6','B7']);
-    expect(HANGAR_NARRATION.ENTRY['pt-BR']).toMatch(/^Você e AMI/);
+    expect(HANGAR_NARRATION.ENTRY['pt-BR']).toMatch(/^Você e AMI.*naves abandonadas.*destruídas/);
+    expect(HANGAR_NARRATION.PANEL['pt-BR']).toContain('registros e diagnósticos das naves');
+    expect(HANGAR_DIALOGUE.slice(0,3).map(b=>b.text['pt-BR'])).toEqual([
+      'Identifiquei uma nave de emergência com a estrutura intacta.',
+      'Ela está no setor de decolagem, do outro lado do hangar. Podemos utilizá-la para sair do planeta.',
+      'Porém, o circuito de alimentação necessita de uma célula de reposição.',
+    ]);
+    expect(HANGAR_DIALOGUE[4].text['pt-BR']).toContain('depósito do setor de manutenção');
+    expect(HANGAR_NARRATION.APPROACH['pt-BR']).toContain('entrada do setor de manutenção');
+    expect(BOAR.choices[3].consequence['pt-BR']).toContain('caminho até o depósito');
+    expect(HANGAR_NARRATION.FIND['pt-BR']).toContain('depósito de manutenção');
+    expect(HANGAR_NARRATION.CARRY['pt-BR']).toContain('setor de decolagem');
     expect(LAUNCH_DIALOGUE[4].text['pt-BR']).toBe('Nada de dicas de casa ou informações aleatórias dessa vez!');
     expect(FINAL_TITLE).toEqual({'pt-BR':'CONTINUA...',en:'TO BE CONTINUED...'});
     expect(CHAPTER_FIVE_ASSETS).toEqual(['CENA-09','CENA-10']);
