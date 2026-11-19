@@ -94,9 +94,9 @@ export const RAT: EncounterDefinition = {
   random: local('Para remover a casca de um ovo cozido, recomenda-se mergulhá-lo em água fria.', 'To remove the shell from a boiled egg, immersing it in cold water is recommended.'),
   randomIsRecipe: true,
   choices: [
-    { id: 'RAT-01', label: local('Ativar o sistema de emissão ultrassônica.', 'Activate the ultrasonic emission system.'), consequence: local('A criatura ignora o estímulo e ataca David quando ele tenta atravessar.', 'The creature ignores the stimulus and attacks David as he tries to cross.'), outcome: 'DEAD' },
-    { id: 'RAT-02', label: local('Ativar a iluminação de contenção.', 'Activate the containment lighting.'), consequence: local('A luz intensa força a criatura a recuar para o abrigo escuro. David atravessa.', 'Intense light forces the creature into its dark shelter. David crosses.'), outcome: 'SUCCESS' },
-    { id: 'RAT-03', label: local('Acionar a ventilação de emergência.', 'Activate the emergency ventilation.'), consequence: local('O fluxo de ar não afasta o organismo; David é atacado.', 'The airflow does not drive the organism away; David is attacked.'), outcome: 'DEAD' },
+    { id: 'RAT-01', label: local('Ativar o sistema de emissão ultrassônica.', 'Activate the ultrasonic emission system.'), consequence: local('A criatura ignora o estímulo e ataca você quando tenta atravessar.', 'The creature ignores the stimulus and attacks you as you try to cross.'), outcome: 'DEAD' },
+    { id: 'RAT-02', label: local('Ativar a iluminação de contenção.', 'Activate the containment lighting.'), consequence: local('A luz intensa força a criatura a recuar para o abrigo escuro. Você atravessa.', 'Intense light forces the creature into its dark shelter. You cross.'), outcome: 'SUCCESS' },
+    { id: 'RAT-03', label: local('Acionar a ventilação de emergência.', 'Activate the emergency ventilation.'), consequence: local('O fluxo de ar não afasta o organismo. Você é atacado.', 'The airflow does not drive the organism away. You are attacked.'), outcome: 'DEAD' },
     { id: 'RAT-04', label: local('Atravessar pelo corredor mantendo silêncio.', 'Cross the corridor in silence.'), consequence: local('O rato detecta sua presença, mesmo em silêncio, e ataca.', 'The rat detects your presence, even in silence, and attacks.'), outcome: 'DEAD' },
   ],
 };
