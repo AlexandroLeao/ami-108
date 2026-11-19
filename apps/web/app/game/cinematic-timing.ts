@@ -10,6 +10,7 @@ export function imageGateMs(view: CampaignView): number {
   if (view.cue==='fade-in' && id==='A03-S01/L01/NEXT') return 750;
   if (view.cue==='startle' && id==='A02-S01/L01/NEXT') return 1000;
   if (view.cue==='startle' && id==='A03-S02/L01/NEXT') return 1350;
+  if (view.cue==='startle' && id==='A05-S01/L06/NEXT') return 1350;
   if (view.cue==='crt-reveal' || view.cue==='crt-startle') return 1800;
   if (view.cue==='disoriented') return 1450;
   return 0;

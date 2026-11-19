@@ -8,6 +8,9 @@ import { beginChapterThree, chapterThreeView, chapterThreeAsset, advanceChapterT
 
 import { advanceFour, beginFour, viewFour, CHAPTER_FIVE_BOUNDARY, type ChapterFourProgress } from './chapter-four-domain';
 
+import { advanceFive, beginFive, viewFive, type ChapterFiveProgress } from './chapter-five-domain';
+
+type FiveState = Omit<ChapterFiveProgress, 'stepId'|'reviewStepId'|'revision'|'locale'|'diagnostics'|'events'>;
 const HANDOFF = 'A02-S01/CHAPTER_CARD';
 export type Diagnostics = Readonly<{ energy: Energy; med: number; bio: number; hist: number; personal: number; personalUnlocked: boolean }>;
 const INITIAL_DIAGNOSTICS: Diagnostics = { energy: 3, med: 10, bio: 15, hist: 12, personal: 5, personalUnlocked: false };
@@ -31,6 +34,9 @@ export type NarrativeState = Readonly<{
   chapterThree?: ChapterThreeState;
   // Optional marker keeps existing saves compatible; the authoritative cursor/events remain shared.
   chapterFour?: true;
+  chapterFive?: FiveState;
+  savedBoarSlots?: readonly Slot[];
+  chapterFiveStart?: Readonly<{ chapterTwo: ChapterTwoState; chapterThree: ChapterThreeState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   chapterFourStart?: Readonly<{ chapterTwo: ChapterTwoState; chapterThree: ChapterThreeState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   chapterThreeStart?: Readonly<{ chapterTwo: ChapterTwoState; diagnostics: Diagnostics; events: readonly EventId[] }>;
   intro: Readonly<{ category: 'RANDOM'; source: 'fallback' | 'generated'; text: Localized }> | null;
@@ -47,6 +53,7 @@ export type CurrentView = Readonly<{
   narration: boolean;
   information: boolean;
   chapters?: readonly ChapterOption[];
+  complete?: boolean;
 }>;
 
 export class NarrativeError extends Error {
@@ -156,6 +163,7 @@ function normalizeRetiredScenes(state: NarrativeState): NarrativeState {
 }
 export function currentAsset(state: NarrativeState): OpeningAsset | null {
   state = normalizeRetiredScenes(state);
+  if (state.chapterFive) return viewFive(fiveProgress(state)).asset;
   if (state.chapterFour) return viewFour(fourProgress(state)).asset;
   if (state.chapterThree) { chapterThreeView(state); return chapterThreeAsset(state); }
   if (state.chapterTwo) { chapterTwoView(state); return chapterTwoAsset(state); }
@@ -179,8 +187,8 @@ function currentActions(state: NarrativeState, index: number): readonly Narrativ
 }
 
 function unlocked(state: NarrativeState): number {
-  const reached = state.chapterFour || state.stepId === CHAPTER_FOUR_CARD ? 4 : state.chapterThree || state.stepId === 'A03-S01/CHAPTER_CARD' ? 3 : state.chapterTwo || state.stepId === HANDOFF ? 2 : 1;
-  return Math.min(4, Math.max(reached, state.unlockedChapter ?? 1));
+  const reached = state.chapterFive || (state.chapterFour && state.stepId === CHAPTER_FIVE_BOUNDARY) ? 5 : state.chapterFour || state.stepId === CHAPTER_FOUR_CARD ? 4 : state.chapterThree || state.stepId === 'A03-S01/CHAPTER_CARD' ? 3 : state.chapterTwo || state.stepId === HANDOFF ? 2 : 1;
+  return Math.min(5, Math.max(reached, state.unlockedChapter ?? 1));
 }
 export function projectNarrative(state: NarrativeState): CurrentView {
   state = normalizeRetiredScenes(state);
@@ -190,6 +198,7 @@ export function projectNarrative(state: NarrativeState): CurrentView {
 function projectCurrent(state: NarrativeState): CurrentView {
   ensureLocale(state.locale);
   if (state.version !== NARRATIVE_VERSION) throw new NarrativeError('INVALID_STATE');
+  if (state.chapterFive) return projectFive(state);
   if (state.chapterFour) return projectFour(state);
   if (state.chapterThree) {
     const view = chapterThreeView(state);
@@ -232,23 +241,37 @@ function retainedRatSlots(state: NarrativeState): readonly Slot[] {
   const current = state.chapterThree?.rat?.slots ?? [];
   return current.length > cached.length ? current : cached;
 }
+function retainedBoarSlots(state: NarrativeState): readonly Slot[] {
+  const cached = state.savedBoarSlots ?? [];
+  const current = state.chapterFive?.retainedSlots ?? [];
+  return current.length > cached.length ? current : cached;
+}
 function rememberProgress(state: NarrativeState): NarrativeState {
   const archive = state.stepId === 'A03-S01/CHAPTER_CARD' && state.chapterTwo && state.diagnostics
     ? { chapterTwo: state.chapterTwo, diagnostics: state.diagnostics, events: state.events } : state.chapterThreeStart;
   const four = state.stepId === CHAPTER_FOUR_CARD && state.chapterTwo && state.chapterThree && state.diagnostics
     ? { chapterTwo: state.chapterTwo, chapterThree: state.chapterThree, diagnostics: state.diagnostics, events: state.events } : state.chapterFourStart;
-  return { ...state, unlockedChapter: unlocked(state), savedDogSlots: retainedSlots(state), savedRatSlots: retainedRatSlots(state), ...(archive ? { chapterThreeStart: archive } : {}), ...(four ? { chapterFourStart: four } : {}) };
+  const five = state.chapterFour && !state.chapterFive && state.stepId === CHAPTER_FIVE_BOUNDARY && state.chapterTwo && state.chapterThree && state.diagnostics
+    ? { chapterTwo: state.chapterTwo, chapterThree: state.chapterThree, diagnostics: state.diagnostics, events: state.events } : state.chapterFiveStart;
+  return { ...state, unlockedChapter: unlocked(state), savedDogSlots: retainedSlots(state), savedRatSlots: retainedRatSlots(state), savedBoarSlots: retainedBoarSlots(state), ...(five ? { chapterFiveStart: five } : {}), ...(archive ? { chapterThreeStart: archive } : {}), ...(four ? { chapterFourStart: four } : {}) };
 }
 function restartChapter(state: NarrativeState, chapter: number): NarrativeState {
   if (chapter < 1 || chapter > unlocked(state)) throw new NarrativeError('ACTION_NOT_ALLOWED');
   const remembered = rememberProgress(state);
   const common = { ...startNarrative(state.locale), revision: state.revision + 1, intro: state.intro,
     unlockedChapter: remembered.unlockedChapter, savedDogSlots: remembered.savedDogSlots, savedRatSlots: remembered.savedRatSlots,
+    savedBoarSlots: remembered.savedBoarSlots,
+    ...(remembered.chapterFiveStart ? { chapterFiveStart: remembered.chapterFiveStart } : {}),
     ...(remembered.chapterFourStart ? { chapterFourStart: remembered.chapterFourStart } : {}),
     ...(remembered.chapterThreeStart ? { chapterThreeStart: remembered.chapterThreeStart } : {}) };
   if (chapter === 1) return common;
   if (chapter === 2) return { ...common, stepId: HANDOFF, diagnostics: INITIAL_DIAGNOSTICS,
     events: ['E-JOIN', 'INTRO-RANDOM', 'MEM-D1', 'FB-D1'], intro: state.intro ?? { category: 'RANDOM', source: 'fallback', text: INTRO_FALLBACK } };
+  if (chapter === 5) {
+    const snapshot = remembered.chapterFiveStart;
+    if (!snapshot || !snapshot.chapterThree.rat) throw new NarrativeError('ACTION_NOT_ALLOWED');
+    return { ...common, ...snapshot, chapterFour:true, chapterTwo: { ...snapshot.chapterTwo, dog: { ...snapshot.chapterTwo.dog, slots: retainedSlots(remembered) } }, chapterThree: { ...snapshot.chapterThree, rat: { ...snapshot.chapterThree.rat, slots: retainedRatSlots(remembered) } }, stepId: CHAPTER_FIVE_BOUNDARY };
+  }
   if (chapter === 4) {
     const snapshot = remembered.chapterFourStart;
     if (!snapshot || !snapshot.chapterThree.rat) throw new NarrativeError('ACTION_NOT_ALLOWED');
@@ -285,7 +308,7 @@ function projectFour(state: NarrativeState): CurrentView {
   return { revision:view.revision, locale:view.locale, phase:view.phase, chapter,
     chapterTitle:CHAPTERS[chapter-1].title[state.locale], sceneId:view.stepId.split('/')[0],
     speaker:view.speaker, text:view.text, asset:view.asset ? {url:`/api/game/asset?key=${view.asset}`,alt:OPENING_ASSETS[view.asset][state.locale]} : null,
-    diagnostics:view.diagnostics, actions:view.actions, pending:false, cue,
+    diagnostics:view.diagnostics, actions: state.stepId===CHAPTER_FIVE_BOUNDARY && !state.reviewStepId ? [{id:CHAPTER_FIVE_BOUNDARY+'/NEXT',kind:'CONTINUE',label:actionLabel[state.locale]},...view.actions] : view.actions, pending:false, cue,
     narration:view.text!=='' && view.speaker===null && !view.record && view.phase!=='CHAPTER_CARD', information:false };
 }
 function applyFour(state: NarrativeState, progress: ChapterFourProgress): NarrativeState {
@@ -295,7 +318,43 @@ function applyFour(state: NarrativeState, progress: ChapterFourProgress): Narrat
     revision:progress.revision,diagnostics:progress.diagnostics,events};
 }
 
+const fiveEvents = ['E-SHIP','CP-BOAR','E-LAUNCH','E-COMPLETE'] as const;
+function isFiveEvent(event: EventId): event is typeof fiveEvents[number] {
+  return fiveEvents.some(value=>value===event);
+}
+function fiveProgress(state: NarrativeState): ChapterFiveProgress {
+  if (!state.chapterFive || !state.chapterFour || !state.diagnostics || !state.chapterTwo || !state.chapterThree ||
+      !state.events.includes('F3') || !state.events.includes('E-PAST-RESTORED')) throw new NarrativeError('INVALID_STATE');
+  return {...state.chapterFive,stepId:state.stepId,reviewStepId:state.reviewStepId,revision:state.revision,
+    locale:state.locale,diagnostics:state.diagnostics,events:state.events.filter(isFiveEvent)};
+}
+function projectFive(state: NarrativeState): CurrentView {
+  const view=viewFive(fiveProgress(state));
+  return {revision:view.revision,locale:view.locale,phase:view.phase,chapter:5,chapterTitle:CHAPTERS[4].title[state.locale],
+    sceneId:view.stepId.split('/')[0],speaker:view.speaker,text:view.text,
+    asset:view.asset?{url:`/api/game/asset?key=${view.asset}`,alt:OPENING_ASSETS[view.asset][state.locale]}:null,
+    diagnostics:view.diagnostics,actions:view.actions,pending:false,cue:view.stepId==='A05-S01/L06'?'startle':view.stepId==='A05-S02/NAVIGATION'?'fade-in':'none',
+    narration:view.narration,information:false,complete:view.complete};
+}
+function applyFive(state: NarrativeState, progress: ChapterFiveProgress): NarrativeState {
+  const {stepId,reviewStepId,revision,locale,diagnostics,events,...chapterFive}=progress;
+  return {...state,chapterFive,stepId,reviewStepId,revision,locale,diagnostics,
+    events:[...state.events.filter(e=>!isFiveEvent(e)),...events]};
+}
 function advanceCurrent(state: NarrativeState, actionId: string, random: () => number): NarrativeState {
+  if (state.chapterFive) {
+    if (!projectFive(state).actions.some(action=>action.id===actionId)) throw new NarrativeError('ACTION_NOT_ALLOWED');
+    return applyFive(state,advanceFive(fiveProgress(state),actionId,state.revision));
+  }
+  if (state.chapterFour && state.stepId===CHAPTER_FIVE_BOUNDARY && !state.reviewStepId && actionId===CHAPTER_FIVE_BOUNDARY+'/NEXT') {
+    if (!state.diagnostics || !state.chapterTwo || !state.chapterThree?.rat) throw new NarrativeError('INVALID_STATE');
+    const remembered=rememberProgress(state);
+    try {
+      const progress=beginFive(state.diagnostics,state.events,state.locale,state.revision,
+        state.chapterTwo.dog.recipeSeen || state.chapterThree.rat.recipeSeen,retainedBoarSlots(state));
+      return applyFive(remembered,advanceFive(progress,actionId,state.revision));
+    } catch { throw new NarrativeError('INVALID_STATE'); }
+  }
   if (state.chapterFour) {
     if (!projectFour(state).actions.some(action=>action.id===actionId)) throw new NarrativeError('ACTION_NOT_ALLOWED');
     return applyFour(state,advanceFour(fourProgress(state),actionId,state.revision));

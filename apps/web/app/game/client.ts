@@ -11,6 +11,7 @@ export type CampaignView = {
   narration: boolean;
   information: boolean;
   chapters?: { number: number; title: string }[];
+  complete?: boolean;
 };
 export type CommandBody = { commandId: string; expectedRevision: number } &
   ({ actionId: string } | { locale: Locale });

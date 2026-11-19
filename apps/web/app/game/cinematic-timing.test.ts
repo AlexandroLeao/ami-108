@@ -23,6 +23,12 @@ describe('owner-requested cinematic timing',()=>{
     expect(imageGateMs(view('A04-S02/F09','disoriented'))).toBe(1450);
     expect(beatKey(view('A04-S02/F09','disoriented'))).toBe('A04-S02/F09/NEXT');
   });
+  it('gates only the original boar reveal until the artwork and startle finish',()=>{
+    expect(imageGateMs(view('A05-S01/L06','startle'))).toBe(1350);
+    expect(imageGateMs(view('A05-S01/L06','startle',false))).toBe(0);
+    expect(imageGateMs(view('A05-S01/L06b','none'))).toBe(0);
+    expect(imageGateMs(view('A05-S01/LOOK','none',false))).toBe(0);
+  });
   it('pulses exactly the three tutorial beats and settles only on return',()=>{
     for(const id of ['TUTORIAL','TUTORIAL-b','TUTORIAL-c']) expect(energyMotion(view('A01-S03/'+id,'none',false))).toBe('tutorial');
     expect(energyMotion(view('A01-S03/RETURN-STREET','none',false))).toBe('settle');

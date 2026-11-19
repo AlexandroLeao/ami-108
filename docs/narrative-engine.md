@@ -1,5 +1,10 @@
 # Narrative engine — AMI-004
 
+## Day 4 Chapter 5 candidate — November 19
+
+Candidate integrates the reviewed #30 catalog/domain into authoritative dispatch. Legacy Chapter 5 boundary resumes; chapter replay high-water reaches 5, and snapshots retain immutable boar slots. E-SHIP, CP-BOAR, E-LAUNCH and E-COMPLETE are transactional; the boar uses authored CORRECT only, no provider call. Original CENA-09/10 are gated by current scene; the owner revised Chapter 5 to confront the boar before retrieving the cell, with one shared departure dialogue regardless of recipe or consultation history. CP-BOAR precedes E-SHIP, then E-LAUNCH after gate opening. The black pre-reveal beats, gated CENA-09 startle, split orbit narration, centered final title and rolling credits supersede the original draft. Completion is a current-view optional boolean, ending and credits are distinct; no new postcredits scene. Owner preview and exact CI pending; main remains unchanged.
+
+
 ## Current implemented scope
 
 Chapters 1–4 are playable and accepted. Chapter 3 retains its archive, MEM-D3, rat and F2; Chapter 4 uses `chapter-four-catalog.ts`, `chapter-four-domain.ts` and engine dispatch with the optional persisted marker, original cursor/revision/events, existing chapter snapshots and no new migration. F3 restores all indexes and energy atomically, manual and memory sequence lead to the Chapter 5 card; review does not replay events. Chapter 5 draft #30 has catalog and pure tests only. Preserve current-only projection, stable IDs, replay high-water and immutable slots. Historical notes below are superseded where inconsistent.
