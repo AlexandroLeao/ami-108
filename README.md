@@ -7,7 +7,7 @@
 ---
 
 
-A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories.
+A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories. An original, non-profit project. Content warning: violence, blood, strong language and horror; provisional editorial recommendation 16+, official age rating pending.
 
 **Historical baseline:** PR #22 accepted Chapters 1–2; superseded by the PR #25 status above.
 
