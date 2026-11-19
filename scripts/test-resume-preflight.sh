@@ -27,7 +27,7 @@ preflight() {
 }
 output=$(preflight)
 grep -q '^WORKTREE=CLEAN$' <<< "$output"
-grep -q '^PRIVATE_ENV=\?PRESENT' <<< "$output"
+grep -q '^PRIVATE_ENV=PRESENT' <<< "$output"
 grep -q '^PRIVATE_ENV_PERMISSIONS=RESTRICTED$' <<< "$output"
 grep -q '^PRIVATE_ENV_GITIGNORE=YES$' <<< "$output"
 grep -q '^BACKUP_CHECKSUM=PASS$' <<< "$output"
