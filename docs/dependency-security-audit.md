@@ -1,6 +1,10 @@
 # Dependency security audit — AMI-010
 
-## Observed baseline (2026-11-19)
+## Latest recorded remediation status (historical scans, not a new audit)
+
+The **initial vulnerability table below is a pre-remediation snapshot**. PR #48 subsequently accepted a narrowly scoped `deepmerge-ts` override with exact CI and compatibility checks; the owner-reported locked JS production and full scans at that checkpoint returned **zero known advisory records**, and prior locked Python scans returned none. This does not replace a fresh vulnerability scan or review of container/OS images, package licenses, production ingress, retention or deployment. See [release-readiness and open gates](release-readiness-matrix.md). Do not report the initial high/critical entries as unresolved current findings, or the later zero-known scan as permanent safety certification.
+
+## Initial observed baseline — before fixes (2026-11-19)
 
 Owner-provided Cloud Shell terminal output at clean main `a27f4dac4ad29ba18c500ad5b64de7d2cd2d4351`, with the existing API image and read-only Python lockfile mounts. Disposable containers; no dependency changes, no database writes or paid resources. All four Compose services remained healthy; 18 GB root free (86% used). The image revision was not independently attested by the scan. Previous backup and two-session preservation were documented in #12; this dependency scan did not recount sessions.
 
