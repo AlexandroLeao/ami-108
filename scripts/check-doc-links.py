@@ -7,11 +7,12 @@ Non-mutating and intentionally independent of third-party Markdown packages.
 from __future__ import annotations
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-LINK = re.compile(r"(?<!!)\[[^\]]*\]\((<?[^\s)]+>?)")
+LINK = re.compile(r"\[[^\]]*\]\((<?[^\s)]+>?)")
 FENCE = re.compile(r"^\s*(\x60{3,}|~{3,})")
 EXTERNAL = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 
@@ -50,8 +51,9 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent.parent)
     opts = parser.parse_args()
     root = opts.root.resolve()
-    documents = [p for p in root.rglob("*.md")
-                 if not any(part in {".git", "node_modules", ".venv", ".next"} for part in p.relative_to(root).parts)]
+    tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z", "--", "*.md"])
+    documents = [root / rel.decode("utf-8") for rel in tracked.split(b"\\0") if rel]
+    documents = [p for p in documents if p.is_file()]
     missing = [problem for doc in documents for problem in invalid_links(root, doc)]
     for problem in missing:
         print("BROKEN_LOCAL_LINK:", problem)
