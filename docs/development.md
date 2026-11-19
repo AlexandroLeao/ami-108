@@ -1,5 +1,10 @@
 # Development foundation
 
+## Latest safe-pause handoff — November 19, 2026
+
+The current private Cloud Shell runtime is `14ea583` (PR #53). The owner confirmed a fresh port-3000 game now presents varied responses; Continue preserves older immutable utterances. CI 44606120570 passed 221 tests (105 API, 44 Web, 72 Python), all four migrations, complete built campaign and twelve art hashes. The installation had five saved sessions, zero pending generations, four healthy services and pinned local Qwen2.5:1.5b resident; subsequent owner playtest confirms the experience, but final post-playtest counts and shutdown archive are **not yet recorded**. Docker root disk had 13 GiB free, 90% used. Follow the exact [safe Cloud Shell pause/resume runbook](cloud-shell-pause-resume.md) rather than relying on Docker volume persistence. Keep #12–#15 open; do not claim the game is publicly release-ready.
+
+
 ## Latest accepted handoff — November 19
 
 **Latest accepted increment:** PR #41 merged `9b76771` (CI 44582546867; wire-contract and facade rejection tests). Owner terminal audit verified `day4-final-20261119-153020.dump`, full restore to empty database, two sessions, four healthy services at `9b76771`, 27 GiB root free and 12 GiB RAM available; Continue confirmed. PR #42 merged `910b354` (exact approved `2bc43da`, [CI 44590534060](https://github.com/AlexandroLeao/ami-108/actions/runs/44590534060): 206 tests, 100 API/35 web/71 Python, four migrations, all 12 artwork hashes). Owner approved localized content advisory and spoiler-free Extras with nonprofit statement; no changes to story, artwork, rules, API, AI or database. Port 3000 frontend update and pinned-model reactivation pending. 16+ is provisional editorial guidance, not a formal rating. All four release issues remain open.
