@@ -46,6 +46,8 @@ export const enabled = () => process.env.AMI_AI_GENERATION === '1';
 // The authoritative domain has already selected the category and constructed
 // the authored fallback. Never reserve a replayed slot or intro.
 export function generationRequest(before: NarrativeState, after: NarrativeState, requestId: string): GenerationRequest | null {
+  // BOAR is authored CORRECT only; never reserve model inference for Chapter 5.
+  if (after.chapterFive) return null;
   const common = { requestId, locale: after.locale, deadlineMs: GENERATION_DEADLINE_MS };
   if (!before.intro && after.intro) {
     return { ...common, questionId: 'INTRO-RANDOM', category: 'RANDOM', factIds: ['INTRO-OCTOPUS', 'INTRO-PENGUIN', 'INTRO-CHESS', 'INTRO-HEXAGON', 'INTRO-DOZEN', 'INTRO-PIANO', 'INTRO-CENTURY', 'INTRO-ALPHABET'] };
