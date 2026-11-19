@@ -30,6 +30,11 @@ jobs:
           --health-retries 12
     steps:
       - uses: actions/checkout@v4
+      - name: Verify safe resume diagnostics
+        run: |
+          bash -n scripts/check-resume-readonly.sh
+          bash -n scripts/test-resume-preflight.sh
+          bash scripts/test-resume-preflight.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
