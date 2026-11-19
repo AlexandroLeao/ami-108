@@ -37,7 +37,7 @@ describe('internal AI request authorization', () => {
     const before=state;
     step(projectNarrative(state).actions.find(x=>x.kind==='CONSULT')!.id);
     const req=generationRequest(before,state,randomUUID())!;
-    expect(req).toMatchObject({questionId:'Q-RAT',locale,category,factIds:category==='CORRECT'?['RAT-LIGHT','RAT-CONTAINMENT']:['RAT-RECIPE','RAT-LAUNDRY','RAT-PENGUIN']});
+    expect(req).toMatchObject({questionId:'Q-RAT',locale,category,factIds:category==='CORRECT'?['RAT-LIGHT','RAT-CONTAINMENT']:['RAT-RECIPE','RAT-LAUNDRY','RAT-PENGUIN','RAT-KILOGRAM','RAT-BREAD','RAT-FRUIT','RAT-CALENDAR','RAT-BOOKS']});
     expect(expectedText(req,state)).toEqual(state.chapterThree?.rat?.slots[0].text[locale]);
     expect(generationRequest(state,changeNarrativeLocale(state,locale==='en'?'pt-BR':'en',state.revision),randomUUID())).toBeNull();
     while(projectNarrative(state).phase!=='ENCOUNTER') step();
@@ -63,6 +63,30 @@ describe('internal AI request authorization', () => {
     const english=changeNarrativeLocale(state,'en',state.revision);
     expect(projectNarrative(english).text).toBe('Folding clothes immediately after drying is recommended.');
     step();expect(projectNarrative(state).text).toBe('Certo... Pelo visto, dessa vez estou por conta própria.');
+  });
+
+  it('stores expanded recipe and non-recipe alternatives without changing the rat draw or previous slot', () => {
+    let state=startNarrative('pt-BR');
+    const step=(action=projectNarrative(state).actions[0].id)=>{state=advanceNarrative(state,action,state.revision,()=>0.99);};
+    for(let i=0;i<120 && projectNarrative(state).phase!=='ENCOUNTER';i++) step();
+    step('DOG-04');
+    for(let i=0;i<150 && projectNarrative(state).phase!=='ENCOUNTER';i++) step();
+    const before=state;step(projectNarrative(state).actions.find(x=>x.kind==='CONSULT')!.id);
+    const req=generationRequest(before,state,randomUUID())!;
+    expect(req.factIds).toHaveLength(8);
+    const result={generationStatus:'VALIDATED' as const,generationReason:null,text:'A massa de pão pode ser preparada com farinha, água e fermento.'};
+    expect(applyGeneratedText(state,{...req,factIds:['RAT-RECIPE','RAT-LAUNDRY','RAT-PENGUIN']},result)).toBe(state);
+    state=applyGeneratedText(state,req,result);
+    expect(state.savedRatSlots?.[0]).toMatchObject({recipe:true,category:'RANDOM',text:{en:'Bread dough can be made with flour, water and yeast.'}});
+    expect(state.chapterThree?.rat).toMatchObject({energy:2,used:['RANDOM'],recipeSeen:true});
+    const first=state.savedRatSlots?.[0];
+    while(projectNarrative(state).phase!=='ENCOUNTER') step();
+    const beforeSecond=state;step(projectNarrative(state).actions.find(x=>x.kind==='CONSULT')!.id);
+    const req2=generationRequest(beforeSecond,state,randomUUID())!;
+    state=applyGeneratedText(state,req2,{generationStatus:'VALIDATED',generationReason:null,text:'Um quilograma corresponde a mil gramas.'});
+    expect(state.savedRatSlots?.[0]).toEqual(first);
+    expect(state.savedRatSlots?.[1]).toMatchObject({recipe:false,category:'RANDOM',text:{en:'A kilogram equals one thousand grams.'}});
+    expect(state.chapterThree?.rat).toMatchObject({energy:1,used:['RANDOM','RANDOM'],recipeSeen:true});
   });
   it('falls back without configuration and never sends a request', async () => {
     const token = process.env.AMI_AI_INTERNAL_TOKEN;
