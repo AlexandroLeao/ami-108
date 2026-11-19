@@ -599,7 +599,7 @@ button:focus-visible, a:focus-visible {
 .campaign-credits-roll { position: absolute; top: 100%; left: 0; right: 0; padding: 0 12px; animation: campaign-credits-roll 32s linear both; }
 .campaign-credits-roll h1, .campaign-credits-roll h2, .campaign-credits-roll p { margin: 0 0 8px; }
 .campaign-credits-roll > div { margin: 24px 0; }
-.campaign-credits-menu { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 16px); }
+.campaign-dialogue .campaign-credits-menu { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 16px); }
 @keyframes campaign-credits-roll { from { top: 100%; transform: translateY(0); } to { top: 0; transform: translateY(-100%); } }
 @media (prefers-reduced-motion: reduce) {
   .campaign-credits-roll { animation: none; top: 0; bottom: 58px; overflow-y: auto; }
