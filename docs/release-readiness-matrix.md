@@ -13,10 +13,10 @@ At accepted local runtime `14ea583`, the owner rebuilt Web/API/AI and started th
 | Item | Last supported evidence | Limit |
 | --- | --- | --- |
 | Accepted game runtime | Owner installed `14ea583a83c7c1473bc94f3b1d515a8497827ac3` on private port 3000, approved new-game AI variety and intact Continue | Not a public production release |
-| Documentation main | PR #54 merged `99bbf8e7bb57d330aee020a16fe54d4b5017f4b9`; post-merge [CI 44609150270](https://github.com/AlexandroLeao/ami-108/actions/runs/44609150270) succeeded | Docs-only; Cloud Shell need not rebuild |
+| Documentation and recovery tooling | [Current GitHub main](https://github.com/AlexandroLeao/ami-108/tree/main) contains later README, documentation-audit and pinned-model preparation PRs, with successful exact CI; these do not modify the accepted application runtime | Do not assume a merged operational script was run on the user's VM; verify its independent owner test result |
 | Code validation | [Exact PR #53 CI 44603955413](https://github.com/AlexandroLeao/ami-108/actions/runs/44603955413) green: 105 API, 44 Web, 72 Python = 221 tests, four migrations, Prisma validation, lint/typecheck/build, full built campaign and 12 original artwork hashes | CI uses disposable state; does not validate hosted runtime |
 | AI gameplay | Disposable port 3002 full playthrough: seven VALIDATED/zero fallback; 2/2 distinct DOG RANDOM, 2/2 RAT RANDOM, Qwen2.5:1.5b pinned ID 65ec06548149 resident (`Forever`). Owner then accepted fresh port 3000 game | Only one intro in preview; no cross-session uniqueness guarantee with finite eight-option pool. Old Continue text is intentionally immutable |
-| Saves and backup | Verified private `pre-variety-20261119-201700.dump` before installation, five sessions and zero pending at installation; user reported Cloud Shell shutdown after separate pause instructions | **Superseded by the verified recovery checkpoint above**. Latest pause archive integrity, complete-read and successful six-session restoration were confirmed; local AI generation is still temporarily disabled |
+| Saves and backup | The newer final `pause-ami108-20261119T203206Z-180786.dump` was SHA-256-verified and read completely. The owner restored **6 sessions / 0 pending / 4 migrations** into a formerly empty DB, rebuilt all four services and confirmed Continue | No further restore on this populated database; private raw archive and .env are never uploaded to the repository |
 | Dependency review | JS production/full locked audits zero known at PR #48; prior Python locked audit zero known, Prisma scoped override and full CI compatibility checks | Not an OS/container, licensing, complete application or future advisory clearance |
 | Cost and visibility | Private GitHub, local Cloud Shell only, no mandatory paid resources provisioned | Zero-cost **public hosting** not yet verified or approved |
 
@@ -31,17 +31,20 @@ At accepted local runtime `14ea583`, the owner rebuilt Web/API/AI and started th
 
 The prior seven-day calendar goal (Nov 16–22) is a planning target, **not permission to skip release gates**. Replan if evidence requires more time.
 
-## First ten minutes of the next session
+## Next operational gate — model preparation, not another database recovery
 
-1. Run the [read-only resume diagnostic](../scripts/check-resume-readonly.sh) (retrieve the exact script from updated GitHub main as described in the [pause/resume runbook](cloud-shell-pause-resume.md)) before starting, building or restoring anything; it checks the latest dump checksum, source and Docker availability without disclosing secrets. Then inspect: `git status --short --branch`, `git rev-parse HEAD`, `df -h / /home`, `docker compose ps -a`, `docker volume ls`, and private backup filenames/size. Check the pause command's reported final `SAFE PAUSE COMPLETE` if available. Do not paste `.env`, cookies, secrets or save payloads.
-2. Verify the newest actual `pause-ami108-*.dump` checksum and archive integrity from [pause/resume runbook](cloud-shell-pause-resume.md). An earlier pre-variety dump exists as a fallback, but it may lack saves created afterward; do not overwrite a nonempty database.
-3. Determine if the Docker VM, volumes, models and private network survived. If yes, start existing DB and model then AI/API/Web carefully, confirming four migrations, counts, private connectivity, ten-case AI evaluator and Continue. If no, create a fresh empty DB and request a controlled backup restore plan before any write. Do not assume Docker persistence.
-4. If the local runtime remains `14ea583`, the newer documentation-only main commit does not require an image rebuild. Fast-forward only after reviewing the diff and backup state.
-5. Resume the two most independent QA areas: screen-reader/reduced-motion/browser audit and deployment-cost/security design. Do not modify the frozen narrative, images, mechanics, cached responses or production visibility without specific review.
+The earlier Cloud Shell read-only preflight, checksum/full archive inspection, empty-target database restoration, source build, health checks and **Continue** are complete and supported by owner terminal evidence. **Do not repeat them** against the now-populated six-session database.
+
+1. Preserve local accepted runtime `14ea583` and the existing private `.env`. Confirm the owner-run [pinned Ollama preparation](../scripts/prepare-pinned-local-ollama.sh) only if its preconditions (AI generation OFF, healthy stack, six sessions, adequate RAM/disk) are still satisfied. This procedure is non-idempotent; stop and inspect if it partially fails.
+2. Require the **actual owner-run terminal evidence** for the pinned image/model ID, final internal-only network, 3 GiB model limit, warmup, direct ten authorized bilingual cases and unchanged `6|0|4` aggregate, before considering application inference activation. The CI guard only tests the script's safety preflight; it does not run Ollama.
+3. Separately review API inference enabling while retaining session data, timeout limits and authentic internal token; audit a **new disposable game** without mutating existing saves. No generated outputs should be claimed validated until runtime receipts support them.
+4. Continue independent browser accessibility/performance testing, approved private-source synchronization and zero-mandatory-cost security/hosting assessment under issues #12–#15. None authorizes public deployment or an official rating.
+
+Earlier VM-recovery guidance was for a now-completed operation; see [archived recovery checklist](release-readiness-history.md) when auditing prior steps.
 
 ## Safeguards and non-goals
 
-- **No destructive cleanup**: no `docker compose down -v`, `docker system prune`, manual save edits, or archive restoration into nonempty PostgreSQL. Root space was 13 GiB free / 90% used at the last supplied deployment log; remeasure before new images.
+- **No destructive cleanup**: no `docker compose down -v`, `docker system prune`, manual save edits, or archive restoration into nonempty PostgreSQL. The last supplied post-rebuild root filesystem had 27 GiB free, but resource availability changes across Cloud Shell sessions: remeasure before any model download.
 - **AI remains bounded**: use pinned local model and internal-only Ollama, token authentication, distinct authorized RANDOM options, 2s transport / 2.5s application deadline, fallback, and immutable cached slots. Correct-answer probabilities and BOAR authored-only behavior remain unchanged.
 - **Privacy**: keep `.env` and raw `.dump` private; only aggregates and non-secret test receipts belong in GitHub issues.
 - **Scope**: this matrix adds no infrastructure or application functionality; pending checks are not falsely marked passed.
