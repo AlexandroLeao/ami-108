@@ -35,6 +35,8 @@ class OllamaProvider:
         if context.category == "RANDOM":
             # Vary presentation of approved topics only; never change category or facts.
             secrets.SystemRandom().shuffle(order)
+            # Keep the original prompt size even when the authorized pool grows.
+            order = order[:3]
         prompt = json.dumps(
             {
                 "locale": "en",
