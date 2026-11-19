@@ -2,7 +2,7 @@
 // Engine owns shared revision, locale, events and diagnostics; this domain owns the ship and encounter.
 import { local, type Locale, type Localized } from './catalog';
 import type { Diagnostics, NarrativeAction } from './engine';
-import { BOAR, BOAR_QUESTION, HANGAR_DIALOGUE, LAUNCH_CONSULTED, LAUNCH_NO_CONSULT, LAUNCH_NO_RECIPE, ORBIT_DIALOGUE, FINAL_TITLE } from './chapter-five-catalog';
+import { BOAR, BOAR_QUESTION, HANGAR_DIALOGUE, HANGAR_NARRATION, LAUNCH_DIALOGUE, ORBIT_DIALOGUE, FINAL_TITLE } from './chapter-five-catalog';
 import { startEncounter, consultEncounter, chooseEncounter, retryEncounter, type EncounterState, type Slot } from './encounter';
 
 const hangar = (id:string) => 'A05-S01/'+id;
@@ -15,7 +15,7 @@ const TITLE = orbit('ENDING'), CREDITS = orbit('CREDITS');
 type Event = 'E-SHIP'|'CP-BOAR'|'E-LAUNCH'|'E-COMPLETE';
 type Ship = Readonly<{powered:boolean; gateOpen:boolean; enginesOn:boolean; launched:boolean}>;
 const unpowered:Ship={powered:false,gateOpen:false,enginesOn:false,launched:false};
-const prepared:Ship={...unpowered,powered:true};
+const prepared:Ship={...unpowered,powered:true,gateOpen:true};
 const launched:Ship={powered:true,gateOpen:true,enginesOn:true,launched:true};
 type Checkpoint=Readonly<{stepId:string;diagnostics:Diagnostics;ship:Ship;events:readonly Event[]}>;
 export type ChapterFiveProgress=Readonly<{
@@ -32,8 +32,9 @@ export function beginFive(diagnostics:Diagnostics,previousEvents:readonly string
   if(retainedSlots.length>3 || retainedSlots.some((s,i)=>s.index!==i+1||s.category!=='CORRECT'||s.recipe||s.text['pt-BR']!==BOAR.correct['pt-BR']||s.text.en!==BOAR.correct.en)) return invalid();
   return {stepId:FIVE_CARD,reviewStepId:null,revision,locale,diagnostics,events:[],trail:[FIVE_CARD],ship:unpowered,recipeSeenInJourney,retainedSlots};
 }
-const hangarSteps=[FIVE_CARD,...HANGAR_DIALOGUE.slice(0,4).map(b=>hangar(b.id)),hangar('REPAIR'),...HANGAR_DIALOGUE.slice(4).map(b=>hangar(b.id))];
-const orbitSteps=[orbit('NAVIGATION'),...ORBIT_DIALOGUE.map(b=>orbit(b.id)),orbit('DEPARTURE'),TITLE,CREDITS];
+const hangarSteps=[FIVE_CARD,...['ENTRY','PANEL','L01','L02','L03','APPROACH','NOISE','LOOK',...HANGAR_DIALOGUE.slice(3).map(b=>b.id)].map(hangar)];
+const departureSteps=['B1','B2','B3','FIND','CARRY','REPAIR','LAUNCH','B4','B5','B6','B7'].map(hangar);
+const orbitSteps=[orbit('NAVIGATION'),orbit('ROUTE'),...ORBIT_DIALOGUE.map(b=>orbit(b.id)),orbit('DEPARTURE'),orbit('DISTANCE'),orbit('MELODY'),TITLE,CREDITS];
 const barrier=(id:string)=>id.startsWith(hangar('DECISION-'))||[DEAD,DEAD_CARD,SUCCESS,CREDITS].includes(id);
 function visible(s:ChapterFiveProgress) {
   const id=s.reviewStepId??s.stepId;
@@ -56,7 +57,7 @@ function actions(s:ChapterFiveProgress):NarrativeAction[]{
     if(e.energy>0&&e.used.length<3)choices.unshift(a(id+'/CONSULT','CONSULT',local('Consultar AMI (−1 energia)','Consult AMI (−1 energy)')));
     return choices;
   }
-  if(id===hangar('L04'))return [next('INTERACT',local('Instalar célula','Install cell')),...back];
+  if(id===hangar('CARRY'))return [next('INTERACT',local('Instalar célula','Install cell')),...back];
   return [next(),...back];
 }
 export function viewFive(s:ChapterFiveProgress){
@@ -67,12 +68,15 @@ export function viewFive(s:ChapterFiveProgress){
   let text:Localized;
   let narration=false;
   if(id===FIVE_CARD){phase='CHAPTER_CARD';text=local('CAPÍTULO 5 — DE NADA, BOBO','CHAPTER 5 — YOU’RE WELCOME, BOBO');}
-  else if(id===hangar('REPAIR')){text=local('Você instala a célula de reposição na nave. Os controles voltam a funcionar.','You install the replacement cell in the ship. The controls come back online.');narration=true;}
+  else if(id.startsWith('A05-S01/') && HANGAR_NARRATION[id.split('/')[1]]){text=HANGAR_NARRATION[id.split('/')[1]];narration=true;}
   else if(id.startsWith(hangar('DECISION-'))){phase='ENCOUNTER';text=local('Escolha uma ação.','Choose an action.');asset='CENA-09';}
   else if(id===DEAD||id===SUCCESS){text=(BOAR.choices.find(c=>c.id===s.boar?.selected)??invalid()).consequence;narration=true;if(id===DEAD)phase='DEAD';}
   else if(id===DEAD_CARD){phase='DEAD';text=local('VOCÊ NÃO SOBREVIVEU','YOU DID NOT SURVIVE');}
-  else if(id===orbit('NAVIGATION')){text=local('Em órbita, você examina as informações de navegação. Agora se lembra do contato comercial e define a rota.','In orbit, you examine the navigation data. You now remember the commercial contact and set the course.');asset='CENA-10';narration=true;}
-  else if(id===orbit('DEPARTURE')){text=local('AMI sorri em sua tela. A nave se afasta do planeta enquanto ele volta a cantar aquela melodia. Você não o interrompe.','AMI smiles on his screen. The ship moves away from the planet as he begins singing that melody again. You do not interrupt him.');asset='CENA-10';narration=true;}
+  else if(id===orbit('NAVIGATION')){text=local('Em órbita, você examina as informações de navegação.','In orbit, you examine the navigation data.');asset='CENA-10';narration=true;}
+  else if(id===orbit('ROUTE')){text=local('Você define a rota para sua próxima viagem.','You set the course for your next journey.');asset='CENA-10';narration=true;}
+  else if(id===orbit('DEPARTURE')){text=local('AMI sorri em sua tela.','AMI smiles on his screen.');asset='CENA-10';narration=true;}
+  else if(id===orbit('DISTANCE')){text=local('A nave se afasta cada vez mais do planeta.','The ship moves farther and farther away from the planet.');asset='CENA-10';narration=true;}
+  else if(id===orbit('MELODY')){text=local('Enquanto isso, AMI volta a cantar aquela melodia.','Meanwhile, AMI begins singing that melody again.');asset='CENA-10';narration=true;}
   else if(id===TITLE){text=FINAL_TITLE;}
   else if(id===CREDITS){text=local('AMI-108 — Créditos','AMI-108 — Credits');}
   else {
@@ -83,10 +87,10 @@ export function viewFive(s:ChapterFiveProgress){
       const beat=slotBeat[1]==='Q'?BOAR_QUESTION:{speaker:'AMI-108',text:slot.text};
       speaker=beat.speaker;text=beat.text;asset='CENA-09';
     }else{
-      const beat=(id.startsWith('A05-S02/')?ORBIT_DIALOGUE:[...HANGAR_DIALOGUE,...LAUNCH_CONSULTED,...LAUNCH_NO_CONSULT]).find(b=>b.id===key)??invalid();
-      speaker=beat.speaker;text=key==='B3'&&!s.recipeSeenInJourney?LAUNCH_NO_RECIPE:beat.text;
+      const beat=(id.startsWith('A05-S02/')?ORBIT_DIALOGUE:[...HANGAR_DIALOGUE,...LAUNCH_DIALOGUE]).find(b=>b.id===key)??invalid();
+      speaker=beat.speaker;text=beat.text;
       if(id.startsWith('A05-S02/'))asset='CENA-10';
-      else if(/^L(06|07|08|09|10|11|12)$/.test(key))asset='CENA-09';
+      else if(/^L(06b?|07b?|08b?|09|10|11|12)$/.test(key))asset='CENA-09';
     }
   }
   return {stepId:id,revision:s.revision,locale:s.locale,phase,speaker,text:text[s.locale],asset,narration,diagnostics:s.diagnostics,actions:actions(s),complete:s.events.includes('E-COMPLETE')};
@@ -112,15 +116,22 @@ export function advanceFive(s:ChapterFiveProgress,actionId:string,revision:numbe
   }
   if(a.kind==='CHOOSE'){
     const r=chooseEncounter(s.boar??invalid(),BOAR,actionId);
-    return r.state.phase==='SUCCESS'?move(s,SUCCESS,{boar:r.state,ship:launched,events:append(s,'E-LAUNCH')}):move(s,DEAD,{boar:r.state});
+    return r.state.phase==='SUCCESS'?move(s,SUCCESS,{boar:r.state}):move(s,DEAD,{boar:r.state});
   }
   if(id===DEAD)return move(s,DEAD_CARD);
-  if(id===SUCCESS)return move(s,hangar((s.boar??invalid()).used.length?'B1':'C1'));
+  if(id===SUCCESS)return move(s,hangar('B1'));
   const slotBeat=id.match(/^A05-S01\/(Q|ANSWER)-(\d)$/);
   if(slotBeat)return move(s,slotBeat[1]==='Q'?hangar('ANSWER-'+slotBeat[2]):decision(Number(slotBeat[2])));
-  if(id===hangar('L04'))return move(s,hangar('REPAIR'),{ship:prepared,events:append(s,'E-SHIP')});
-  if(id===hangar('L05')){
-    if(!restored(s.diagnostics)||!s.events.includes('E-SHIP')||!s.ship.powered||s.ship.enginesOn||s.ship.gateOpen)return invalid();
+  if(id===hangar('CARRY')){
+    if(s.boar?.phase!=='SUCCESS'||s.ship.powered)return invalid();
+    return move(s,hangar('REPAIR'),{ship:prepared,events:append(s,'E-SHIP')});
+  }
+  if(id===hangar('REPAIR')){
+    if(!s.ship.powered||!s.ship.gateOpen||s.ship.enginesOn||s.boar?.phase!=='SUCCESS')return invalid();
+    return move(s,hangar('LAUNCH'),{ship:launched,events:append(s,'E-LAUNCH')});
+  }
+  if(id===hangar('LOOK')){
+    if(!restored(s.diagnostics)||s.ship.powered||s.ship.enginesOn||s.ship.gateOpen)return invalid();
     const events=append(s,'CP-BOAR');
     const boar={...startEncounter(BOAR,s.diagnostics.energy),slots:s.retainedSlots};
     return move(s,checkpointId,{boar,events,checkpoint:{stepId:checkpointId,diagnostics:s.diagnostics,ship:s.ship,events}});
@@ -128,8 +139,8 @@ export function advanceFive(s:ChapterFiveProgress,actionId:string,revision:numbe
   if(id===hangar('L12'))return move(s,decision(0));
   const h=hangarSteps.indexOf(id);
   if(h>=0&&h<hangarSteps.length-1)return move(s,hangarSteps[h+1]);
-  const branch=id.match(/^A05-S01\/([BC])(\d)$/);
-  if(branch){const end=branch[1]==='B'?6:2;return move(s,Number(branch[2])===end?orbitSteps[0]:hangar(branch[1]+(Number(branch[2])+1)));}
+  const departure=departureSteps.indexOf(id);
+  if(departure>=0)return move(s,departure===departureSteps.length-1?orbitSteps[0]:departureSteps[departure+1]);
   const o=orbitSteps.indexOf(id);
   if(o>=0&&o<orbitSteps.length-1){
     const target=orbitSteps[o+1];
