@@ -15,6 +15,17 @@
   server="ami108-local-ollama"
   network="ami108-local-inference"
   volume="ami108-local-ollama-models"
+  created_server=0
+  isolated_server=0
+  stop_unisolated_model_on_failure() {
+    status=$?
+    if (( status != 0 )) && (( created_server == 1 )) && (( isolated_server == 0 )); then
+      # Do not leave an aborted bootstrap process listening on Docker's bridge.
+      # Retain its named volume for operator review; do not remove anything.
+      docker stop -t 10 "$server" >/dev/null 2>&1 || true
+    fi
+  }
+  trap stop_unisolated_model_on_failure EXIT
 
   echo "=== ACCEPTED LOCAL BASELINE ==="
   test "$(git branch --show-current)" = main
@@ -64,6 +75,7 @@ PY
   docker pull "$image"
   docker volume create "$volume"
   docker run -d --name "$server" --network bridge     --memory 3g --memory-swap 3g     -e OLLAMA_NO_CLOUD=1     -e OLLAMA_HOST=0.0.0.0:11434     -e OLLAMA_NUM_PARALLEL=1 -e OLLAMA_MAX_LOADED_MODELS=1     -v "$volume:/root/.ollama" "$image"
+  created_server=1
 
   ready=0
   for _ in $(seq 1 40); do
@@ -80,6 +92,7 @@ PY
   docker network create --internal "$network"
   docker network connect --alias ollama "$network" "$server"
   docker network disconnect bridge "$server"
+  isolated_server=1
   docker network connect "$network" ami-108-ai-1
   test "$(docker network inspect --format '{{.Internal}}' "$network")" = true
   test "$(docker inspect --format '{{.HostConfig.Memory}}' "$server")" = 3221225472
