@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { MAX_GAME_BODY_BYTES, readGameBody } from './body';
+import { describe, expect, it, vi } from 'vitest';
+import { MAX_GAME_BODY_BYTES, MAX_GAME_BODY_READ_MS, readGameBody } from './body';
 
 const encoder = new TextEncoder();
 function stream(...chunks: Uint8Array[]): ReadableStream<Uint8Array> {
@@ -41,5 +41,44 @@ describe('bounded game facade request body', () => {
     const body = new ReadableStream<Uint8Array>({ start(controller) { controller.error(new Error('read failed')); } });
     expect(await readGameBody(body)).toEqual({ ok: false, status: 400 });
     expect(body.locked).toBe(false);
+  });
+  it('rejects a stalled body at the total deadline and releases the reader', async () => {
+    vi.useFakeTimers();
+    try {
+      let cancelled = false;
+      const body = new ReadableStream<Uint8Array>({
+        cancel() {
+          cancelled = true;
+          // A source that never finishes cancellation must not delay the response.
+          return new Promise<void>(() => {});
+        },
+      });
+      const result = readGameBody(body, 100);
+      await vi.advanceTimersByTimeAsync(100);
+      expect(await result).toEqual({ ok: false, status: 408 });
+      expect(cancelled).toBe(true);
+      expect(body.locked).toBe(false);
+    } finally { vi.useRealTimers(); }
+  });
+  it('does not reset the deadline for a partial chunk', async () => {
+    vi.useFakeTimers();
+    try {
+      let controller!: ReadableStreamDefaultController<Uint8Array>;
+      const body = new ReadableStream<Uint8Array>({ start(c) { controller = c; } });
+      const result = readGameBody(body, 100);
+      await vi.advanceTimersByTimeAsync(60);
+      controller.enqueue(encoder.encode('{'));
+      await vi.advanceTimersByTimeAsync(40);
+      expect(await result).toEqual({ ok: false, status: 408 });
+      expect(body.locked).toBe(false);
+    } finally { vi.useRealTimers(); }
+  });
+  it('clears the deadline after a successful read', async () => {
+    vi.useFakeTimers();
+    try {
+      expect(MAX_GAME_BODY_READ_MS).toBe(10000);
+      expect(await readGameBody(stream(encoder.encode('{}')))).toEqual({ ok: true, body: '{}' });
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { vi.useRealTimers(); }
   });
 });
