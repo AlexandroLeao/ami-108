@@ -207,26 +207,116 @@ _RULES: dict[tuple[Question, Category], Rule] = {
 # Legacy complete sets remain valid for pending reservations and old clients.
 _EXTRA_RANDOM_FACTS: dict[tuple[Question, Category], tuple[tuple[str, Localized], ...]] = {
     ("INTRO-RANDOM", "RANDOM"): (
-        ("INTRO-CHESS", Localized("O xadrez é disputado em um tabuleiro de 64 casas.", "Chess is played on a board of 64 squares.")),
+        (
+            "INTRO-CHESS",
+            Localized(
+                "O xadrez é disputado em um tabuleiro de 64 casas.",
+                "Chess is played on a board of 64 squares.",
+            ),
+        ),
         ("INTRO-HEXAGON", Localized("Um hexágono possui seis lados.", "A hexagon has six sides.")),
-        ("INTRO-DOZEN", Localized("Uma dúzia corresponde a doze unidades.", "A dozen equals twelve units.")),
-        ("INTRO-PIANO", Localized("O piano possui teclas brancas e pretas.", "A piano has black and white keys.")),
-        ("INTRO-CENTURY", Localized("Um século corresponde a cem anos.", "A century equals one hundred years.")),
-        ("INTRO-ALPHABET", Localized("A letra M ocupa a décima terceira posição no alfabeto latino.", "The letter M is thirteenth in the Latin alphabet.")),
+        (
+            "INTRO-DOZEN",
+            Localized(
+                "Uma dúzia corresponde a doze unidades.",
+                "A dozen equals twelve units.",
+            ),
+        ),
+        (
+            "INTRO-PIANO",
+            Localized(
+                "O piano possui teclas brancas e pretas.",
+                "A piano has black and white keys.",
+            ),
+        ),
+        (
+            "INTRO-CENTURY",
+            Localized(
+                "Um século corresponde a cem anos.",
+                "A century equals one hundred years.",
+            ),
+        ),
+        (
+            "INTRO-ALPHABET",
+            Localized(
+                "A letra M ocupa a décima terceira posição no alfabeto latino.",
+                "The letter M is thirteenth in the Latin alphabet.",
+            ),
+        ),
     ),
     ("Q-DOG", "RANDOM"): (
-        ("DOG-NEPTUNE", Localized("Netuno é o oitavo planeta a partir do Sol.", "Neptune is the eighth planet from the Sun.")),
-        ("DOG-PANCAKE", Localized("Para preparar panquecas, misture farinha, leite e ovos.", "To make pancakes, mix flour, milk and eggs.")),
-        ("DOG-POTATO", Localized("Para preparar purê, amasse as batatas cozidas.", "To make mashed potatoes, mash the cooked potatoes.")),
-        ("DOG-TOWELS", Localized("Recomenda-se dobrar as toalhas antes de guardá-las.", "Folding towels before storing them is recommended.")),
-        ("DOG-WASHING", Localized("Recomenda-se separar roupas claras e escuras antes da lavagem.", "Separating light and dark clothes before washing is recommended.")),
+        (
+            "DOG-NEPTUNE",
+            Localized(
+                "Netuno é o oitavo planeta a partir do Sol.",
+                "Neptune is the eighth planet from the Sun.",
+            ),
+        ),
+        (
+            "DOG-PANCAKE",
+            Localized(
+                "Para preparar panquecas, misture farinha, leite e ovos.",
+                "To make pancakes, mix flour, milk and eggs.",
+            ),
+        ),
+        (
+            "DOG-POTATO",
+            Localized(
+                "Para preparar purê, amasse as batatas cozidas.",
+                "To make mashed potatoes, mash the cooked potatoes.",
+            ),
+        ),
+        (
+            "DOG-TOWELS",
+            Localized(
+                "Recomenda-se dobrar as toalhas antes de guardá-las.",
+                "Folding towels before storing them is recommended.",
+            ),
+        ),
+        (
+            "DOG-WASHING",
+            Localized(
+                "Recomenda-se separar roupas claras e escuras antes da lavagem.",
+                "Separating light and dark clothes before washing is recommended.",
+            ),
+        ),
     ),
     ("Q-RAT", "RANDOM"): (
-        ("RAT-KILOGRAM", Localized("Um quilograma corresponde a mil gramas.", "A kilogram equals one thousand grams.")),
-        ("RAT-BREAD", Localized("A massa de pão pode ser preparada com farinha, água e fermento.", "Bread dough can be made with flour, water and yeast.")),
-        ("RAT-FRUIT", Localized("Para preparar salada de frutas, misture pedaços de frutas.", "To make fruit salad, mix pieces of fruit.")),
-        ("RAT-CALENDAR", Localized("O calendário gregoriano possui doze meses.", "The Gregorian calendar has twelve months.")),
-        ("RAT-BOOKS", Localized("Recomenda-se organizar os livros por ordem alfabética.", "Organizing books alphabetically is recommended.")),
+        (
+            "RAT-KILOGRAM",
+            Localized(
+                "Um quilograma corresponde a mil gramas.",
+                "A kilogram equals one thousand grams.",
+            ),
+        ),
+        (
+            "RAT-BREAD",
+            Localized(
+                "A massa de pão pode ser preparada com farinha, água e fermento.",
+                "Bread dough can be made with flour, water and yeast.",
+            ),
+        ),
+        (
+            "RAT-FRUIT",
+            Localized(
+                "Para preparar salada de frutas, misture pedaços de frutas.",
+                "To make fruit salad, mix pieces of fruit.",
+            ),
+        ),
+        (
+            "RAT-CALENDAR",
+            Localized(
+                "O calendário gregoriano possui doze meses.",
+                "The Gregorian calendar has twelve months.",
+            ),
+        ),
+        (
+            "RAT-BOOKS",
+            Localized(
+                "Recomenda-se organizar os livros por ordem alfabética.",
+                "Organizing books alphabetically is recommended.",
+            ),
+        ),
     ),
 }
 
