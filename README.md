@@ -2,10 +2,11 @@
 
 ## Current project status
 
-**Latest accepted increment:** PR #41 merged `9b76771` (CI 44582546867; wire-contract and facade rejection tests). Owner terminal audit verified `day4-final-20261119-153020.dump`, full restore to empty database, two sessions, four healthy services at `9b76771`, 27 GiB root free and 12 GiB RAM available; Continue confirmed. PR #42 merged `910b354` (exact approved `2bc43da`, [CI 44590534060](https://github.com/AlexandroLeao/ami-108/actions/runs/44590534060): 206 tests, 100 API/35 web/71 Python, four migrations, all 12 artwork hashes). Owner approved localized content advisory and spoiler-free Extras with nonprofit statement; no changes to story, artwork, rules, API, AI or database. Port 3000 frontend update and pinned-model reactivation pending. 16+ is provisional editorial guidance, not a formal rating. All four release issues remain open.
+**Latest accepted runtime — November 19, 2026:** The owner approved the complete five-chapter PT-BR/EN campaign, all twelve original scene assets, desktop/mobile presentation, and the fresh-game RANDOM response variety in PR #53. Local Cloud Shell game/runtime commit: `14ea583`. After PR #54, the private GitHub `main` is `99bbf8e` (documentation-only; no local rebuild required). The exact [PR #53 CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44603955413) and [main CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44606120570) passed **221 automated tests** (105 API, 44 Web, 72 Python), Prisma schema/migrations, lint/types/build, complete built campaign and all 12 image hashes. [PR #54 post-merge CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44609150270) also passed both jobs.
 
-**Current accepted baseline — November 19, 2026:** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
+**Local inference:** The pinned, local-only Qwen2.5:1.5b was verified resident, with 7/7 new preview game generations validated and two distinct RANDOM consultation texts each for DOG and RAT; fresh port-3000 gameplay was accepted by the owner. `Continue` intentionally reuses previously persisted responses. Installation evidence confirmed five saved sessions and zero pending generations at installation, four healthy services and a verified prior database dump. The owner has since closed Cloud Shell for a pause, but the final shutdown dump and container stop report have not been supplied for independent verification. Do not infer persistent VM/Docker volumes from the pause.
 
+**Release status:** Full campaign accepted **does not mean publicly released**. Four formal issues remain open: [#12 security/QA](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 zero-cost deployment](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 final documentation](https://github.com/AlexandroLeao/ami-108/issues/14), and [#15 release approval](https://github.com/AlexandroLeao/ami-108/issues/15). See [release readiness and blocker matrix](docs/release-readiness-matrix.md), [safe Cloud Shell pause/resume](docs/cloud-shell-pause-resume.md), and [release QA](docs/release-qa.md). No public hosting, license decision, paid resources or `v1.0.0` tag is claimed. The mandatory cost target remains R$ 0.
 ---
 
 
@@ -22,9 +23,8 @@ A short, static 2D web narrative with five chapters, twelve narrative scenes, th
 - `apps/web`: Next.js, React, TypeScript, Tailwind CSS.
 - `apps/api`: NestJS, Prisma, PostgreSQL; authoritative narrative state and game rules.
 - `services/ai`: Python, FastAPI, Pydantic; authorized retrieval, controlled generation and validation.
-- `packages/`: shared contracts/configuration where justified.
 - `docs/`: technical documentation, decisions and tests.
-- `infra/`: Docker Compose and conditional AWS/OpenTofu integration.
+- `compose.yaml`: private local Docker Compose stack; `infra/` contains Docker build files. AWS/OpenTofu remains conditional and unprovisioned.
 
 The game must remain playable using authored fallbacks when the AI provider is unavailable. Real AI integration is a project deliverable, not replaced by fallback-only behavior.
 
@@ -63,6 +63,10 @@ Short-lived branches, reviewable pull requests, explicit acceptance criteria and
 Repository documentation, issue and PR text, commits, code identifiers and comments are written in English. Official private documents and owner-facing reports are in Portuguese; in-game content remains PT-BR/EN.
 
 License and asset distribution terms are not yet decided.
+
+## Archived development milestones (historical, superseded)
+
+The notes below document earlier stages only. The latest accepted status above takes precedence; do not use historical next steps as current instructions.
 
 PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
 
