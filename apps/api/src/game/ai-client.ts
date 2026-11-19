@@ -10,25 +10,25 @@ export type GenerationRequest = {
 };
 export type GenerationAudit = { generationStatus: 'VALIDATED' | 'FALLBACK_REQUIRED'; generationReason: string | null };
 export type GenerationResult = GenerationAudit & { text?: string };
-type Variant = { questionId: GenerationRequest['questionId']; category: GenerationRequest['category']; text: Localized; recipe: boolean };
+type Variant = { questionId: GenerationRequest['questionId']; category: GenerationRequest['category']; text: Localized; recipe: boolean; factId?: string };
 // Bilingual finite allowlist: original Master v1.13 examples and owner-requested expanded RANDOM topics.
 const variants: readonly Variant[] = [
-  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("O xadrez é disputado em um tabuleiro de 64 casas.", "Chess is played on a board of 64 squares."), recipe: false },
-  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Um hexágono possui seis lados.", "A hexagon has six sides."), recipe: false },
-  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Uma dúzia corresponde a doze unidades.", "A dozen equals twelve units."), recipe: false },
-  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("O piano possui teclas brancas e pretas.", "A piano has black and white keys."), recipe: false },
-  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Um século corresponde a cem anos.", "A century equals one hundred years."), recipe: false },
-  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("A letra M ocupa a décima terceira posição no alfabeto latino.", "The letter M is thirteenth in the Latin alphabet."), recipe: false },
-  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Netuno é o oitavo planeta a partir do Sol.", "Neptune is the eighth planet from the Sun."), recipe: false },
-  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para preparar panquecas, misture farinha, leite e ovos.", "To make pancakes, mix flour, milk and eggs."), recipe: true },
-  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para preparar purê, amasse as batatas cozidas.", "To make mashed potatoes, mash the cooked potatoes."), recipe: true },
-  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Recomenda-se dobrar as toalhas antes de guardá-las.", "Folding towels before storing them is recommended."), recipe: false },
-  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Recomenda-se separar roupas claras e escuras antes da lavagem.", "Separating light and dark clothes before washing is recommended."), recipe: false },
-  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Um quilograma corresponde a mil gramas.", "A kilogram equals one thousand grams."), recipe: false },
-  { questionId: 'Q-RAT', category: 'RANDOM', text: local("A massa de pão pode ser preparada com farinha, água e fermento.", "Bread dough can be made with flour, water and yeast."), recipe: true },
-  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Para preparar salada de frutas, misture pedaços de frutas.", "To make fruit salad, mix pieces of fruit."), recipe: true },
-  { questionId: 'Q-RAT', category: 'RANDOM', text: local("O calendário gregoriano possui doze meses.", "The Gregorian calendar has twelve months."), recipe: false },
-  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Recomenda-se organizar os livros por ordem alfabética.", "Organizing books alphabetically is recommended."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-CHESS', text: local("O xadrez é disputado em um tabuleiro de 64 casas.", "Chess is played on a board of 64 squares."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-HEXAGON', text: local("Um hexágono possui seis lados.", "A hexagon has six sides."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-DOZEN', text: local("Uma dúzia corresponde a doze unidades.", "A dozen equals twelve units."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-PIANO', text: local("O piano possui teclas brancas e pretas.", "A piano has black and white keys."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-CENTURY', text: local("Um século corresponde a cem anos.", "A century equals one hundred years."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-ALPHABET', text: local("A letra M ocupa a décima terceira posição no alfabeto latino.", "The letter M is thirteenth in the Latin alphabet."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', factId: 'DOG-NEPTUNE', text: local("Netuno é o oitavo planeta a partir do Sol.", "Neptune is the eighth planet from the Sun."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', factId: 'DOG-PANCAKE', text: local("Para preparar panquecas, misture farinha, leite e ovos.", "To make pancakes, mix flour, milk and eggs."), recipe: true },
+  { questionId: 'Q-DOG', category: 'RANDOM', factId: 'DOG-POTATO', text: local("Para preparar purê, amasse as batatas cozidas.", "To make mashed potatoes, mash the cooked potatoes."), recipe: true },
+  { questionId: 'Q-DOG', category: 'RANDOM', factId: 'DOG-TOWELS', text: local("Recomenda-se dobrar as toalhas antes de guardá-las.", "Folding towels before storing them is recommended."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', factId: 'DOG-WASHING', text: local("Recomenda-se separar roupas claras e escuras antes da lavagem.", "Separating light and dark clothes before washing is recommended."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', factId: 'RAT-KILOGRAM', text: local("Um quilograma corresponde a mil gramas.", "A kilogram equals one thousand grams."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', factId: 'RAT-BREAD', text: local("A massa de pão pode ser preparada com farinha, água e fermento.", "Bread dough can be made with flour, water and yeast."), recipe: true },
+  { questionId: 'Q-RAT', category: 'RANDOM', factId: 'RAT-FRUIT', text: local("Para preparar salada de frutas, misture pedaços de frutas.", "To make fruit salad, mix pieces of fruit."), recipe: true },
+  { questionId: 'Q-RAT', category: 'RANDOM', factId: 'RAT-CALENDAR', text: local("O calendário gregoriano possui doze meses.", "The Gregorian calendar has twelve months."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', factId: 'RAT-BOOKS', text: local("Recomenda-se organizar os livros por ordem alfabética.", "Organizing books alphabetically is recommended."), recipe: false },
   { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Os pinguins não sabem voar.", "Penguins cannot fly."), recipe: false },
   { questionId: 'Q-DOG', category: 'RANDOM', text: local("Saturno possui um sistema de anéis composto principalmente por partículas de gelo.", "Saturn has a ring system composed primarily of ice particles."), recipe: false },
   { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para remover manchas de tecidos claros, recomenda-se utilizar sabão neutro.", "To remove stains from light fabrics, mild soap is recommended."), recipe: false },
@@ -38,7 +38,7 @@ const variants: readonly Variant[] = [
   { questionId: 'Q-RAT', category: 'CORRECT', text: local("Organismos da primeira geração são intolerantes à luz intensa. A iluminação de contenção deverá forçá-lo a recuar.", "First-generation organisms are intolerant of intense light. The containment lighting should force it to retreat."), recipe: false },
 ];
 function matchVariant(request: GenerationRequest, text: unknown) {
-  return variants.find(v => v.questionId === request.questionId && v.category === request.category && v.text[request.locale] === text);
+  return variants.find(v => v.questionId === request.questionId && v.category === request.category && (!v.factId || request.factIds.includes(v.factId)) && v.text[request.locale] === text);
 }
 export const fallback = (reason: string): GenerationResult => ({ generationStatus: 'FALLBACK_REQUIRED', generationReason: reason });
 export const enabled = () => process.env.AMI_AI_GENERATION === '1';
