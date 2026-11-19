@@ -252,7 +252,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     void run(() => mutate(view, { actionId: nextAction.id }));
   }, [view, nextAction, overlay, chapterReady, cinematicReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
   const previous = useCallback(() => {
-    if (!view || choiceMode || !chapterReady || !cinematicReady || busyRef.current || overlay !== 'none' || !pageReady) return;
+    if (!view || choiceMode || !chapterReady || (view.chapter===5 && !cinematicReady) || busyRef.current || overlay !== 'none' || !pageReady) return;
     if (pageIndex > 0) {
       setPagination((old) => ({ ...old, index: Math.max(0, old.index - 1) }));
       return;
@@ -370,7 +370,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               </div>}
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
               <div className="dialogue-navigation" hidden={choiceMode || credits}>
-                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || !cinematicReady || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
+                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || (view.chapter===5 && !cinematicReady) || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
                   aria-label={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
                 <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || !cinematicReady || (!chapter && !pageReady)}
                   aria-label={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
