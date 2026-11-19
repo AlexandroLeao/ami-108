@@ -604,3 +604,30 @@ button:focus-visible, a:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .campaign-credits-roll { animation: none; top: 0; bottom: 58px; overflow-y: auto; }
 }
+
+
+/* Pre-game warning only. Preserve the existing scene and dialogue geometry. */
+.campaign-warning-scene { overflow: auto; }
+.campaign-warning-copy {
+  box-sizing: border-box; width: min(100%, 680px); max-height: 100%;
+  padding: clamp(6px, 2vw, 20px); display: grid; gap: clamp(4px, 1.2dvh, 12px);
+  text-align: center; align-content: safe center; overflow: auto;
+  font-size: clamp(20px, 3vw, 28px); line-height: 1.05;
+}
+.campaign-warning-copy h1 { margin: 0; color: var(--alert); font-size: clamp(25px, 4vw, 42px); line-height: 1; }
+.campaign-warning-copy p { margin: 0; }
+.campaign-warning-age { font-weight: bold; }
+.campaign-warning-status { font-size: clamp(18px, 2.5vw, 23px); }
+.campaign-dialogue.campaign-warning-controls {
+  padding: 10px 12px; align-items: center; justify-content: center;
+  gap: 10px; flex-wrap: wrap; align-content: center;
+}
+@media (max-width: 480px) and (orientation: portrait) {
+  .campaign-warning-controls .game-control { width: min(100%, 300px); padding: 6px 10px; }
+}
+@media (max-height: 460px) and (orientation: landscape) {
+  .campaign-warning-copy { padding: 4px 12px; gap: 4px; font-size: 20px; }
+  .campaign-warning-copy h1 { font-size: 26px; }
+  .campaign-warning-status { font-size: 18px; }
+  .campaign-dialogue.campaign-warning-controls { padding: 6px 10px; }
+}
