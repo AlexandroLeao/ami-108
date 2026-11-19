@@ -91,6 +91,21 @@ Close the game and Web Preview tabs before starting. This **does not delete volu
 
 Only after `SAFE PAUSE COMPLETE` should the operator use `exit` or close Cloud Shell. If `pg_dump` or validation fails, stop: database service is still running, and no successful pause has been demonstrated. A partial `.pause-*.dump` may remain; do not rely on it. Never output or upload private `.env` or a raw save archive to a public issue.
 
+## First return: non-destructive evidence collection
+
+Run the [read-only resume check](../scripts/check-resume-readonly.sh) **before** starting or restoring services. It only inspects Git, checks the hash of the newest local backup if its `.sha256` companion exists, reports private environment presence/permissions without displaying values, and lists existing AMI containers/volumes if Docker is available. It does **not** run `pg_restore`, modify the database, fetch models, expose secrets or activate the game. The checksum verifies downloaded/saved bytes, **not** the archive structure or data restoration.
+
+If the local checkout is still on `14ea583`, fetch documentation without changing the local worktree:
+
+```bash
+cd ~/ami-108
+git fetch origin main
+git show origin/main:scripts/check-resume-readonly.sh > /tmp/ami108-check-resume.sh
+bash -n /tmp/ami108-check-resume.sh && bash /tmp/ami108-check-resume.sh
+```
+
+A missing/corrupt checksum, missing private environment, unavailable Docker or changed working tree is a **stop-and-review** result, not permission to restore, prune, overwrite or recreate anything. If the newest dump is missing, inspect earlier known-good backups by name without overwriting them; the owner may have a later archive from the shutdown command, but no terminal evidence has been supplied yet. Share only the non-secret diagnostic output. Resume procedures below depend on which resources actually survived.
+
 ## Resume without touching saved data
 
 1. Reopen normal (non-ephemeral) Google Cloud Shell; `cd ~/ami-108`; check `git status --short --branch`, `git rev-parse HEAD`, `df -h / /home`, `docker compose ps -a`, `docker volume ls` and `ls -lh ~/ami-108-backups/pause-ami108-*.dump`. Confirm `.env` exists privately without displaying its values.
