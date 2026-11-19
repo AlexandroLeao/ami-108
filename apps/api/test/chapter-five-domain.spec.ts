@@ -29,22 +29,22 @@ describe('Chapter 5 isolated progression',()=>{
     expect(()=>act(s,'BOAR-04')).toThrow('ACTION_NOT_ALLOWED');
     expect(()=>advanceFive(s,viewFive(s).actions[0].id,1)).toThrow('STALE_REVISION');
   });
-  it('repairs the ship once and creates a checkpoint before the first boar reveal',()=>{
-    let s=reach(start(),'A05-S01/L04');
-    expect(viewFive(s).actions[0].kind).toBe('INTERACT');
-    expect(s.ship.powered).toBe(false);
-    s=next(s);
-    expect(s.events).toEqual(['E-SHIP']);
-    expect(s.ship).toEqual({powered:true,gateOpen:false,enginesOn:false,launched:false});
-    s=next(s);
-    expect(viewFive(s).asset).toBeNull();
+  it('keeps the hangar dark until the boar reveal and checkpoints before cell retrieval',()=>{
+    let s=start();
+    for(const id of ['ENTRY','PANEL','L01','L02','L03','APPROACH','NOISE','LOOK']){
+      s=next(s);
+      expect(s.stepId).toBe('A05-S01/'+id);
+      expect(viewFive(s).asset).toBeNull();
+      expect(s.ship.powered).toBe(false);
+      expect(s.events).toEqual([]);
+    }
     s=next(s);
     expect(s.stepId).toBe('A05-S01/L06');
+    expect(viewFive(s).text).toBe('Meu Deus...');
     expect(viewFive(s).asset).toBe('CENA-09');
-    expect(s.checkpoint).toMatchObject({stepId:s.stepId,diagnostics:restored,ship:s.ship,events:['E-SHIP','CP-BOAR']});
+    expect(s.checkpoint).toMatchObject({stepId:s.stepId,diagnostics:restored,ship:{powered:false,gateOpen:false,enginesOn:false,launched:false},events:['CP-BOAR']});
     const back=act(s,s.stepId+'/PREVIOUS');
-    expect(viewFive(back).stepId).toBe('A05-S01/L05');
-    expect(next(back).events).toEqual(['E-SHIP','CP-BOAR']);
+    expect(viewFive(back).stepId).toBe('A05-S01/LOOK');
     expect(next(back).checkpoint).toEqual(s.checkpoint);
   });
   it.each(['BOAR-01','BOAR-02','BOAR-03'])('fails %s and restores checkpoint with immutable slots',choice=>{
@@ -63,25 +63,33 @@ describe('Chapter 5 isolated progression',()=>{
     expect(s.boar!.slots).toEqual(slots);
     s=consult(reach(s,'A05-S01/DECISION-0'));
     expect(s.boar!.slots).toEqual(slots);
-    expect(s.events).toEqual(['E-SHIP','CP-BOAR']);
+    expect(s.events).toEqual(['CP-BOAR']);
   });
   it('permits three certain consultations without a recharge or fourth consult',()=>{
     let s=reach(start(),'A05-S01/DECISION-0');
     for(let i=0;i<3;i++){s=consult(s);expect(s.diagnostics.energy).toBe(2-i);}
     expect(viewFive(s).actions.map(a=>a.id)).toEqual(['BOAR-01','BOAR-02','BOAR-03','BOAR-04']);
     s=act(s,'BOAR-04');
+    expect(s.ship.powered).toBe(false);
+    expect(s.events).toEqual(['CP-BOAR']);
+    s=reach(s,'A05-S01/CARRY');
+    expect(viewFive(s).actions[0].kind).toBe('INTERACT');
+    s=next(s);
+    expect(s.ship).toEqual({powered:true,gateOpen:true,enginesOn:false,launched:false});
+    expect(s.events).toEqual(['CP-BOAR','E-SHIP']);
+    s=next(s);
     expect(s.ship).toEqual({powered:true,gateOpen:true,enginesOn:true,launched:true});
-    expect(s.events).toEqual(['E-SHIP','CP-BOAR','E-LAUNCH']);
+    expect(s.events).toEqual(['CP-BOAR','E-SHIP','E-LAUNCH']);
     expect(()=>act(s,'BOAR-04')).toThrow('ACTION_NOT_ALLOWED');
     expect(s.diagnostics.energy).toBe(0);
   });
-  it.each(['pt-BR','en'] as const)('preserves the single ending and both consulted variants in %s',locale=>{
+  it.each(['pt-BR','en'] as const)('preserves the single ending and revised departure in %s',locale=>{
     for(const recipe of [false,true]){
       let s=reach(start(locale,recipe),'A05-S01/DECISION-0');
       s=act(consult(s),'BOAR-04');
-      s=reach(s,'A05-S01/B3');
-      expect(viewFive(s).text).toBe(recipe?(locale==='pt-BR'?'Sem receitas de bolo dessa vez.':'No cake recipes this time.'):(locale==='pt-BR'?'Sem bananas dessa vez.':'No bananas this time.'));
-      s=reach(s,'A05-S02/L08');
+      s=reach(s,'A05-S01/B5');
+      expect(viewFive(s).text).toBe(locale==='pt-BR'?'Nada de dicas de casa ou informações aleatórias dessa vez!':'No household tips or random information this time!');
+      s=reach(s,'A05-S02/L12');
       expect(viewFive(s).text).toBe('...');
       expect(viewFive(s).asset).toBe('CENA-10');
       s=reach(s,'A05-S02/L15');
@@ -97,12 +105,12 @@ describe('Chapter 5 isolated progression',()=>{
       expect(viewFive(s).actions).toEqual([]);
     }
   });
-  it('allows a neutral success without consulting even if recipes were seen earlier',()=>{
+  it('allows the same revised success without consulting',()=>{
     let s=reach(start('en',true),'A05-S01/DECISION-0');
     s=next(act(s,'BOAR-04'));
-    expect(viewFive(s).text).toBe('We made it.');
-    expect(next(s).stepId).toBe('A05-S01/C2');
+    expect(viewFive(s).text).toBe('It worked.');
+    expect(next(s).stepId).toBe('A05-S01/B2');
     expect(s.diagnostics.energy).toBe(3);
-    expect(next(next(s)).stepId).toBe('A05-S02/NAVIGATION');
+    expect(reach(s,'A05-S02/NAVIGATION').ship.launched).toBe(true);
   });
 });
