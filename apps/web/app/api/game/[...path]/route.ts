@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { sameOriginMutation } from './origin';
+import { MAX_GAME_BODY_BYTES, readGameBody } from './body';
 
 export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ path: string[] }> };
@@ -29,9 +30,10 @@ async function proxy(request: NextRequest, context: Context) {
     if (!request.headers.get('content-type')?.split(';')[0].trim().toLowerCase().match(/^application\/json$/)) {
       return new Response(null, { status: 415, headers: noStore });
     }
-    if (Number(request.headers.get('content-length') ?? 0) > 2048) return new Response(null, { status: 413, headers: noStore });
-    body = await request.text();
-    if (new TextEncoder().encode(body).length > 2048) return new Response(null, { status: 413, headers: noStore });
+    if (Number(request.headers.get('content-length') ?? 0) > MAX_GAME_BODY_BYTES) return new Response(null, { status: 413, headers: noStore });
+    const result = await readGameBody(request.body);
+    if (!result.ok) return new Response(null, { status: result.status, headers: noStore });
+    body = result.body;
     headers.set('Content-Type', 'application/json');
   }
   try {
