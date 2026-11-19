@@ -18,6 +18,9 @@ describe('pre-game content warning', () => {
     expect(html.indexOf(warning.description)).toBeLessThan(html.indexOf('campaign-warning-controls'));
     expect(html).toContain(copy[locale].continue);
     expect(html).toContain(copy[locale].mainMenu);
+    expect(html.indexOf('>'+copy[locale].mainMenu+'</button>')).toBeLessThan(html.indexOf('>'+copy[locale].continue+'</button>'));
+    expect(html).toContain('>'+copy[locale].mainMenu+'</button>');
+    expect(html).toContain('>'+copy[locale].continue+'</button>');
     expect(html.match(/<button /g)).toHaveLength(2);
     expect(html).not.toContain('<img');
     expect(html).not.toContain('<input');
@@ -28,10 +31,15 @@ describe('pre-game content warning', () => {
     }));
     expect(html.match(/disabled=""/g)).toHaveLength(2);
   });
-  it.each(['pt-BR', 'en'] as const)('keeps approved extras and adds nonprofit and advisory in %s', locale => {
+  it.each(['pt-BR', 'en'] as const)('keeps other extras and uses a spoiler-free nonprofit synopsis in %s', locale => {
     const pages = campaignExtras(locale);
     expect(pages).toHaveLength(4);
-    expect(pages[0].paragraphs).toEqual([...copy[locale].extrasPages[0].paragraphs, contentWarning[locale].nonProfit]);
+    expect(pages[0].paragraphs).toEqual(contentWarning[locale].about);
+    expect(pages[0].paragraphs).toHaveLength(2);
+    expect(pages[0].paragraphs.join(' ')).not.toMatch(/David/i);
+    const original = locale === 'pt-BR' ? /projeto autoral/gi : /original/gi;
+    expect(pages[0].paragraphs.join(' ').match(original)).toHaveLength(1);
+    expect(pages[0].paragraphs[1]).toContain(locale === 'pt-BR' ? 'sem fins lucrativos' : 'non-profit');
     expect(pages.slice(1, 3)).toEqual(copy[locale].extrasPages.slice(1));
     expect(pages[3].paragraphs).toEqual([contentWarning[locale].age, contentWarning[locale].description, contentWarning[locale].status]);
   });
