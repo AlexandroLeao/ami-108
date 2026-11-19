@@ -9,8 +9,8 @@ NestJS controls all five chapters, DOG/RAT/BOAR, all three checkpoints, immutabl
 ---
 
 
-**AMI-002 · reviewed design, merged in PR #17; implementation is incremental**  
-Canonical narrative: Documento Mestre v1.12 / Roteiro Interativo v1.10 (private backup). See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
+**Historical original design (AMI-002 / PR #17); the complete five-chapter implementation was accepted later.**  
+**Historical PR #17 source input:** Documento Mestre v1.12 / Roteiro Interativo v1.10 (private backup). **Current approved source precedence:** private Documento Mestre v1.14 and Roteiro Interativo v1.12, supplemented only by subsequent owner-approved amendments. See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
 
 ## C4 level 1 — system context
 
