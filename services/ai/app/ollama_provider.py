@@ -19,7 +19,7 @@ class OllamaProvider:
     port: int
     model: str
     timeout_seconds: float = 2.0
-    keep_alive: str = "5m"
+    keep_alive: str | int = "5m"
 
     async def generate(self, context: AuthorizedContext) -> str:
         return await asyncio.to_thread(self._generate, context)
@@ -110,6 +110,6 @@ def local_provider() -> Provider | None:
             or target.fragment
         ):
             return None
-        return OllamaProvider(target.hostname, target.port or 11434, model, keep_alive=keep_alive)
+        return OllamaProvider(target.hostname, target.port or 11434, model, keep_alive=-1 if keep_alive == "-1" else "5m")
     except ValueError:
         return None
