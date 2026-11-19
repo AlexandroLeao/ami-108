@@ -32,7 +32,7 @@ export function beginFive(diagnostics:Diagnostics,previousEvents:readonly string
   if(retainedSlots.length>3 || retainedSlots.some((s,i)=>s.index!==i+1||s.category!=='CORRECT'||s.recipe||s.text['pt-BR']!==BOAR.correct['pt-BR']||s.text.en!==BOAR.correct.en)) return invalid();
   return {stepId:FIVE_CARD,reviewStepId:null,revision,locale,diagnostics,events:[],trail:[FIVE_CARD],ship:unpowered,recipeSeenInJourney,retainedSlots};
 }
-const hangarSteps=[FIVE_CARD,...['ENTRY','PANEL','L01','L02','L03','APPROACH','NOISE','LOOK',...HANGAR_DIALOGUE.slice(3).map(b=>b.id)].map(hangar)];
+const hangarSteps=[FIVE_CARD,...['ENTRY','PANEL','L01','L01a','L01b','L02','L03','APPROACH','NOISE','LOOK',...HANGAR_DIALOGUE.slice(5).map(b=>b.id)].map(hangar)];
 const departureSteps=['B1','B2','B3','FIND','CARRY','REPAIR','LAUNCH','B4','B5','B6','B7'].map(hangar);
 const orbitSteps=[orbit('NAVIGATION'),orbit('ROUTE'),...ORBIT_DIALOGUE.map(b=>orbit(b.id)),orbit('DEPARTURE'),orbit('DISTANCE'),orbit('MELODY'),TITLE,CREDITS];
 const barrier=(id:string)=>id.startsWith(hangar('DECISION-'))||[DEAD,DEAD_CARD,SUCCESS,CREDITS].includes(id);
