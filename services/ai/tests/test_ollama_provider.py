@@ -264,7 +264,7 @@ def test_resident_model_is_explicit_and_preserves_transport_deadline(
             {"done": True, "response": "0"}
         ).encode()
         assert provider._generate(context) == context.approved_text
-        assert json.loads(conn.request.call_args.args[2])["keep_alive"] == "-1"
+        assert json.loads(conn.request.call_args.args[2])["keep_alive"] == -1
         constructor.assert_called_once_with("ollama", 11434, timeout=2.0)
     monkeypatch.setenv("AMI_OLLAMA_KEEP_ALIVE", "unbounded-invalid")
     assert local_provider() is None
