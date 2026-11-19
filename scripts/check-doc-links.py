@@ -52,7 +52,7 @@ def main() -> int:
     opts = parser.parse_args()
     root = opts.root.resolve()
     tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z", "--", "*.md"])
-    documents = [root / rel.decode("utf-8") for rel in tracked.split(b"\\0") if rel]
+    documents = [root / rel.decode("utf-8") for rel in tracked.split(bytes([0])) if rel]
     documents = [p for p in documents if p.is_file()]
     missing = [problem for doc in documents for problem in invalid_links(root, doc)]
     for problem in missing:
