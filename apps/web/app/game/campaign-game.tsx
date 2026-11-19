@@ -328,8 +328,8 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
             </CampaignScene>
             <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={(view.cue === 'archive-record' || view.cue === 'f3-count')} data-f3-count={counting} data-chapter-four-record={view.chapter===4 && (view.cue==='archive-record' || counting)} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
               {credits ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
-                <p className="campaign-death-title">{labels.extrasPages[2].title}</p>
-                {labels.extrasPages[2].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
+                <p className="campaign-death-title">{labels.extrasPages[1].title}</p>
+                {labels.extrasPages[1].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
                 <button className="game-control" type="button" onClick={mainMenu}>{labels.mainMenu}</button>
               </div> : choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
