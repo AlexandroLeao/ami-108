@@ -137,8 +137,19 @@ PYTHON
   docker exec "$db" psql -v ON_ERROR_STOP=1 -U ami_test -d ami_test -c 'SELECT "generationStatus", "generationReason", count(*) FROM "GameCommandReceipt" WHERE "generationStatus" IS NOT NULL GROUP BY 1,2 ORDER BY 1,2;'
   docker exec "$db" psql -v ON_ERROR_STOP=1 -U ami_test -d ami_test -c 'SELECT "encounterId", category, count(*) FROM "GameConsultationSlot" GROUP BY 1,2 ORDER BY 1,2;'
   echo '=== Persisted RANDOM variety (aggregate only) ==='
-  docker exec "$db" psql -v ON_ERROR_STOP=1 -U ami_test -d ami_test -c 'SELECT "encounterId", count(*) AS slots, count(DISTINCT "localizedText") AS variants, count(*) FILTER (WHERE recipe) AS recipe_slots FROM "GameConsultationSlot" WHERE category = $RANDOM$ GROUP BY 1 ORDER BY 1;'
+  audit_status=0
+  docker exec -i "$db" psql -v ON_ERROR_STOP=1 -U ami_test -d ami_test <<'SQL' || audit_status=1
+SELECT "encounterId", count(*) AS slots, count(DISTINCT "localizedText") AS variants,
+       count(*) FILTER (WHERE recipe) AS recipe_slots
+FROM "GameConsultationSlot"
+WHERE category = 'RANDOM'
+GROUP BY 1 ORDER BY 1;
+SQL
+  if [ "$audit_status" -ne 0 ]; then
+    echo 'Distinct-slot audit failed; gameplay acceptance and other results must be assessed separately.' >&2
+  fi
   echo '=== Accepted stack (read-only) ==='
   docker compose ps
   docker compose exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "SELECT count(*) FROM \"GameSession\";"'
+  exit "$audit_status"
 )
