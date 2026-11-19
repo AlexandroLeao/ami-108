@@ -21,6 +21,7 @@ services:
       AMI_AI_PROVIDER: ${AMI_AI_PROVIDER:-}
       AMI_OLLAMA_URL: ${AMI_OLLAMA_URL:-}
       AMI_OLLAMA_MODEL: ${AMI_OLLAMA_MODEL:-}
+      AMI_OLLAMA_KEEP_ALIVE: ${AMI_OLLAMA_KEEP_ALIVE:-5m}
     ports: ["127.0.0.1:8000:8000"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
