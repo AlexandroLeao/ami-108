@@ -1,77 +1,69 @@
 # AMI-108
 
-## Current project status
+**A retrofuturistic narrative survival game about memory, trust and an AI companion.**
 
-**Latest accepted runtime — November 19, 2026:** The owner approved the complete five-chapter PT-BR/EN campaign, all twelve original scene assets, desktop/mobile presentation, and the fresh-game RANDOM response variety in PR #53. Local Cloud Shell game/runtime commit: `14ea583`. PR #54 merged as `99bbf8e` (documentation-only); subsequent documentation commits do not require a local runtime rebuild. The exact [PR #53 CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44603955413) and [main CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44606120570) passed **221 automated tests** (105 API, 44 Web, 72 Python), Prisma schema/migrations, lint/types/build, complete built campaign and all 12 image hashes. [PR #54 post-merge CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44609150270) also passed both jobs.
+AMI-108 is an original, non-profit, story-driven 2D web game. Players progress through a five-chapter campaign by reading dialogue, making choices and uncovering memories. The game is available in **Portuguese (Brazil) and English**, with responsive desktop and mobile presentation.
 
-**Local inference:** The pinned, local-only Qwen2.5:1.5b was verified resident, with 7/7 new preview game generations validated and two distinct RANDOM consultation texts each for DOG and RAT; fresh port-3000 gameplay was accepted by the owner. `Continue` intentionally reuses previously persisted responses. Installation evidence confirmed five saved sessions and zero pending generations at installation, four healthy services and a verified prior database dump. The owner has since closed Cloud Shell for a pause, but the final shutdown dump and container stop report have not been supplied for independent verification. Do not infer persistent VM/Docker volumes from the pause.
+> **Content advisory:** Violence, blood, strong language and horror. **16+ is an editorial recommendation, not an official age rating.** Formal classification and any applicable release obligations remain to be reviewed.
 
-**Release status:** Full campaign accepted **does not mean publicly released**. Four formal issues remain open: [#12 security/QA](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 zero-cost deployment](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 final documentation](https://github.com/AlexandroLeao/ami-108/issues/14), and [#15 release approval](https://github.com/AlexandroLeao/ami-108/issues/15). See [release readiness and blocker matrix](docs/release-readiness-matrix.md), [safe Cloud Shell pause/resume](docs/cloud-shell-pause-resume.md), and [release QA](docs/release-qa.md). No public hosting, license decision, paid resources or `v1.0.0` tag is claimed. The mandatory cost target remains R$ 0.
----
+## At a glance
 
+| Area | Implemented |
+| --- | --- |
+| Campaign | Five chapters, twelve narrative scenes and one ending |
+| Interaction | Dialogue, branching choices, three encounters and checkpoints |
+| Persistence | PostgreSQL-backed sessions, chapter replay and cached consultations |
+| Languages | PT-BR and English, including authorized AI responses |
+| Visuals | Twelve approved original scene illustrations and a responsive cinematic interface |
+| AI companion | Optional private, local Qwen2.5:1.5b inference with server-authorized facts, output validation and safe authored fallbacks |
+| Validation | Full-campaign HTTP smoke, image-integrity checks, migration tests and automated API/Web/Python suites |
 
-A retrofuturistic narrative survival game featuring an AI-powered robot companion with corrupted memories. An original, non-profit project. Content warning: violence, blood, strong language and horror; provisional editorial recommendation 16+, official age rating pending.
+The AI does **not** decide outcomes, change the rules or invent story facts. The game engine authorizes the context and available text; previously saved consultation responses remain unchanged on Continue, retry and chapter replay.
 
-**Historical baseline:** PR #22 accepted Chapters 1–2; superseded by the PR #25 status above.
+## Project status
 
-## Product
+**Five-chapter campaign: complete and approved in private playtests. Public release: not yet approved.**
 
-A short, static 2D web narrative with five chapters, twelve narrative scenes, three encounters, a single campaign ending and PT-BR/EN localization. David and AMI-108 navigate a post-apocalyptic world through dialogue, choices and memory restoration.
+The last accepted game-runtime change is [PR #53](https://github.com/AlexandroLeao/ami-108/pull/53) (`14ea583`), which corrected repeated RANDOM consultations and added opt-in local model residency. Its exact [CI run](https://github.com/AlexandroLeao/ami-108/actions/runs/44603955413) passed **221 tests** (105 API, 44 Web and 72 Python), four migrations and a full built-game smoke test, including all twelve artwork hashes. Documentation and recovery tooling have evolved separately without changing the approved campaign.
 
-## Implemented architecture and planned infrastructure
+**Recovery checkpoint (November 19, 2026):** After the Cloud Shell Docker VM was recycled, the owner verified a private PostgreSQL archive and restored **six sessions, zero pending generations and four completed migrations**. Web, API, AI service and database were rebuilt and healthy; Continue resumed the existing game. **Live model generation remains temporarily disabled until the pinned local Ollama instance is restored and revalidated.** This is a local recovery state, not a claim of live or production AI availability.
 
-- `apps/web`: Next.js, React, TypeScript, Tailwind CSS.
-- `apps/api`: NestJS, Prisma, PostgreSQL; authoritative narrative state and game rules.
-- `services/ai`: Python, FastAPI, Pydantic; authorized retrieval, controlled generation and validation.
-- `docs/`: technical documentation, decisions and tests.
-- `compose.yaml`: private local Docker Compose stack; `infra/` contains Docker build files. AWS/OpenTofu remains conditional and unprovisioned.
+The repository is **private**. No public deployment, billable infrastructure, distribution license or `v1.0.0` release has been authorized. The mandatory service-cost target remains **R$ 0**.
 
-The game must remain playable using authored fallbacks when the AI provider is unavailable. Real AI integration is a project deliverable, not replaced by fallback-only behavior.
+The remaining formal release work is tracked in [#12 — Security and QA](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 — Hosting and deployment](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 — Documentation](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15 — Release approval](https://github.com/AlexandroLeao/ami-108/issues/15). See the [release-readiness matrix](docs/release-readiness-matrix.md) for evidence and outstanding gates.
 
-## Development
+## Architecture
 
-The repository is currently private. See [development setup](docs/development.md) for environment setup, initial dependency resolution, tests and Compose instructions. The bootstrap was merged in PR #16 after successful CI, four-container startup and Google Cloud Shell preview. No credentials, private documentation, or unapproved assets should be committed. See [AGENTS.md](AGENTS.md) for project constraints.
+| Component | Technology | Responsibility |
+| --- | --- | --- |
+| `apps/web` | Next.js, React, TypeScript | Presentation, accessibility and same-origin game facade |
+| `apps/api` | NestJS, Prisma | Authoritative narrative state, sessions, commands and consultation policy |
+| `services/ai` | Python, FastAPI | Local-only authorized retrieval, generation and text validation |
+| PostgreSQL | PostgreSQL 17 | Durable player state, checkpoints, consultation slots and receipts |
+| Ollama | Qwen2.5:1.5b, optional | Private inference; not required for the authored-fallback path |
+| `compose.yaml`, `infra/` | Docker Compose and build definitions | Local development stack, not a production deployment |
 
-The canonical private narrative sources are Documento Mestre v1.14 and Roteiro Interativo v1.12, supplemented by the owner-approved Chapter 5 amendments in PR #38. Private source synchronization is pending. AMI-108 is the approved project and game title. See the [production plan](docs/production-plan.md) for the seven-day target and release gates.
+The model endpoint and database must not be made public. Current Cloud Shell preview routing is **development-only** and requires additional security controls before any hosted release. See the [system design](docs/architecture/system-design.md), [local API contracts](docs/api/README.md) and [production security gates](docs/architecture/production-security-gates.md).
 
-## Approved game interface
+## Working with the project
 
-- [UI specification and opening sequence](docs/ui-design.md)
-- [Scene asset preparation and local preview](docs/assets.md)
-- [Narrative engine implementation status](docs/narrative-engine.md)
+This repository is intended for a controlled, private development environment. Development uses Docker Compose, Node.js 22, pnpm and Python 3.12. See [development setup](docs/development.md) for prerequisites and configuration; do not commit `.env`, session cookies, database dumps or the private narrative sources.
 
-The owner approved the opening preview on desktop and mobile; PR #18 merged after CI passed. The local root uses the persisted five-chapter campaign API; the isolated visual fixture remains at `/preview`. Continue game is enabled only when a saved session is confirmed. The owner accepted the Chapter 1 playtest refinements; post-merge [CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passed. See the narrative engine for verification limits and next steps.
+**Returning to an existing Cloud Shell session:** Start with the [safe pause/resume runbook](docs/cloud-shell-pause-resume.md) and the read-only [recovery diagnostic](scripts/check-resume-readonly.sh). Verify saved-session backups and the existing database before starting or rebuilding services. Never restore an archive into a populated database or delete volumes as part of a normal update. Model installation and activation are separate, guarded steps.
 
-## Architecture specification
+**Testing:** The [GitHub CI workflow](.github/workflows/ci.yml) runs lint, type checks, Python checks, API/Web tests, Prisma validation/migrations and a built HTTP campaign smoke. See [release QA](docs/release-qa.md) and [AI evaluation evidence](docs/ai-local-evaluation.md) for measured results and limitations. Passing local tests is not a production capacity or security certification.
 
-- [Requirements and traceability](docs/architecture/requirements.md)
-- [System design and diagrams](docs/architecture/system-design.md)
-- [Domain model and invariants](docs/architecture/domain-model.md)
-- [Architecture decisions](docs/architecture/decisions.md)
-- [Local API contracts](docs/api/README.md)
+## Documentation
 
-See [release QA evidence and remaining gates](docs/release-qa.md) for implemented behavior, source review and outstanding verification. The architecture diagrams retain historical design context.
+- [Requirements and traceability](docs/architecture/requirements.md), [domain invariants](docs/architecture/domain-model.md) and [architecture decisions](docs/architecture/decisions.md)
+- [Approved interface](docs/ui-design.md), [art pipeline](docs/assets.md) and [narrative engine](docs/narrative-engine.md)
+- [Accessibility/performance verification plan](docs/accessibility-performance-qa.md) and [dependency security review](docs/dependency-security-audit.md)
+- [Release-readiness matrix](docs/release-readiness-matrix.md), [production plan](docs/production-plan.md) and [safe Cloud Shell recovery](docs/cloud-shell-pause-resume.md)
 
-## Portfolio summary
+The canonical **Documento Mestre v1.14** and **Roteiro Interativo v1.12** remain private, with later owner-approved amendments pending synchronization. They are not distributed by this repository.
 
-AMI-108 is an original interactive narrative project combining a responsive Next.js frontend, a deterministic NestJS state machine, PostgreSQL persistence and a constrained local FastAPI/Ollama inference service. The owner designed and approved the narrative, visual direction and rules; implementation, review and documentation were developed with AI assistance. The model selects only authorized alternatives; gameplay outcomes remain deterministic. The complete campaign has passed automated and owner playtest gates; production deployment, release-level security, accessibility and licensing remain open. No public release or paid infrastructure is claimed.
+## Project ownership and release
 
-## Collaboration
+The project owner defined and approved the original story, artwork direction, mechanics and presentation. Engineering implementation, code review and documentation were developed with AI assistance. All accepted narrative, art and gameplay rules remain under owner control.
 
-Short-lived branches, reviewable pull requests, explicit acceptance criteria and reproducible tests. The project owner approves changes before merge. New services must respect the R$ 0 mandatory-cost constraint.
-
-Repository documentation, issue and PR text, commits, code identifiers and comments are written in English. Official private documents and owner-facing reports are in Portuguese; in-game content remains PT-BR/EN.
-
-License and asset distribution terms are not yet decided.
-
-## Archived development milestones (historical, superseded)
-
-The notes below document earlier stages only. The latest accepted status above takes precedence; do not use historical next steps as current instructions.
-
-PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
-
-Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.
-
-Next: AMI-007 authorized inference/RAG and AMI-008 Chapter 3, with remaining AMI-006 persistence/restoration work. See [encounter engine](docs/encounter-engine.md) and [production plan](docs/production-plan.md).
-
-Day 2 continuation: AMI-005 #7 is closed completed; AMI-006 #8 has its first two criteria met, third remains open. Private documents synchronized in place; no private source or artwork changes in the repository. Next AMI-007 and AMI-008.
+The public-facing license, asset distribution terms, official age classification, hosting model and release date are **undecided**. Nothing in this README grants permission to redistribute assets, publish the source, or deploy the game. Release requires explicit owner authorization and completion of the outstanding security, accessibility, infrastructure and legal checks.
