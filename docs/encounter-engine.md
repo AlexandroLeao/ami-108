@@ -1,5 +1,10 @@
 # Encounter engine — AMI-005 / AMI-006
 
+## Day 4 candidate — CP-BOAR
+
+Chapter 5 integration candidate creates CP-BOAR at first boar sighting, powered ship, closed gate, engines off, all memories 100%, energy 3. Existing checkpoint/slot tables persist the snapshot and immutable authored CORRECT slots with the session/receipt transaction. Three lethal choices, one success, no RNG or model authority; retry restores checkpoint and keeps slots. No new schema or changes to dog/rat. Exact CI and owner playtest pending.
+
+
 ## Current encounter rules
 
 DOG and RAT each retain four deterministic choices, three lethal and one safe, checkpoint retry, immutable slots and one energy debit per consult. CORRECT probabilities 15%/42%/100% (BOAR catalog only); zero energy allows choices. F1 (35/42/53/5 locked), F2 (75/85/78/5 locked), F3 (100/100/100/100 unlocked) restore three bars atomically. No solar actions. Dog/rat use the approved gradual reveal and existing shake; Chapter 4 HUD is hidden without changing energy. CP-DOG/CP-RAT and opt-in provider reservation/finalization are implemented. CP-BOAR, E-SHIP and launch remain pending; #29 tracks RANDOM diversity and live activation.
