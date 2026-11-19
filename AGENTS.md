@@ -2,7 +2,7 @@
 
 ## Day 4 candidate — November 19
 
-Private Master v1.14 / Script v1.12 are now synchronized; cumulative approved amendments take precedence. This branch integrates the Chapter 5 candidate from #30, not an owner-approved baseline. No changes to Chapters 1–4 or expanded AI behavior. Main remains `fd0a906` until exact CI and owner preview acceptance. Preserve original artwork and fixed boar answer; no paid resources.
+Private Master v1.14 / Script v1.12 are now synchronized; cumulative approved amendments take precedence. This branch integrates the Chapter 5 candidate from #30, not an owner-approved baseline. Owner Day 4 correction changes only RAT consequence wording to second person in Chapters 1–4, and the Chapter 5 sequence, heat diversion, final title and credits. Expanded AI behavior unchanged. Main remains `fd0a906` until exact CI and owner preview acceptance. Preserve original artwork and fixed boar answer; no paid resources.
 
 
 ## Current authoritative instructions — November 18, 2026
