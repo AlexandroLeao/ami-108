@@ -35,8 +35,10 @@ jobs:
         with:
           node-version: "22"
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ami-108/api exec prisma validate
       - run: pnpm db:generate
       - run: pnpm --filter @ami-108/api exec prisma migrate deploy
+      - run: pnpm --filter @ami-108/api exec prisma migrate status
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
