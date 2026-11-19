@@ -497,6 +497,64 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     }
   },30000);
 
+  it('persists three distinct new RANDOM slots during provider timeout and replays without reroll', async () => {
+    const previous={flag:process.env.AMI_AI_GENERATION,token:process.env.AMI_AI_INTERNAL_TOKEN,url:process.env.AI_SERVICE_URL};
+    delete process.env.AMI_AI_GENERATION;
+    const {cookie,view:initial}=await create();
+    let view=initial;
+    for(let i=0;i<120 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+    expect(view.sceneId).toBe('A02-S01');
+    const row=await prisma.gameSession.findUniqueOrThrow({where:{tokenDigest:digest(cookie.split('=')[1])}});
+    let requests=0;
+    const server=createServer((req,res)=>{
+      let raw='';
+      req.on('data',(chunk:Buffer)=>{raw+=chunk.toString();});
+      req.on('end',()=>{
+        requests++;
+        const body=JSON.parse(raw) as {requestId:string;category:string};
+        if(body.category!=='RANDOM') {res.writeHead(400);res.end();return;}
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({requestId:body.requestId,status:'FALLBACK_REQUIRED',reason:'TIMEOUT'}));
+      });
+    });
+    server.listen(0,'127.0.0.1'); await once(server,'listening');
+    const address=server.address();
+    if(!address || typeof address==='string') throw Error('Mock server address');
+    process.env.AMI_AI_GENERATION='1';
+    process.env.AMI_AI_INTERNAL_TOKEN='test-only';
+    process.env.AI_SERVICE_URL='http://127.0.0.1:'+address.port;
+    const rng=jest.spyOn(Math,'random').mockReturnValue(0.99);
+    try {
+      for(let i=0;i<3;i++){
+        const body={commandId:randomUUID(),expectedRevision:view.revision,actionId:view.actions.find(x=>x.kind==='CONSULT')!.id};
+        view=(await request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send(body).expect(200)).body.view as CurrentView;
+        expect(view.diagnostics?.energy).toBe(2-i);
+        expect(await prisma.gameCommandReceipt.findUniqueOrThrow({where:{sessionId_commandId:{sessionId:row.id,commandId:body.commandId}}})).toMatchObject({generationStatus:'FALLBACK_REQUIRED',generationReason:'TIMEOUT'});
+        for(let j=0;j<8 && view.phase!=='ENCOUNTER';j++) view=await command(cookie,view);
+      }
+      const slots=await prisma.gameConsultationSlot.findMany({where:{sessionId:row.id,encounterId:'DOG'},orderBy:{slotIndex:'asc'}});
+      expect(slots).toHaveLength(3);
+      expect(slots.every(s=>s.category==='RANDOM')).toBe(true);
+      expect(new Set(slots.map(s=>JSON.stringify(s.localizedText))).size).toBe(3);
+      await app.close(); await open();
+      view=await command(cookie,view,'DOG-01');
+      for(let i=0;i<5 && !view.actions.some(a=>a.kind==='RETRY');i++) view=await command(cookie,view);
+      view=await command(cookie,view,view.actions.find(a=>a.kind==='RETRY')!.id);
+      for(let i=0;i<15 && view.phase!=='ENCOUNTER';i++) view=await command(cookie,view);
+      view=await command(cookie,view,view.actions.find(a=>a.kind==='CONSULT')!.id);
+      expect(view.diagnostics?.energy).toBe(2);
+      expect(requests).toBe(3);
+      expect(await prisma.gameConsultationSlot.findMany({where:{sessionId:row.id,encounterId:'DOG'},orderBy:{slotIndex:'asc'}})).toEqual(slots);
+    } finally {
+      rng.mockRestore();
+      server.closeAllConnections();
+      await new Promise<void>(resolve=>server.close(()=>resolve()));
+      for(const [key,value] of [['AMI_AI_GENERATION',previous.flag],['AMI_AI_INTERNAL_TOKEN',previous.token],['AI_SERVICE_URL',previous.url]] as const) {
+        if(value===undefined) delete process.env[key]; else process.env[key]=value;
+      }
+    }
+  },30000);
+
   it.each(['DOG','RAT'] as const)('recovers an expired %s reservation after restart, with no reroll, double debit or provider call', async encounter => {
     const {cookie,view:initial}=await create();
     let view=initial;
