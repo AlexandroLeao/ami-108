@@ -1,5 +1,5 @@
 // AMI-009: isolated Chapter 5 progression, grounded in Master v1.13 §7.
-// No engine, database, HTTP, provider or frontend wiring in this increment.
+// Engine owns shared revision, locale, events and diagnostics; this domain owns the ship and encounter.
 import { local, type Locale, type Localized } from './catalog';
 import type { Diagnostics, NarrativeAction } from './engine';
 import { BOAR, BOAR_QUESTION, HANGAR_DIALOGUE, LAUNCH_CONSULTED, LAUNCH_NO_CONSULT, LAUNCH_NO_RECIPE, ORBIT_DIALOGUE, FINAL_TITLE } from './chapter-five-catalog';
