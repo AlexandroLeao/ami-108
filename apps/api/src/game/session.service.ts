@@ -4,7 +4,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../prisma.service';
 import { advanceNarrative, changeNarrativeLocale, currentAsset, NarrativeError, projectNarrative, startNarrative, type NarrativeState } from '../narrative/engine';
 import { NARRATIVE_VERSION, type Locale } from '../narrative/catalog';
-import { applyGeneratedText, callGeneration, enabled, expectedText, fallback, generationRequest, GENERATION_DEADLINE_MS, type GenerationAudit, type GenerationRequest, type GenerationResult } from './ai-client';
+import { applyGeneratedText, callGeneration, enabled, expectedText, fallback, generationRequest, prepareRandomFallback, rejectRepeatedRandom, GENERATION_DEADLINE_MS, type GenerationAudit, type GenerationRequest, type GenerationResult } from './ai-client';
 
 export const SESSION_SECONDS = 30 * 24 * 60 * 60;
 export const SESSION_COOKIE = 'ami_session';
@@ -129,10 +129,11 @@ export class SessionService {
     const next = pending.nextState as unknown as NarrativeState;
     if (next.revision !== state.revision + 1 || next.version !== state.version) throw new GameError(503, 'INVALID_SAVED_STATE');
     const request = pending.request as unknown as GenerationRequest;
-    const finalized = applyGeneratedText(next, request, audit);
+    const accepted = rejectRepeatedRandom(state, request, audit, expectedText(request, next));
+    const finalized = applyGeneratedText(next, request, accepted);
     projectNarrative(finalized);
     const result = await this.persist(tx, pending.sessionId, state, finalized, pending.commandId, pending.requestDigest, {
-      generationStatus: audit.generationStatus, generationReason: audit.generationReason,
+      generationStatus: accepted.generationStatus, generationReason: accepted.generationReason,
     });
     await tx.gamePendingGeneration.delete({ where: { sessionId: pending.sessionId } });
     return result;
@@ -172,6 +173,7 @@ export class SessionService {
         }
         const request = enabled() ? generationRequest(state, next, input.commandId) : null;
         if (!request) return { kind: 'done' as const, result: await this.persist(tx, sessionId, state, next, input.commandId, fingerprint) };
+        next = prepareRandomFallback(state, next, request);
         // Persist the drawn category, slot, authored fallback and resulting
         // revision BEFORE any network call. Only this reserving caller calls AI.
         const reserved = await tx.gamePendingGeneration.create({ data: {

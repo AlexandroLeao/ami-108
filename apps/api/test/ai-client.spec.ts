@@ -1,4 +1,4 @@
-import { applyGeneratedText, callGeneration, expectedText, generationRequest } from '../src/game/ai-client';
+import { applyGeneratedText, callGeneration, expectedText, generationRequest, prepareRandomFallback, rejectRepeatedRandom, fallback } from '../src/game/ai-client';
 import { advanceNarrative, changeNarrativeLocale, projectNarrative, startNarrative } from '../src/narrative/engine';
 import { randomUUID } from 'node:crypto';
 
@@ -94,5 +94,90 @@ describe('internal AI request authorization', () => {
     try {
       expect(await callGeneration({requestId:randomUUID(),questionId:'INTRO-RANDOM',category:'RANDOM',locale:'en',factIds:['INTRO-OCTOPUS','INTRO-PENGUIN'],deadlineMs:2500},'Octopuses have three hearts.',new Date(Date.now()+200))).toEqual({generationStatus:'FALLBACK_REQUIRED',generationReason:'UNAVAILABLE'});
     } finally { if (token !== undefined) process.env.AMI_AI_INTERNAL_TOKEN = token; }
+  });
+});
+
+describe('fresh RANDOM variety under provider failure', () => {
+  function introTransition(locale: 'pt-BR' | 'en') {
+    let state = startNarrative(locale);
+    for (let i = 0; i < 120; i++) {
+      const next = advanceNarrative(state, projectNarrative(state).actions[0].id, state.revision);
+      const req = generationRequest(state, next, randomUUID());
+      if (req) return { before: state, next, req };
+      state = next;
+    }
+    throw new Error('Missing intro transition');
+  }
+
+  it('has eight distinct bilingual intro fallbacks and keeps the source honest', () => {
+    const {before,next,req} = introTransition('pt-BR');
+    const variants = Array.from({length:8},(_,index) => {
+      const chosen = prepareRandomFallback(before,next,req,count => {
+        expect(count).toBe(8); return index;
+      });
+      expect(chosen.intro?.source).toBe('fallback');
+      expect(chosen.revision).toBe(next.revision);
+      expect(chosen.diagnostics).toEqual(next.diagnostics);
+      expect(applyGeneratedText(chosen,req,fallback('TIMEOUT'))).toBe(chosen);
+      expect(changeNarrativeLocale(chosen,'en',chosen.revision).intro).toEqual(chosen.intro);
+      return chosen.intro!.text;
+    });
+    expect(new Set(variants.map(v=>v['pt-BR'])).size).toBe(8);
+    expect(new Set(variants.map(v=>v.en)).size).toBe(8);
+    expect(variants.some(v=>v['pt-BR']==='Os polvos têm três corações.')).toBe(true);
+    const chosen = prepareRandomFallback(before,next,req,()=>1);
+    expect(applyGeneratedText(chosen,req,{generationStatus:'VALIDATED',generationReason:null}).intro)
+      .toEqual({...chosen.intro,source:'generated'});
+  });
+
+  it.each(['DOG','RAT'] as const)('keeps all three new %s RANDOM slots distinct even if the provider repeats or times out', encounter => {
+    let state = startNarrative('pt-BR');
+    const step = (action = projectNarrative(state).actions[0].id) => {
+      state = advanceNarrative(state,action,state.revision,()=>0.99);
+    };
+    for(let i=0;i<120 && projectNarrative(state).phase!=='ENCOUNTER';i++) step();
+    if (encounter==='RAT') {
+      step('DOG-04');
+      for(let i=0;i<150 && projectNarrative(state).phase!=='ENCOUNTER';i++) step();
+    }
+    const getSlots = (s:typeof state) => encounter==='DOG' ? s.savedDogSlots! : s.savedRatSlots!;
+    for(let i=0;i<3;i++) {
+      const before=state;
+      const old = i ? [...getSlots(before)] : [];
+      step(projectNarrative(state).actions.find(x=>x.kind==='CONSULT')!.id);
+      const req=generationRequest(before,state,randomUUID())!;
+      expect(req.category).toBe('RANDOM');
+      state=prepareRandomFallback(before,state,req,count=>{expect(count).toBe(8-i);return 0;});
+      const reservedText=expectedText(req,state);
+      const result=i===0 ? fallback('TIMEOUT') : rejectRepeatedRandom(before,req,{
+        generationStatus:'VALIDATED',generationReason:null,text:old[0].text['pt-BR'],
+      },reservedText);
+      expect(result.generationStatus).toBe('FALLBACK_REQUIRED');
+      state=applyGeneratedText(state,req,result);
+      expect(getSlots(state).slice(0,i)).toEqual(old);
+      expect(getSlots(state)[i].category).toBe('RANDOM');
+      expect(new Set(getSlots(state).map(s=>s.text['pt-BR'])).size).toBe(i+1);
+      expect(new Set(getSlots(state).map(s=>s.text.en)).size).toBe(i+1);
+      expect(projectNarrative(state).diagnostics?.energy).toBe(2-i);
+      for(let j=0;j<8 && projectNarrative(state).phase!=='ENCOUNTER';j++) step();
+    }
+    const cached=getSlots(state);
+    step(encounter+'-01');
+    for(let i=0;i<5 && !projectNarrative(state).actions.some(a=>a.kind==='RETRY');i++) step();
+    step(projectNarrative(state).actions.find(a=>a.kind==='RETRY')!.id);
+    for(let i=0;i<15 && projectNarrative(state).phase!=='ENCOUNTER';i++) step();
+    const before=state;
+    step(projectNarrative(state).actions.find(a=>a.kind==='CONSULT')!.id);
+    expect(generationRequest(before,state,randomUUID())).toBeNull();
+    expect(getSlots(state)).toEqual(cached);
+  });
+
+  it('does not vary CORRECT or reopen an existing introduction', () => {
+    const {before,next,req}=introTransition('en');
+    const chosen=prepareRandomFallback(before,next,req,()=>2);
+    expect(prepareRandomFallback(before,next,{...req,category:'CORRECT'},()=>{throw Error('Unexpected draw');})).toBe(next);
+    const later=advanceNarrative(chosen,projectNarrative(chosen).actions[0].id,chosen.revision);
+    expect(generationRequest(chosen,later,randomUUID())).toBeNull();
+    expect(later.intro).toEqual(chosen.intro);
   });
 });

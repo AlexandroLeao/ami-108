@@ -69,6 +69,8 @@ def test_transport_uses_bounded_nonstreaming_authorized_context() -> None:
         data = json.loads(body)
         assert data["model"] == "model:1b"
         assert data["stream"] is False
+        assert data["keep_alive"] == "5m"
+        constructor.assert_called_once_with("ollama", 11434, timeout=2.0)
         assert data["options"]["num_predict"] == 4
         prompt = json.loads(data["prompt"])
         assert prompt["options"] == {"0": "Octopuses have three hearts.", "1": "Penguins cannot fly."}
@@ -234,3 +236,35 @@ def test_expanded_pool_samples_three_and_maps_new_variant(locale: str) -> None:
         invalid = asyncio.run(generate(req, OllamaProvider("ollama", 11434, "model:1b")))
         assert invalid.status == "FALLBACK_REQUIRED"
         assert invalid.reason == "INVALID_OUTPUT"
+
+
+def test_resident_model_is_explicit_and_preserves_transport_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AMI_AI_PROVIDER", "ollama")
+    monkeypatch.setenv("AMI_OLLAMA_URL", "http://ollama:11434")
+    monkeypatch.setenv("AMI_OLLAMA_MODEL", "model:1b")
+    monkeypatch.setenv("AMI_OLLAMA_KEEP_ALIVE", "-1")
+    provider = local_provider()
+    assert isinstance(provider, OllamaProvider)
+    assert provider.timeout_seconds == 2.0
+    req = GenerationRequest(
+        requestId=str(uuid4()), questionId="INTRO-RANDOM", category="RANDOM",
+        locale="en", factIds=["INTRO-OCTOPUS", "INTRO-PENGUIN"], deadlineMs=2500,
+    )
+    context = retrieve(req)
+    assert context is not None
+    with (
+        patch("app.ollama_provider.secrets.SystemRandom"),
+        patch("app.ollama_provider.http.client.HTTPConnection") as constructor,
+    ):
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"done": True, "response": "0"}
+        ).encode()
+        assert provider._generate(context) == context.approved_text
+        assert json.loads(conn.request.call_args.args[2])["keep_alive"] == -1
+        constructor.assert_called_once_with("ollama", 11434, timeout=2.0)
+    monkeypatch.setenv("AMI_OLLAMA_KEEP_ALIVE", "unbounded-invalid")
+    assert local_provider() is None

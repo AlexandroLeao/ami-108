@@ -19,6 +19,7 @@ class OllamaProvider:
     port: int
     model: str
     timeout_seconds: float = 2.0
+    keep_alive: str | int = "5m"
 
     async def generate(self, context: AuthorizedContext) -> str:
         return await asyncio.to_thread(self._generate, context)
@@ -54,7 +55,7 @@ class OllamaProvider:
                 "prompt": prompt,
                 "stream": False,
                 "options": {"temperature": 0.5, "num_predict": 4},
-                "keep_alive": "5m",
+                "keep_alive": self.keep_alive,
             },
             ensure_ascii=False,
         ).encode("utf-8")
@@ -89,6 +90,11 @@ def local_provider() -> Provider | None:
         return None
     model = os.getenv("AMI_OLLAMA_MODEL", "")
     url = os.getenv("AMI_OLLAMA_URL", "")
+    # Dedicated local VM may explicitly retain the model until stopped.
+    # Keep the bounded default for other deployments; reject arbitrary values.
+    keep_alive = os.getenv("AMI_OLLAMA_KEEP_ALIVE") or "5m"
+    if keep_alive not in ("5m", "-1"):
+        return None
     # Require a named local tag, reject cloud tags, paths and implicit defaults.
     if not re.fullmatch(r"[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+", model) or "cloud" in model.lower():
         return None
@@ -104,6 +110,6 @@ def local_provider() -> Provider | None:
             or target.fragment
         ):
             return None
-        return OllamaProvider(target.hostname, target.port or 11434, model)
+        return OllamaProvider(target.hostname, target.port or 11434, model, keep_alive=-1 if keep_alive == "-1" else "5m")
     except ValueError:
         return None
