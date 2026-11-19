@@ -1,7 +1,9 @@
 // Internal AI transport, never exposed to the browser. No provider retry.
 import type { NarrativeState } from '../narrative/engine';
-import { local, type Locale, type Localized } from '../narrative/catalog';
-import type { EncounterState } from '../narrative/encounter';
+import { randomInt } from 'node:crypto';
+import { INTRO_FALLBACK, local, type Locale, type Localized } from '../narrative/catalog';
+import { DOG, type EncounterState } from '../narrative/encounter';
+import { RAT } from '../narrative/chapter-three-catalog';
 
 export const GENERATION_DEADLINE_MS = 2500;
 export type GenerationRequest = {
@@ -13,6 +15,9 @@ export type GenerationResult = GenerationAudit & { text?: string };
 type Variant = { questionId: GenerationRequest['questionId']; category: GenerationRequest['category']; text: Localized; recipe: boolean; factId?: string };
 // Bilingual finite allowlist: original Master v1.13 examples and owner-requested expanded RANDOM topics.
 const variants: readonly Variant[] = [
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-OCTOPUS', text: INTRO_FALLBACK, recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', factId: 'DOG-RECIPE', text: DOG.random, recipe: DOG.randomIsRecipe },
+  { questionId: 'Q-RAT', category: 'RANDOM', factId: 'RAT-RECIPE', text: RAT.random, recipe: RAT.randomIsRecipe },
   { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-CHESS', text: local("O xadrez é disputado em um tabuleiro de 64 casas.", "Chess is played on a board of 64 squares."), recipe: false },
   { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-HEXAGON', text: local("Um hexágono possui seis lados.", "A hexagon has six sides."), recipe: false },
   { questionId: 'INTRO-RANDOM', category: 'RANDOM', factId: 'INTRO-DOZEN', text: local("Uma dúzia corresponde a doze unidades.", "A dozen equals twelve units."), recipe: false },
@@ -74,14 +79,56 @@ export function expectedText(request: GenerationRequest, next: NarrativeState): 
   return next.chapterTwo?.dog.slots.at(-1)?.text[request.locale];
 }
 
-// Apply only a validated alternative to the newly reserved slot. The domain
-// already drew its category and charged energy. Never change either.
+// Only the current newly drawn RANDOM slot is eligible. Previously committed
+// text is immutable, even if a provider returns the same authorized option.
+function previousRandomTexts(before: NarrativeState, request: GenerationRequest): Set<string> {
+  const slots = request.questionId === 'Q-DOG'
+    ? before.savedDogSlots ?? before.chapterTwo?.dog.slots ?? []
+    : request.questionId === 'Q-RAT'
+      ? before.savedRatSlots ?? before.chapterThree?.rat?.slots ?? []
+      : [];
+  return new Set(slots.filter(slot => slot.category === 'RANDOM').map(slot => slot.text[request.locale]));
+}
+
+// Choose once, before persisting the pending reservation. Even a timeout or
+// recovery uses this same approved bilingual utterance; no extra model call.
+export function prepareRandomFallback(
+  before: NarrativeState, next: NarrativeState, request: GenerationRequest,
+  draw: (count: number) => number = randomInt,
+): NarrativeState {
+  if (request.category !== 'RANDOM') return next;
+  const previous = previousRandomTexts(before, request);
+  const candidates = variants.filter(v => v.questionId === request.questionId && v.category === 'RANDOM'
+    && (!v.factId || request.factIds.includes(v.factId)) && !previous.has(v.text[request.locale]));
+  if (!candidates.length) return next;
+  const selected = candidates[draw(candidates.length)];
+  if (!selected) throw new RangeError('Invalid random utterance selection');
+  return applyVariant(next, request, selected, 'fallback');
+}
+
+// A repeated model selection is unsuitable for a fresh RANDOM slot. Keep the
+// already reserved distinct fallback and report the rejection honestly.
+export function rejectRepeatedRandom(
+  before: NarrativeState, request: GenerationRequest, result: GenerationResult,
+  reservedText: string | undefined,
+): GenerationResult {
+  if (request.category !== 'RANDOM' || result.generationStatus !== 'VALIDATED') return result;
+  const candidate = result.text ?? reservedText;
+  return candidate && previousRandomTexts(before, request).has(candidate)
+    ? fallback('INVALID_OUTPUT') : result;
+}
+
 export function applyGeneratedText(next: NarrativeState, request: GenerationRequest, result: GenerationResult): NarrativeState {
-  if (result.generationStatus !== 'VALIDATED' || !result.text) return next;
-  const variant = matchVariant(request, result.text);
-  if (!variant) return next;
+  if (result.generationStatus !== 'VALIDATED') return next;
+  // A matching reserved RANDOM text is also a validated provider response.
+  const text = result.text ?? (request.category === 'RANDOM' ? expectedText(request, next) : undefined);
+  const variant = matchVariant(request, text);
+  return variant ? applyVariant(next, request, variant, 'generated') : next;
+}
+
+function applyVariant(next: NarrativeState, request: GenerationRequest, variant: Variant, source: 'fallback' | 'generated'): NarrativeState {
   if (request.questionId === 'INTRO-RANDOM') {
-    return next.intro ? { ...next, intro: { ...next.intro, source: 'generated', text: variant.text } } : next;
+    return next.intro ? { ...next, intro: { ...next.intro, source, text: variant.text } } : next;
   }
   const update = (encounter: EncounterState): EncounterState => {
     const index = encounter.used.length;
