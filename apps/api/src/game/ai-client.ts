@@ -11,8 +11,24 @@ export type GenerationRequest = {
 export type GenerationAudit = { generationStatus: 'VALIDATED' | 'FALLBACK_REQUIRED'; generationReason: string | null };
 export type GenerationResult = GenerationAudit & { text?: string };
 type Variant = { questionId: GenerationRequest['questionId']; category: GenerationRequest['category']; text: Localized; recipe: boolean };
-// Bilingual, finite allowlist. RANDOM alternatives are exact private Master v1.13 examples.
+// Bilingual finite allowlist: original Master v1.13 examples and owner-requested expanded RANDOM topics.
 const variants: readonly Variant[] = [
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("O xadrez é disputado em um tabuleiro de 64 casas.", "Chess is played on a board of 64 squares."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Um hexágono possui seis lados.", "A hexagon has six sides."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Uma dúzia corresponde a doze unidades.", "A dozen equals twelve units."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("O piano possui teclas brancas e pretas.", "A piano has black and white keys."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Um século corresponde a cem anos.", "A century equals one hundred years."), recipe: false },
+  { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("A letra M ocupa a décima terceira posição no alfabeto latino.", "The letter M is thirteenth in the Latin alphabet."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Netuno é o oitavo planeta a partir do Sol.", "Neptune is the eighth planet from the Sun."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para preparar panquecas, misture farinha, leite e ovos.", "To make pancakes, mix flour, milk and eggs."), recipe: true },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para preparar purê, amasse as batatas cozidas.", "To make mashed potatoes, mash the cooked potatoes."), recipe: true },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Recomenda-se dobrar as toalhas antes de guardá-las.", "Folding towels before storing them is recommended."), recipe: false },
+  { questionId: 'Q-DOG', category: 'RANDOM', text: local("Recomenda-se separar roupas claras e escuras antes da lavagem.", "Separating light and dark clothes before washing is recommended."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Um quilograma corresponde a mil gramas.", "A kilogram equals one thousand grams."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("A massa de pão pode ser preparada com farinha, água e fermento.", "Bread dough can be made with flour, water and yeast."), recipe: true },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Para preparar salada de frutas, misture pedaços de frutas.", "To make fruit salad, mix pieces of fruit."), recipe: true },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("O calendário gregoriano possui doze meses.", "The Gregorian calendar has twelve months."), recipe: false },
+  { questionId: 'Q-RAT', category: 'RANDOM', text: local("Recomenda-se organizar os livros por ordem alfabética.", "Organizing books alphabetically is recommended."), recipe: false },
   { questionId: 'INTRO-RANDOM', category: 'RANDOM', text: local("Os pinguins não sabem voar.", "Penguins cannot fly."), recipe: false },
   { questionId: 'Q-DOG', category: 'RANDOM', text: local("Saturno possui um sistema de anéis composto principalmente por partículas de gelo.", "Saturn has a ring system composed primarily of ice particles."), recipe: false },
   { questionId: 'Q-DOG', category: 'RANDOM', text: local("Para remover manchas de tecidos claros, recomenda-se utilizar sabão neutro.", "To remove stains from light fabrics, mild soap is recommended."), recipe: false },
@@ -32,7 +48,7 @@ export const enabled = () => process.env.AMI_AI_GENERATION === '1';
 export function generationRequest(before: NarrativeState, after: NarrativeState, requestId: string): GenerationRequest | null {
   const common = { requestId, locale: after.locale, deadlineMs: GENERATION_DEADLINE_MS };
   if (!before.intro && after.intro) {
-    return { ...common, questionId: 'INTRO-RANDOM', category: 'RANDOM', factIds: ['INTRO-OCTOPUS', 'INTRO-PENGUIN'] };
+    return { ...common, questionId: 'INTRO-RANDOM', category: 'RANDOM', factIds: ['INTRO-OCTOPUS', 'INTRO-PENGUIN', 'INTRO-CHESS', 'INTRO-HEXAGON', 'INTRO-DOZEN', 'INTRO-PIANO', 'INTRO-CENTURY', 'INTRO-ALPHABET'] };
   }
   // Only newly resolved slots at the active consultation transition may call AI.
   // Cached slots are retained across chapter restart and retry.
@@ -41,13 +57,13 @@ export function generationRequest(before: NarrativeState, after: NarrativeState,
     const slot = after.chapterThree?.rat?.slots.find(item => !previous.some(old => old.index === item.index));
     if (!slot) return null;
     return { ...common, questionId: 'Q-RAT', category: slot.category,
-      factIds: slot.category === 'CORRECT' ? ['RAT-LIGHT', 'RAT-CONTAINMENT'] : ['RAT-RECIPE', 'RAT-LAUNDRY', 'RAT-PENGUIN'] };
+      factIds: slot.category === 'CORRECT' ? ['RAT-LIGHT', 'RAT-CONTAINMENT'] : ['RAT-RECIPE', 'RAT-LAUNDRY', 'RAT-PENGUIN', 'RAT-KILOGRAM', 'RAT-BREAD', 'RAT-FRUIT', 'RAT-CALENDAR', 'RAT-BOOKS'] };
   }
   const previous = before.savedDogSlots ?? before.chapterTwo?.dog.slots ?? [];
   const slot = after.chapterTwo?.dog.slots.find(item => !previous.some(old => old.index === item.index));
   if (!slot) return null;
   return { ...common, questionId: 'Q-DOG', category: slot.category,
-    factIds: slot.category === 'CORRECT' ? ['DOG-VISION', 'DOG-HEARING', 'DOG-WAIT'] : ['DOG-RECIPE', 'DOG-SATURN', 'DOG-LAUNDRY'] };
+    factIds: slot.category === 'CORRECT' ? ['DOG-VISION', 'DOG-HEARING', 'DOG-WAIT'] : ['DOG-RECIPE', 'DOG-SATURN', 'DOG-LAUNDRY', 'DOG-NEPTUNE', 'DOG-PANCAKE', 'DOG-POTATO', 'DOG-TOWELS', 'DOG-WASHING'] };
 }
 
 export function expectedText(request: GenerationRequest, next: NarrativeState): string | undefined {
