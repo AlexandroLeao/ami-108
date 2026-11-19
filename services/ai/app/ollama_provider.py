@@ -4,6 +4,7 @@ import http.client
 import json
 import os
 import re
+import secrets
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
@@ -30,11 +31,15 @@ class OllamaProvider:
         # The result is still mapped exclusively to the requested locale.
         if len(context.selection_options) != len(options):
             return ""
+        order = list(range(len(options)))
+        if context.category == "RANDOM":
+            # Vary presentation of approved topics only; never change category or facts.
+            secrets.SystemRandom().shuffle(order)
         prompt = json.dumps(
             {
                 "locale": "en",
                 "category": context.category,
-                "options": {str(i): text for i, text in enumerate(context.selection_options)},
+                "options": {str(i): context.selection_options[j] for i, j in enumerate(order)},
             },
             ensure_ascii=False,
         )
@@ -71,7 +76,7 @@ class OllamaProvider:
             # Accept only an exact in-range index; the existing text validator and
             # NestJS independently verify the mapped utterance. No new facts.
             selected = text.strip()
-            allowed = {str(i): option for i, option in enumerate(options)}
+            allowed = {str(i): options[j] for i, j in enumerate(order)}
             return allowed.get(selected, "")
         finally:
             conn.close()
