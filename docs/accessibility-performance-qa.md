@@ -2,7 +2,7 @@
 
 ## Scope and baseline
 
-The five-chapter campaign and visual presentation are owner-approved and frozen. Review against the accepted security baseline `f89c342` (PR #48), preserving the original 12 artwork hashes, dialogue, layout, cinematic timing and game rules. This is a verification plan and source review, not a browser audit result or a claim of WCAG conformance. Do not use real saves for destructive checks or start a new game in the owner's existing browser profile.
+The five-chapter campaign and visual presentation are owner-approved and frozen. Review the accepted runtime `14ea583` (PR #53), which includes the earlier security baseline `f89c342` (PR #48), preserving the original 12 artwork hashes, dialogue, layout, cinematic timing and game rules. This is a verification plan and source review, not a browser audit result or a claim of WCAG conformance. Do not use real saves for destructive checks or start a new game in the owner's existing browser profile.
 
 ## Source review — November 19, 2026
 
