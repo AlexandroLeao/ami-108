@@ -8,14 +8,20 @@ export const contentWarning = {
     age: 'Recomendação provisória: 16 anos',
     description: 'Este jogo contém violência, sangue, linguagem imprópria e elementos de terror.',
     status: 'Classificação indicativa a confirmar.',
-    nonProfit: 'Projeto autoral e sem fins lucrativos.',
+    about: [
+      'AMI-108 é uma aventura narrativa retrofuturista. Você e um robô de memórias corrompidas lutam para sobreviver em um mundo em ruínas.',
+      'Projeto autoral de engenharia de software, sem fins lucrativos, que une narrativa interativa, arte pixelada e inteligência artificial controlada.',
+    ],
   },
   en: {
     title: 'CONTENT WARNING',
     age: 'Provisional guidance: ages 16 and up',
     description: 'This game contains violence, blood, strong language and horror elements.',
     status: 'Official age rating pending.',
-    nonProfit: 'An original, non-profit project.',
+    about: [
+      'AMI-108 is a retrofuturistic narrative adventure. You and a robot with corrupted memories fight to survive in a world in ruins.',
+      'An original, non-profit software engineering project combining interactive storytelling, pixel art and controlled artificial intelligence.',
+    ],
   },
 } as const;
 
@@ -23,7 +29,7 @@ export function campaignExtras(locale: Locale) {
   const pages = copy[locale].extrasPages;
   const warning = contentWarning[locale];
   return [
-    { ...pages[0], paragraphs: [...pages[0].paragraphs, warning.nonProfit] },
+    { ...pages[0], paragraphs: warning.about },
     ...pages.slice(1),
     { title: warning.title, paragraphs: [warning.age, warning.description, warning.status] },
   ];
@@ -49,8 +55,8 @@ export function ContentWarning({ locale, busy, onContinue, onBack }: {
         </div>
       </div>
       <section className="dialogue-frame campaign-dialogue campaign-warning-controls" aria-busy={busy}>
-        <button className="game-control" type="button" data-primary disabled={busy} onClick={onContinue}>{labels.continue}</button>
         <button className="game-control" type="button" disabled={busy} onClick={onBack}>{labels.mainMenu}</button>
+        <button className="game-control" type="button" data-primary disabled={busy} onClick={onContinue}>{labels.continue}</button>
       </section>
     </section>
   );
