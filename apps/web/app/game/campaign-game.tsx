@@ -17,6 +17,22 @@ const messages = {
   en: { replace: 'Start a new game? Continue will then resume the new run.', connection: 'Unable to complete the action. Please try again.', stale: 'Progress was updated. Continue from the current dialogue.', expired: 'Session unavailable. Start a new game.', boundary: 'Chapter 4 complete in this version. Chapter 5 will be integrated next.', resumeAt: 'Continue game', chapters: 'Chapters', restart: 'Restart this chapter? Your current position will be replaced, but unlocked chapters and cached consultations will be preserved.' },
 } as const;
 type Notice = 'connection' | 'stale' | 'expired';
+const finalCredits = {
+  'pt-BR': [
+    {title:'Idealização e roteiro',lines:['Alexandro Milhomes Leão']},
+    {title:'Direção criativa e conceito visual',lines:['Alexandro Milhomes Leão']},
+    {title:'Liderança técnica e desenvolvimento',lines:['Alexandro Milhomes Leão']},
+    {title:'Tecnologias utilizadas',lines:['TypeScript · Next.js · React','NestJS · Prisma · PostgreSQL','Python · FastAPI · Ollama · Qwen2.5:1.5b','Docker · Git · GitHub Actions']},
+    {title:'AMI-108',lines:['Obrigado por jogar!']},
+  ],
+  en: [
+    {title:'Original concept and writing',lines:['Alexandro Milhomes Leão']},
+    {title:'Creative direction and visual concept',lines:['Alexandro Milhomes Leão']},
+    {title:'Technical leadership and development',lines:['Alexandro Milhomes Leão']},
+    {title:'Technologies used',lines:['TypeScript · Next.js · React','NestJS · Prisma · PostgreSQL','Python · FastAPI · Ollama · Qwen2.5:1.5b','Docker · Git · GitHub Actions']},
+    {title:'AMI-108',lines:['Thank you for playing!']},
+  ],
+} as const;
 
 function EnergyIndicator({ view }: { view: CampaignView }) {
   const d = view.diagnostics;
@@ -53,12 +69,13 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const locale = view?.locale ?? preference;
   const labels = copy[locale];
   const chapter = view?.phase === 'CHAPTER_CARD';
-  const chapterKey = chapter && view ? String(view.chapter) : null;
-  const chapterReady = !chapter || readyCard === chapterKey;
+  const finalTitle = !!view?.complete && beatKey(view)==='A05-S02/ENDING/NEXT';
+  const chapterKey = chapter && view ? String(view.chapter) : finalTitle ? 'ending' : null;
+  const chapterReady = !chapterKey || readyCard === chapterKey;
   const credits = !!view?.complete && view.actions.length === 0;
   const boundary = !!view && !credits && !view.actions.some((action) => action.kind !== 'PREVIOUS');
   const showChapter = chapter && !(boundary && chapterReady);
-  const displayText = !view || showChapter ? '' : boundary ? messages[locale].boundary : view.text;
+  const displayText = !view || showChapter || finalTitle || credits ? '' : boundary ? messages[locale].boundary : view.text;
   const cinematicKey = view ? beatKey(view) : '';
   const requiresImage = !!view && imageGateMs(view)>0;
   const counting = view?.cue === 'f3-count';
@@ -235,13 +252,13 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
     void run(() => mutate(view, { actionId: nextAction.id }));
   }, [view, nextAction, overlay, chapterReady, cinematicReady, chapter, pageReady, pageIndex, pageCount, run, mutate]);
   const previous = useCallback(() => {
-    if (!view || choiceMode || !chapterReady || busyRef.current || overlay !== 'none' || !pageReady) return;
+    if (!view || choiceMode || !chapterReady || !cinematicReady || busyRef.current || overlay !== 'none' || !pageReady) return;
     if (pageIndex > 0) {
       setPagination((old) => ({ ...old, index: Math.max(0, old.index - 1) }));
       return;
     }
     if (previousAction) void run(() => mutate(view, { actionId: previousAction.id }));
-  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate, choiceMode]);
+  }, [view, chapterReady, overlay, pageReady, pageIndex, previousAction, run, mutate, choiceMode, cinematicReady]);
   const closeOverlay = useCallback(() => setOverlay(overlay === 'chapters' ? 'resume' : overlay === 'language' && view ? 'pause' : 'none'), [overlay, view]);
   const chooseLanguage = async (value: Locale) => {
     if (busyRef.current) return;
@@ -322,23 +339,27 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <path fill="currentColor" d="M5 1h6v1h2v2h1v6h-2v2h-1v3H5v-3H4v-2H2V4h1V2h2z" />
                 <path fill="var(--coal)" d="M4 5h3v3H4zM9 5h3v3H9zM7 9h2v2H7zM6 12h1v3H6zM9 12h1v3H9z" />
               </svg>}
-              <div key={view.chapter} className="chapter-layer" data-active={chapter} aria-hidden={!chapter}>
-                <h1 className="chapter-title">{titleText}</h1>
+              <div key={finalTitle ? 'ending' : view.chapter} className="chapter-layer" data-active={chapter || finalTitle} aria-hidden={!chapter && !finalTitle}>
+                <h1 className="chapter-title">{finalTitle ? view.text : titleText}</h1>
               </div>
+              {credits && <div className="campaign-final-credits" role="region" aria-label={labels.extrasPages[1].title}>
+                <div className="campaign-credits-roll">
+                  <h1>{labels.extrasPages[1].title}</h1>
+                  <h2>AMI-108</h2>
+                  {finalCredits[locale].map(group => <div key={group.title}><h2>{group.title}</h2>{group.lines.map(line => <p key={line}>{line}</p>)}</div>)}
+                </div>
+                <button className="game-control campaign-credits-menu" type="button" data-primary onClick={mainMenu}>{labels.mainMenu}</button>
+              </div>}
             </CampaignScene>
             <section ref={frameRef} className="dialogue-frame campaign-dialogue" data-robot={robotDialogue} data-information={view.information} data-archive-record={(view.cue === 'archive-record' || view.cue === 'f3-count')} data-f3-count={counting} data-chapter-four-record={view.chapter===4 && (view.cue==='archive-record' || counting)} data-choices={choiceMode} data-dead={view.phase === 'DEAD'} aria-busy={busy}>
-              {credits ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
-                <p className="campaign-death-title">{labels.extrasPages[1].title}</p>
-                {labels.extrasPages[1].paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
-                <button className="game-control" type="button" onClick={mainMenu}>{labels.mainMenu}</button>
-              </div> : choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
+              {choiceMode ? <div className="campaign-choice-area" role="group" aria-label={view.text} tabIndex={-1}>
                 {view.phase === 'DEAD' && <p className="campaign-death-title" role="status">{view.text}</p>}
                 <div className="campaign-choice-list">
                   {explicitActions.map(action => <button key={action.id} type="button" className="game-control campaign-choice" data-kind={action.kind} disabled={busy}
                     onClick={() => void run(() => mutate(view, { actionId: action.id }))}>{action.label}</button>)}
                 </div>
               </div> : <div className="dialogue-copy" aria-live={counting && !cinematicReady ? 'off' : 'polite'} aria-atomic="true">
-                {!showChapter && (
+                {!showChapter && !finalTitle && !credits && (
                   <>
                     {(view.speaker || narrationLabel) && <p className={'dialogue-speaker' + (narrationLabel ? ' campaign-narration' : '')}>
                       {nameReveal ? <span key={pageKey} className="campaign-name-reveal"><span className="campaign-name-before" aria-hidden="true">{view.speaker === 'HOWARD' ? (locale === 'pt-BR' ? 'Voz familiar' : 'Familiar voice') : view.speaker === 'AMI-108' ? (locale === 'pt-BR' ? 'Robô' : 'Robot') : '???'}</span><span className="campaign-name-after">{view.speaker}</span></span> : view.speaker ?? narrationLabel}
@@ -349,7 +370,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               </div>}
               <p ref={measureRef} className="dialogue-text campaign-measure" aria-hidden="true" />
               <div className="dialogue-navigation" hidden={choiceMode || credits}>
-                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
+                <button className="advance-control previous-control" type="button" disabled={busy || !chapterReady || !cinematicReady || (!choiceMode && !pageReady) || (!previousAction && pageIndex === 0)}
                   aria-label={labels.previousDialogue} onClick={previous}><span aria-hidden="true" className="pixel-arrow" /></button>
                 <button className="advance-control" type="button" data-primary disabled={busy || !nextAction || !chapterReady || !cinematicReady || (!chapter && !pageReady)}
                   aria-label={advanceLabel} onClick={advance}><span aria-hidden="true" className="pixel-arrow" /></button>
