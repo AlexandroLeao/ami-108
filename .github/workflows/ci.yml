@@ -35,6 +35,10 @@ jobs:
           bash -n scripts/check-resume-readonly.sh
           bash -n scripts/test-resume-preflight.sh
           bash scripts/test-resume-preflight.sh
+      - name: Verify documentation links
+        run: |
+          python3 scripts/check-doc-links.py
+          python3 scripts/test-doc-links.py
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
