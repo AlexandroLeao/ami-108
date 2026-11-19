@@ -154,7 +154,31 @@ try {
   assert.equal((await call('asset?key=CENA-09')).status,404);
   assert.equal((await call('asset?key=CENA-10')).status,404);
   assert.deepEqual(await (await call('view')).json(),view);
-  console.log('Built Next.js/NestJS smoke passed: session, origin guard, commands, 12 manifest hashes and stable HTTP artwork bytes for all 10 reached assets, locale, resume, dog and rat encounters, F2/F3 restoration and Chapter 5 boundary.');
+  assert.deepEqual(view.chapters.map(c=>c.number),[1,2,3,4,5]);
+  for(let i=0;i<30 && view.phase!=='ENCOUNTER';i++) await send(view.actions[0]);
+  assert.equal(view.sceneId,'A05-S01');
+  assert.equal(view.asset.url,'/api/game/asset?key=CENA-09');
+  assert.equal((await call('asset?key=CENA-10')).status,404);
+  await send(view.actions.find(a=>a.kind==='CONSULT'));
+  assert.equal(view.diagnostics.energy,2);
+  for(let i=0;i<4 && view.phase!=='ENCOUNTER';i++) await send(view.actions[0]);
+  await send(view.actions.find(a=>a.id==='BOAR-01'));
+  assert.equal(view.phase,'DEAD');
+  await send(view.actions[0]);
+  await send(view.actions.find(a=>a.kind==='RETRY'));
+  assert.equal(view.diagnostics.energy,3);
+  for(let i=0;i<12 && view.phase!=='ENCOUNTER';i++) await send(view.actions[0]);
+  await send(view.actions.find(a=>a.id==='BOAR-04'));
+  for(let i=0;i<40 && !view.complete;i++) await send(view.actions[0]);
+  assert.equal(view.complete,true);
+  assert.equal(view.text,view.locale==='en'?'TO BE CONTINUED...':'CONTINUA...');
+  assert.equal(view.asset,null);
+  await send(view.actions[0]);
+  assert.equal(view.actions.length,0);
+  assert.equal(view.complete,true);
+  assert.deepEqual(await (await call('view')).json(),view);
+  assert.deepEqual([...verifiedAssets].sort(),[...expectedHashes.keys()].sort());
+  console.log('Built Next.js/NestJS smoke passed: complete campaign, all 12 HTTP artwork hashes, session, locale, checkpoints, restoration, launch and credits.');
 } finally {
   for (const child of children) child.kill('SIGTERM');
 }
