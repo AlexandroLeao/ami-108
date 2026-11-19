@@ -2,13 +2,19 @@
 
 ## Accepted state at handoff
 
-- Private source: `AlexandroLeao/ami-108`. Local and GitHub runtime baseline `14ea583a83c7c1473bc94f3b1d515a8497827ac3` (PR #53). The approved five chapters, original art, layout, story, rules and saves remain frozen.
+- Private source: `AlexandroLeao/ami-108`. Accepted local game runtime baseline (later GitHub commits are documentation/diagnostic-only; see current `main`) `14ea583a83c7c1473bc94f3b1d515a8497827ac3` (PR #53). The approved five chapters, original art, layout, story, rules and saves remain frozen.
 - Exact main [CI 44606120570](https://github.com/AlexandroLeao/ami-108/actions/runs/44606120570) passed both jobs; exact PR #53 CI 44603955413: **105 API + 44 web + 72 Python = 221 tests**, four Prisma migrations, lint/types/build, full built campaign and 12 artwork hashes.
 - Approved isolated port-3002 candidate `96556a0`: seven validated generation receipts, no timeout/fallback; DOG RANDOM 2/2 distinct and RAT RANDOM 2/2 distinct; approved BOAR authored only; model remained resident (`Forever`). Owner completed full campaign and confirmed a **fresh** port-3000 game works and its new RANDOM utterances vary. Prior Continue on old sessions correctly reuses immutable saved responses, not a new model call.
 - Owner installed `14ea583a83c7c1473bc94f3b1d515a8497827ac3` on Cloud Shell port 3000: verified private backup `pre-variety-20261119-201700.dump`, five sessions / zero pending generations preserved **at installation**; API/Web/AI rebuilt and all four services healthy; direct AI evaluator 10/10; persistent `AMI_OLLAMA_KEEP_ALIVE=-1` and live Ollama `Forever`. Post-install root disk 13 GiB free / 90% used; no prune. A newer fresh-session count has not yet been audited; check at shutdown.
 - Pinned local-only model Qwen2.5:1.5b ID `65ec06548149` on `ami108-local-ollama` and internal-only `ami108-local-inference`; Docker model memory limit 3 GiB. Two-second HTTP / 2.5-second engine deadlines unchanged; BOAR is never model-generated.
 - Unresolved formal issues: #12 release security/QA (browser screen-reader and reduced motion/automated scan, production trusted origin, ingress/rate limits/retention, OS/image review), #13 hosted zero-cost deployment decision, #14 canonical private Master v1.14 / Script v1.12 synchronization and final documentation, #15 explicit publication/classification/license approval. **Not release-ready. No public deployments or paid provisioning.**
 - Prior GitHub PRs #44–#53 merged and branch CI green; do not close open release issues merely to pause.
+
+## Latest recovered environment — November 19 (after this historical pause)
+
+The owner verified the **final** private archive `pause-ami108-20261119T203206Z-180786.dump` (160,719 bytes, SHA-256 PASS), enumerated all five game tables and completed an isolated PostgreSQL 17 archive read. The former Docker VM volumes were absent, so the owner restored the archive **once** into a confirmed empty PostgreSQL database, yielding **6 saved sessions, 0 pending generations and 4 completed migrations**. Rebuilt Web/API/AI and the recovered DB passed health checks; Continue successfully resumed the original save. No additional restore is needed or safe on that now-populated database. Ollama is still absent on the recovered VM and app generation remains temporarily disabled until a separately reviewed pin/network/model validation and explicit opt-in. See [current QA evidence](release-qa.md) and [release-readiness matrix](release-readiness-matrix.md).
+
+The shutdown procedure below is **historical** and must not be rerun on the recovered stack; use it only for a future deliberate pause after separately checking the actual running state.
 
 ## Why a database export is mandatory
 

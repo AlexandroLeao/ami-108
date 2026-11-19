@@ -11,7 +11,7 @@ At accepted local runtime `14ea583`, the owner rebuilt Web/API/AI and started th
 
 The owner completed the full isolated PR #53 playtest at port 3002 (7/7 VALIDATED, zero timeouts; DOG/RAT each 2 distinct RANDOM texts from 2 slots; one intro only, so cross-session intro diversity not measured). Exact PR CI 44603955413 and post-merge main CI 44606120570 passed both jobs, 221 tests, existing four migrations and complete campaign with twelve original hashes; merged `14ea583`. Owner installed this commit at port 3000 with a verified private backup `pre-variety-20261119-201700.dump`, five sessions and zero pending at install, healthy web/API/AI/DB, pinned Qwen `Forever`, direct 10/10. The owner later confirmed a **fresh game** has the expected varied behavior; old Continue sessions intentionally retain cached responses. No new gameplay receipt audit was supplied for that fresh live game.
 
-Cloud Shell pause is requested. The safe [pause/resume runbook](cloud-shell-pause-resume.md) documents a new checkpoint and the ephemeral Docker-volume risk; final shutdown **not yet verified**. All PRs through #53 merged; formal issues #12–#15 stay open for remaining QA, production deployment and explicit launch approval. Security measures added by #51 and production gates documented by #52 are not a public deployment authorization.
+**Historical PR #53 handoff:** Cloud Shell pause was requested; at that time the final shutdown had not yet been independently verified. The later confirmed archive/read/restore and six-session recovery are documented above. The [pause/resume runbook](cloud-shell-pause-resume.md) remains the operational reference. All PRs through #53 merged; formal issues #12–#15 stay open for remaining QA, production deployment and explicit launch approval. Security measures added by #51 and production gates documented by #52 are not a public deployment authorization.
 
 
 ## Scope and status
@@ -41,7 +41,7 @@ Owner terminal audit: `910b354` web-only build 18.5 s, verified 112 KiB backup `
 
 Owner authorized merging validated engineering changes. PR #44 merged `2358ef4`, #45 `3207a88`, #46 `7ef0bf1`; exact CI for each green, #46 212 tests, four migrations, all 12 artwork hashes and full HTTP smoke. Owner isolated pnpm 10.15.1 lock regeneration at `ebee88b` reports zero critical/moderate, one high in both JS audit scopes. Cloud Shell remained on `a27f4da`, four healthy services and 18 GB disk free; no live rebuild or save change. The remaining Prisma advisory was subsequently resolved in PR #48; production protections remain release blockers.
 
-## Latest live security and inference handoff — November 19
+## Historical live security and inference handoff — November 19 (before VM recycling)
 
 PR #48 exact `f69a373` passed [CI 44598068478](https://github.com/AlexandroLeao/ami-108/actions/runs/44598068478): 215 tests (100 API/44 web/71 Python), Prisma validate/generate, four migrations and up-to-date status, full campaign and 12 artwork hashes. Merged `f89c342`, main CI 44598507917 green. Owner installed API/web only (143 seconds build), verified private 119 KiB archive `pre-security-20261119-192956.dump` (checksum, list and full archive read), three sessions and zero pending generations before/after, migrations current and all health endpoints OK. Previous images retained. Initial API recreation omitted the inference flags/token; authored fallback remained available.
 
