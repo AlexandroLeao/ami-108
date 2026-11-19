@@ -434,7 +434,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
           )}
           {overlay === 'extras' && (
             <section className="extras-screen">
-              <header><h1>{labels.extras}</h1><span>{extrasPage + 1}/{extrasPages.length}</span></header>
+              <header><h1>{labels.extras}</h1></header>
               <article className="extras-card" aria-live="polite">
                 <h2>{extrasPages[extrasPage].title}</h2>
                 {extrasPages[extrasPage].paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
