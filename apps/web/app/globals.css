@@ -611,7 +611,7 @@ button:focus-visible, a:focus-visible {
 .campaign-warning-copy {
   box-sizing: border-box; width: min(100%, 680px); max-height: 100%;
   padding: clamp(6px, 2vw, 20px); display: grid; gap: clamp(4px, 1.2dvh, 12px);
-  text-align: center; align-content: center; overflow: auto;
+  text-align: center; align-content: safe center; overflow: auto;
   font-size: clamp(20px, 3vw, 28px); line-height: 1.05;
 }
 .campaign-warning-copy h1 { margin: 0; color: var(--alert); font-size: clamp(25px, 4vw, 42px); line-height: 1; }
