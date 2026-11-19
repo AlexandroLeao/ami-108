@@ -83,6 +83,18 @@ try {
     method:'POST', headers:{Origin:webOrigin,'Content-Type':'text/plain'}, body:'{}'
   })).status, 415);
   assert.equal((await call('session', 'POST', { locale: 'x'.repeat(2048) })).status, 413);
+  // A streaming request has no declared Content-Length; enforce the same raw-byte limit.
+  const oversizedStream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('x'.repeat(1024)));
+      controller.enqueue(new TextEncoder().encode('x'.repeat(1025)));
+      controller.close();
+    }
+  });
+  assert.equal((await fetch(webOrigin + '/api/game/session', {
+    method: 'POST', headers: { Origin: webOrigin, 'Content-Type': 'application/json' },
+    body: oversizedStream, duplex: 'half', signal: AbortSignal.timeout(10000)
+  })).status, 413);
   const created = await call('session', 'POST', { locale: 'pt-BR' });
   assert.equal(created.status, 201);
   const setCookie = created.headers.get('set-cookie');
