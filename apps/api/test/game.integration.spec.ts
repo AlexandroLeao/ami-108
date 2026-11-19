@@ -316,7 +316,7 @@ integration('Chapter 1 HTTP API with migrated PostgreSQL', () => {
     await request(app.getHttpServer()).get('/game/asset?key=CENA-09').set('Cookie',cookie).expect(200);
     await request(app.getHttpServer()).get('/game/asset?key=CENA-10').set('Cookie',cookie).expect(404);
     const checkpoint=await prisma.gameCheckpoint.findUniqueOrThrow({where:{sessionId_checkpointId:{sessionId:row.id,checkpointId:'CP-BOAR'}}});
-    expect(checkpoint.snapshot).toMatchObject({diagnostics:{energy:3,bio:100,personalUnlocked:true},ship:{powered:true,gateOpen:false,enginesOn:false,launched:false}});
+    expect(checkpoint.snapshot).toMatchObject({diagnostics:{energy:3,bio:100,personalUnlocked:true},ship:{powered:false,gateOpen:false,enginesOn:false,launched:false}});
     const consult=view.actions.find(a=>a.kind==='CONSULT')!;
     const consultBody={commandId:randomUUID(),expectedRevision:view.revision,actionId:consult.id};
     const consultSend=()=>request(app.getHttpServer()).post('/game/commands').set('Cookie',cookie).send(consultBody);
