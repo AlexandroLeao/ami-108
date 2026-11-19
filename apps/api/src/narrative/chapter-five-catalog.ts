@@ -1,5 +1,5 @@
 // Server-only Chapter 5 source catalog. Master v1.13 §7.
-// Not connected to the campaign, API, or browser yet. Original artwork only.
+// Original artwork only; campaign dispatch and persistence live outside this catalog.
 import { local, type Localized } from './catalog';
 import type { EncounterDefinition } from './encounter';
 
