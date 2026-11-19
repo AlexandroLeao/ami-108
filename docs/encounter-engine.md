@@ -2,7 +2,7 @@
 
 ## Day 4 candidate — CP-BOAR
 
-Chapter 5 integration candidate creates CP-BOAR at first boar sighting, powered ship, closed gate, engines off, all memories 100%, energy 3. Existing checkpoint/slot tables persist the snapshot and immutable authored CORRECT slots with the session/receipt transaction. Three lethal choices, one success, no RNG or model authority; retry restores checkpoint and keeps slots. No new schema or changes to dog/rat. Exact CI and owner playtest pending.
+Chapter 5 integration candidate creates CP-BOAR at first boar sighting, unpowered ship, closed gate, engines off, all memories 100%, energy 3. Existing checkpoint/slot tables persist the snapshot and immutable authored CORRECT slots with the session/receipt transaction. Three lethal choices, one success, no RNG or model authority; retry restores checkpoint and keeps slots. The correct strategy remotely activates a heater at the far end of the hangar, waits for the path to clear, retrieves the cell, opens the gate and launches. No new schema or changes to dog/rat mechanics. RAT-01/02/03 consequences are second-person bilingual text only. Exact CI and owner playtest pending.
 
 
 ## Current encounter rules
