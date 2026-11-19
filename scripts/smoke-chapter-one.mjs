@@ -6,6 +6,35 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 
+const contract = JSON.parse(await readFile(new URL('../docs/api/game.openapi.json', import.meta.url), 'utf8'));
+const schemas = contract.components.schemas;
+// Focused wire-shape checks against the documented contract, not a full JSON Schema validator.
+function assertShape(name, value) {
+  const schema = schemas[name];
+  assert.ok(value && typeof value === 'object' && !Array.isArray(value), name);
+  for (const key of schema.required) assert.ok(Object.hasOwn(value, key), name + ' missing ' + key);
+  for (const key of Object.keys(value)) assert.ok(Object.hasOwn(schema.properties, key), name + ' unexpected ' + key);
+}
+function assertProjection(view) {
+  assertShape('Projection', view);
+  for (const field of ['phase','locale','cue']) assert.ok(schemas.Projection.properties[field].enum.includes(view[field]), field);
+  assert.equal(view.pending, false);
+  assert.ok(Number.isInteger(view.revision) && view.revision >= 0);
+  assert.ok(Number.isInteger(view.chapter) && view.chapter >= 1 && view.chapter <= 5);
+  if (Object.hasOwn(view, 'complete')) assert.equal(typeof view.complete, 'boolean');
+  if (view.diagnostics) assertShape('Diagnostics', view.diagnostics);
+  if (view.asset) assertShape('Asset', view.asset);
+  for (const action of view.actions) {
+    assertShape('Action', action);
+    assert.ok(schemas.Action.properties.kind.enum.includes(action.kind));
+  }
+  for (const chapter of view.chapters) assert.deepEqual(Object.keys(chapter).sort(), ['number','title']);
+}
+function assertResult(result) {
+  assertShape('CommandResult', result);
+  assert.ok(schemas.CommandResult.properties.status.enum.includes(result.status));
+  assertProjection(result.view);
+}
 const manifest = JSON.parse(await readFile(new URL('../apps/api/assets/scenes/manifest.json', import.meta.url), 'utf8'));
 assert.equal(manifest.scenes.length, 12);
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -46,15 +75,29 @@ try {
   assert.match(await home.text(), /AMI-108/);
   assert.equal((await call('view')).status, 401);
   assert.equal((await call('session', 'POST', { locale: 'pt-BR' }, 'https://other.example')).status, 403);
+  assert.equal((await call('session')).status, 405);
+  assert.equal((await call('internal/generate', 'POST', {})).status, 404);
+  assert.equal((await call('view?unexpected=1')).status, 400);
+  assert.equal((await call('session', 'POST', { locale: 'pt-BR', extra: true })).status, 400);
+  assert.equal((await fetch(webOrigin + '/api/game/session', {
+    method:'POST', headers:{Origin:webOrigin,'Content-Type':'text/plain'}, body:'{}'
+  })).status, 415);
+  assert.equal((await call('session', 'POST', { locale: 'x'.repeat(2048) })).status, 413);
   const created = await call('session', 'POST', { locale: 'pt-BR' });
   assert.equal(created.status, 201);
   const setCookie = created.headers.get('set-cookie');
   assert.match(setCookie, /^ami_session=[A-Za-z0-9_-]{43}; HttpOnly; SameSite=Lax; Path=\/; Max-Age=2592000$/);
   cookie = setCookie.split(';')[0];
   let view = await created.json();
+  assertProjection(view);
+  assert.ok(!JSON.stringify(view).includes(cookie.split('=')[1]));
+  assert.deepEqual(view.chapters.map(c=>c.number),[1]);
   assert.equal(view.phase, 'CHAPTER_CARD');
   assert.equal(view.asset, null);
   assert.equal((await call('asset?key=CENA-01')).status, 404);
+  assert.equal((await call('asset?key=../../secret')).status, 404);
+  assert.equal((await call('commands','POST',{commandId:randomUUID(),expectedRevision:view.revision,actionId:'CHAPTER/RESTART/5'})).status,403);
+  assert.deepEqual(await (await call('view')).json(),view);
   const verifiedAssets = new Set();
   const verifyCurrentArtwork = async () => {
     if (!view.asset) return;
@@ -70,6 +113,7 @@ try {
     const result = await call('commands', 'POST', body);
     assert.equal(result.status, 200);
     const outcome = await result.json();
+    assertResult(outcome);
     assert.equal(outcome.status, 'APPLIED');
     view = outcome.view;
     await verifyCurrentArtwork();
@@ -86,12 +130,15 @@ try {
   assert.equal(view.text, 'Sangue...?');
   assert.deepEqual(Buffer.from(await (await fetch(webOrigin + view.asset.url, { headers: { Cookie: cookie } })).arrayBuffer()), pixels);
   const replay = await (await call('commands', 'POST', body)).json();
+  assertResult(replay);
   assert.equal(replay.status, 'REPLAYED');
   assert.equal(replay.view.revision, view.revision);
   assert.equal((await call('asset?key=CENA-12')).status, 404);
   const translated = await call('locale', 'PATCH', { commandId: randomUUID(), expectedRevision: view.revision, locale: 'en' });
   assert.equal(translated.status, 200);
-  view = (await translated.json()).view;
+  const localeResult = await translated.json();
+  assertResult(localeResult);
+  view = localeResult.view;
   assert.equal(view.text, 'Blood...?');
   assert.deepEqual(await (await call('view')).json(), view);
   const resumed = await fetch(webOrigin, { headers: { Cookie: cookie } });
@@ -178,6 +225,8 @@ try {
   assert.equal(view.complete,true);
   assert.deepEqual(await (await call('view')).json(),view);
   assert.deepEqual([...verifiedAssets].sort(),[...expectedHashes.keys()].sort());
+  assertProjection(view);
+  console.log('Wire contract and facade rejection checks passed.');
   console.log('Built Next.js/NestJS smoke passed: complete campaign, all 12 HTTP artwork hashes, session, locale, checkpoints, restoration, launch and credits.');
 } finally {
   for (const child of children) child.kill('SIGTERM');

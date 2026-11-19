@@ -1,0 +1,38 @@
+# Release QA and security evidence — AMI-010
+
+## Scope and status
+
+The owner approved the entire five-chapter campaign, desktop/mobile, and requested no narrative, artwork, layout or mechanics changes. Accepted runtime is PR #38 merge `7ae614d`; docs-only PRs #39/#40 followed. This is a release preparation checklist, not a claim of production readiness. Repository remains private and the mandatory cost budget is R$ 0.
+
+| Check | Evidence / status |
+| --- | --- |
+| Campaign regression | Exact approved head `817aa5d`, [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677): 100 API, 30 web, 71 Python tests, four migrations, lint/types/build, full HTTP campaign and twelve original image hashes. Owner desktop/mobile preview reached credits. |
+| Durable state | PostgreSQL integration: session isolation, restart, concurrency, idempotent receipts, F1/F2/F3, three checkpoints, immutable consultation slots and chapter replay. Owner confirmed port 3000 saves resumed. |
+| Local API contract | Candidate adds focused built-HTTP checks of projection/result shapes and facade rejection paths, with reconciled OpenAPI. Candidate CI pending; not a complete schema conformance audit. |
+| Existing security controls | Random 32-byte session capability, digest stored, provisional 30-day expiry, HttpOnly/SameSite=Lax and Secure on HTTPS facade, current-only image authorization, strict mutation fields, origin check, 2048-byte facade JSON limit, private/no-store. Internal AI bearer token and 8192-byte request limit; no browser route to provider. DB has no published port; local web/API/AI ports bind loopback. |
+| Controlled AI | Prior real-provider evaluation 81/82 validated, 21/24 distinct RANDOM options; live 10/10, cached slots unchanged, safe fallback. New VM runs fallback until pinned model reactivation and repeat regression. BOAR is authored only. |
+| Dependency advisories | Pending current lockfile scans for JS and Python; record findings, severity, reachability and remediation. CI passes do not certify absence of vulnerabilities. |
+| Production security | Open: production-mode routing and trusted origin, rate limits/quotas, body streaming bounds, session retention policy/cleanup, security headers, TLS, private network/secrets, monitoring and deployment review. Dev preview must not be exposed as production. |
+| Accessibility | Owner approved desktop/mobile appearance; keyboard/focus, reduced motion, screen-reader announcements, zoom and automated accessibility audit still need documented evidence. Preserve approved visual design. |
+| Performance | Local model benchmark exists; collect current warm/cold request latency, resource use and mobile rendering evidence on actual hardware; no universal latency claims. |
+| Release | #12 security/QA, #13 zero-cost deployment decision, #14 final docs and #15 explicit release approval remain open. License/asset distribution and visibility need owner decision. |
+
+## Runbook for evidence
+
+1. Verify local VM, backup integrity, exact git SHA, four migrations and restored Continue before tests; no restore over a nonempty DB. Use an isolated disposable test database for new regression runs.
+2. Re-enable the previously approved pinned local provider only after checking memory, free disk, internal-only network, model ID and a 10-case direct regression. Record aggregate results, not tokens, cookies, prompts or save contents.
+3. Run JS dependency audit against the frozen lockfile and Python audit against the locked dependency export (without modifying lockfiles). Record date, tool/version, exit code and advisory IDs; review dev versus shipped dependencies. Do not automatically upgrade or dismiss advisories without checking compatibility and rerunning regression. No paid scanners.
+4. Run the built HTTP smoke and unit/integration suites in CI. Test invalid inputs, unauthorized assets, stale/duplicate commands, session isolation, origin rejection, no future facts, provider timeout and fallback. Never send real saves to CI.
+5. Check actual desktop/mobile and keyboard navigation, focus visibility, reduced-motion preference, 200% zoom and screen-reader labels. Record findings and distinguish automated results from manual review.
+6. Record performance with the approved hardware, browser viewport, configuration and sample size; no production capacity claim from Cloud Shell.
+7. Before any public hosting, complete production hardening and confirm verified zero mandatory cost; no cloud resources, billing or public visibility changes without owner authorization.
+
+## Known release blockers
+
+- Local preview is intentionally gated by `AMI_DEV_PREVIEW=1`; production entry point and enforcement are not yet implemented.
+- No production rate limiter or session cleanup/retention job has been evidenced; the 30-day expiry is provisional.
+- The facade checks length after reading the entire request when Content-Length is absent. Streaming bounds are a production hardening task.
+- Final Day 4 shutdown archive/checksum and current VM state need owner terminal verification.
+- Complete private source synchronization, final portfolio and release decisions remain tracked separately.
+
+This document records the review of the current source and existing test evidence. It does not certify security, deployment, accessibility or performance.

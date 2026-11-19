@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AMI-108 Game API",
-    "version": "0.1.0-proposed",
-    "description": "Owner-approved local bilingual Chapters 1–3 merged in PR #25 at 985cb60; Chapter 4 card is current boundary. Authoritative game endpoints, DOG/RAT checkpoints/cache and F1/F2 restoration-linked recharge implemented. Real inference/pending generation, later chapters, production rate limits and deployment remain proposals on main. Responses never expose future narrative or solution data."
+    "version": "0.1.0-local",
+    "description": "Implemented local preview contract for the complete five-chapter campaign at 7ae614d. Same-origin Next.js facade; no production hosting or rate limit guarantee. Pending inference waits for bounded completion or authored fallback; only current authorized view is returned."
   },
   "servers": [
     {
@@ -61,8 +61,8 @@
               }
             }
           },
-          "429": {
-            "description": "Rate limit exceeded",
+          "403": {
+            "description": "Rejected origin (empty facade response), or unauthorized action (JSON error from API).",
             "content": {
               "application/json": {
                 "schema": {
@@ -70,6 +70,15 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Local preview disabled; empty facade response."
+          },
+          "413": {
+            "description": "Facade rejects body over 2048 bytes; empty response."
+          },
+          "415": {
+            "description": "Facade requires application/json; empty response."
           },
           "503": {
             "description": "Service unavailable",
@@ -109,8 +118,11 @@
               }
             }
           },
-          "429": {
-            "description": "Rate limit exceeded",
+          "404": {
+            "description": "Local preview disabled; empty facade response."
+          },
+          "409": {
+            "description": "Saved narrative version mismatch",
             "content": {
               "application/json": {
                 "schema": {
@@ -136,7 +148,7 @@
       "post": {
         "operationId": "executeCommand",
         "summary": "Execute one currently allowed action",
-        "description": "Check duplicate command receipts before revision validation. Client sends only the current action ID. Pending generation returns 202; retry identical command or GET view. Never expose outcomes before choosing.",
+        "description": "Identical duplicate commands wait or replay the current view; conflicts return 409. New actions require the current revision and authorized action ID. Pending generation is finalized within its deadline or falls back; no HTTP 202 response.",
         "requestBody": {
           "required": true,
           "content": {
@@ -150,16 +162,6 @@
         "responses": {
           "200": {
             "description": "Applied or replayed result",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommandResult"
-                }
-              }
-            }
-          },
-          "202": {
-            "description": "Reserved, processing or replayed pending command",
             "content": {
               "application/json": {
                 "schema": {
@@ -189,7 +191,7 @@
             }
           },
           "403": {
-            "description": "Action not authorized",
+            "description": "Rejected origin (empty facade response), or unauthorized action (JSON error from API).",
             "content": {
               "application/json": {
                 "schema": {
@@ -197,6 +199,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Local preview disabled; empty facade response."
           },
           "409": {
             "description": "Stale revision, pending command or conflicting idempotency key",
@@ -208,15 +213,11 @@
               }
             }
           },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "413": {
+            "description": "Facade rejects body over 2048 bytes; empty response."
+          },
+          "415": {
+            "description": "Facade requires application/json; empty response."
           },
           "503": {
             "description": "Service unavailable",
@@ -277,6 +278,19 @@
               }
             }
           },
+          "403": {
+            "description": "Rejected origin (empty facade response), or unauthorized action (JSON error from API).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Local preview disabled; empty facade response."
+          },
           "409": {
             "description": "Stale revision, pending command or conflicting idempotency key",
             "content": {
@@ -287,15 +301,11 @@
               }
             }
           },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "413": {
+            "description": "Facade rejects body over 2048 bytes; empty response."
+          },
+          "415": {
+            "description": "Facade requires application/json; empty response."
           },
           "503": {
             "description": "Service unavailable",
@@ -346,7 +356,7 @@
             }
           },
           "404": {
-            "description": "Not found or not authorized",
+            "description": "Missing, malformed, stale or unauthorized key; facade can return an empty response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -355,8 +365,8 @@
               }
             }
           },
-          "429": {
-            "description": "Rate limit exceeded",
+          "409": {
+            "description": "Saved narrative version mismatch",
             "content": {
               "application/json": {
                 "schema": {
@@ -433,11 +443,10 @@
             "enum": [
               "CONTINUE",
               "INTERACT",
+              "PREVIOUS",
               "CONSULT",
               "CHOOSE",
-              "RETRY",
-              "FINISH",
-              "PREVIOUS"
+              "RETRY"
             ]
           },
           "label": {
@@ -532,9 +541,7 @@
               "NARRATIVE",
               "FLASHBACK",
               "ENCOUNTER",
-              "DEAD",
-              "CREDITS",
-              "COMPLETE"
+              "DEAD"
             ]
           },
           "chapter": {
@@ -585,7 +592,9 @@
             }
           },
           "pending": {
-            "type": "boolean"
+            "type": "boolean",
+            "const": false,
+            "description": "Completed current projection. Server waits outside transaction for pending reservation to finalize."
           },
           "narration": {
             "type": "boolean",
@@ -611,7 +620,11 @@
               "memory-shiver",
               "name-reveal",
               "energy-reveal",
-              "archive-record"
+              "archive-record",
+              "crt-reveal",
+              "crt-startle",
+              "disoriented",
+              "f3-count"
             ],
             "description": "Presentation cue for current authored beat only; no game-state effect."
           },
@@ -636,6 +649,10 @@
               ]
             },
             "description": "Only chapters reached by this session, including earlier chapters after replay. No future chapter titles."
+          },
+          "complete": {
+            "type": "boolean",
+            "description": "Optional Chapter 5 completion marker; credits have complete=true and no actions."
           }
         },
         "required": [
@@ -683,12 +700,14 @@
           },
           "expectedRevision": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 2147483646
           },
           "actionId": {
             "type": "string",
             "minLength": 1,
-            "description": "Current authorized action ID or CHAPTER/RESTART/N for a previously unlocked chapter. Server validates progress and revision."
+            "description": "Current authorized action ID or CHAPTER/RESTART/N for a previously unlocked chapter. Server validates progress and revision.",
+            "maxLength": 120
           }
         },
         "required": [
@@ -707,7 +726,8 @@
           },
           "expectedRevision": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 2147483646
           },
           "locale": {
             "type": "string",
@@ -735,7 +755,6 @@
             "type": "string",
             "enum": [
               "APPLIED",
-              "PENDING",
               "REPLAYED"
             ]
           },
