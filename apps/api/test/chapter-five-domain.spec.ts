@@ -31,7 +31,7 @@ describe('Chapter 5 isolated progression',()=>{
   });
   it('keeps the hangar dark until the boar reveal and checkpoints before cell retrieval',()=>{
     let s=start();
-    for(const id of ['ENTRY','PANEL','L01','L02','L03','APPROACH','NOISE','LOOK']){
+    for(const id of ['ENTRY','PANEL','L01','L01a','L01b','L02','L03','APPROACH','NOISE','LOOK']){
       s=next(s);
       expect(s.stepId).toBe('A05-S01/'+id);
       expect(viewFive(s).asset).toBeNull();
