@@ -2,15 +2,15 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AMI-108 Internal AI API",
-    "version": "0.1.0-proposed",
-    "description": "Internal-only service. NestJS owns authorization, category, budget, state and fallbacks. No client prompt, player identity, game-state mutation or arbitrary fact text is accepted."
+    "version": "0.1.0-local",
+    "description": "Implemented internal FastAPI contract. Authenticated server-to-server only. Q-BOAR is recognized on the wire but always denied by retrieval; Chapter 5 consultations are authored in NestJS. Provider selection and deadline fallback never determine game state."
   },
   "paths": {
     "/internal/generate": {
       "post": {
         "operationId": "generateUtterance",
         "summary": "Generate validated wording or request authored fallback",
-        "description": "Check question/category/fact IDs against allowlist. No future facts or external calls beyond approved budget. A returned candidate is not an authoritative game decision; NestJS enforces deadline and fallback.",
+        "description": "Requires configured bearer token and JSON body up to 8192 bytes. Validate exact question/category/fact set; unauthorized context returns FALLBACK_REQUIRED, not a new model prompt. No player identity or game-state mutation.",
         "requestBody": {
           "required": true,
           "content": {
@@ -33,7 +33,7 @@
             }
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Malformed JSON, invalid input, unsupported content type or body over 8192 bytes",
             "content": {
               "application/json": {
                 "schema": {
@@ -43,27 +43,7 @@
             }
           },
           "403": {
-            "description": "Action not authorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service unavailable",
+            "description": "Missing, incorrect or unconfigured internal token",
             "content": {
               "application/json": {
                 "schema": {
@@ -113,7 +93,8 @@
               "Q-RAT",
               "Q-BOAR",
               "INTRO-RANDOM"
-            ]
+            ],
+            "description": "Q-BOAR is accepted by the request parser but returns UNAUTHORIZED_CONTEXT. Eligible contexts: INTRO-RANDOM, Q-DOG and Q-RAT, with exact authorized categories and fact sets."
           },
           "category": {
             "type": "string",
@@ -133,7 +114,8 @@
             "type": "array",
             "items": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "maxLength": 64
             },
             "uniqueItems": true,
             "maxItems": 12
@@ -141,7 +123,8 @@
           "deadlineMs": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 30000
+            "maximum": 30000,
+            "description": "Wire limit 1–30000 ms. Gameplay adapter uses at most 2500 ms, Ollama transport 2000 ms; diagnostic requests can differ."
           }
         },
         "required": [
@@ -210,6 +193,24 @@
           }
         ]
       }
+    },
+    "securitySchemes": {
+      "internalBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Private AMI_AI_INTERNAL_TOKEN; never exposed to browser"
+      }
     }
-  }
+  },
+  "servers": [
+    {
+      "url": "http://ai:8000",
+      "description": "Internal Compose service, not a public URL"
+    }
+  ],
+  "security": [
+    {
+      "internalBearer": []
+    }
+  ]
 }
