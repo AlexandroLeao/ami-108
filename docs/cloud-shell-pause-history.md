@@ -1,6 +1,6 @@
 # Historical Cloud Shell pause/recovery runbook — November 19, 2026
 
-> **ARCHIVED — NOT THE CURRENT SHUTDOWN COMMAND.** The original runbook below records older recovery, manual pause, model installation and activation stages. Do not run its hardcoded scripts against a newer game state. For the current tested, dynamic-session-count backup procedure, use [safe Cloud Shell pause/resume](cloud-shell-pause-resume.md) and [scripts/pause-cloud-shell-safely.sh](../scripts/pause-cloud-shell-safely.sh). Player data and backups must not be deleted or restored into a populated database.
+> **ARCHIVED — NOT THE CURRENT SHUTDOWN COMMAND.** The original runbook below records older recovery, manual pause, model installation and activation stages. Do not run its hardcoded scripts against a newer game state. For the **current AI-OFF pause state** and future-return decision tree, use [safe Cloud Shell pause/resume](cloud-shell-pause-resume.md). The earlier [AI-ON pause script](../scripts/pause-cloud-shell-safely.sh) is not compatible with the latest environment and must not be rerun without an environment-specific safety review. Player data and backups must not be deleted or restored into a populated database.
 
 ---
 

@@ -39,7 +39,7 @@ Architecture and security details are in the [system design](docs/architecture/s
 
 The last owner-accepted game runtime is commit `14ea583` ([PR #53](https://github.com/AlexandroLeao/ami-108/pull/53)). The accepted game regression passed **221 automated tests** (105 API, 44 Web, 72 Python) plus the full built-campaign smoke and original artwork hash checks. Later documentation/operational PRs do not automatically change that accepted runtime.
 
-The owner tested Continue and new gameplay on desktop/mobile in both languages, with local Qwen inference and increased RANDOM-response variety. The **last verified private pause** preserved **7 sessions, 0 pending generations and 4 migrations** in a checksum-verified PostgreSQL archive. On the latest read-only Cloud Shell inspection, that backup was still intact but the previous AMI Docker containers and volumes were absent; the new VM has **not yet been restored or revalidated**. See [release readiness](docs/release-readiness-matrix.md) and [safe pause/resume](docs/cloud-shell-pause-resume.md) for current evidence and next steps.
+The owner accepted five-chapter desktop/mobile gameplay in PT-BR/EN and previously observed working private local-Qwen inference. The model's previous-VM acceptance is **historical**; on the replacement VM, inference was OFF and authored fallback remained available. The owner verified Continue, created a fully checked seven-session backup and safely stopped all four Compose services. For the **latest exact checkpoint**, consult [release readiness](docs/release-readiness-matrix.md) rather than copying its file names and VM details here.
 
 This repository remains **private**. There is **no public deployment, distribution license, official age classification or `v1.0.0` approval**. The mandatory service-cost target is **R$ 0**. Open gates are tracked in [#12 QA/security](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 hosting](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 documentation](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15 release](https://github.com/AlexandroLeao/ami-108/issues/15).
 
@@ -53,7 +53,7 @@ QA evidence and remaining manual checks are in the [release QA report](docs/rele
 
 ## Documentation
 
-Start with the [documentation index](docs/README.md). It separates current implementation references, operations, release decisions, dated evidence and archived development notes. Detailed restore logs and issue histories live there—not in this overview.
+Start with the [documentation index](docs/README.md) and [documentation maintenance policy](docs/documentation-standards.md). It separates current implementation references, operations, release decisions, dated evidence and archived development notes. Detailed restore logs and issue histories live there—not in this overview.
 
 The private **Documento Mestre v1.14** and **Roteiro Interativo v1.12** predate final Chapter 5 acceptance. Their approved-source reconciliation is pending; neither the sources nor unreleased narrative passages are distributed here.
 

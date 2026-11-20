@@ -2,13 +2,14 @@
 
 **Purpose:** Navigation, ownership and source precedence. **Not** a release certificate, chronological log, deployment approval or database recovery command. For the actual current project state, use the [release-readiness matrix](release-readiness-matrix.md); for the original game overview, see the [root README](../README.md).
 
-The accepted private campaign uses game runtime `14ea583`. The last verified backup contained **7 saved sessions**, with no pending generations and four completed migrations. The most recent Cloud Shell read-only check saw the checksum-verified backup but **no previous AMI Docker containers or volumes**; restored gameplay has not been reverified on that VM. Detailed dated evidence belongs in the reports below, not in this index.
+The five-chapter private campaign has an approved game runtime; the current VM, latest safe pause, retained backup and outstanding release decisions are recorded **only** in [release readiness](release-readiness-matrix.md). Older checkpoints are intentionally historical, not competing operating instructions.
 
 ## Current operating references
 
 | Document | Owns | Boundary |
 | --- | --- | --- |
 | [Release readiness](release-readiness-matrix.md) | Current evidence, checkpoint, issue #12–#15 status and next action | **Single status source of truth** |
+| [Documentation standards](documentation-standards.md) | Writing rules, ownership, evidence, history and PR review gates | **Maintenance policy** |
 | [Development guide](development.md) | Dependencies, repository layout, approved local runtime and safe development workflow | No unconditional restore/reinstall |
 | [Cloud Shell pause/resume](cloud-shell-pause-resume.md) | Preserve saves, inspect Docker VM, backup verification, safe return and pause | **Operational runbook**; never restore into a nonempty DB |
 | [Release QA](release-qa.md) | Dated validation results, regressions and concrete limitations | Historical observations are dated, not fresh certificates |
@@ -50,6 +51,6 @@ The accepted private campaign uses game runtime `14ea583`. The last verified bac
 
 The private **Documento Mestre v1.14** (PDF/Markdown) and **Roteiro Interativo v1.12** (PDF) describe the *November 18 Day 3* checkpoint of **4/5 chapters**, before the approved final chapter. Their original authored passages must stay private and unchanged until the owner approves reconciliation. The later **explicitly owner-approved** five-chapter changes and accepted game implementation govern observed runtime behavior; the old files do not authorize new story content. Issue [#14](https://github.com/AlexandroLeao/ami-108/issues/14) covers synchronized private revision approval.
 
-CI checks internal Markdown file paths and basic document boundaries, plus obvious tracked private-file names. It does **not** prove that external URLs work, private PDFs match the code, all historical claims remain current, the app meets WCAG, secret content is absent, or public infrastructure is secure. Those are separate verification and release gates.
+CI checks tracked local links, Markdown headings/fences, basic editorial duplication/ownership rules, ADR completeness and OpenAPI JSON/operation structure, plus obvious tracked private-file names. These checks do **not** validate external URLs, complete schema conformance, private PDF parity, factual historical truth, WCAG, hidden secrets, or public security. Manual review and separate release gates remain required.
 
-Repository engineering rules are in [AGENTS.md](../AGENTS.md). No document grants permission to expose the game, publish spoilers, change the approved rules, incur mandatory costs, delete saves or create a `v1.0.0` release without authorization.
+Repository engineering rules are in [AGENTS.md](../AGENTS.md); the [documentation policy](documentation-standards.md) defines the next review baseline. No document grants permission to expose the game, publish spoilers, change the approved rules, incur mandatory costs, delete saves or create a `v1.0.0` release without authorization.

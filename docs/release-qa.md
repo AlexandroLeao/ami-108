@@ -1,10 +1,12 @@
 # Release QA and security evidence — AMI-010
 
-## Latest read-only environment inspection — November 20, 2026
+> **Scope:** dated implementation, security and manual QA evidence. For **current** runtime, most recent backup and release decisions, use [release readiness](release-readiness-matrix.md). For pending browser tests and owner-reported keyboard/zoom passes, use the [acceptance worksheet](final-qa-acceptance-worksheet.md). Historical outcomes below are not new tests on the stopped VM.
+
+## Historical pre-recovery read-only inspection — November 20
 
 Owner reopened Cloud Shell and ran the approved non-mutating diagnostic. Local accepted `14ea583` remained clean, `.env` restricted and ignored, and the newest **182,626-byte** 7-session archive passed SHA-256 checking. **No AMI containers or volumes were found**. Root had **10 GiB available (92% used)**; `/home` had **1.7 GiB**. The seven sessions were counted during the last verified safe pause, **not on this fresh VM**; no restore, gameplay or real-provider evaluation has yet been performed on it. Keep #12 open and inspect Docker image/disk headroom before any replacement VM rebuild.
 
-## Final verified Cloud Shell pause — November 20, 2026 UTC
+## Earlier verified pause on the preceding Cloud Shell VM — November 20, 00:54 UTC
 
 The owner ran the reviewed dynamic-count safe-pause procedure against clean approved local runtime `14ea583` after successful PT-BR/EN, mobile/desktop private playtests. Web and API writers stopped first. Both pre/post archive checks confirmed **7 GameSession / 0 pending generations / 4 completed migrations**, unchanged DB container identity. A new private PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes) passed custom-format listing, complete read, and `sha256sum -c` (`OK`). A restricted `.env` backup was made outside GitHub; all four Compose containers and the local Ollama stopped without data-volume deletion. The terminal concluded `=== SAFE PAUSE COMPLETE ===`. No fresh-recovery test on a future VM has been run; preserve the archive and check before any reinstallation. A separate encrypted off-Cloud-Shell backup would further reduce reliance on home-directory persistence.
 

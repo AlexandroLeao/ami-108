@@ -1,6 +1,6 @@
 # Production plan
 
-> **Current planning state:** Five chapters are accepted in private preview, but public production, classification, licensing and the zero-mandatory-cost hosting choice remain **unapproved**. Recovery and local Qwen reactivation were confirmed, followed by owner-approved desktop/mobile PT-BR/EN gameplay. The verified end-of-day pause preserved **7 sessions, 0 pending, 4 migrations**, and all services were safely stopped on the previous VM. The latest new Cloud Shell read-only check found **no AMI containers or volumes**, with the seven-session archive checksum intact; it has not been restored yet. This is not public deployment readiness. See the [release-readiness matrix](release-readiness-matrix.md). The original seven-day calendar and earlier snapshots below are historical targets, not an authorization to deploy.
+> **Planning boundary:** The owner accepted the five-chapter private game, and the replacement Cloud Shell VM was later safely paused with a validated seven-session backup. The authoritative checkpoint, model status and remaining release gates are in [release readiness](release-readiness-matrix.md). This file preserves the original November 16–22 seven-day **planning schedule as history**; it does **not** approve a provider, paid resources, license, classification, public deployment or tag.
 
 ## Historical PR #38 handoff — November 19
 

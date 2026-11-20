@@ -2,13 +2,11 @@
 
 > **Status: current development reference (November 20, 2026).** The archived milestone log is [development-history.md](development-history.md). Do not execute commands from that historical log against live saves. For authoritative acceptance status, see [release readiness](release-readiness-matrix.md).
 
-## Accepted game and currently verified environment
+## Accepted runtime and current operating boundary
 
-- **Accepted game runtime:** clean local `main` at `14ea583a83c7c1473bc94f3b1d515a8497827ac3`, with five approved chapters, 12 original scenes, PT-BR/EN, durable game state and consultations. GitHub `main` contains later **documentation and guarded operational QA**; do not fast-forward the accepted game checkout merely to read those scripts.
-- **Previous owner-accepted gameplay:** Continue resumed correctly; desktop/mobile PT-BR/EN gameplay and varied local Qwen output were observed. The pinned model passed 10/10 direct bilingual evaluation on the previous Cloud Shell VM. These are **historical local acceptance results**, not today's model-readiness proof.
-- **Latest safe pause (November 20 UTC):** protected custom PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` (**182,626 bytes**, previously fully read and SHA-256 verified) preserved **7 sessions / 0 pending / 4 migrations**. No volume deletion occurred during shutdown.
-- **Latest current Cloud Shell read-only preflight (November 20):** accepted local git state clean, `.env` present/restricted/ignored, newest backup checksum PASS; **no AMI containers or Docker volumes**. Root filesystem **10 GiB free (92% used)**; home **1.7 GiB free**. There is **no live restored database, no observed healthy services or model residency on this VM yet**. Inspect Docker image/disk usage and archive integrity before any downloads or empty-target restore.
-- **Release boundary:** private preview only, no official age rating, license grant, paid infrastructure or public hosting. Formal [QA](release-qa.md), [release-readiness](release-readiness-matrix.md) and [production security gates](architecture/production-security-gates.md) remain open.
+The accepted local gameplay revision is `14ea583a83c7c1473bc94f3b1d515a8497827ac3`, with five chapters, PT-BR/EN, authoritative PostgreSQL saves and optional local inference with authored fallback. The owner confirmed Continue after the replacement-VM recovery and subsequently completed a safe pause. **No application service is currently running.** The prior VM's real-Qwen evaluation remains historical; the replacement VM used `AMI_AI_GENERATION=0` and had no Ollama.
+
+For the **latest verified archive, counts, disk limits and release issues**, consult [release readiness](release-readiness-matrix.md) instead of maintaining a second snapshot here. For recovery or another pause, use the [reviewed operational runbook](cloud-shell-pause-resume.md); do not fast-forward the frozen game to GitHub documentation-only `main` by default.
 
 ## Prerequisites and local boundaries
 
@@ -18,37 +16,20 @@ The local `compose.yaml` uses `AMI_DEV_PREVIEW=1`, exposes only loopback ports *
 
 Copy `.env.example` to `.env` **only when provisioning a genuinely new, disposable environment**. Never replace the existing private `.env`, share it, add it to Git, or commit dumps or cookies. Use a local URL-safe PostgreSQL password (or encode it appropriately for `DATABASE_URL`), independent secure internal token, and no paid/cloud model provider.
 
-## Read-only inspection before recovery
+## Inspect a resumed environment
 
-**The latest Cloud Shell VM has not been restored.** First use the reviewed [read-only resume diagnostic](../scripts/check-resume-readonly.sh) from current GitHub documentation without fast-forwarding the accepted local game checkout. The following additional commands only inspect Git, Docker inventory and disk usage; they do not start services, install images, create volumes or touch saves:
+**Read-only checks come first.** Before any recovery, image build, migration, game action or model pull, follow the [Cloud Shell runbook](cloud-shell-pause-resume.md). If the Docker database volume survived, never restore into it. Use the [historical developer record](development-history.md) only for provenance, **not** as a replacement for the reviewed current preflight.
 
-```bash
-cd ~/ami-108
-git status --short --branch
-git rev-parse HEAD
-docker info --format '{{.ServerVersion}}'
-docker system df
-docker image ls
-docker ps -a
-docker volume ls
-df -h / /home
-```
-
-Compare results with the [current release-readiness matrix](release-readiness-matrix.md) and [safe Cloud Shell recovery runbook](cloud-shell-pause-resume.md). Inspect the newest verified archive's structure and full readability before any restore. **Never restore into a populated database**, run `docker compose down -v`, prune volumes/images or pull/rebuild the game or model blindly. If Docker images, disk space or database state are uncertain, stop and review the evidence before any write.
-
-## Checks only after controlled restoration
-
-After the approved runtime, PostgreSQL data and application services have been restored **and independently confirmed healthy**, inspect the previously accepted private preview endpoints:
+In a separately approved, healthy private preview, the read-only status endpoints are:
 
 ```bash
-cd ~/ami-108
 docker compose ps
-curl -fsS http://localhost:3000/health
-curl -fsS http://localhost:3001/health/ready
-curl -fsS http://localhost:8000/health
+curl --fail --silent --show-error http://127.0.0.1:3000/health
+curl --fail --silent --show-error http://127.0.0.1:3001/health/ready
+curl --fail --silent --show-error http://127.0.0.1:8000/health
 ```
 
-The previously accepted game ran on port **3000**. Keep the same browser/origin and existing cookies for Continue; verify saved sessions before running new-game tests in a separate private browser context. A healthy endpoint does **not** prove that a pinned model is installed or generating. [Pinned local model preparation](../scripts/prepare-pinned-local-ollama.sh) and [API-only activation](../scripts/activate-verified-local-ai.sh) were successfully completed **on the prior VM**, not proven on this replacement VM. Do not rerun either operation without the runbook's resource, model identity, network, backup and saved-session preconditions.
+Do not run the above against stopped services to “prove” availability. The HTTP endpoints prove **only service readiness**, not local Qwen inference, saved-session integrity, UI accessibility or public capacity. Continue should be retested only when a future recovery plan actually requires it; preserve the owner's original cookies and browser origin.
 
 ## Code structure and verification
 

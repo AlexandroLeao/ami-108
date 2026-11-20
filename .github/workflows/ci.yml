@@ -39,6 +39,10 @@ jobs:
         run: |
           python3 scripts/check-doc-links.py
           python3 scripts/test-doc-links.py
+      - name: Verify documentation editorial standards and OpenAPI structure
+        run: |
+          python3 scripts/check-doc-editorial.py
+          python3 scripts/test-doc-editorial.py
       - name: Verify documentation boundaries
         run: |
           python3 scripts/check-doc-structure.py

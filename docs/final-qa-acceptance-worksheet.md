@@ -1,61 +1,48 @@
-# Final QA and release evidence — November 20, 2026
+# Final QA and release acceptance worksheet
 
-**Status: WORKSHEET, not a release certificate.** Owner-approved local game runtime `14ea583` remains frozen. The last verified private pause preserved **7 sessions, 0 pending generations, 4 migrations** in `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes, full-read and SHA-256 PASS). The game/AI was stopped cleanly. A later **read-only inspection** of the replacement Cloud Shell VM confirmed a clean accepted local game checkout, restricted ignored `.env` and matching archive checksum, but **no AMI containers or volumes**; root free space was **10 GiB**. The archive's complete read and seven-session count were verified at the prior pause, **not restored or recounted** on this VM.
+**Status:** evidence checklist, not a WCAG, security or public-release certificate. The accepted game runtime is `14ea583`; the latest seven-session private backup and paused VM state are owned by [release readiness](release-readiness-matrix.md). No changes to player saves or the frozen game are authorized by this worksheet.
 
-## Current restored private preview — November 20, 2026
+## Accepted functional evidence
 
-The owner subsequently recovered the replacement Cloud Shell VM, after the earlier read-only inspection recorded above. A fresh PostgreSQL 17 database was proven empty and restored once from the checksum-verified and fully readable seven-session archive. SQL then confirmed **7 sessions / 0 pending generations / 4 finished migrations**. Web, API, FastAPI and PostgreSQL are **healthy** and the owner confirmed **Continue** works on private port 3000; the specific browser locale was not recorded, so **A09 bilingual locale-switch verification remains incomplete**. The API was explicitly confirmed with `AMI_AI_GENERATION=0`; **no live Qwen inference on this VM has been verified**. Last observed root disk free: **5.8 GiB**. Do not repeat restore, infer accessibility compliance, or attempt the historical pinned-model scripts with their hardcoded six-session and 10 GiB prerequisites.
+- The approved five-chapter PT-BR/EN campaign, three encounters and twelve original scene assets passed the accepted **221-test PR #53 CI** and built-campaign/artwork smoke. These tests use disposable state, not the owner's real saves.
+- Previous-VM pinned Qwen2.5:1.5b direct authenticated evaluation passed **10/10 bilingual cases** after an earlier first-load 8/10 with two safe timeouts; the owner approved private desktop/mobile gameplay. **This does not demonstrate live model residency on the last replacement VM**, where inference was OFF.
+- After controlled recovery on the replacement VM, the owner confirmed **Continue** on private Web Preview port 3000. The user also reported **keyboard-only menu/dialogue/button operation** and **200% browser zoom usability** passing. The exact browser, OS, device and locale for those two checks were **not recorded**.
+- The latest private backup was fully read, checksum-verified and preserves **7 saved sessions / 0 pending / 4 finished migrations**. The game was safely paused without deleting volumes. The authoritative filename is recorded in [release readiness](release-readiness-matrix.md).
 
-## Accepted evidence
+## Accessibility and browser checks — issue #12
 
-- All five chapters, two locales, twelve original scene illustrations and three encounters passed accepted gameplay/CI checks. At the worksheet's initial documentation checkpoint (`6bda027`), Python/TypeScript CI was green, 29 Markdown files passed internal-link and structure checks, and the full built-campaign smoke checked all 12 artwork hashes. Later documentation-only merges require their own exact CI evidence; this dated count is not today's repository inventory.
-- Resident local Qwen2.5:1.5b passed ten authenticated direct PT-BR/EN cases at 1220–1711 ms; its earlier first-load 8/10 had two safe timeouts. Owner verified activation and normal fresh-game RANDOM variety on mobile and desktop in both languages. Not per-receipt telemetry or universal latency evidence.
-- Saved Continue worked on the previous VM **and was observed working again on the new restored VM**. Locale switching and formal screen-reader acceptance remain unverified. Never clear the owner's session cookies or restore over a populated database.
+Record a test as **passed only for the actually tested configuration**. Owner-reported checks can be accepted as observations without fabricating browser, assistive technology or per-language coverage. Use a separate disposable browser profile for new-game/destructive tests; preserve the owner's real saves.
 
-## Browser and accessibility matrix — issue #12
-
-Use the existing private preview only **after** a read-only environment preflight and safe resume. Existing save tests stay in the original browser; all new games in separate/private profiles. Record browser/OS/version, locale, viewport, screen reader/version, actual pass/fail, and a short reproduction note; avoid screenshots of cookies, secrets or spoilers.
-
-| ID | Gate | PT-BR | EN |
+| ID | Test | Available evidence | Still required |
 | --- | --- | --- | --- |
-| A01 | Keyboard-only menu: Tab/Shift+Tab, Enter/Space, visible focus | NOT RUN | NOT RUN |
-| A02 | Warnings, Extras, Language and Pause dialogs: focus trapping/Escape/Back | NOT RUN | NOT RUN |
-| A03 | Dialogue/choices: correct focus, arrows, image/action gate | NOT RUN | NOT RUN |
-| A04 | Real screen reader speaks meaningful headings, dialogues, choices and errors | NOT RUN | NOT RUN |
-| A05 | Reduced-motion setting: readable reveals, transitions and credits | NOT RUN | NOT RUN |
-| A06 | 200% zoom: no clipping or unreachable controls | NOT RUN | NOT RUN |
-| A07 | Mobile portrait and short landscape: visible text and navigation | OWNER FLOW PASSED; FULL A11Y NOT RUN | OWNER FLOW PASSED; FULL A11Y NOT RUN |
-| A08 | Current scene image alt and retry/error recovery | NOT RUN | NOT RUN |
-| A09 | Continue and locale switch preserve authorized progress | PARTIAL: Continue passed, locale unspecified; switch not retested | PARTIAL: Continue passed, locale unspecified; switch not retested |
-| A10 | Automated accessibility audit in menu/modal/game states | NOT RUN | NOT RUN |
+| A01 | Keyboard menu, Tab/Shift+Tab, Enter/Space and visible focus | Owner reported keyboard menu PASS; locale unspecified | Record any missing focus-state coverage and locale-specific results if required |
+| A02 | Warning/Extras/Language/Pause modal focus, Escape and Back | NOT RUN as complete modal/focus-trap suite | Manual assistive-technology/focus checks |
+| A03 | Dialogue, choice navigation and current-image gating | Owner reported keyboard dialogue/buttons PASS; locale unspecified | Per-locale focus/arrow/gating observations |
+| A04 | Screen reader announces headings, dialogue, errors and language | NOT RUN | PT-BR and EN assistive-technology tests |
+| A05 | Reduced-motion readability, transitions and credits | NOT RUN | Native reduced-motion tests |
+| A06 | 200% browser zoom with accessible controls | Owner reported PASS; locale/viewport unspecified | Screen-size/locale-specific clipping checks if release requires |
+| A07 | Mobile portrait/landscape usability | Earlier owner desktop/mobile gameplay accepted in both languages | Full mobile accessibility coverage |
+| A08 | Current scene alternative text and retry/recovery | NOT RUN | Image-error/alt-text checks on test data |
+| A09 | Continue and locale-switch preservation | Continue owner-verified on restored VM; tested locale unspecified | Controlled locale-switch and session invariants |
+| A10 | Automated accessibility checks in menu/modal/game states | NOT RUN | Document scan tool, version, results and remaining manual cases |
 
-### Owner-reported keyboard and 200% zoom acceptance — November 20, 2026
+## Performance and security evidence — issue #12
 
-After confirming **Continue** on the restored port-3000 preview, the owner reported that the requested **keyboard-only navigation of menu, dialogue and buttons** and **200% browser zoom legibility/usability** checks passed. These are manual, owner-observed results, not measured automated audits. Browser/OS, viewport and tested locale were not recorded. Treat A01/A03/A06 as **partial observed pass (locale unspecified)**; do not infer all modal focus traps, bilingual coverage, screen-reader compliance, reduced-motion testing or WCAG certification. The report is also recorded in issue #12.
-
-## Safe read-only backend evidence collection
-
-Only **after** the exact accepted local runtime and healthy Web/API/AI/DB/model have been safely resumed (no restore into populated DB), use [read-only resumed QA metrics](../scripts/qa-readonly-resumed-metrics.sh) from the reviewed GitHub commit. It checks actual session/pending/migration counts (at least seven saved), model network and generation ON, takes five non-mutating HTTP health samples per endpoint and one Docker CPU/memory snapshot. It does **not** open a new game, request model generation, or create/delete/update saves. This is useful backend readiness evidence, **not** gameplay p95, screen-reader or public capacity certification. Do not run it before the safe-resume inspection, and stop on any mismatch.
-
-## Performance and security — issue #12
-
-| Gate | Status | Required actual evidence |
+| Gate | Current status | Required proof |
 | --- | --- | --- |
-| Device timing/cold-warm UI/images/credits | NOT RUN | Browser and network, CPU/RAM, viewport, repeat samples, median/range, no leaked HAR |
-| Real screen-reader and zoom/reduced motion | NOT RUN | Device-specific observations and reproduced defects |
-| JS/Python dependencies, licenses and container OS | HISTORICAL SCANS ONLY | New dated lockfile and image scans; triage, never auto-upgrade |
-| Origin/Host/forwarded header, cookie/session abuse | SOURCE REVIEW ONLY | Test behind selected trusted HTTPS ingress with disposable DB |
-| Rate caps, inference concurrency, retention and backups | PUBLIC RELEASE BLOCKED | Explicit policy and bounded synthetic test; never stress real saves |
+| UI cold/warm timings, image loading and credits | NOT MEASURED on replacement VM | Browser/device/network, CPU/RAM, repeat samples and median/range; no sensitive HAR files |
+| Local AI latency and failure fallback | Historical **10/10** direct model cases; model absent on latest VM | Fresh test on actual chosen inference host, if deployment uses AI |
+| Dependencies, licenses, container images and OS | Historical JS/Python dependency scans and CI checks | New dated scans, advisory triage, OS/container and license review |
+| Session cookies, origin/Host proxy and private assets | Local source/CI coverage, public deployment NOT TESTED | Test trusted HTTPS ingress with disposable state and hostile headers |
+| Rate limiting, anonymous creation, model concurrency, retention and restore | NOT APPROVED FOR PUBLIC DEPLOYMENT | Bounded synthetic load, abuse policy, monitoring, privacy and recovery plan |
 
-Read the [existing a11y plan](accessibility-performance-qa.md) and [proposed production security gates](architecture/production-security-gates.md) for detailed cases. Automated green CI does not equal WCAG compliance or production security.
+The [browser QA plan](accessibility-performance-qa.md) owns test methods. The [production-security checklist](architecture/production-security-gates.md) owns deploy-specific controls. The [dependency audit](dependency-security-audit.md) owns historical advisory evidence. CI's private-file-name guard does **not** inspect every secret embedded in content.
 
-**Repository privacy hygiene:** CI now checks tracked filenames for accidental `.env` variants, PostgreSQL dumps, private keys, canonical Master/Script documents and original private asset archives. This guards paths only. It does **not** inspect file contents or certify that source strings, logs or fixtures are secret-free. Additional credential, license, dependency, container and deployment reviews remain required. It never reads or uploads the real private backups under the owner's Cloud Shell home.
+## Release acceptance — issues #13–#15
 
-## Release-critical decisions — issues #13–#15
+- [ ] **#13 Hosting:** owner approves an actual architecture with mandatory cost R$ 0 (or separately agrees to a cost exception); actual TLS/ingress, PostgreSQL persistence, secrets, quotas and model-data privacy are verified.
+- [ ] **#14 Documents:** privately reconcile the Day 3 Master v1.14 and Interactive Script v1.12 to the owner-approved final Chapter 5 and later explicit amendments. The private draft addendum remains **unapproved**.
+- [ ] **#15 Rights and release:** verify source/art distribution license, applicable Brazilian classification and whether repository visibility can change; obtain explicit tag/public-launch approval.
+- [ ] **#12 QA/security:** satisfy or explicitly scope the remaining accessibility, measured-performance, public threat/abuse and dependency-image gates.
 
-- [ ] #13: Choose and prove **R$ 0 mandatory cost** deployment with owner authorization, quotas/terms, TLS, isolation, secrets, recovery and sustainable capacity. Or explicitly accept **private-only completion** without public hosting.
-- [ ] #14: Privately reconcile Master v1.14 and Interactive Script v1.12 with the accepted Chapter 5 and subsequent amendments; approve new source revisions without changing approved dialogue. The separate private addendum is **only a draft for owner review**.
-- [ ] #15: Decide project/asset license, distribution permissions, applicable Brazilian content classification and formal public-release approval; do not change visibility or create `v1.0.0` based only on a target date.
-- [ ] #12: Complete real browser a11y, measured performance and production threat/abuse testing.
-
-**Decision status:** PRIVATE PLAYABLE GAME ACCEPTED; PRIVATE DOCUMENT SYNC PENDING; PUBLIC HOSTING NOT PROVISIONED; PUBLIC RELEASE NOT AUTHORIZED. Keep #12–#15 open until the actual evidence and owner decisions satisfy each acceptance criterion.
+**Current decision:** owner-approved **private playable campaign**; canonical reconciliation pending; public hosting not provisioned; public release not authorized. The previous seven-day production target is not a waiver of these checks.

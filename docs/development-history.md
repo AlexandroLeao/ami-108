@@ -175,3 +175,36 @@ After the verified database backup and stop procedure above, reopen Cloud Shell,
 ## Resume verification — November 18 (later session)
 
 Cloud Shell replaced the ephemeral VM (Docker initially empty). Owner restored checksum-verified `day3-final-20261118-140919.dump` into a newly created empty PostgreSQL volume; custom archive full read and single-transaction restore succeeded. Rebuild at `d587be9` succeeded, four migrations current, four services healthy, one original session retained; owner confirmed Continue in port 3000. No repeat restore. New VM: 7.8 GiB total RAM, 4.7 GiB available after startup, 27 GB root free, 1.7 GB persistent home free. Generation still disabled. Re-evaluate the pinned warmed provider in isolation under current resource constraints before live opt-in. Prior benchmark script hardcodes historical pre-merge `af212f0`; adapt only the temporary script guard to `d587be9` and bound the experimental Ollama container to 3 GiB. Do not change deadlines, main runtime or player database. Previous real model performance does not establish performance on this VM.
+
+## Historical AGENTS presentation amendments and Day 2 acceptance (moved from agent instructions)
+
+> **ARCHIVED — NOT CURRENT OPERATING RULES.** This section preserves earlier owner refinements and CI history formerly repeated in `AGENTS.md`. The last explicitly approved frozen presentation is defined in [UI design](ui-design.md), [narrative engine](narrative-engine.md) and the actual accepted runtime; newer approvals supersede interim experiments.
+
+- November 17 owner refinement in PR #22: concise E-JOIN narration and three red information cards, three dark dog approach beats and a single loaded-art startle cue, two warning beats, no PREVIOUS at active decisions, dark consequences/branches, pixel skull death card and persistent chapter selection under Continue. Preserve unlocked high-water mark and immutable consultation slots on explicit chapter restart; no new story events, assets or mechanics beyond this authorized presentation/replay amendment. See docs/encounter-engine.md and docs/ui-design.md. Private cumulative source update follows owner acceptance.
+
+- Second owner refinement: remove the solar tutorial card (normalize retired saved cursor), shorten accurate-answer information, three dark terminal-arrival beats, MEM-D2 blink-to-black and silent/voice/AMI call, wake on L15, three recognition beats with E-NAME at L18c, red skull and energy bars without numeric fraction. Keep F1/SOL-01, cache, chapter selection and unrelated presentation intact.
+
+- Third owner refinement: abbreviated Continue/Chapter labels, energy-only enlarged HUD (memory rules and persisted values unchanged), revised ARRIVAL-03, FOUND fade-in, revised cake-related L04, split F01/F01b and MEM-D2 pain text. Preserve SOL-01 timing and planned SOL-02, no unapproved solar mechanics or other story/UI changes.
+
+- Fourth owner refinement: reduce repeated storage-component wording, continuous memory-shiver only FB-D1b–g/MEM-D2/F01/F01b, one-shot name-reveal on L18c, original approved CENA-04 geometry (experimental override reverted after owner review), manifest and HTTP artwork hashes checked. Preserve original art, stable IDs, event effects, chapter replay and solar mechanics.
+
+- Owner correction: preserve the exact b9da1be layout for normal dialogue and choices; do not adjust image or frame dimensions without specific owner approval. A02-S02/L04 has one localized text for all success variants; no recipe-dependent alternative. Name reveal 1800ms; no unrelated changes.
+
+- Targeted owner refinement: energy-reveal on first information card, same CENA-04 with one-shot veil/brief layer shake, L08b solar lead-in (SOL-01 still on entry to L09), alternating name reveal 2600ms. No changes to approved dimensions or other dialogue, rules or artwork.
+
+- Latest owner refinement: exact shortened ARRIVAL-03; dark FOUND and L01-only CENA-05 veil; slower dog reveal with text first; faster distinct ???/DAVID alternation. No other changes to text, layout, original assets or mechanics.
+
+### Accepted Day 2 baseline
+
+PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
+
+Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.
+
+- Final rules supersede earlier refinement notes: 77 Chapter 1 beats; three red information cards with energy reveal on the first; energy-only HUD; exact pre-dog-resize approved geometry; no back at decisions; dark success, red skull, chapter-number-only replay. ARRIVAL-03 exact shortened wording, FOUND dark, L01 original CENA-05 with 700ms veil, dog L01 1450ms reveal with 435ms initial dark hold after load, L18c 1500ms alternating name reveal. All branches use the same approved L04. SOL-01 on entry to L09 after L08b. Do not change approved dialogue, dimensions, assets, or rules without explicit owner authorization. Earlier refinement descriptions are historical, not current instructions.
+- Next AMI-007/008; AMI-006 partial. Preserve the approved baseline and use a new feature branch. No paid service, real provider or public deployment without separate verification/authorization.
+
+## Superseded Docker disk-cleanup advice from the original asset guide
+
+> **HISTORICAL — DO NOT RUN ON THE CURRENT OR UNKNOWN VM.** The older asset guide contained generic Docker image removal, cache pruning and rebuild commands that are not suitable for the currently paused owner environment. This passage is retained only to explain prior engineering changes; the [active asset guide](assets.md) and [safe runbook](cloud-shell-pause-resume.md) supersede it.
+
+If Compose fails during a build with `No space left on device`, inspect `df -h /`, `df -i /` and `docker system df`. The Node Dockerfile installs and builds as the unprivileged node user; it no longer recursively changes ownership of the whole dependency tree. To reclaim space, stop this project with `docker compose down --rmi local` (retains PostgreSQL volumes), then run `docker builder prune -a` only if you can discard unused build caches, including those from other projects. Confirm the prompt, check free space and rebuild sequentially with `docker compose --parallel 1 up --build -d --wait`. Never add `--volumes` or `-v` to recovery commands. The corrective Dockerfile requires a fresh integrated runtime check; application CI alone does not verify container builds.
