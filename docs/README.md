@@ -35,6 +35,7 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [Assets](assets.md) | Original scene images and asset workflow |
 | [AI/RAG](ai-rag.md) | Server-bounded facts, generation authorization and fallbacks |
 | [Optional cloud inference evaluation](cloud-inference-evaluation.md) | Proposed Workers AI connector, privacy/cost gates, local/offline tests and provider-acceptance plan | **Not activated / no deployment** |
+| [Groq Free inference evaluation](groq-inference-evaluation.md) | Free-tier quotas, strict GPT-OSS response contract, privacy, CI and live-acceptance gates | **Candidate only; not activated** |
 | [Local AI evaluation](ai-local-evaluation.md) | **Dated** real-model evaluation and activation history |
 
 ## Historical and audit references

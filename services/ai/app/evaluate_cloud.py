@@ -14,48 +14,13 @@ import statistics
 import time
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
-from uuid import uuid4
 
 from app.cloudflare_provider import CloudflareProvider, cloudflare_config_issue, cloudflare_provider
-from app.generation import Category, GenerationRequest, Locale, Question, generate, retrieve
+from app.evaluation_scenarios import planned_requests
+from app.generation import Locale, generate
 
 _CONFIRM = "I_APPROVE_10_CLOUDFLARE_CALLS"
 _DIAGNOSTIC_CONFIRM = "I_APPROVE_1_CLOUDFLARE_CALL"
-_LOCALES: tuple[Locale, ...] = ("pt-BR", "en")
-# The data is referenced by allowlisted, pre-existing fact IDs, not a new prompt.
-_CASES: tuple[tuple[str, Question, Category, tuple[str, ...]], ...] = (
-    (
-        "intro-random",
-        "INTRO-RANDOM",
-        "RANDOM",
-        (
-            "INTRO-OCTOPUS", "INTRO-PENGUIN", "INTRO-CHESS", "INTRO-HEXAGON",
-            "INTRO-DOZEN", "INTRO-PIANO", "INTRO-CENTURY", "INTRO-ALPHABET",
-        ),
-    ),
-    (
-        "dog-random",
-        "Q-DOG",
-        "RANDOM",
-        (
-            "DOG-RECIPE", "DOG-SATURN", "DOG-LAUNDRY", "DOG-NEPTUNE",
-            "DOG-PANCAKE", "DOG-POTATO", "DOG-TOWELS", "DOG-WASHING",
-        ),
-    ),
-    (
-        "rat-random",
-        "Q-RAT",
-        "RANDOM",
-        (
-            "RAT-RECIPE", "RAT-LAUNDRY", "RAT-PENGUIN", "RAT-KILOGRAM",
-            "RAT-BREAD", "RAT-FRUIT", "RAT-CALENDAR", "RAT-BOOKS",
-        ),
-    ),
-    ("dog-correct", "Q-DOG", "CORRECT", ("DOG-VISION", "DOG-HEARING", "DOG-WAIT")),
-    ("rat-correct", "Q-RAT", "CORRECT", ("RAT-LIGHT", "RAT-CONTAINMENT")),
-)
-
-
 @dataclass(frozen=True)
 class Evaluation:
     case: str
@@ -64,26 +29,6 @@ class Evaluation:
     duration_ms: float
     fallback_reason: str = "NONE"
     provider_code: str = "NO_DIAGNOSTIC"
-
-
-def planned_requests() -> tuple[tuple[str, GenerationRequest], ...]:
-    cases: list[tuple[str, GenerationRequest]] = []
-    for case_name, question, category, fact_ids in _CASES:
-        for locale in _LOCALES:
-            request = GenerationRequest(
-                requestId=str(uuid4()),
-                questionId=question,
-                category=category,
-                locale=locale,
-                factIds=list(fact_ids),
-                deadlineMs=2500,
-            )
-            if retrieve(request) is None:
-                raise RuntimeError("Local scenario no longer matches accepted allowlist")
-            cases.append((case_name, request))
-    if len(cases) != 10:
-        raise RuntimeError("Evaluation must use exactly ten authorized cases")
-    return tuple(cases)
 
 
 class EvaluationBlocked(RuntimeError):

@@ -1,0 +1,67 @@
+name: Manual Groq Free AI acceptance
+
+# No push/PR/scheduled trigger. Only an owner-operated workflow_dispatch can
+# transmit already-approved short option strings to the selected Groq model.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Start with one diagnostic request; ten-case acceptance only after review"
+        required: true
+        type: choice
+        default: diagnostic-one
+        options:
+          - diagnostic-one
+          - acceptance-ten
+      confirm:
+        description: "One: I_APPROVE_1_GROQ_CALL | Ten: I_APPROVE_10_GROQ_CALLS"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-private-groq-free-acceptance
+  cancel-in-progress: false
+
+jobs:
+  private-groq-evaluation:
+    if: ${{ (inputs.mode == 'diagnostic-one' && inputs.confirm == 'I_APPROVE_1_GROQ_CALL') || (inputs.mode == 'acceptance-ten' && inputs.confirm == 'I_APPROVE_10_GROQ_CALLS') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: services/ai
+    env:
+      AMI_AI_GENERATION: "0"
+      AMI_AI_PROVIDER: groq
+      AMI_GROQ_MODEL: "openai/gpt-oss-20b"
+      AMI_GROQ_API_KEY: ${{ secrets.AMI_GROQ_API_KEY }}
+      AMI_GROQ_EVAL_MODE: ${{ inputs.mode }}
+      AMI_GROQ_EVAL_CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - name: Checkout private project
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set up pinned uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Validate ten scenarios offline
+        run: uv run --locked python -m app.evaluate_groq --dry-run
+      - name: One approved Groq request (no retry)
+        if: ${{ inputs.mode == 'diagnostic-one' }}
+        run: |
+          set +x
+          uv run --locked python -m app.evaluate_groq --diagnostic-one
+      - name: Ten approved bilingual Groq requests (no retry)
+        if: ${{ inputs.mode == 'acceptance-ten' }}
+        run: |
+          set +x
+          uv run --locked python -m app.evaluate_groq
