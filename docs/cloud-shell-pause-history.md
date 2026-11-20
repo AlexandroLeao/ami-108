@@ -4,7 +4,7 @@
 
 ---
 
-# Safe Cloud Shell pause and resume — November 19, 2026
+## Original archived runbook — Safe Cloud Shell pause and resume (November 19, 2026)
 
 ## Accepted state at handoff
 
