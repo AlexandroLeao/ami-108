@@ -15,7 +15,7 @@ AMI-108 is a private, non-profit, story-driven 2D web game. The **five-chapter c
 | Persistence | PostgreSQL-backed saves, replay, idempotent commands and cached consultation responses |
 | Languages | PT-BR and English, including validated authorized AI text |
 | Presentation | Twelve approved original scene illustrations and responsive cinematic UI |
-| AI companion | Optional private Ollama/Qwen2.5:1.5b inference; server-authorized facts, validated output, fixed game rules and safe authored fallback |
+| AI companion | Optional local Ollama/Qwen2.5:1.5b inference and a separate OFF-by-default Groq adapter; server-authorized facts, validated selection, fixed game rules and safe authored fallback |
 | Quality | GitHub Actions CI, unit/integration tests, Prisma migrations and built-campaign HTTP/artwork-integrity smoke |
 
 The server—not the language model—decides encounter probabilities, outcomes and energy. Once a consultation response is saved, Continue and replay preserve it.
@@ -28,7 +28,7 @@ The server—not the language model—decides encounter probabilities, outcomes 
 | API | NestJS, Prisma | Authoritative game state, commands, sessions and consultation policy |
 | AI service | Python, FastAPI | Authorized retrieval, local inference and response validation |
 | Database | PostgreSQL 17 | Persistent game and consultation state |
-| Model | Ollama, Qwen2.5:1.5b | Optional private inference with controlled fallback |
+| Model | Local Ollama/Qwen2.5:1.5b; optional Groq GPT-OSS 20B adapter | Constrained inference with server-validated selection; no default cloud activation |
 | Operations | Docker Compose, GitHub Actions | Private local stack, builds and continuous integration |
 
 Architecture and security details are in the [system design](docs/architecture/system-design.md), [API contracts](docs/api/README.md) and [production security gates](docs/architecture/production-security-gates.md).

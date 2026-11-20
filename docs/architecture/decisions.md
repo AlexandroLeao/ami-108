@@ -127,7 +127,7 @@
 
 ## ADR-010 — Free-first Groq structured inference as optional provider
 
-**Status:** Proposed, implemented as an **OFF-by-default** adapter after the failed real Gemma 4 qualification. Free account and live Groq inference have **not** yet passed acceptance; no payment, hosting provider or runtime migration is approved.
+**Status:** Accepted as an **OFF-by-default optional adapter** in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80). The November 20 owner-triggered provider-only Groq samples passed; end-to-end player activation, Free-account/privacy verification, hosting and runtime migration remain unapproved.
 
 **Context:** The owner requires working live inference to distinguish the AMI-108 portfolio project. The real Cloudflare Gemma 4 tests failed the authorized output contract (0/10), then a bounded one-call test failed with an invalid index; further repeated trials would waste time. The game must still complete without model availability. Free Groq GPT-OSS 20B supports constrained JSON Schema and fast text inference, within documented Free quotas.
 
@@ -135,7 +135,7 @@
 
 **Alternatives considered:** Continuing to adjust Gemma after exhausted owner-run evidence was inefficient; keeping a resident Ollama/Qwen server requires memory/disk capacity and possibly hosting cost; directly exposing an OpenAI-compatible API from the browser would leak credentials. Arbitrary third-party endpoints and unconstrained chat would exceed approved narrative authority.
 
-**Consequences:** Add offline quota, timeouts, schema, locale and secret tests. Real Free-account proof, a single private probe, ten bilingual cases, latency measurements, privacy settings, service quotas and independent production QA are required before activating remote inference. Using an LLM to select a prewritten line is **real inference but not free-form dialogue generation**; separate owner approval is required before any fact-bounded new wording feature. No cost-bearing upgrade or gameplay/canonical-source changes are implied.
+**Consequences:** Offline negative-path tests and the single-plus-ten provider-only live checks are recorded in the [Groq evaluation](../groq-inference-evaluation.md); they do not establish actual Free-account quota/privacy settings or end-to-end gameplay acceptance. Those gates, hosted security and owner activation consent remain outstanding. Selecting a prewritten line is **real inference but not free-form dialogue generation**; any new wording feature requires a separate reviewed decision. No cost-bearing upgrade or gameplay/canonical-source change is implied.
 
 ## Historical decisions and revisions
 
