@@ -4,6 +4,10 @@
 
 The five-chapter campaign and visual presentation are owner-approved and frozen. Review the accepted runtime `14ea583` (PR #53), which includes the earlier security baseline `f89c342` (PR #48), preserving the original 12 artwork hashes, dialogue, layout, cinematic timing and game rules. This is a verification plan and source review, not a browser audit result or a claim of WCAG conformance. Do not use real saves for destructive checks or start a new game in the owner's existing browser profile.
 
+## Latest owner-observed browser increment — November 20, 2026
+
+On the recovered private port-3000 preview, the owner **reported PASS** for keyboard-only operation of menu/dialogue/buttons and for 200% browser zoom readability/usability, in addition to Continue. The precise browser/device/locale was not recorded. Preserve this result as **manual, locale-unspecified evidence**; it does **not** replace full modal focus, PT-BR/EN screen reader, reduced motion, automated WCAG or measured performance cases. See the [final QA worksheet](final-qa-acceptance-worksheet.md) for the non-duplicated gate matrix.
+
 ## Source review — November 19, 2026
 
 | Existing implementation | Source | Evidence still required |
