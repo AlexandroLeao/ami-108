@@ -63,6 +63,14 @@ Owner-run [manual diagnostic #44801196570](https://github.com/AlexandroLeao/ami-
 
 The earlier connector limited the reasoning-capable Gemma 4 model to `max_tokens: 8`. Cloudflare now documents `max_tokens` as deprecated and recommends `max_completion_tokens`. A proposed, **bounded 64-token** cap is a hypothesis-driven compatibility change, not evidence of success. Incomplete responses still fail closed; explicit safe `RESPONSE_LENGTH`, `RESPONSE_MISSING_FINISH` and `RESPONSE_OTHER_FINISH` codes distinguish outcomes without exposing model text. After CI and merge, use **one** manual `diagnostic-one` attempt, not the ten-case suite, to determine whether the change helped.
 
+## Performance intervention — one remaining controlled probe
+
+On November 20, 2026 the [fifth manual run #44802266151](https://github.com/AlexandroLeao/ami-108/actions/runs/44802266151) returned **`FALLBACK_REQUIRED` / `NETWORK_TIMEOUT`** after **2,045 ms**, with `max_completion_tokens: 64`. This is an actual timeout, not proof the account/token are bad. Combined with the prior incomplete response at 8 tokens, neither bound passed the strict 2-second provider contract.
+
+The [Cloudflare Gemma 4 setup guide](https://developers.cloudflare.com/workers-ai/get-started/workers-wrangler/) explicitly demonstrates `chat_template_kwargs: { enable_thinking: false }` and explains this disables internal reasoning. The AMI-108 provider therefore uses this exact documented setting and returns to a **small maximum 16 completion tokens**, without relaxing output format, timeout or authorized-option mapping. Tests assert the outgoing configuration; they do not prove real latency.
+
+**Decision gate:** after merging CI-green code, perform **at most one** further `diagnostic-one` attempt. If it fails, **stop testing Gemma 4** for the currently specified 2.5-second game deadline. Retain its connector as optional and unactivated, preserve the authored fallback and local Qwen evidence, and continue public-hosting feasibility without blocking on remote model acceptance. Any alternate model must be Free-eligible, justify its value and pass an independently reviewed, resource-bounded protocol. Do not repeatedly change credentials, response rules or automatic retries to chase a green badge.
+
 ## Private, explicitly manual evaluation — no saved sessions
 
 A separate [manual-only GitHub Actions workflow](../.github/workflows/remote-ai-evaluation.yml) and [ten-case evaluation runner](../services/ai/app/evaluate_cloud.py) prepare the first real Workers AI acceptance check. **They have not made any real provider calls yet.** Ordinary PRs, merges, builds and GitHub CI do **not** trigger this workflow; it cannot run without an operator choosing `Run workflow`, entering the exact ten-call confirmation and configuring the required private repository secrets.
