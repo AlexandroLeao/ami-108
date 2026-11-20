@@ -34,6 +34,7 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [UI design](ui-design.md) | Approved presentation, localization, warning and Extras |
 | [Assets](assets.md) | Original scene images and asset workflow |
 | [AI/RAG](ai-rag.md) | Server-bounded facts, generation authorization and fallbacks |
+| [Optional cloud inference evaluation](cloud-inference-evaluation.md) | Proposed Workers AI connector, privacy/cost gates, local/offline tests and provider-acceptance plan | **Not activated / no deployment** |
 | [Local AI evaluation](ai-local-evaluation.md) | **Dated** real-model evaluation and activation history |
 
 ## Historical and audit references
