@@ -1,10 +1,6 @@
 # Release QA and security evidence — AMI-010
 
-## Latest owner-verified replacement-VM pause — November 20, 15:56 UTC
-
-**Latest owner-verified pause (November 20, 2026, 15:56 UTC):** the recovered replacement Cloud Shell VM returned to the approved local runtime `14ea583`, with Web, NestJS API, FastAPI and PostgreSQL healthy before shutdown and Continue confirmed by the owner. The API remained in authorized fallback mode (`AMI_AI_GENERATION=0`); **Ollama was absent on this VM**, unlike the previously verified model on the earlier VM. Web/API writers stopped first, then PostgreSQL reported **7 saved sessions / 0 pending generations / 4 finished migrations** before and after the archive. The new private `$HOME/ami-108-backups/pause-ami108-20261120T155634Z-1926.dump` is **182,626 bytes** and passed the archive listing, full `pg_restore` read and SHA-256 check; a protected `.env` copy was also made. All four containers were stopped without removing volumes or images; the terminal ended with `SAFE PAUSE COMPLETE`. Latest observed root free disk was **5.8 GiB**, below the pinned-model installer's unchanged **10 GiB** safeguard. The GitHub `main` has documentation/operational changes, but **the local approved gameplay checkout must not be fast-forwarded** merely to read them. No restart, second restore, model pull, public deployment, paid resource or release tag is authorized by this checkpoint.
-
-**Scope of audit evidence:** Continue plus keyboard-only menu/dialogue/button operation and 200% zoom were owner-observed on the private preview, without a recorded browser/OS or per-locale test matrix. The owner-accepted previously pinned model is **not currently resident** on the replacement VM; no current live-inference, screen-reader, automated WCAG, production performance or deployment acceptance is asserted. The four release issues #12–#15 remain open.
+> **Scope:** dated implementation, security and manual QA evidence. For **current** runtime, most recent backup and release decisions, use [release readiness](release-readiness-matrix.md). For pending browser tests and owner-reported keyboard/zoom passes, use the [acceptance worksheet](final-qa-acceptance-worksheet.md). Historical outcomes below are not new tests on the stopped VM.
 
 ## Historical pre-recovery read-only inspection — November 20
 
