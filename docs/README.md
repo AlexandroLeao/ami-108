@@ -1,10 +1,8 @@
 # AMI-108 documentation index
 
-> **Current status guide — November 19, 2026.** This is a navigation and precedence guide, not public release approval. The authoritative accepted gameplay remains the privately tested five-chapter runtime `14ea583`; later GitHub revisions contain documentation and guarded recovery tooling. The last confirmed recovered Cloud Shell run preserved **6 sessions, 0 pending generations, 4 Prisma migrations** and passed Continue; the resident pinned model passed **10/10 real bilingual direct checks** and guarded API-only activation confirmed **gameplay AI ON**, all three endpoints healthy and Continue intact. A separate-browser new-game AI E2E check remains pending. See [release readiness](release-readiness-matrix.md) for what remains open.
+> **Current documentation index — November 20, 2026.** This is a navigation and precedence guide, not public release authorization. The accepted private game runtime is `14ea583`: five approved chapters, original artwork, PT-BR/EN and tested local Qwen inference. The most recent owner terminal evidence is a **safe shutdown** with **7 sessions / 0 pending / 4 migrations** and a private, fully readable SHA-256-verified backup. **Today's Cloud Shell VM/volumes have not yet been inspected.** The older six-session result is the prior recovery checkpoint, not today's expected count. See [release readiness](release-readiness-matrix.md).
 
-**Most recent owner functional check:** With local generation ON, the owner reports that desktop/mobile playtests in PT-BR/English worked normally, Continue resumed saved games and RANDOM responses were more varied. This is owner-observed E2E acceptance but not a quantified per-request receipt, screen-reader or production-security result. The safe pause must read today's **actual** count after new games, rather than assume six. See [current release QA](release-qa.md) and [safe shutdown](cloud-shell-pause-resume.md).
-
-**Latest operating state (November 20 UTC):** the owner completed the reviewed pause procedure: **7 sessions / 0 pending / 4 migrations**, a private 182,626-byte full-readable PostgreSQL dump with a passing SHA-256, and all Web/API/AI/DB/Ollama services stopped without volume removal. The earlier six-session count is the original recovery checkpoint, **not the current last backup**. For actual recovery decisions start with [safe pause/resume](cloud-shell-pause-resume.md) and [current release readiness](release-readiness-matrix.md).
+The owner previously confirmed mobile/desktop PT-BR/EN gameplay, Continue and improved RANDOM variety. That supports private functional acceptance, **not** formal assistive-technology or deployment-security certification. The latest private Master v1.14 and Script v1.12 still predate approved Chapter 5 and require reviewed synchronization in #14.
 
 ## 1. Start here: current state and operations
 
@@ -15,6 +13,8 @@
 | [Development guide](development.md) | Safe checks, stack basics and local constraints | **Current, no obsolete restore steps** |
 | [Cloud Shell pause/resume](cloud-shell-pause-resume.md) | Archive integrity, six-save recovery, protected AI preparation | Current reference with *explicitly historical* prior pause command |
 | [Release QA](release-qa.md) | CI and owner evidence vs missing independent/browser tests | Current evidence register; dated sections may be historical |
+| [Final QA acceptance worksheet](final-qa-acceptance-worksheet.md) | Exact mobile/desktop PT-BR/EN, screen-reader, zoom, reduced-motion, performance and security sign-offs | **Open test worksheet, not certification** |
+| [Zero mandatory-cost hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Official provider constraints, honest local-vs-public options and release decisions | **Feasibility only; no provisioning authorized** |
 | [Accessibility/performance QA](accessibility-performance-qa.md) | Tests still required before public launch | **Plan**, not pass certificate |
 | [Production security gates](architecture/production-security-gates.md) | Proposal of required controls, not yet enabled | **Proposal, not deployment** |
 | [Dependency security audit](dependency-security-audit.md) | Earlier vulnerability findings and recorded remediation | **Dated scan evidence**, not a current vulnerability warranty |
