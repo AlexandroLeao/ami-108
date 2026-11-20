@@ -1,10 +1,16 @@
 # Release QA and security evidence — AMI-010
 
-## Latest read-only environment inspection — November 20, 2026
+## Latest owner-verified replacement-VM pause — November 20, 15:56 UTC
+
+**Latest owner-verified pause (November 20, 2026, 15:56 UTC):** the recovered replacement Cloud Shell VM returned to the approved local runtime `14ea583`, with Web, NestJS API, FastAPI and PostgreSQL healthy before shutdown and Continue confirmed by the owner. The API remained in authorized fallback mode (`AMI_AI_GENERATION=0`); **Ollama was absent on this VM**, unlike the previously verified model on the earlier VM. Web/API writers stopped first, then PostgreSQL reported **7 saved sessions / 0 pending generations / 4 finished migrations** before and after the archive. The new private `$HOME/ami-108-backups/pause-ami108-20261120T155634Z-1926.dump` is **182,626 bytes** and passed the archive listing, full `pg_restore` read and SHA-256 check; a protected `.env` copy was also made. All four containers were stopped without removing volumes or images; the terminal ended with `SAFE PAUSE COMPLETE`. Latest observed root free disk was **5.8 GiB**, below the pinned-model installer's unchanged **10 GiB** safeguard. The GitHub `main` has documentation/operational changes, but **the local approved gameplay checkout must not be fast-forwarded** merely to read them. No restart, second restore, model pull, public deployment, paid resource or release tag is authorized by this checkpoint.
+
+**Scope of audit evidence:** Continue plus keyboard-only menu/dialogue/button operation and 200% zoom were owner-observed on the private preview, without a recorded browser/OS or per-locale test matrix. The owner-accepted previously pinned model is **not currently resident** on the replacement VM; no current live-inference, screen-reader, automated WCAG, production performance or deployment acceptance is asserted. The four release issues #12–#15 remain open.
+
+## Historical pre-recovery read-only inspection — November 20
 
 Owner reopened Cloud Shell and ran the approved non-mutating diagnostic. Local accepted `14ea583` remained clean, `.env` restricted and ignored, and the newest **182,626-byte** 7-session archive passed SHA-256 checking. **No AMI containers or volumes were found**. Root had **10 GiB available (92% used)**; `/home` had **1.7 GiB**. The seven sessions were counted during the last verified safe pause, **not on this fresh VM**; no restore, gameplay or real-provider evaluation has yet been performed on it. Keep #12 open and inspect Docker image/disk headroom before any replacement VM rebuild.
 
-## Final verified Cloud Shell pause — November 20, 2026 UTC
+## Earlier verified pause on the preceding Cloud Shell VM — November 20, 00:54 UTC
 
 The owner ran the reviewed dynamic-count safe-pause procedure against clean approved local runtime `14ea583` after successful PT-BR/EN, mobile/desktop private playtests. Web and API writers stopped first. Both pre/post archive checks confirmed **7 GameSession / 0 pending generations / 4 completed migrations**, unchanged DB container identity. A new private PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes) passed custom-format listing, complete read, and `sha256sum -c` (`OK`). A restricted `.env` backup was made outside GitHub; all four Compose containers and the local Ollama stopped without data-volume deletion. The terminal concluded `=== SAFE PAUSE COMPLETE ===`. No fresh-recovery test on a future VM has been run; preserve the archive and check before any reinstallation. A separate encrypted off-Cloud-Shell backup would further reduce reliance on home-directory persistence.
 
