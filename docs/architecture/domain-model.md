@@ -4,7 +4,7 @@
 
 Four migrations are deployed locally: durable sessions/receipts, checkpoints/slots, pending-generation reservation. All three checkpoints and immutable slots, Chapter 3/4/5 snapshots and replay high-water are persisted. F1/F2/F3 atomically restore energy/memory, F3 unlocks PERSONAL. Chapter 5 uses optional persisted progress with shared authoritative cursor, revision, diagnostics and events; CP-BOAR before cell retrieval, E-SHIP and E-LAUNCH later, E-COMPLETE once. No new schema migration. Historical target diagrams below are specifications, not complete runtime schema documentation.
 
-> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
 ---
 
