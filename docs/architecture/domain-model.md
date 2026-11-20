@@ -90,7 +90,7 @@ erDiagram
   }
 ```
 
-### Chapters 1–3 implemented subset
+### Historical Chapters 1–3 implemented subset (later extended through Chapter 5)
 
 The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. PR #22 adds dedicated transactional checkpoint and resolved-slot tables for CP-DOG; the pure engine retains a JSON checkpoint and slot cache persisted atomically with normalized records and receipts. Provider reservation/finalization and later encounters remain pending.
 
