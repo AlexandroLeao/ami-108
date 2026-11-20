@@ -109,3 +109,50 @@ def test_failed_case_does_not_claim_acceptance(
     bad = evaluate_cloud.Evaluation("intro-random", "en", "FALLBACK_REQUIRED", 2000.0)
     assert not evaluate_cloud.summarize((good, bad))
     assert "1/2 validated" in capsys.readouterr().out
+
+@pytest.mark.parametrize(
+    ("account", "token", "model", "expected"),
+    [
+        ("", _TOKEN, _MODEL, "ACCOUNT_ID_FORMAT"),
+        (_ACCOUNT, "", _MODEL, "API_TOKEN_FORMAT"),
+        (_ACCOUNT, "value with spaces", _MODEL, "API_TOKEN_FORMAT"),
+        (_ACCOUNT, _TOKEN, "unsupported", "MODEL_ALLOWLIST"),
+    ],
+)
+def test_config_failure_exposes_only_safe_reason_code(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    account: str,
+    token: str,
+    model: str,
+    expected: str,
+) -> None:
+    monkeypatch.setattr(sys, "argv", ["evaluate_cloud"])
+    monkeypatch.setenv("AMI_AI_PROVIDER", "cloudflare")
+    monkeypatch.setenv("AMI_CLOUDFLARE_ACCOUNT_ID", account)
+    monkeypatch.setenv("AMI_CLOUDFLARE_API_TOKEN", token)
+    monkeypatch.setenv("AMI_CLOUDFLARE_MODEL", model)
+    monkeypatch.setenv("AMI_CLOUD_EVAL_CONFIRM", _CONFIRM)
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("AMI_AI_GENERATION", "0")
+    assert evaluate_cloud.main() == 2
+    output = capsys.readouterr().out
+    assert "BLOCKED: " + expected in output
+    assert _TOKEN not in output
+    assert _ACCOUNT not in output
+    assert "value with spaces" not in output
+
+
+def test_config_diagnostic_never_makes_network_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AMI_CLOUDFLARE_API_TOKEN", "")
+    monkeypatch.setenv("AMI_CLOUDFLARE_ACCOUNT_ID", _ACCOUNT)
+    monkeypatch.setenv("AMI_CLOUDFLARE_MODEL", _MODEL)
+    monkeypatch.setenv("AMI_AI_PROVIDER", "cloudflare")
+    monkeypatch.setenv("AMI_CLOUD_EVAL_CONFIRM", _CONFIRM)
+    monkeypatch.setenv("AMI_AI_GENERATION", "0")
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    with pytest.raises(evaluate_cloud.EvaluationBlocked) as exception:
+        evaluate_cloud.require_manual_authorization()
+    assert exception.value.code == "API_TOKEN_FORMAT"
