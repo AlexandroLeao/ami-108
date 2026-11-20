@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Header, Headers, HttpException, HttpCode, Patch, Post, Query, Res, StreamableFile } from '@nestjs/common';
+import { Body, Controller, Get, Header, Headers, HttpException, HttpCode, Patch, Post, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { GameError, SESSION_COOKIE, SESSION_SECONDS, SessionService, sessionToken, type Mutation } from './session.service';
 import type { Locale } from '../narrative/catalog';
+import { gameMode } from './game-access';
+import { GameInternalGuard } from './game-internal.guard';
 
 type HeaderResponse = { setHeader(name: string, value: string): void };
 function invalid(): never { throw new GameError(400, 'INVALID_INPUT'); }
@@ -29,13 +31,14 @@ function mutation(body: unknown, kind: Mutation['kind']): Mutation {
 }
 
 @Controller('game')
+@UseGuards(GameInternalGuard)
 export class GameController {
   constructor(private readonly sessions: SessionService) {}
 
   private async execute<T>(operation: () => Promise<T>): Promise<T> {
     try {
       // Local integration only; production needs rate limits and deployment review.
-      if (process.env.AMI_DEV_PREVIEW !== '1') throw new GameError(404, 'NOT_AVAILABLE');
+      if (gameMode() === 'disabled') throw new GameError(404, 'NOT_AVAILABLE');
       return await operation();
     } catch (error) {
       const status = error instanceof GameError ? error.status : 503;
