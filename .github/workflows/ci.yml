@@ -57,6 +57,10 @@ jobs:
           bash -n scripts/recheck-warm-local-ai.sh
           bash -n scripts/test-warm-ai-recheck.sh
           bash scripts/test-warm-ai-recheck.sh
+      - name: Check seven-session local AI guard semantics
+        run: |
+          bash -n scripts/test-local-ai-session-gates.sh
+          bash scripts/test-local-ai-session-gates.sh
       - name: Check API-only activation safety
         run: |
           bash -n scripts/activate-verified-local-ai.sh
