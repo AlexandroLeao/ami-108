@@ -31,14 +31,13 @@ At accepted local runtime `14ea583`, the owner rebuilt Web/API/AI and started th
 
 The prior seven-day calendar goal (Nov 16–22) is a planning target, **not permission to skip release gates**. Replan if evidence requires more time.
 
-## Next operational gate — model preparation, not another database recovery
+## Next operational gate — API-only activation, then isolated owner game audit
 
-The earlier Cloud Shell read-only preflight, checksum/full archive inspection, empty-target database restoration, source build, health checks and **Continue** are complete and supported by owner terminal evidence. **Do not repeat them** against the now-populated six-session database.
+The owner completed the checksum/full archive validation, **6-session restoration**, four-service rebuild and Continue. The pinned, internal-only Qwen2.5:1.5b model was then reinstalled, and the **second, resident-instance** authenticated benchmark passed **10/10 VALIDATED** in PT-BR/EN with durations **1220–1711 ms**. Model resident `Forever`, no host-published Ollama port, 3 GiB cap, and DB unchanged at **6/0/4**. The first installation test's 8/10 with two TIMEOUTs remains historical evidence of transient latency. These tests do not mean that generation is already enabled in the game; API is still intentionally `AMI_AI_GENERATION=0`.
 
-1. Preserve local accepted runtime `14ea583` and the existing private `.env`. Confirm the owner-run [pinned Ollama preparation](../scripts/prepare-pinned-local-ollama.sh) only if its preconditions (AI generation OFF, healthy stack, six sessions, adequate RAM/disk) are still satisfied. This procedure is non-idempotent; stop and inspect if it partially fails.
-2. Require the **actual owner-run terminal evidence** for the pinned image/model ID, final internal-only network, 3 GiB model limit, warmup, direct ten authorized bilingual cases and unchanged `6|0|4` aggregate, before considering application inference activation. The CI guard only tests the script's safety preflight; it does not run Ollama.
-3. Separately review API inference enabling while retaining session data, timeout limits and authentic internal token; audit a **new disposable game** without mutating existing saves. No generated outputs should be claimed validated until runtime receipts support them.
-4. Continue independent browser accessibility/performance testing, approved private-source synchronization and zero-mandatory-cost security/hosting assessment under issues #12–#15. None authorizes public deployment or an official rating.
+1. Owner uses the [guarded API-only activation](../scripts/activate-verified-local-ai.sh) with current runtime `14ea583` still clean, all four services healthy, six saved sessions, pinned model resident and untracked private `.env`. It backs up `.env`, updates only the generation toggle, recreates only API and attempts to roll back if an assertion fails. Do **not** rerun model install or PostgreSQL restore.
+2. After a verified successful API-only activation, owner checks existing **Continue** first and then a **disposable fresh browser session** at the same private port 3000. Validate real INTRO and DOG/RAT generation, visible variety, accurate receipt statuses, saved response immutability and no unexpected requests to BOAR. Never overwrite an existing save just to test.
+3. Continue screen-reader/reduced-motion/browser performance, approved private canonical source synchronization and zero-mandatory-cost hosting/security evaluation under issues #12–#15; explicit legal/classification/distribution and owner public-release authorization are still required.
 
 Earlier VM-recovery guidance was for a now-completed operation; see [archived recovery checklist](release-readiness-history.md) when auditing prior steps.
 
