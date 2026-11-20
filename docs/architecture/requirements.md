@@ -54,11 +54,11 @@ Performance and accessibility thresholds are proposed for AMI-010 (WCAG 2.2 AA w
 
 No free movement, inventory, pickup systems, audio playback, animated sprites, real-time combat, hunger/thirst, free chat, procedural plot, additional endings, or new artwork. The 9 reference sheets are internal only; 12 scene assets are distinct from the 12 narrative scene IDs. Target duration 10–20 minutes is unmeasured until playtest.
 
-## Day 1 implementation trace
+## Historical Day 1 implementation trace (superseded by the five-chapter campaign)
 
 AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile approval and passing CI. FR-02/03 are partially demonstrated by the opening preview, not the full campaign. NFR-01 is verified for the development foundation. FR-04/05/11/13 have Chapter 1 domain, persisted-session and authorized-UI integration evidence in merged PRs #19/#20; FR-02/03 now also have a playable bilingual Chapter 1 subset. The owner accepted Chapter 1 presentation; final branch CI and post-merge CI passed. This does not establish full-campaign compliance, encounter behavior, real inference or independent accessibility/security acceptance; see [narrative engine](../narrative-engine.md). No requirement is marked fully implemented solely by a design or unit test.
 
-## Release evidence
+## Historical early release evidence (current status in release-readiness matrix)
 
 Track FR/NFR IDs in subsequent PRs and tests. AMI-004/005/006 cover the first two chapters, AMI-007 real inference and contingency, AMI-008/009 remaining campaign, AMI-010 full acceptance/security/accessibility, AMI-011/012 deployment/docs, AMI-013 final approval. Do not replace a missing implementation with a checked specification box.
 
