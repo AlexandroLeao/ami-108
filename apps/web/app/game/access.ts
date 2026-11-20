@@ -9,7 +9,7 @@ export function securePublicOrigin(raw: string | undefined): boolean {
   } catch { return false; }
 }
 
-export function gameMode(env: NodeJS.ProcessEnv = process.env): GameMode {
+export function gameMode(env: Readonly<Record<string, string | undefined>> = process.env): GameMode {
   if (env.VERCEL !== '1') return env.AMI_DEV_PREVIEW === '1' ? 'local' : 'disabled';
   // Never use the development flag on a public Vercel deployment.
   if (env.AMI_DEV_PREVIEW === '1') return 'disabled';
