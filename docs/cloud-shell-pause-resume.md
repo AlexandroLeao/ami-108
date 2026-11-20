@@ -2,11 +2,17 @@
 
 > **Current owner recovery and pause guide — November 20, 2026.** Earlier one-time operations and superseded commands are preserved separately in [historical runbook](cloud-shell-pause-history.md). Never paste those older commands into the current recovered database.
 
-## Current resumed environment — November 20 (owner-verified)
+## Latest owner-verified safe pause — November 20, 15:56 UTC
+
+**Latest owner-verified pause (November 20, 2026, 15:56 UTC):** the recovered replacement Cloud Shell VM returned to the approved local runtime `14ea583`, with Web, NestJS API, FastAPI and PostgreSQL healthy before shutdown and Continue confirmed by the owner. The API remained in authorized fallback mode (`AMI_AI_GENERATION=0`); **Ollama was absent on this VM**, unlike the previously verified model on the earlier VM. Web/API writers stopped first, then PostgreSQL reported **7 saved sessions / 0 pending generations / 4 finished migrations** before and after the archive. The new private `$HOME/ami-108-backups/pause-ami108-20261120T155634Z-1926.dump` is **182,626 bytes** and passed the archive listing, full `pg_restore` read and SHA-256 check; a protected `.env` copy was also made. All four containers were stopped without removing volumes or images; the terminal ended with `SAFE PAUSE COMPLETE`. Latest observed root free disk was **5.8 GiB**, below the pinned-model installer's unchanged **10 GiB** safeguard. The GitHub `main` has documentation/operational changes, but **the local approved gameplay checkout must not be fast-forwarded** merely to read them. No restart, second restore, model pull, public deployment, paid resource or release tag is authorized by this checkpoint.
+
+**Operational warning:** The checked-in [historical AI-ON pause script](../scripts/pause-cloud-shell-safely.sh) requires both a running Ollama container and `AMI_AI_GENERATION=1`. The owner's replacement VM was paused successfully **without Ollama and with generation OFF** using a separately guarded backup/stop procedure, not that AI-ON script. **Do not run the AI-ON script against this paused state** and do not attempt to restore the already populated database. Next time, inspect Docker first; the VM may have been recycled and the named volume may or may not survive.
+
+## Earlier owner-verified recovery on the replacement VM (before latest pause)
 
 The previously reported replacement VM has since been **recovered** using the verified seven-session backup. Owner terminal evidence confirms: SHA-256 PASS; complete PostgreSQL 17.11 archive read; initially **zero public objects** in a new PostgreSQL 17 container; **one successful transaction-protected restore**; recount **7 sessions | 0 pending | 4 completed migrations**. The approved local game remains on `14ea583`, not the documentation-only GitHub `main` head. Web, API, FastAPI and database are all **healthy**, and the owner confirmed existing **Continue** on the private port 3000. **No second restore, new DB or repeat image builds are authorized by this status.**
 
-At this checkpoint, the API reports **game generation OFF**, Ollama is **not installed on this new VM**, and root free disk is **5.8 GiB**. The previous Qwen2.5:1.5b 10/10 evidence and API activation took place on the *previous VM*; they are not proof of model residency today. The original preparation/activation scripts hardcode a **six-session** checkpoint, and model preparation additionally requires **10 GiB** free. Do **not** run them unchanged, bypass their guards, delete a Docker volume/cache, or pull the model until resources and a reviewed seven-session-safe procedure are established. Preserve the private archive and `.env`; complete the remaining release QA independently.
+At this checkpoint, the API reports **game generation OFF**, Ollama is **not installed on this new VM**, and root free disk is **5.8 GiB**. The previous Qwen2.5:1.5b 10/10 evidence and API activation took place on the *previous VM*; they are not proof of model residency today. At that recovery checkpoint the preparation/activation scripts still hardcoded six sessions; merged PR #71 subsequently updated their counts to accept at least seven, while model preparation **still requires 10 GiB free**. Do **not** run them unchanged, bypass their guards, delete a Docker volume/cache, or pull the model until resources and a reviewed seven-session-safe procedure are established. Preserve the private archive and `.env`; complete the remaining release QA independently.
 
 ## Previous read-only Cloud Shell inspection — November 20 (before recovery)
 
@@ -28,9 +34,11 @@ The owner provided `=== SAFE PAUSE COMPLETE ===` after running the versioned scr
 
 **Historical checkpoint (subsequently recovered):** the old VM was shut down safely, and the new VM is now open without AMI containers/volumes. **Do not rerun the pause command** before restoring a verified working stack. On the next session, inspect the existing VM and retained files first; restore the newest verified dump only if the prior DB volume has actually disappeared and a new empty target has been checked. The following shutdown instructions are retained for a **future** deliberate pause, not as an operation required today.
 
-## Safe owner-run shutdown — do not delete Docker data
+## Historical AI-ON shutdown procedure — not applicable to latest AI-OFF pause
 
-First close every game and Web Preview tab, including the separate mobile and incognito sessions. Then use the reviewed [end-of-day pause script](../scripts/pause-cloud-shell-safely.sh), retrieved from the current merged main **without changing the accepted local runtime commit**:
+**This procedure is provided for traceability of the previous Ollama-on environment only.** The latest AI-OFF environment was already paused and this script would reject it; do **not** run it without a new environment-specific safety review.
+
+In an AI-ON environment, first close every game and Web Preview tab, including separate mobile and incognito sessions. Then use the previously reviewed [end-of-day pause script](../scripts/pause-cloud-shell-safely.sh), retrieved from the current merged main **without changing the accepted local runtime commit**:
 
 ```bash
 (
