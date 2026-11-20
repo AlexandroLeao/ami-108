@@ -1,0 +1,58 @@
+name: Neon Preview Schema Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: "Enter MIGRATE_PREVIEW to apply reviewed Prisma migrations to the isolated Neon preview branch"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-neon-preview-migrate
+  cancel-in-progress: false
+
+jobs:
+  migrate-preview:
+    if: github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && inputs.approval == 'MIGRATE_PREVIEW'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Validate exact preview database target without displaying credentials
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          const urlText = process.env.DATABASE_URL;
+          if (!urlText) throw Error('NEON_PREVIEW_DATABASE_URL secret is missing');
+          let u;
+          try { u = new URL(urlText); } catch { throw Error('Invalid Neon preview database URL'); }
+          if (!['postgresql:', 'postgres:'].includes(u.protocol) ||
+              !/^ep-summer-field-bcnzvyx2(-pooler)?\.c-16\.us-east-1\.aws\.neon\.tech$/.test(u.hostname) ||
+              u.pathname !== '/ami' ||
+              u.username !== 'ami_app' ||
+              !['require', 'verify-full'].includes(u.searchParams.get('sslmode'))) {
+            throw Error('Database target does not match approved Neon preview branch');
+          }
+          console.log('Verified approved Neon preview hostname, role, database and TLS; credentials omitted');
+          NODE
+      - name: Apply version-controlled Prisma migrations to preview ONLY
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: pnpm --filter @ami-108/api exec prisma migrate deploy --schema prisma/schema.prisma
+      - name: Verify migration history
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: pnpm --filter @ami-108/api exec prisma migrate status --schema prisma/schema.prisma
