@@ -4,6 +4,8 @@
 
 **Most recent owner functional check:** With local generation ON, the owner reports that desktop/mobile playtests in PT-BR/English worked normally, Continue resumed saved games and RANDOM responses were more varied. This is owner-observed E2E acceptance but not a quantified per-request receipt, screen-reader or production-security result. The safe pause must read today's **actual** count after new games, rather than assume six. See [current release QA](release-qa.md) and [safe shutdown](cloud-shell-pause-resume.md).
 
+**Latest operating state (November 20 UTC):** the owner completed the reviewed pause procedure: **7 sessions / 0 pending / 4 migrations**, a private 182,626-byte full-readable PostgreSQL dump with a passing SHA-256, and all Web/API/AI/DB/Ollama services stopped without volume removal. The earlier six-session count is the original recovery checkpoint, **not the current last backup**. For actual recovery decisions start with [safe pause/resume](cloud-shell-pause-resume.md) and [current release readiness](release-readiness-matrix.md).
+
 ## 1. Start here: current state and operations
 
 | Source | Purpose | Status |
