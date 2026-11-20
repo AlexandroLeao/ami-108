@@ -57,6 +57,12 @@ The owner successfully configured their private GitHub Actions secrets and ran [
 
 After reviewing that code with the owner, retain default fallback or fix **only** the verified incompatibility. The old `acceptance-ten` mode remains available separately and requires its original exact `I_APPROVE_10_CLOUDFLARE_CALLS` confirmation; do not use it until a one-call diagnostic succeeds. Neither mode creates a public endpoint, changes billing, rewrites gameplay or touches saved sessions.
 
+## First one-call diagnosis and constrained completion hypothesis
+
+Owner-run [manual diagnostic #44801196570](https://github.com/AlexandroLeao/ami-108/actions/runs/44801196570) on November 20, 2026 returned **`FALLBACK_REQUIRED`**, reason `UNAVAILABLE`, provider code **`RESPONSE_NOT_STOP`**, 759 ms. This demonstrates a genuine HTTP 200 response with one choice but **not a completed `stop` choice**; it does not reveal whether the finish reason was `length`, `null`, or something else. Credentials passed the configuration gate and should **not** be changed based on this result.
+
+The earlier connector limited the reasoning-capable Gemma 4 model to `max_tokens: 8`. Cloudflare now documents `max_tokens` as deprecated and recommends `max_completion_tokens`. A proposed, **bounded 64-token** cap is a hypothesis-driven compatibility change, not evidence of success. Incomplete responses still fail closed; explicit safe `RESPONSE_LENGTH`, `RESPONSE_MISSING_FINISH` and `RESPONSE_OTHER_FINISH` codes distinguish outcomes without exposing model text. After CI and merge, use **one** manual `diagnostic-one` attempt, not the ten-case suite, to determine whether the change helped.
+
 ## Private, explicitly manual evaluation — no saved sessions
 
 A separate [manual-only GitHub Actions workflow](../.github/workflows/remote-ai-evaluation.yml) and [ten-case evaluation runner](../services/ai/app/evaluate_cloud.py) prepare the first real Workers AI acceptance check. **They have not made any real provider calls yet.** Ordinary PRs, merges, builds and GitHub CI do **not** trigger this workflow; it cannot run without an operator choosing `Run workflow`, entering the exact ten-call confirmation and configuring the required private repository secrets.

@@ -67,7 +67,10 @@ class CloudflareProvider:
                     {"role": "user", "content": prompt},
                 ],
                 "temperature": 0,
-                "max_tokens": 8,
+                # Gemma 4 is a reasoning-capable model. Eight output tokens can
+                # terminate a completion before its final numeric index.
+                # Still require finish_reason=stop and an exact allowed index.
+                "max_completion_tokens": 64,
                 "stream": False,
                 "options": {"rejectIfBusy": True},
             },
@@ -114,8 +117,19 @@ class CloudflareProvider:
                 self._note("RESPONSE_CHOICES")
                 raise ValueError("Invalid response choices")
             item = items[0]
-            if not isinstance(item, dict) or item.get("finish_reason") != "stop":
-                self._note("RESPONSE_NOT_STOP")
+            if not isinstance(item, dict):
+                self._note("RESPONSE_CHOICE_SHAPE")
+                raise TypeError("Invalid provider choice")
+            finish = item.get("finish_reason")
+            if finish != "stop":
+                # Fixed diagnostic categories only. Never log raw finish
+                # reason, generated text, provider payload or secrets.
+                if finish == "length":
+                    self._note("RESPONSE_LENGTH")
+                elif finish is None:
+                    self._note("RESPONSE_MISSING_FINISH")
+                else:
+                    self._note("RESPONSE_OTHER_FINISH")
                 raise ValueError("Incomplete provider response")
             message = item.get("message")
             if not isinstance(message, dict):
