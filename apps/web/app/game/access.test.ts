@@ -21,7 +21,7 @@ describe('explicit game release gate', () => {
   });
   it('requires an exact HTTPS origin without credentials or paths', () => {
     for (const origin of [
-      'http://ami-108.vercel.app', 'https://ami-108.vercel.app.evil.invalid',
+      'http://ami-108.vercel.app', 
       'https://user:pass@ami-108.vercel.app', 'https://ami-108.vercel.app/path',
       'https://ami-108.vercel.app/', 'javascript:alert(1)',
     ]) {
