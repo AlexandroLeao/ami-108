@@ -8,6 +8,10 @@ A newer owner recovery log supersedes the pre-pause uncertainty **for that local
 
 At accepted local runtime `14ea583`, the owner rebuilt Web/API/AI and started them alongside the restored database. All four Compose services and three health endpoints were healthy, the database container ID and counts were unchanged, and the API was explicitly started with `AMI_AI_GENERATION=0` as a temporary safety gate while Ollama remains absent. The owner then confirmed that the existing saved game **Continued normally** in the browser. Root free disk was 27 GiB after builds. This is successful **saved-game recovery**, **not** proof that actual AI generation is currently enabled; restore the pinned local Ollama on its internal-only network, run the exact bilingual 10-case validation, and re-enable game generation separately after another non-secret count/health check. Do **not** rerun `pg_restore`, recreate the DB volume, remove existing images/volumes, or create new sessions before that controlled activation.
 
+## Latest owner-confirmed end-of-day checkpoint — November 20 UTC
+
+After accepting desktop/mobile PT-BR/EN local AI gameplay, the owner completed the safe Cloud Shell pause. The verified private PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` is **182,626 bytes**, passed both full archive read and SHA-256, and recorded **7 GameSession / 0 pending / 4 finished migrations**. All Web/API/AI/PostgreSQL/Ollama containers stopped; there was **no volume removal**. The earlier six-session count in the recovery narrative below is intentionally historical. Do not re-run the backup script just because the release matrix is updated, and do not publish the private dump or secrets.
+
 ## Version and pause boundary
 
 | Item | Last supported evidence | Limit |
@@ -31,13 +35,13 @@ At accepted local runtime `14ea583`, the owner rebuilt Web/API/AI and started th
 
 The prior seven-day calendar goal (Nov 16–22) is a planning target, **not permission to skip release gates**. Replan if evidence requires more time.
 
-## Current local status — owner browser AI check passed; safe pause next
+## Current local status — owner AI checks passed; safe pause COMPLETE
 
 The final archived pause backup was verified and restored into a formerly empty PostgreSQL, preserving **6 sessions / 0 pending / 4 completed migrations** at the recovery checkpoint. The pinned local-only Qwen2.5:1.5b was reinstalled, passed a warmed **10/10 real bilingual direct FastAPI** evaluation (individual **1220–1711 ms**), stayed resident (`Forever`) on an internal-only network with 3 GiB container cap, and the API was safely activated with `AMI_AI_GENERATION=1` and three healthy endpoints; existing Continue worked. Prior initial first-load 8/10 with two timeouts is historical timing evidence.
 
 **Owner-observed browser acceptance is now reported complete:** On November 19, the owner tested the recovered game on **desktop and mobile**, in **Brazilian Portuguese and English**, observed normal gameplay/Continue and **more varied RANDOM responses**. This closes the specific functional owner-confirmation gate for fresh-session local AI and variation. It does **not** give a quantified E2E `VALIDATED` receipt count, prove every alternative was model-selected rather than the game's authorized varied fallback, or satisfy formal screen-reader, reduced-motion, automated security or sustained latency requirements.
 
-1. **Tonight:** Close all game/preview tabs, run [current safe pause](cloud-shell-pause-resume.md) using the [dynamic-session-count script](../scripts/pause-cloud-shell-safely.sh) from the merged GitHub main without changing the local runtime `14ea583`. It verifies no pending AI, four migrations, full PostgreSQL archive read, SHA-256, private `.env` copy and safe service stop. Actual session totals may now exceed six. Do not assume pause complete before the owner's final terminal report.
+1. **Tonight — COMPLETED:** The owner ran the reviewed [dynamic-count safe pause](cloud-shell-pause-resume.md). Terminal evidence proves **7 sessions / 0 pending / 4 migrations**, a new **182,626-byte** PostgreSQL custom archive fully read with SHA-256 PASS, private `.env` copy, and stopped Web/API/AI/DB/Ollama without deleting volumes. The exact backup filename is `pause-ami108-20261120T005447Z-121510.dump`. No new pause or restore is needed now; Cloud Shell may remain closed.
 2. **Next session:** Inspect the retained private dump and Docker state **before** running anything. If the Cloud Shell VM was recycled, do not restore into an existing/nonempty DB. Continue issue **#12** formal browser accessibility (screen reader PT/EN, reduced motion, automated audit), security review and measured performance.
 3. Reconcile private canonical Master v1.14 / Script v1.12 Chapter 5 status under **#14**; evaluate verifiable zero mandatory-cost hosting/security under **#13** without provisioning paid resources; retain **#15** open until classification, rights and explicit owner release approval.
 
