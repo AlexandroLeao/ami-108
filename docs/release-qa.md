@@ -1,5 +1,11 @@
 # Release QA and security evidence — AMI-010
 
+## Final verified Cloud Shell pause — November 20, 2026 UTC
+
+The owner ran the reviewed dynamic-count safe-pause procedure against clean approved local runtime `14ea583` after successful PT-BR/EN, mobile/desktop private playtests. Web and API writers stopped first. Both pre/post archive checks confirmed **7 GameSession / 0 pending generations / 4 completed migrations**, unchanged DB container identity. A new private PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes) passed custom-format listing, complete read, and `sha256sum -c` (`OK`). A restricted `.env` backup was made outside GitHub; all four Compose containers and the local Ollama stopped without data-volume deletion. The terminal concluded `=== SAFE PAUSE COMPLETE ===`. No fresh-recovery test on a future VM has been run; preserve the archive and check before any reinstallation. A separate encrypted off-Cloud-Shell backup would further reduce reliance on home-directory persistence.
+
+This records **functional QA and safe pause**, not screen-reader, automated accessibility, formal security, p95 performance, hosted deployment or release approval. Issues #12–#15 remain open.
+
 ## Latest owner-reported private gameplay acceptance — November 19, 2026
 
 After pinned local model direct **10/10 VALIDATED** bilingual regression and guarded API-only activation, the owner reports that Continue still works and that they ran new-game tests on **mobile and desktop in PT-BR and English**. The game operated normally and generated **more varied RANDOM responses** in those sessions. This resolves the outstanding **owner functional confirmation of browser-level local inference** on the recovered VM, based on their report. No aggregate per-request `VALIDATED`/fallback receipt count, number of newly created sessions, sustained p95 latency, screen-reader pass, reduced-motion pass or formal automated a11y/security scan was supplied; **do not fabricate any of those outcomes**.
