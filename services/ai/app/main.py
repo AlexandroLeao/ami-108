@@ -6,8 +6,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
 
-from app.generation import GenerationRequest, GenerationResult, Provider, generate
 from app.cloudflare_provider import cloudflare_provider
+from app.generation import GenerationRequest, GenerationResult, Provider, generate
 from app.ollama_provider import local_provider
 
 
