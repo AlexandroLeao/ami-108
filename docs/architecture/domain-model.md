@@ -9,7 +9,7 @@ Four migrations are deployed locally: durable sessions/receipts, checkpoints/slo
 ---
 
 
-**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
+**Historical target schema for AMI-004/005/006; the production-grade local schema is now implemented and has four migrations.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
 
 ## ER diagram
 
