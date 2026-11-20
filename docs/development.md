@@ -1,22 +1,14 @@
 # Development — AMI-108
 
-> **Status: current development reference (November 19, 2026).** The archived milestone log is [development-history.md](development-history.md). Do not execute commands from that historical log against live saves. For authoritative acceptance status, see [release readiness](release-readiness-matrix.md).
+> **Status: current development reference (November 20, 2026).** The archived milestone log is [development-history.md](development-history.md). Do not execute commands from that historical log against live saves. For authoritative acceptance status, see [release readiness](release-readiness-matrix.md).
 
-## Accepted game and local state
+## Accepted game and currently verified environment
 
-- **Runtime code:** `14ea583a83c7c1473bc94f3b1d515a8497827ac3` (PR #53). GitHub main has subsequent documentation and recovery-tool changes, which do not require rebuilding the approved application.
-- **Campaign:** five chapters, original twelve scene assets, PT-BR and EN, all checkpoints and persistent consultations; owner-approved and protected from incidental content edits.
-- **Cloud Shell recovery:** the final pause archive was verified and restored **once** into a confirmed empty PostgreSQL 17 database. **Six sessions, zero pending generations, four completed migrations** recovered; DB, API, AI service and Web were healthy and Continue worked in the original browser.
-- **Inference status at latest owner report:** the pinned Qwen2.5:1.5b model was verified resident (`Forever`), and its authenticated bilingual **10/10** warm direct check passed. The owner executed [guarded API-only activation](../scripts/activate-verified-local-ai.sh), verified `CURRENT_GAME_GENERATION=ON`, three healthy endpoints, the original 6 sessions / 0 pending / 4 migrations and successful Continue in the browser. **Actual new-game generation and variation in a separate browser session on this recovered VM remain to be checked.** Do not rerun model installation or API activation on the active stack.
-- **Release:** private local preview, not hosted production. No public release, paid resources, licensing grant or official content rating. See [QA](release-qa.md), [release gates](architecture/production-security-gates.md), and [outstanding issues](release-readiness-matrix.md).
-
-## Latest owner gameplay check and end-of-day boundary
-
-The owner subsequently confirmed successful **desktop and mobile** private browser tests in **PT-BR and English**, including normal Continue and more varied RANDOM responses with generation ON. This is functional acceptance, not formal screen-reader, reduced-motion, production-security or performance certification. Because the owner created new games, the prior **six sessions** were a *pre-playtest snapshot*, not a count to hardcode in today's archive. Use the new [dynamic-count safe shutdown](cloud-shell-pause-resume.md) and review its verified backup report before closing Cloud Shell. Never rerun last session's database restore, local model install or API activation.
-
-## Verified end-of-day stop — November 20 UTC
-
-The owner's final safe-pause terminal report records **7 GameSession, 0 GamePendingGeneration and 4 completed migrations** before and after the PostgreSQL export. The new private custom-format archive `pause-ami108-20261120T005447Z-121510.dump` is **182,626 bytes**, passed list/full-read and SHA-256 checks, and a private `.env` copy was saved. Web, API, AI, PostgreSQL and Ollama are **stopped**; no Docker volume was deleted. The post-new-game count is seven (not the six at initial recovery). On the next session, inspect [safe pause/resume](cloud-shell-pause-resume.md) before starting or restoring anything. Do not treat this as formal release/security acceptance.
+- **Accepted game runtime:** clean local `main` at `14ea583a83c7c1473bc94f3b1d515a8497827ac3`, with five approved chapters, 12 original scenes, PT-BR/EN, durable game state and consultations. GitHub `main` contains later **documentation and guarded operational QA**; do not fast-forward the accepted game checkout merely to read those scripts.
+- **Previous owner-accepted gameplay:** Continue resumed correctly; desktop/mobile PT-BR/EN gameplay and varied local Qwen output were observed. The pinned model passed 10/10 direct bilingual evaluation on the previous Cloud Shell VM. These are **historical local acceptance results**, not today's model-readiness proof.
+- **Latest safe pause (November 20 UTC):** protected custom PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` (**182,626 bytes**, previously fully read and SHA-256 verified) preserved **7 sessions / 0 pending / 4 migrations**. No volume deletion occurred during shutdown.
+- **Latest current Cloud Shell read-only preflight (November 20):** accepted local git state clean, `.env` present/restricted/ignored, newest backup checksum PASS; **no AMI containers or Docker volumes**. Root filesystem **10 GiB free (92% used)**; home **1.7 GiB free**. There is **no live restored database, no observed healthy services or model residency on this VM yet**. Inspect Docker image/disk usage and archive integrity before any downloads or empty-target restore.
+- **Release boundary:** private preview only, no official age rating, license grant, paid infrastructure or public hosting. Formal [QA](release-qa.md), [release-readiness](release-readiness-matrix.md) and [production security gates](architecture/production-security-gates.md) remain open.
 
 ## Prerequisites and local boundaries
 
