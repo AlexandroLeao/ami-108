@@ -9,7 +9,7 @@ Merged PR #38 integrates the reviewed #30 catalog/domain into authoritative disp
 
 All five chapters are playable and accepted. Chapter 3 retains its archive, MEM-D3, rat and F2; Chapter 4 uses `chapter-four-catalog.ts`, `chapter-four-domain.ts` and engine dispatch with the optional persisted marker, original cursor/revision/events, existing chapter snapshots and no new migration. F3 restores all indexes and energy atomically, manual and memory sequence lead to the Chapter 5 card; review does not replay events. Chapter 5 is integrated; #30 superseded by merged #38. Preserve current-only projection, stable IDs, replay high-water and immutable slots. Historical notes below are superseded where inconsistent.
 
-> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 ---
 
