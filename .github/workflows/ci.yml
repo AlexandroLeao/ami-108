@@ -49,6 +49,11 @@ jobs:
           bash -n scripts/recheck-warm-local-ai.sh
           bash -n scripts/test-warm-ai-recheck.sh
           bash scripts/test-warm-ai-recheck.sh
+      - name: Check API-only activation safety
+        run: |
+          bash -n scripts/activate-verified-local-ai.sh
+          bash -n scripts/test-activate-verified-local-ai.sh
+          bash scripts/test-activate-verified-local-ai.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
