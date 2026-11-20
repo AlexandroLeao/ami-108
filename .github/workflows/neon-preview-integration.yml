@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       approval:
-        description: "Enter TEST_PREVIEW to run synthetic NestJS/Prisma integration tests against Neon preview"
+        description: "Use SMOKE_PREVIEW for a bounded human-paced check; TEST_PREVIEW runs the exhaustive legacy suite"
         required: true
         type: string
 
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   integration-preview:
-    if: github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && inputs.approval == 'TEST_PREVIEW'
+    if: github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && (inputs.approval == 'TEST_PREVIEW' || inputs.approval == 'SMOKE_PREVIEW')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -54,7 +54,16 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
         run: pnpm --filter @ami-108/api exec prisma migrate status --schema prisma/schema.prisma
+      - name: Run bounded human-paced HTTP smoke against preview pooled endpoint
+        if: inputs.approval == 'SMOKE_PREVIEW'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+          AMI_TEST_DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+          AMI_SMOKE_USE_POOLER: '1'
+          AMI_AI_GENERATION: '0'
+        run: pnpm --filter @ami-108/api exec jest --runInBand game.preview.smoke.spec.ts
       - name: Run existing synthetic NestJS HTTP + real Neon persistence regression
+        if: inputs.approval == 'TEST_PREVIEW'
         env:
           DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
           AMI_TEST_DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
