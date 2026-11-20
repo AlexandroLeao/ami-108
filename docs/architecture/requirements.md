@@ -4,7 +4,7 @@
 
 FR-10 restoration-linked energy implemented for F1/F2/F3. All five chapters passed automated transition/persistence checks and owner desktop/mobile playtests. All 12 artwork hashes verified; CP-BOAR and guaranteed CORRECT implemented. Controlled real inference and expanded RANDOM diversity are accepted; recovered local Qwen reactivation and owner-observed mobile/desktop PT-BR/EN fresh-game variety passed. The stack is now safely paused with 7 saved sessions, zero pending, four migrations and a verified private backup. Formal security and accessibility review remains open. Independent accessibility/security, deployment and release gates remain open.
 
-> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
 ---
 
