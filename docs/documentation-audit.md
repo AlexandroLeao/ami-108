@@ -19,6 +19,12 @@ This audit records the first cleanup; a later follow-up further separated curren
 | Source precedence | AGENTS previously cited earlier Master/Script as the current authoritative documents | Clarified private Master v1.14 and Script v1.12 plus explicit later owner-approved amendments; no private story content imported into GitHub |
 | Documentation links | Relative links can silently rot | Add tracked-Markdown relative-path validator and fixture coverage to CI; ignore external URLs and code fences; **this is not a full Markdown parser or external link verifier** |
 
+## Private canonical-source gap — independently observed
+
+A read-only review of the three private Drive source files (Master v1.14 Markdown and PDF, Interactive Script v1.12 PDF) showed their Day 3 opening status still reports **four of five chapters approved** and treats Chapter 5 as an integration draft. That status predates the subsequently accepted PR #38 five-chapter campaign and later owner-approved refinements. The private PDFs/Markdown have **not** been edited, overwritten, redistributed or synchronized in this repository audit. Their story contents remain protected; no private passage is copied here. Issue [#14](https://github.com/AlexandroLeao/ami-108/issues/14) must reconcile these sources with the complete approved runtime, preserving all prior authored material and requiring owner review before treating a new revision as canonical.
+
+The repository documentation and local-link audit can be cleaned and green **without** certifying that the private source files have been synchronized. The project documentation is therefore **not yet universally current**, and a blanket 'zero errors in all documentation' claim would be unsupported.
+
 ## Traceability and boundaries
 
 - Current implementation and acceptance facts: [README](../README.md), [release QA](release-qa.md), [AI evaluation history](ai-local-evaluation.md), [release readiness](release-readiness-matrix.md).
