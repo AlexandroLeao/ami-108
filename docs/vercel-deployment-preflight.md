@@ -56,6 +56,17 @@ The manually dispatched full [Neon integration run #1](https://github.com/Alexan
 
 Run the new manual-only `Neon Preview Latency Diagnostics` workflow (branch `main`, acknowledgement `DIAGNOSE_PREVIEW`) to collect **sanitized, read-only** connection, SELECT, count and transaction latency from a GitHub runner. It consumes the existing preview secret and is pinned to the same host/TLS/db/role. This is diagnostic data only, not gameplay certification: use the timings to decide on targeted database/connection improvements and a bounded, minimal remote E2E suite. Keep full exhaustive narrative/regression tests in local PostgreSQL CI. Do not change production compute, disable 503 fail-closed behavior or publish the game to mask failures.
 
+## Bounded Neon preview HTTP smoke (separate from exhaustive regression)
+
+The read-only [latency diagnostic run](https://github.com/AlexandroLeao/ami-108/actions/runs/44839824743) passed: cold Prisma connection **802 ms**; simple SELECT median **32 ms**, p95 **73 ms**; count median **32 ms**, p95 **80 ms**; read-only transaction median **127 ms**, p95 **159 ms**. These measurements do **not** explain or clear the HTTP 503 errors in the exhaustive stress-like sequence. [Issue #13](https://github.com/AlexandroLeao/ami-108/issues/13) retains that blocker.
+
+The existing manual [Neon Preview Integration Acceptance](../.github/workflows/neon-preview-integration.yml) now distinguishes two explicitly acknowledged scopes on reviewed `main`:
+
+- `SMOKE_PREVIEW`: short, synthetic **10-command** human-paced NestJS HTTP test with session creation, replay/idempotency, persisted view after app restart, and an explicit **5-second per-action** budget. Uses the same pinned Neon `preview` secret but converts its vetted direct host to the official PgBouncer `-pooler` endpoint for application-style traffic. Internal failures are logged only by exception kind and Prisma P-code, never raw error messages, tokens or URLs. Cleans **only** its own sessions. Afterward, independently check zero remaining preview game rows.
+- `TEST_PREVIEW`: old exhaustive 14-test suite, **still failing 10/14** in run #2. Do not repeat blindly; exhaustive narrative correctness remains enforced by local PostgreSQL CI.
+
+A green short smoke establishes **only** bounded backend/Neon persistence; it does not imply full gameplay E2E, Vercel private binding acceptance, Groq readiness or a public release. Keep game and AI flags OFF, production Neon unmigrated and user Cloud Shell saves untouched.
+
 ## Verification
 
 Run `node scripts/test-vercel-services-config.mjs` or use PR CI. This verifies the intended public route and bindings **statically**; the Vercel beta builder, actual service URLs and managed database require a separate real preview deployment. See [hosting assessment](zero-mandatory-cost-hosting-assessment.md) and [release readiness](release-readiness-matrix.md).
