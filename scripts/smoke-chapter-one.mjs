@@ -80,6 +80,12 @@ try {
     assert.equal(response.headers.get('x-powered-by'), null);
   }
   assertBrowserHeaders(home);
+  // Browser favicon is a Next.js file-based route; verify the exact three-color asset.
+  const icon = await fetch(webOrigin + '/icon.png');
+  assert.equal(icon.status, 200);
+  assert.match(icon.headers.get('content-type') ?? '', /^image\/png(?:;|$)/);
+  const expectedIcon = await readFile(new URL('../apps/web/app/icon.png', import.meta.url));
+  assert.equal(sha256(Buffer.from(await icon.arrayBuffer())), sha256(expectedIcon), 'favicon HTTP hash');
   assertBrowserHeaders(await fetch(webOrigin + '/health'));
   const unauthorized = await call('view');
   assert.equal(unauthorized.status, 401);
