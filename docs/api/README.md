@@ -4,7 +4,7 @@
 
 Existing game commands and same-origin facade support all five chapters, DOG/RAT/BOAR, all three checkpoints, F1/F2/F3, replay and final credits. Chapter 5 resumes legacy boundary saves and exposes optional completion in current view. BOAR consultations use authored CORRECT only; no internal provider request. Presentation cues and text animations do not mutate state. PR #24 implements authenticated opt-in generation and persisted reservation/receipt audit; default fallback remains. OpenAPI files below describe the implemented local wire contract, reconciled against runtime source. Built HTTP smoke checks the projection/result shapes, action and cue enums, and facade rejection paths; this is not a complete OpenAPI conformance suite. Production rate limiting, origin and deployment remain open.
 
-> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
 ---
 
