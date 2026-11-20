@@ -16,7 +16,7 @@ from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 
 from app.cloudflare_provider import CloudflareProvider, cloudflare_config_issue, cloudflare_provider
-from app.evaluation_scenarios import planned_requests
+from app.evaluation_scenarios import planned_requests as planned_requests
 from app.generation import Locale, generate
 
 _CONFIRM = "I_APPROVE_10_CLOUDFLARE_CALLS"
