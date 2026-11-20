@@ -156,3 +156,58 @@ def test_config_diagnostic_never_makes_network_call(
     with pytest.raises(evaluate_cloud.EvaluationBlocked) as exception:
         evaluate_cloud.require_manual_authorization()
     assert exception.value.code == "API_TOKEN_FORMAT"
+
+
+def test_one_call_diagnostic_cannot_be_run_under_ten_call_consent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AMI_AI_PROVIDER", "cloudflare")
+    monkeypatch.setenv("AMI_CLOUDFLARE_ACCOUNT_ID", _ACCOUNT)
+    monkeypatch.setenv("AMI_CLOUDFLARE_API_TOKEN", _TOKEN)
+    monkeypatch.setenv("AMI_CLOUDFLARE_MODEL", _MODEL)
+    monkeypatch.setenv("AMI_AI_GENERATION", "0")
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("AMI_CLOUD_EVAL_MODE", "diagnostic-one")
+    monkeypatch.setenv("AMI_CLOUD_EVAL_CONFIRM", _CONFIRM)
+    with pytest.raises(evaluate_cloud.EvaluationBlocked) as error:
+        evaluate_cloud.require_manual_authorization("diagnostic-one")
+    assert error.value.code == "CONFIRMATION"
+    monkeypatch.setenv("AMI_CLOUD_EVAL_CONFIRM", "I_APPROVE_1_CLOUDFLARE_CALL")
+    assert isinstance(
+        evaluate_cloud.require_manual_authorization("diagnostic-one"),
+        CloudflareProvider,
+    )
+    with pytest.raises(evaluate_cloud.EvaluationBlocked) as error:
+        evaluate_cloud.require_manual_authorization()
+    assert error.value.code == "CONFIRMATION"
+
+
+def test_one_call_diagnostic_never_makes_more_than_one_request(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    calls: list[tuple[str, str]] = []
+
+    async def stub_generate(request: object, provider: object) -> SimpleNamespace:
+        from app.generation import GenerationRequest
+
+        assert isinstance(request, GenerationRequest)
+        assert isinstance(provider, CloudflareProvider)
+        calls.append((request.questionId, request.locale))
+        if provider.diagnostic_sink:
+            provider.diagnostic_sink("HTTP_403")
+        return SimpleNamespace(status="FALLBACK_REQUIRED", reason="UNAVAILABLE")
+
+    monkeypatch.setattr(evaluate_cloud, "generate", stub_generate)
+    results = asyncio.run(
+        evaluate_cloud.evaluate(CloudflareProvider(_ACCOUNT, _TOKEN, _MODEL), True)
+    )
+    assert calls == [("INTRO-RANDOM", "pt-BR")]
+    assert len(results) == 1
+    assert results[0].provider_code == "HTTP_403"
+    assert results[0].fallback_reason == "UNAVAILABLE"
+    assert not evaluate_cloud.summarize(results)
+    output = capsys.readouterr().out
+    assert "provider=HTTP_403" in output
+    assert _TOKEN not in output
+    assert _ACCOUNT not in output

@@ -10,7 +10,8 @@ import json
 import os
 import re
 import secrets
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 
 from app.generation import AuthorizedContext, Provider
 
@@ -28,6 +29,14 @@ class CloudflareProvider:
     api_token: str
     model: str
     timeout_seconds: float = 2.0
+    diagnostic_sink: Callable[[str], None] | None = field(
+        default=None, repr=False, compare=False
+    )
+
+    def _note(self, code: str) -> None:
+        """Only fixed status codes can reach an opt-in manual diagnostic sink."""
+        if self.diagnostic_sink is not None:
+            self.diagnostic_sink(code)
 
     async def generate(self, context: AuthorizedContext) -> str:
         return await asyncio.to_thread(self._generate, context)
@@ -35,6 +44,7 @@ class CloudflareProvider:
     def _generate(self, context: AuthorizedContext) -> str:
         choices = (context.approved_text, *context.alternatives)
         if len(choices) != len(context.selection_options):
+            self._note("LOCAL_OPTIONS_MISMATCH")
             return ""
         # Match the accepted Ollama contract: sample at most 3 approved RANDOM
         # options, map only the exact returned numeric index to localized text.
@@ -79,28 +89,53 @@ class CloudflareProvider:
             )
             response = conn.getresponse()
             if response.status != 200:
+                status_codes = {
+                    400: "HTTP_400", 401: "HTTP_401", 403: "HTTP_403",
+                    404: "HTTP_404", 408: "HTTP_408", 429: "HTTP_429",
+                    500: "HTTP_500", 502: "HTTP_502", 503: "HTTP_503",
+                }
+                self._note(status_codes.get(response.status, "HTTP_OTHER"))
                 raise RuntimeError("Remote inference unavailable")
+            self._note("HTTP_200")
             raw = response.read(16385)
             if len(raw) > 16384:
+                self._note("RESPONSE_OVERSIZED")
                 raise ValueError("Oversized inference response")
-            result = json.loads(raw)
+            try:
+                result = json.loads(raw)
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                self._note("RESPONSE_INVALID_JSON")
+                raise
             if not isinstance(result, dict):
+                self._note("RESPONSE_ENVELOPE")
                 raise TypeError("Invalid response envelope")
             items = result.get("choices")
             if not isinstance(items, list) or len(items) != 1:
+                self._note("RESPONSE_CHOICES")
                 raise ValueError("Invalid response choices")
             item = items[0]
             if not isinstance(item, dict) or item.get("finish_reason") != "stop":
+                self._note("RESPONSE_NOT_STOP")
                 raise ValueError("Incomplete provider response")
             message = item.get("message")
             if not isinstance(message, dict):
+                self._note("RESPONSE_MESSAGE")
                 raise TypeError("Invalid provider message")
             content = message.get("content")
             if not isinstance(content, str):
+                self._note("RESPONSE_CONTENT")
                 raise TypeError("Invalid provider text")
-            return {str(i): choices[index] for i, index in enumerate(order)}.get(
+            result_text = {str(i): choices[index] for i, index in enumerate(order)}.get(
                 content.strip(), ""
             )
+            self._note("INDEX_VALID" if result_text else "INDEX_INVALID")
+            return result_text
+        except TimeoutError:
+            self._note("NETWORK_TIMEOUT")
+            raise
+        except OSError:
+            self._note("NETWORK_ERROR")
+            raise
         finally:
             conn.close()
 

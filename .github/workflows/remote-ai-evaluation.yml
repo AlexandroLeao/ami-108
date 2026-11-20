@@ -5,8 +5,16 @@ name: Manual Workers AI acceptance check
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: "Start with one diagnostic call; ten-call acceptance only after review"
+        required: true
+        type: choice
+        default: diagnostic-one
+        options:
+          - diagnostic-one
+          - acceptance-ten
       confirm:
-        description: "Type I_APPROVE_10_CLOUDFLARE_CALLS after verifying Workers Free"
+        description: "For one call: I_APPROVE_1_CLOUDFLARE_CALL; for ten: I_APPROVE_10_CLOUDFLARE_CALLS"
         required: true
         type: string
 
@@ -19,7 +27,7 @@ concurrency:
 
 jobs:
   private-remote-evaluation:
-    if: ${{ inputs.confirm == 'I_APPROVE_10_CLOUDFLARE_CALLS' }}
+    if: ${{ (inputs.mode == 'diagnostic-one' && inputs.confirm == 'I_APPROVE_1_CLOUDFLARE_CALL') || (inputs.mode == 'acceptance-ten' && inputs.confirm == 'I_APPROVE_10_CLOUDFLARE_CALLS') }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     defaults:
@@ -32,6 +40,7 @@ jobs:
       AMI_CLOUDFLARE_API_TOKEN: ${{ secrets.AMI_CLOUDFLARE_API_TOKEN }}
       AMI_CLOUDFLARE_MODEL: "@cf/google/gemma-4-26b-a4b-it"
       AMI_CLOUD_EVAL_CONFIRM: ${{ inputs.confirm }}
+      AMI_CLOUD_EVAL_MODE: ${{ inputs.mode }}
     steps:
       - name: Checkout reviewed private sources
         uses: actions/checkout@v4
@@ -47,7 +56,13 @@ jobs:
         run: uv sync --locked
       - name: Verify allowlisted scenarios without network
         run: uv run --locked python -m app.evaluate_cloud --dry-run
-      - name: Run ten authorized, non-retried remote calls
+      - name: Run one authorized diagnostic call (only when selected)
+        if: ${{ inputs.mode == 'diagnostic-one' }}
+        run: |
+          set +x
+          uv run --locked python -m app.evaluate_cloud --diagnostic-one
+      - name: Run ten authorized, non-retried acceptance calls (only when selected)
+        if: ${{ inputs.mode == 'acceptance-ten' }}
         run: |
           set +x
           uv run --locked python -m app.evaluate_cloud

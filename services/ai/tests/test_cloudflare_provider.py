@@ -198,3 +198,34 @@ def test_invalid_json_falls_back_without_provider_text() -> None:
         assert result.status == "FALLBACK_REQUIRED"
         assert result.reason == "UNAVAILABLE"
         conn.request.assert_called_once()
+
+
+def test_diagnostics_emit_only_fixed_http_status_without_server_body() -> None:
+    noted: list[str] = []
+    with patch("app.cloudflare_provider.http.client.HTTPSConnection") as constructor:
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 403
+        conn.getresponse.return_value.read.return_value = b"PRIVATE_PROVIDER_RESPONSE"
+        provider = CloudflareProvider(
+            ACCOUNT, TOKEN, MODEL, diagnostic_sink=noted.append,
+        )
+        output = asyncio.run(generate(request(), provider))
+        assert output.status == "FALLBACK_REQUIRED"
+        assert noted == ["HTTP_403"]
+        assert "PRIVATE_PROVIDER_RESPONSE" not in repr(provider)
+
+
+def test_diagnostics_classify_invalid_index_without_exposing_text() -> None:
+    noted: list[str] = []
+    with patch("app.cloudflare_provider.http.client.HTTPSConnection") as constructor:
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"choices": [{"finish_reason": "stop", "message": {"content": "NO"}}]}
+        ).encode()
+        provider = CloudflareProvider(
+            ACCOUNT, TOKEN, MODEL, diagnostic_sink=noted.append,
+        )
+        output = asyncio.run(generate(request(), provider))
+        assert output.status == "FALLBACK_REQUIRED"
+        assert noted == ["HTTP_200", "INDEX_INVALID"]
