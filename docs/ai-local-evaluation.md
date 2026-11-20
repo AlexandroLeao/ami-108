@@ -1,5 +1,7 @@
 # AMI-007 — Isolated local inference evaluation
 
+> **Status guide:** This is a chronological evidence log, not the current AI activation procedure. Previous real-model measurements were on earlier Cloud Shell VMs. The current six-save recovered environment has gameplay generation temporarily OFF; use the [guarded pinned Ollama recovery](../scripts/prepare-pinned-local-ollama.sh) and its [operational instructions](cloud-shell-pause-resume.md) before enabling any live requests. Historical candidate scripts and prior 10/10 outcomes must not be presented as proof of an untested new VM.
+
 > **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 Historical development notes below are retained as evidence and do not override the accepted status.
