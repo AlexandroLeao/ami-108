@@ -4,7 +4,7 @@
 
 CENA-01–07 and CENA-08/11/12 are reached in Chapters 1–4; CENA-09/10 are now reached in Chapter 5: CENA-09 on the gated boar reveal and CENA-10 in orbit. All 12 HTTP hashes passed. All twelve original PNGs and manifest retained. Chapter 4 memory art uses coded CRT opening, continuous subtle interference and shake on the child/lizard images, and disoriented eyelids on the betrayal image. Dog/rat reveal gradually with existing tremor; only specified scenes gate forward navigation. No new or duplicated artwork. Reduced motion supported.
 
-> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 ---
 
