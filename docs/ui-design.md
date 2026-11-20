@@ -10,7 +10,7 @@ The PR #42 advisory and **four-page** Extras flow supersede earlier three-page p
 
 Preserve the Chapter 1 eye-opening gates, robot-name transition and tutorial energy pulse; Chapter 2/3 loaded artwork reveal gates, gradual dog/rat reveal plus existing shake, lab/interface and memory-return gates. Chapter 4 opens dark with approved narration, F3 count from 75/85/78 to 100 and red record panels; AMI memories use original CENA-08/12 with CRT opening and continuous subtle interference/shake. Betrayal uses original CENA-11 with disoriented eyelids and continuous David memory text tremor from FB-D4 through FB-D1-RECALL. Energy HUD hidden throughout Chapter 4; diagnostics remain stored. Keep existing palette, typography, frame geometry, controls, timing, approved bilingual text and reduced-motion behavior. Chapter 5 starts dark, reveals CENA-09 on Meu Deus with gated tremor, uses CENA-10 in orbit, then centered animated CONTINUA / TO BE CONTINUED and rolling credits with main-menu button centered in the lower dialogue frame. Owner desktop/mobile approved.
 
-> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 ---
 

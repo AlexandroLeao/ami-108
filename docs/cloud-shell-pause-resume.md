@@ -8,7 +8,13 @@ The approved local game remains on clean commit `14ea583a83c7c1473bc94f3b1d515a8
 
 After `AMI_AI_GENERATION=1` was enabled by recreating **only** the API, the owner confirmed that Continue worked and subsequently reported successful new-game checks in **desktop/mobile and PT-BR/English**, including greater variation in RANDOM utterances. These are owner-observed functional acceptance results, **not** per-receipt telemetry, formal accessibility audit, sustained performance evidence or public-production acceptance.
 
-**A new game creates more saved sessions.** The authoritative *current* count must be read at shutdown, not assumed to still be six. There is no new backup evidence yet for today's playtests. The current release gate remains [formal QA/security](release-readiness-matrix.md), while private Master v1.14 and Script v1.12 still require approved Chapter 5 synchronization.
+**A new game creates more saved sessions.** The authoritative *current* count must be read at shutdown, not assumed to still be six. **The owner has since completed the safe pause:** 7 sessions / 0 pending / 4 migrations were verified before and after a full-read, checksum-validated new private dump. The completed pause details are below; the six-session value remains the initial recovery checkpoint. The current release gate remains [formal QA/security](release-readiness-matrix.md), while private Master v1.14 and Script v1.12 still require approved Chapter 5 synchronization.
+
+## Confirmed owner shutdown — November 20 UTC
+
+The owner provided `=== SAFE PAUSE COMPLETE ===` after running the versioned script. Its final non-secret report confirmed **7 sessions, 0 pending generations, 4 completed migrations**, the private dump `pause-ami108-20261120T005447Z-121510.dump` (**182,626 bytes**), completed full PostgreSQL archive inspection, `BACKUP_SHA256=PASS` and `PRIVATE_ENV_COPY=PRESENT`. Docker reported Web/API/AI/DB stopped; the script also stopped named Ollama. No volumes were removed. The earlier six-session archive remains a historical recovery point.
+
+**Current action:** Cloud Shell can stay closed. **Do not rerun the pause command** on this already stopped stack. On the next session, inspect the existing VM and retained files first; restore the newest verified dump only if the prior DB volume has actually disappeared and a new empty target has been checked. The following shutdown instructions are retained for a **future** deliberate pause, not as an operation required today.
 
 ## Safe owner-run shutdown — do not delete Docker data
 

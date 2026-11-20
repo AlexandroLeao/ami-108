@@ -4,7 +4,7 @@
 
 ---
 
-# Development foundation
+## Original archived document — Development foundation
 
 ## Current local recovery and safe development — November 19, 2026
 
