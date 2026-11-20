@@ -22,6 +22,9 @@ services:
       AMI_OLLAMA_URL: ${AMI_OLLAMA_URL:-}
       AMI_OLLAMA_MODEL: ${AMI_OLLAMA_MODEL:-}
       AMI_OLLAMA_KEEP_ALIVE: ${AMI_OLLAMA_KEEP_ALIVE:-5m}
+      AMI_CLOUDFLARE_ACCOUNT_ID: ${AMI_CLOUDFLARE_ACCOUNT_ID:-}
+      AMI_CLOUDFLARE_API_TOKEN: ${AMI_CLOUDFLARE_API_TOKEN:-}
+      AMI_CLOUDFLARE_MODEL: ${AMI_CLOUDFLARE_MODEL:-}
     ports: ["127.0.0.1:8000:8000"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
