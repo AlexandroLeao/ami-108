@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { sameOriginMutation } from './origin';
 import { MAX_GAME_BODY_BYTES, readGameBody } from './body';
+import { gameMode } from '../../../game/access';
 
 export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ path: string[] }> };
@@ -11,7 +12,8 @@ const noStore = { 'Cache-Control': 'private, no-store' };
 const unavailable = () => Response.json({ code: 'SERVICE_UNAVAILABLE', message: 'SERVICE_UNAVAILABLE', requestId: crypto.randomUUID() }, { status: 503, headers: noStore });
 
 async function proxy(request: NextRequest, context: Context) {
-  if (process.env.AMI_DEV_PREVIEW !== '1') return new Response(null, { status: 404, headers: noStore });
+  const mode = gameMode();
+  if (mode === 'disabled') return new Response(null, { status: 404, headers: noStore });
   const { path } = await context.params;
   const endpoint = path.length === 1 ? path[0] : '';
   if (!Object.hasOwn(methods, endpoint)) return new Response(null, { status: 404, headers: noStore });
@@ -23,6 +25,7 @@ async function proxy(request: NextRequest, context: Context) {
     return new Response(null, { status: 404, headers: noStore });
   }
   const headers = new Headers();
+  if (mode === 'public') headers.set('X-Ami-Internal-Token', process.env.AMI_API_INTERNAL_TOKEN!);
   const token = request.cookies.get('ami_session')?.value;
   if (token && /^[A-Za-z0-9_-]{43}$/.test(token)) headers.set('Cookie', 'ami_session=' + token);
   let body: string | undefined;

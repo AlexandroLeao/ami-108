@@ -1,4 +1,5 @@
 import GamePage from './game/page';
+import { gameMode } from './game/access';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ async function isApiReady(): Promise<boolean> {
 }
 
 export default async function Home() {
-  if (process.env.AMI_DEV_PREVIEW === '1') return <GamePage />;
+  if (gameMode() !== 'disabled') return <GamePage />;
   const ready = await isApiReady();
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 p-8">
