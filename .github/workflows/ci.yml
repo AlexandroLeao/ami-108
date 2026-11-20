@@ -63,6 +63,11 @@ jobs:
           bash -n scripts/pause-cloud-shell-safely.sh
           bash -n scripts/test-pause-cloud-shell-safely.sh
           bash scripts/test-pause-cloud-shell-safely.sh
+      - name: Check read-only resumed QA metrics safety
+        run: |
+          bash -n scripts/qa-readonly-resumed-metrics.sh
+          bash -n scripts/test-qa-readonly-resumed-metrics.sh
+          bash scripts/test-qa-readonly-resumed-metrics.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
