@@ -49,6 +49,24 @@ The config accepts only `AMI_AI_PROVIDER=cloudflare`, a 32-hex-character account
 5. Validate exact one-request reservation/finalization, idempotent saves, correct energy/slot behavior and no extra billing after retries/timeouts using **disposable** database state.
 6. Review and approve deployment adapters, Vercel function compatibility, persistent PostgreSQL, TLS, same-origin cookies, rate limiting and rollback **before** any public link.
 
+## Private, explicitly manual evaluation — no saved sessions
+
+A separate [manual-only GitHub Actions workflow](../.github/workflows/remote-ai-evaluation.yml) and [ten-case evaluation runner](../services/ai/app/evaluate_cloud.py) prepare the first real Workers AI acceptance check. **They have not made any real provider calls yet.** Ordinary PRs, merges, builds and GitHub CI do **not** trigger this workflow; it cannot run without an operator choosing `Run workflow`, entering the exact ten-call confirmation and configuring the required private repository secrets.
+
+**Before starting**, the owner should independently check that the Cloudflare account is on **Workers Free**, that no paid plan or payment method is being activated, and that `@cf/google/gemma-4-26b-a4b-it` is offered under the free allocation. Cloudflare's [July 28 Free-plan model announcement](https://developers.cloudflare.com/changelog/post/2026-07-28-models-require-workers-paid/) explicitly lists Gemma 4 as Free-eligible; verify the live dashboard again rather than relying on an older snapshot. Review [Cloudflare's current customer-content commitments](https://developers.cloudflare.com/workers-ai/platform/data-usage/) and [Gemma 4's license](https://ai.google.dev/gemma/docs/gemma_4_license).
+
+**Account and secret setup (owner-operated; never paste credentials into chat, issues or logs):**
+
+1. Open the [official Workers AI REST API guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/) and the Cloudflare dashboard. In Workers AI, choose **Use REST API**, create a narrowly scoped **Workers AI Read** API token, and note the account ID locally. Use the owner-controlled **Free** account only.
+2. In the private GitHub repository, go to **Settings → Secrets and variables → Actions → New repository secret**. Add `AMI_CLOUDFLARE_ACCOUNT_ID` and `AMI_CLOUDFLARE_API_TOKEN` using the dashboard values. These encrypted repository secrets must never be committed to `.env`, PRs, workflow files or a chat. Revoke the test token when it is no longer needed.
+3. Open **Actions → Manual Workers AI acceptance check → Run workflow**, keep the approved `main` branch, and enter exactly `I_APPROVE_10_CLOUDFLARE_CALLS`. The operator must separately verify that only the expected workflow is selected and the account remains free.
+4. The workflow first checks the ten allowed scenarios **offline**, then makes **at most ten serial, non-retried** Cloudflare requests: INTRO-RANDOM, DOG-RANDOM, RAT-RANDOM, DOG-CORRECT and RAT-CORRECT, each in PT-BR and EN. The prompt contains only a short selection of already owner-approved English options, not saved games, player IDs, future scenes or private manuscripts.
+5. The private job prints only case names, language, status and elapsed time, plus sample median/p95; it does **not** print raw prompts, generated text or tokens. **Success requires 10/10 `VALIDATED`** in that sample. Any fallback or timeout is honestly recorded as a non-acceptance. A passing sample is **not** a production-latency guarantee.
+
+**Safety contract:** `AMI_AI_GENERATION=0` stays OFF; all game operations remain disconnected; no database, deployment, hosted Web preview or actual saved session is involved. Missing credentials or confirmation fail before a provider request. The manual workflow is *one-way*: it cannot create an account, change billing, enable inference for real players, or automatically publish a service.
+
+The user authorized a bounded test using the already approved snippets. That authorization does not include unrestricted prompts, new providers, publishing the story or changing a Cloudflare billing plan. If the test fails, preserve default authored fallback and evaluate a second **currently Free-eligible** model only through a separately reviewed adapter/CI change.
+
 ## Operator and documentation notes
 
 The already paused Cloud Shell checkout must **not** be fast-forwarded to the latest GitHub `main` or have secrets copied into its `.env` solely because this connector exists. The default `AMI_AI_GENERATION=0` and blank `AMI_AI_PROVIDER` leave the approved fallback path unchanged. Development uses isolated mocked tests; cloud inference is a *candidate* pending model/authorization acceptance.
