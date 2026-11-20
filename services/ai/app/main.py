@@ -8,6 +8,7 @@ from pydantic import BaseModel, ValidationError
 
 from app.cloudflare_provider import cloudflare_provider
 from app.generation import GenerationRequest, GenerationResult, Provider, generate
+from app.groq_provider import groq_provider
 from app.ollama_provider import local_provider
 
 
@@ -60,6 +61,6 @@ def create_app(
 # Provider mode must be explicitly configured; no network access when disabled.
 # Authored fallback and health remain unchanged with default environment.
 app = create_app(
-    provider=local_provider() or cloudflare_provider(),
+    provider=local_provider() or cloudflare_provider() or groq_provider(),
     internal_token=os.getenv("AMI_AI_INTERNAL_TOKEN"),
 )
