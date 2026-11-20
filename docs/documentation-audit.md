@@ -1,4 +1,4 @@
-# Documentation audit — November 19, 2026
+# Documentation audit — updated November 20, 2026
 
 ## Scope and verified reference
 
@@ -30,6 +30,14 @@ The repository documentation and local-link audit can be cleaned and green **wit
 The owner's shutdown terminal output confirms `SAFE PAUSE COMPLETE`, private archive `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes), SHA-256 PASS, complete PostgreSQL read, **7 sessions / 0 pending / 4 completed migrations**, private environment backup and stopped Web/API/AI/DB/Ollama. The archives and private environment are **not stored in GitHub**. The current runbook explicitly distinguishes that completed pause from procedures to use on a future session.
 
 A second structural audit checked all tracked project Markdown for accidental concatenation (more than one top-level title) and unclosed fenced code blocks. Two historical archives contained an embedded original H1; these were demoted to H2 while retaining their source histories. The still-old “current” source versions in requirements and “current” November 17 production baseline were corrected. These structural checks complement the existing local-link audit but do **not** prove semantic equivalence with private PDFs, official content classification, external link health or production readiness.
+
+## Entrypoint ownership and restored-VM follow-up — November 20
+
+A further **semantic** review found defects not caught by basic Markdown link/heading checks: the root README included a literal escaped paragraph break and an obsolete claim that owner browser AI variation remained untested; the documentation index duplicated multiple dated operational snapshots; the release matrix's save/backup row still called the **six-session** November 19 archive the latest even though the owner had safely backed up **seven sessions** later. Several development and AI log introductions also implied the previously running Ollama was available on the **new November 20 Cloud Shell VM**, though the latest read-only terminal output reports **no AMI containers or volumes**.
+
+The cleanup gives each artifact one purpose: root README = product/technology/portfolio introduction; documentation index = navigation and source precedence; release matrix = most recent supported checkpoint and unresolved acceptance; development = current constraints; Cloud Shell runbook = safe operations; AI/QA = **dated** measured evidence; histories = clearly archived; hosting assessment = previous decisions, career alignment and candidate research **without** public deploy approval. The root README was shortened without removing the non-public release warning, authorship, content advisory or private source caveat. The structural test now also rejects literal `\\n\\n` paragraph breaks in README/index prose. No game runtime, migration, original story/art or player data changed.
+
+**Current operational evidence:** clean accepted local `14ea583`, protected `.env`, verified last backup SHA-256 (`pause-ami108-20261120T005447Z-121510.dump`, 182,626 bytes), Docker available **but no AMI containers or volumes**, root **10 GiB free / 92% used**. Seven sessions were last confirmed at the **prior pause**, not re-counted on today's empty VM. No archive restore or model installation was performed by this audit. Manual editorial review remains necessary: CI cannot prove historical narrative truth, private PDF/source parity, external link freshness, accessible UX or production security.
 
 ## Traceability and boundaries
 

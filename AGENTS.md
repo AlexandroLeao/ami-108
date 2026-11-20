@@ -1,8 +1,8 @@
 # AMI-108 — Engineering instructions
 
-## Current source and implementation boundaries — November 19
+## Current source and implementation boundaries — November 20
 
-Private Master v1.14 / Script v1.12 and later approved amendments govern the frozen campaign. PRs #38 and #53 were accepted and merged; do not modify narrative, original art, approved UI, probability rules or mechanics without explicit owner authorization. The owner's accepted local runtime remains `14ea583`. After successful reactivation of pinned local inference and owner desktop/mobile PT-BR/EN new-game checks, the **November 20 UTC safe-pause report** confirmed **7 sessions, 0 pending generations, 4 migrations**, a verified private database dump and stopped Web/API/AI/DB/Ollama without volume deletion. The earlier 6-session/AI-OFF state is historical. Later GitHub commits affect documentation and guarded operational tools, not accepted game behavior. Release issues #12–#15 remain open. No public hosting or paid resources.
+Private Master v1.14 / Script v1.12 and later approved amendments govern the frozen campaign. PRs #38 and #53 were accepted and merged; do not modify narrative, original art, approved UI, probability rules or mechanics without explicit owner authorization. The owner's accepted local runtime remains `14ea583`. After successful reactivation of pinned local inference and owner desktop/mobile PT-BR/EN new-game checks, the **November 20 UTC safe-pause report** confirmed **7 sessions, 0 pending generations, 4 migrations**, a verified private database dump and stopped Web/API/AI/DB/Ollama without volume deletion. The earlier 6-session/AI-OFF state is historical. **A newer read-only Cloud Shell check found no AMI containers or volumes; the seven-session backup checksum passed, but restoration and live model readiness on the new VM are not established.** Root free space was 10 GiB (92% used). Later GitHub commits affect documentation and guarded operational tools, not accepted game behavior. Release issues #12–#15 remain open. No public hosting or paid resources.
 
 
 ## Owner-approved implementation invariants (earlier recorded November 18, 2026)
@@ -10,7 +10,7 @@ Private Master v1.14 / Script v1.12 and later approved amendments govern the fro
 - F1/F2/F3 restore energy and memory atomically; F3 unlocks PERSONAL and all four indexes reach 100%. No new solar actions; legacy SOL IDs remain for old saves.
 - All five chapters are owner-approved. Preserve the exact approved dialogue, art, UI, current-only gates and replay. Selected wake and creature reveals block forward navigation until loaded/effect completed; dog/rat gradual reveal plus existing shake, Chapter 4 CRT memory effects, David memory text shiver and hidden energy HUD are approved. Reduced motion remains supported.
 - PRs #24/#35/#36 merged; AI opt-in active on last observed four-CPU local VM, disabled by default on fresh installs; #29 closed. Preserve category authority, deadlines, cache and fallback. No paid services.
-- Next: verify final backup and VM on resume, pinned AI reactivation, release QA, infrastructure and final documentation. No changes to accepted content without owner authorization.
+- Next: preserve the verified seven-session backup; inspect root/Docker disk availability and full archive readability on the new VM, then restore **only to proven-empty PostgreSQL** under controlled review; validate Continue before any model reactivation. Finish release QA, source documentation and hosting feasibility without changing accepted content or provisioning unauthorised resources.
 
 > **Archived PR #38 snapshot:** [historical evidence](docs/history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](docs/release-readiness-matrix.md).
 

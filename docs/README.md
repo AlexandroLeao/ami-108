@@ -1,58 +1,55 @@
 # AMI-108 documentation index
 
-> **Current documentation index — November 20, 2026.** This is a navigation and precedence guide, not public release authorization. The accepted private game runtime is `14ea583`: five approved chapters, original artwork, PT-BR/EN and tested local Qwen inference. The most recent owner terminal evidence is a **safe shutdown** with **7 sessions / 0 pending / 4 migrations** and a private, fully readable SHA-256-verified backup. **Today's Cloud Shell VM/volumes have not yet been inspected.** The older six-session result is the prior recovery checkpoint, not today's expected count. See [release readiness](release-readiness-matrix.md).
+**Purpose:** Navigation, ownership and source precedence. **Not** a release certificate, chronological log, deployment approval or database recovery command. For the actual current project state, use the [release-readiness matrix](release-readiness-matrix.md); for the original game overview, see the [root README](../README.md).
 
-The owner previously confirmed mobile/desktop PT-BR/EN gameplay, Continue and improved RANDOM variety. That supports private functional acceptance, **not** formal assistive-technology or deployment-security certification. The latest private Master v1.14 and Script v1.12 still predate approved Chapter 5 and require reviewed synchronization in #14.
+The accepted private campaign uses game runtime `14ea583`. The last verified backup contained **7 saved sessions**, with no pending generations and four completed migrations. The most recent Cloud Shell read-only check saw the checksum-verified backup but **no previous AMI Docker containers or volumes**; restored gameplay has not been reverified on that VM. Detailed dated evidence belongs in the reports below, not in this index.
 
-## 1. Start here: current state and operations
+## Current operating references
 
-| Source | Purpose | Status |
+| Document | Owns | Boundary |
 | --- | --- | --- |
-| [Project overview](../README.md) | Game and stack, current private approval | Current entry point |
-| [Release-readiness matrix](release-readiness-matrix.md) | Verified evidence, issues #12–#15, next action | **Current operational status** |
-| [Development guide](development.md) | Safe checks, stack basics and local constraints | **Current, no obsolete restore steps** |
-| [Cloud Shell pause/resume](cloud-shell-pause-resume.md) | Archive integrity, six-save recovery, protected AI preparation | Current reference with *explicitly historical* prior pause command |
-| [Release QA](release-qa.md) | CI and owner evidence vs missing independent/browser tests | Current evidence register; dated sections may be historical |
-| [Final QA acceptance worksheet](final-qa-acceptance-worksheet.md) | Exact mobile/desktop PT-BR/EN, screen-reader, zoom, reduced-motion, performance and security sign-offs | **Open test worksheet, not certification** |
-| [Zero mandatory-cost hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Official provider constraints, honest local-vs-public options and release decisions | **Feasibility only; no provisioning authorized** |
-| [Accessibility/performance QA](accessibility-performance-qa.md) | Tests still required before public launch | **Plan**, not pass certificate |
-| [Production security gates](architecture/production-security-gates.md) | Proposal of required controls, not yet enabled | **Proposal, not deployment** |
-| [Dependency security audit](dependency-security-audit.md) | Earlier vulnerability findings and recorded remediation | **Dated scan evidence**, not a current vulnerability warranty |
+| [Release readiness](release-readiness-matrix.md) | Current evidence, checkpoint, issue #12–#15 status and next action | **Single status source of truth** |
+| [Development guide](development.md) | Dependencies, repository layout, approved local runtime and safe development workflow | No unconditional restore/reinstall |
+| [Cloud Shell pause/resume](cloud-shell-pause-resume.md) | Preserve saves, inspect Docker VM, backup verification, safe return and pause | **Operational runbook**; never restore into a nonempty DB |
+| [Release QA](release-qa.md) | Dated validation results, regressions and concrete limitations | Historical observations are dated, not fresh certificates |
+| [Final QA worksheet](final-qa-acceptance-worksheet.md) | Manual accessibility, security, performance and owner acceptance gates | Checklist, **not** evidence already passed |
+| [Hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Provider conditions, career-aligned options and zero-cost/publication decision | Research, **not** deployed hosting |
+| [Accessibility and performance](accessibility-performance-qa.md) | Test cases and expected behavior | Plan pending real device/screen-reader checks |
+| [Production security gates](architecture/production-security-gates.md) | Origin, proxy, TLS, quotas, retention and network controls | Proposed production hardening, not currently enabled |
+| [Dependency audit](dependency-security-audit.md) | Dated advisories, accepted remediations and scanning limitations | No perpetual vulnerability clearance |
 
-## 2. Implemented design and original authoring constraints
+## Implementation and design
 
-| Documentation | Applies to |
+| Document | Owns |
 | --- | --- |
-| [Architecture requirements](architecture/requirements.md) | Functional/nonfunctional scope and traceability |
-| [System design](architecture/system-design.md) | Game services, boundaries and diagrams |
-| [Domain model](architecture/domain-model.md) | Checkpoints, state invariants and persistence |
-| [Architecture decisions](architecture/decisions.md) | ADRs, security and local-first choices |
-| [API contracts](api/README.md) | Implemented local endpoint contracts and verification limits |
-| [Narrative engine](narrative-engine.md) | Stable story IDs, events and accepted five-chapter mechanics |
-| [Encounter engine](encounter-engine.md) | DOG/RAT/BOAR, energy and immutable consultation slots |
-| [UI design](ui-design.md) | Accepted cinematic presentation and four-page Extras |
-| [Scene assets](assets.md) | Twelve approved images and art-preparation workflow |
-| [Chapter 3 details](chapter-three.md) | Approved chapter and historical implementation history |
-| [AI authorization](ai-rag.md) | Bounded responses and provider design; earlier milestones are historical |
-| [Local AI evaluation](ai-local-evaluation.md) | Real and simulated test history and separate model-reactivation gates |
+| [Requirements](architecture/requirements.md) | Functional scope and traceability |
+| [System design](architecture/system-design.md) | Services, boundaries and architecture diagrams |
+| [Domain model](architecture/domain-model.md) | Session, checkpoint and persistence invariants |
+| [Architecture decisions](architecture/decisions.md) | Accepted technical ADRs |
+| [API contracts](api/README.md) | Local wire and endpoint contracts |
+| [Narrative engine](narrative-engine.md) | Approved state IDs, transitions and five-chapter behavior |
+| [Encounter engine](encounter-engine.md) | DOG/RAT/BOAR rules, categories, energy and immutable slots |
+| [Chapter 3 notes](chapter-three.md) | Accepted specific scene implementation and dated provenance |
+| [UI design](ui-design.md) | Approved presentation, localization, warning and Extras |
+| [Assets](assets.md) | Original scene images and asset workflow |
+| [AI/RAG](ai-rag.md) | Server-bounded facts, generation authorization and fallbacks |
+| [Local AI evaluation](ai-local-evaluation.md) | **Dated** real-model evaluation and activation history |
 
-**Source precedence and synchronization caveat:** The last synchronized private files are **Documento Mestre v1.14** and **Roteiro Interativo v1.12**, but their Day 3 status sections still describe **4/5 chapters completed** and Chapter 5 as a draft. They are **not a complete standalone record of the subsequently accepted five-chapter game**. Later explicitly owner-approved amendments and tested merged implementation take precedence where those files predate acceptance. A reviewed private-source reconciliation remains **open in issue #14**; do not silently rewrite narrative or publish the private files. The approved application code and tested owner acceptance determine implemented behavior. [AGENTS.md](../AGENTS.md) provides engineering constraints. Nothing in a dated PR/design excerpt overrides those sources or authorizes new scenes, dialogue, art, rules, public release or paid hosting.
+## Historical and audit references
 
-## 3. Archived records — not current installation instructions
-
-| Archive | Contains |
+| Record | Purpose |
 | --- | --- |
-| [Historical developer handoffs](development-history.md) | Original Day 1–4 developer log and outdated one-time setup/restore instructions; **do not execute** |
-| [Historical initial VM-return checklist](release-readiness-history.md) | First recovery checklist, **already completed** for six saved sessions |
-| [PR #38 status snapshot](history-pr38-snapshot.md) | One preserved source for a formerly repeated 201-test and early-save milestone |
-| [Documentation audit](documentation-audit.md) | Findings, scope and cleanup of historical/current distinctions |
-| [Production plan](production-plan.md) | Original seven-day target, chronology and remaining release conditions |
+| [Development history](development-history.md) | Archived older development and setup instructions; **do not rerun** |
+| [Cloud Shell pause history](cloud-shell-pause-history.md) | Archived earlier restoration, model installation and pause commands; **not current operations** |
+| [Initial VM-return history](release-readiness-history.md) | Completed older six-save return checklist |
+| [PR #38 snapshot](history-pr38-snapshot.md) | One preserved dated campaign milestone |
+| [Production plan](production-plan.md) | Original seven-day schedule and historical planning assumptions; current release gates live in release readiness |
+| [Documentation audit](documentation-audit.md) | Audit scope, cleanup findings and unresolved semantic-source work |
 
-Implementation design documents may also preserve **clearly marked dated milestones** for code traceability. Those subsections are not an instruction to roll back a completed chapter, run an old model benchmark on player data, reset a save, or reopen a previously closed issue.
+## Private sources, precedence and what the checks mean
 
-## 4. Verification and remaining limits
+The private **Documento Mestre v1.14** (PDF/Markdown) and **Roteiro Interativo v1.12** (PDF) describe the *November 18 Day 3* checkpoint of **4/5 chapters**, before the approved final chapter. Their original authored passages must stay private and unchanged until the owner approves reconciliation. The later **explicitly owner-approved** five-chapter changes and accepted game implementation govern observed runtime behavior; the old files do not authorize new story content. Issue [#14](https://github.com/AlexandroLeao/ami-108/issues/14) covers synchronized private revision approval.
 
-- GitHub CI checks tracked internal Markdown link **paths**; it does not check external websites, every Markdown anchor, a private PDF's semantic correspondence, or full accessibility/production security.
-- The previously accepted PR #53 game suite passed 105 API + 44 Web + 72 Python = **221** tests and a full campaign/12-artwork-hash smoke. Separate operational/doc tests were added later. These tests **do not** prove model readiness on a newly recycled VM.
-- The pinned local Qwen2.5:1.5b and Ollama must be checked on the actual Cloud Shell hardware with real ten-case validation before gameplay generation is enabled. A GitHub-green recovery script is not evidence it already ran.
-- The repository remains private and has **no public-hosting, license, content-rating or release approval**. Issues [#12](https://github.com/AlexandroLeao/ami-108/issues/12), [#13](https://github.com/AlexandroLeao/ami-108/issues/13), [#14](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15](https://github.com/AlexandroLeao/ami-108/issues/15) remain open.
+CI checks internal Markdown file paths and basic document boundaries, plus obvious tracked private-file names. It does **not** prove that external URLs work, private PDFs match the code, all historical claims remain current, the app meets WCAG, secret content is absent, or public infrastructure is secure. Those are separate verification and release gates.
+
+Repository engineering rules are in [AGENTS.md](../AGENTS.md). No document grants permission to expose the game, publish spoilers, change the approved rules, incur mandatory costs, delete saves or create a `v1.0.0` release without authorization.

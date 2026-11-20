@@ -1,6 +1,12 @@
 # Safe Cloud Shell pause and resume — AMI-108
 
-> **Current owner recovery and pause guide — November 19, 2026.** Earlier one-time operations and superseded commands are preserved separately in [historical runbook](cloud-shell-pause-history.md). Never paste those older commands into the current recovered database.
+> **Current owner recovery and pause guide — November 20, 2026.** Earlier one-time operations and superseded commands are preserved separately in [historical runbook](cloud-shell-pause-history.md). Never paste those older commands into the current recovered database.
+
+## Latest Cloud Shell inspection — November 20 (read-only; NOT restored)
+
+The owner ran the versioned [read-only resume diagnostic](../scripts/check-resume-readonly.sh) after reopening **standard** Cloud Shell. It reported: accepted local `main` at `14ea583`, clean tree, restricted and ignored private `.env`; newest archive `pause-ami108-20261120T005447Z-121510.dump` (**182,626 bytes**) with `BACKUP_CHECKSUM=PASS`. Docker is available but **no AMI containers or volumes exist** on the current VM. Available disk: root **10 GiB (92% used)**, home **1.7 GiB**. The archive's full read and **7 sessions / 0 pending / 4 migrations** were verified at the *prior pause*, **not yet in the new VM**. Docker images and runtime model residency have not been checked.
+
+**Next operator gate:** read-only inspect Docker image usage (`docker system df`, `docker image ls`) and disk headroom, then verify PostgreSQL archive structure/full readability with the existing matching image (if present). Do **not** create a DB, pull/rebuild images, run `pg_restore`, prune Docker or rerun AI/model scripts until a controlled plan confirms the target DB is **empty** and resources are adequate. If a populated DB appears, preserve it and stop. Do not fast-forward the accepted local game checkout just because GitHub documentation advanced.
 
 ## Verified state before this pause
 
@@ -14,7 +20,7 @@ After `AMI_AI_GENERATION=1` was enabled by recreating **only** the API, the owne
 
 The owner provided `=== SAFE PAUSE COMPLETE ===` after running the versioned script. Its final non-secret report confirmed **7 sessions, 0 pending generations, 4 completed migrations**, the private dump `pause-ami108-20261120T005447Z-121510.dump` (**182,626 bytes**), completed full PostgreSQL archive inspection, `BACKUP_SHA256=PASS` and `PRIVATE_ENV_COPY=PRESENT`. Docker reported Web/API/AI/DB stopped; the script also stopped named Ollama. No volumes were removed. The earlier six-session archive remains a historical recovery point.
 
-**Current action:** Cloud Shell can stay closed. **Do not rerun the pause command** on this already stopped stack. On the next session, inspect the existing VM and retained files first; restore the newest verified dump only if the prior DB volume has actually disappeared and a new empty target has been checked. The following shutdown instructions are retained for a **future** deliberate pause, not as an operation required today.
+**Current action:** the old VM was shut down safely, and the new VM is now open without AMI containers/volumes. **Do not rerun the pause command** before restoring a verified working stack. On the next session, inspect the existing VM and retained files first; restore the newest verified dump only if the prior DB volume has actually disappeared and a new empty target has been checked. The following shutdown instructions are retained for a **future** deliberate pause, not as an operation required today.
 
 ## Safe owner-run shutdown — do not delete Docker data
 

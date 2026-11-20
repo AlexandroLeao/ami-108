@@ -11,6 +11,8 @@ with tempfile.TemporaryDirectory(prefix="ami-md-") as td:
     readme = root / "README.md"
     readme.write_text("# First\n\n## Heading\n```bash\n# shown as source\n```\n")
     assert problems(readme, root) == [], problems(readme, root)
+    readme.write_text("# First\nLiteral " + chr(92) + "n" + chr(92) + "n escaped paragraph break\n")
+    assert any("literal escaped paragraph" in s for s in problems(readme, root))
     readme.write_text("# First\n# Second merged document\n")
     assert any("found 2" in s for s in problems(readme, root))
     readme.write_text("# First\n\n```bash\n## code still open\n")
