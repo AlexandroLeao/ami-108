@@ -14,6 +14,7 @@
 | [006](#adr-006--local-first-zero-mandatory-cost) | Development infrastructure | Accepted for private development | PR #17 and GitHub CI |
 | [007](#adr-007--restore-energy-with-memory) | Atomic memory/energy restoration | Accepted; implemented | PRs #25, #28 |
 | [008](#adr-008--complete-campaign-without-model-authority) | Deterministic finale | Accepted; implemented | PR #38 |
+| [009](#adr-009--optional-cloudflare-inference-without-gameplay-authority) | Optional Cloudflare Workers AI connector | Proposed; OFF by default | Isolated connector PR (no account/network use) |
 
 ## ADR-001 — Authoritative modular NestJS API
 
@@ -110,6 +111,18 @@
 **Alternatives considered:** Generating correct tactics with an LLM would violate the deterministic gameplay contract; adding a new storage schema or ending would exceed owner-approved scope.
 
 **Consequences:** Atomic replay and immutable-slot tests are required; the approved final narrative/art remain frozen. The public-release sign-off is **not** part of this ADR.
+
+## ADR-009 — Optional Cloudflare inference without gameplay authority
+
+**Status:** Proposed connector architecture, implemented behind a **disabled-by-default** opt-in. Live use, remote data disclosure, selected model and hosted deployment **not approved or tested**.
+
+**Context:** The local Ollama/Qwen evidence is valuable for employment skills, but keeping a warm model resident on the temporary Cloud Shell VM is not sustainable. Demonstrating bounded inference through an independent cloud API can add applied FastAPI integration skills without changing the five-chapter game.
+
+**Decision:** Reuse the existing `Provider` contract and immutable NestJS reservation/finalization and authored fallback. An optional, isolated FastAPI connector for Cloudflare Workers AI uses the provider's fixed HTTPS origin, strict account/token configuration, explicitly reviewed model identifier, a one-request/no-retry transport and at most three already-approved English candidate options for RANDOM. The only accepted output is an index mapped to the approved localized text. The adapter is OFF by default, and no account, token or remote model is supplied by the repo. Before live activation, verify Free-plan eligibility, model availability, token scope, privacy/retention and owner approval to send the small authorized options set externally.
+
+**Alternatives considered:** Requiring a permanent Ollama host adds compute/disk cost, and arbitrary OpenAI-compatible URLs create SSRF, billing and data-disclosure hazards. Replacing NestJS validation with free-form prompting would violate the accepted gameplay guarantees. Cloudflare is a candidate, not an exclusive commercial commitment; Vercel AI Gateway remains an alternative after separate quota/privacy review.
+
+**Consequences:** Keep local Ollama tests and baseline unchanged. Add mocked remote contract, invalid-index/timeout/quota/security tests; evaluate PT-BR/EN in a **new, explicitly authorized remote sandbox** and record real latency before enabling. Model deprecations and daily quota failures must fall back safely. No current inference uptime, public deploy, cost subscription or private narrative release is implied.
 
 ## Historical decisions and revisions
 
