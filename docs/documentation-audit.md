@@ -38,6 +38,10 @@ The inspection distinguished **current facts**, **accepted design**, **historica
 - [Hosting feasibility](zero-mandatory-cost-hosting-assessment.md): options and blockers, **not** provider approval.
 - Historical records: dated snapshots only; they must not override live runbooks.
 
+## Source-to-documentation consistency check
+
+The accepted runtime `14ea583` was checked **read-only** against `package.json`, both app package manifests, `services/ai/pyproject.toml` and `compose.yaml`. Its declared stack is **pnpm 10.15.1, Next.js 16.4.6/React 19, NestJS 11, Python 3.12/FastAPI and PostgreSQL 17**, consistent with the architecture/development references. Compose binds the private Web/API/AI ports to `127.0.0.1` and defaults `AMI_AI_GENERATION` to `0`. This cross-check validates **documented source configuration**, not the actual state of a stopped VM, container image, hosted deployment or live inference.
+
 ## Verification and limitations
 
 The documentation CI includes tests for local Markdown paths, one H1/closed code fences, obvious private-file names, non-destructive operator scripts, and now editorial duplicate/current-checkpoint rules, heading hierarchy, ADR completeness/order, and JSON/OpenAPI operation structure. The new editorial checker has isolated fixture tests. **The exact PR CI outcome must be verified from GitHub Actions before merging.**
