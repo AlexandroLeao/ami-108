@@ -2,7 +2,7 @@
 
 ## Current traceability
 
-FR-10 restoration-linked energy implemented for F1/F2/F3. All five chapters passed automated transition/persistence checks and owner desktop/mobile playtests. All 12 artwork hashes verified; CP-BOAR and guaranteed CORRECT implemented. Controlled real inference and expanded RANDOM diversity are accepted; recovered local Qwen reactivation and owner-observed mobile/desktop PT-BR/EN fresh-game variety passed. The stack is now safely paused with 7 saved sessions, zero pending, four migrations and a verified private backup. Formal security and accessibility review remains open. Independent accessibility/security, deployment and release gates remain open.
+FR-10 restoration-linked energy is implemented for F1/F2/F3. All five chapters passed accepted automated transitions/persistence checks and owner desktop/mobile playtests; the original twelve artwork hashes were verified. CP-BOAR and deterministic authored CORRECT are implemented. Controlled inference and the expanded RANDOM pool were accepted **on the previous VM**; the last replacement VM ran authorized fallback and was safely paused. Production security, accessibility, deployment and release acceptance remain open. For the actual backup and environment checkpoint, consult [release readiness](../release-readiness-matrix.md).
 
 > **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
