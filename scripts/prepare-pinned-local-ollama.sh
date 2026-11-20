@@ -58,7 +58,15 @@ PY
   }
   before=$(counts)
   echo "SESSIONS|PENDING|MIGRATIONS=$before"
-  test "$before" = "6|0|4"
+  accepted_counts() {
+    local snapshot="$1"
+    [[ "$snapshot" =~ ^([0-9]+)\|0\|4$ ]] && (( ${BASH_REMATCH[1]:-0} >= 7 ))
+  }
+
+  if ! accepted_counts "$before"; then
+    echo "Unexpected saved data before local AI operation; review without modifying saves" >&2
+    exit 1
+  fi
   test "$(df -Pk / | awk 'NR==2 {print $4}')" -ge 10485760
   test "$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)" -ge 4194304
 
@@ -68,6 +76,10 @@ PY
   fi
   if docker network inspect "$network" >/dev/null 2>&1; then
     echo "Existing inference network: stop and review; no replacement performed." >&2
+    exit 1
+  fi
+  if docker volume inspect "$volume" >/dev/null 2>&1; then
+    echo "Existing Ollama model volume: stop and review; no reuse or replacement performed." >&2
     exit 1
   fi
 

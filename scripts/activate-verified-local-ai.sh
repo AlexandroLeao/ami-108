@@ -80,7 +80,15 @@ PY
   dbid=$(docker inspect --format '{{.Id}}' ami-108-db-1)
   before=$(counts)
   echo "SESSIONS|PENDING|MIGRATIONS_BEFORE=$before"
-  test "$before" = "6|0|4"
+  accepted_counts() {
+    local snapshot="$1"
+    [[ "$snapshot" =~ ^([0-9]+)\|0\|4$ ]] && (( ${BASH_REMATCH[1]:-0} >= 7 ))
+  }
+
+  if ! accepted_counts "$before"; then
+    echo "Unexpected saved data before local AI operation; review without modifying saves" >&2
+    exit 1
+  fi
   test "$(df -Pk /home | awk 'NR==2 {print $4}')" -ge 262144
 
   echo "=== PRIVATE ENV BACKUP; ENABLE ONLY API GENERATION ==="
