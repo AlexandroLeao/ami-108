@@ -9,7 +9,7 @@ Merged Chapter 5 creates CP-BOAR at first boar sighting, unpowered ship, closed 
 
 DOG and RAT each retain four deterministic choices, three lethal and one safe, checkpoint retry, immutable slots and one energy debit per consult. CORRECT probabilities 15%/42%/100% (BOAR authored only); zero energy allows choices. F1 (35/42/53/5 locked), F2 (75/85/78/5 locked), F3 (100/100/100/100 unlocked) restore three bars atomically. No solar actions. Dog/rat use the approved gradual reveal and existing shake; Chapter 4 HUD is hidden without changing energy. CP-DOG/CP-RAT and opt-in provider reservation/finalization are implemented. CP-BOAR, E-SHIP and launch implemented; #29 closed. Re-enable previously approved local provider after VM recovery.
 
-> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 ---
 
