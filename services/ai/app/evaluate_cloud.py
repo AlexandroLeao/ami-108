@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from app.cloudflare_provider import CloudflareProvider, cloudflare_provider
+from app.cloudflare_provider import CloudflareProvider, cloudflare_config_issue, cloudflare_provider
 from app.generation import Category, GenerationRequest, Locale, Question, generate, retrieve
 
 _CONFIRM = "I_APPROVE_10_CLOUDFLARE_CALLS"
@@ -83,18 +83,27 @@ def planned_requests() -> tuple[tuple[str, GenerationRequest], ...]:
     return tuple(cases)
 
 
+class EvaluationBlocked(RuntimeError):
+    """Internal safe error code; no secret or user-provided string is retained."""
+
+    def __init__(self, code: str) -> None:
+        super().__init__("Evaluation preflight rejected")
+        self.code = code
+
+
 def require_manual_authorization() -> CloudflareProvider:
     if os.getenv("AMI_CLOUD_EVAL_CONFIRM") != _CONFIRM:
-        raise RuntimeError("Manual ten-call confirmation missing")
+        raise EvaluationBlocked("CONFIRMATION")
     if os.getenv("AMI_AI_GENERATION", "0") != "0":
-        raise RuntimeError("Live game AI generation must be OFF for evaluation")
-    if not os.getenv("GITHUB_ACTIONS"):
-        raise RuntimeError("Only the reviewed manual GitHub Actions runner is supported")
-    if os.getenv("AMI_AI_PROVIDER") != "cloudflare":
-        raise RuntimeError("Remote provider not explicitly selected")
+        raise EvaluationBlocked("GENERATION_NOT_OFF")
+    if os.getenv("GITHUB_ACTIONS") != "true":
+        raise EvaluationBlocked("RUNNER_NOT_GITHUB_ACTIONS")
+    issue = cloudflare_config_issue()
+    if issue is not None:
+        raise EvaluationBlocked(issue)
     model = cloudflare_provider()
     if not isinstance(model, CloudflareProvider):
-        raise TypeError("Missing or disallowed Workers AI configuration")
+        raise EvaluationBlocked("PROVIDER_REJECTED")
     return model
 
 
@@ -144,9 +153,9 @@ def main() -> int:
         return 0
     try:
         provider = require_manual_authorization()
-    except (RuntimeError, TypeError):
-        # Do not echo environment variables, account IDs, tokens or values.
-        print("BLOCKED: configuration, explicit consent or runner guard missing")
+    except EvaluationBlocked as exc:
+        # Only one fixed reason code; never echo any account ID, token or value.
+        print(f"BLOCKED: {exc.code}")
         return 2
     return 0 if summarize(asyncio.run(evaluate(provider))) else 1
 
