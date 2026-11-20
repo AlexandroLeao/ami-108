@@ -15,6 +15,7 @@
 | [007](#adr-007--restore-energy-with-memory) | Atomic memory/energy restoration | Accepted; implemented | PRs #25, #28 |
 | [008](#adr-008--complete-campaign-without-model-authority) | Deterministic finale | Accepted; implemented | PR #38 |
 | [009](#adr-009--optional-cloudflare-inference-without-gameplay-authority) | Optional Cloudflare Workers AI connector | Proposed; OFF by default | Isolated connector PR (no account/network use) |
+| [010](#adr-010--free-first-groq-structured-inference-as-optional-provider) | Free-first Groq structured provider | Proposed; OFF by default | Isolated offline provider tests |
 
 ## ADR-001 — Authoritative modular NestJS API
 
@@ -123,6 +124,18 @@
 **Alternatives considered:** Requiring a permanent Ollama host adds compute/disk cost, and arbitrary OpenAI-compatible URLs create SSRF, billing and data-disclosure hazards. Replacing NestJS validation with free-form prompting would violate the accepted gameplay guarantees. Cloudflare is a candidate, not an exclusive commercial commitment; Vercel AI Gateway remains an alternative after separate quota/privacy review.
 
 **Consequences:** Keep local Ollama tests and baseline unchanged. Add mocked remote contract, invalid-index/timeout/quota/security tests; evaluate PT-BR/EN in a **new, explicitly authorized remote sandbox** and record real latency before enabling. Model deprecations and daily quota failures must fall back safely. No current inference uptime, public deploy, cost subscription or private narrative release is implied.
+
+## ADR-010 — Free-first Groq structured inference as optional provider
+
+**Status:** Proposed, implemented as an **OFF-by-default** adapter after the failed real Gemma 4 qualification. Free account and live Groq inference have **not** yet passed acceptance; no payment, hosting provider or runtime migration is approved.
+
+**Context:** The owner requires working live inference to distinguish the AMI-108 portfolio project. The real Cloudflare Gemma 4 tests failed the authorized output contract (0/10), then a bounded one-call test failed with an invalid index; further repeated trials would waste time. The game must still complete without model availability. Free Groq GPT-OSS 20B supports constrained JSON Schema and fast text inference, within documented Free quotas.
+
+**Decision:** Reuse the existing authenticated FastAPI `Provider` interface and NestJS game-authority boundary. An optional Groq adapter uses the fixed HTTPS `api.groq.com` endpoint, an explicit model allowlist, a secret key exclusively in server configuration, a 2-second timeout and no automatic retry. The model receives at most three already approved English utterances and can return **only one index in a required strict-JSON selection field**. The server must independently map the index to preapproved PT-BR/EN text. `AMI_AI_GENERATION=0` and a blank provider mode remain the defaults; HTTP 429 or any invalid response uses the authored fallback.
+
+**Alternatives considered:** Continuing to adjust Gemma after exhausted owner-run evidence was inefficient; keeping a resident Ollama/Qwen server requires memory/disk capacity and possibly hosting cost; directly exposing an OpenAI-compatible API from the browser would leak credentials. Arbitrary third-party endpoints and unconstrained chat would exceed approved narrative authority.
+
+**Consequences:** Add offline quota, timeouts, schema, locale and secret tests. Real Free-account proof, a single private probe, ten bilingual cases, latency measurements, privacy settings, service quotas and independent production QA are required before activating remote inference. Using an LLM to select a prewritten line is **real inference but not free-form dialogue generation**; separate owner approval is required before any fact-bounded new wording feature. No cost-bearing upgrade or gameplay/canonical-source changes are implied.
 
 ## Historical decisions and revisions
 
