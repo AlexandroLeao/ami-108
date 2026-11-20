@@ -54,6 +54,11 @@ jobs:
           bash -n scripts/activate-verified-local-ai.sh
           bash -n scripts/test-activate-verified-local-ai.sh
           bash scripts/test-activate-verified-local-ai.sh
+      - name: Check end-of-day safe backup and pause
+        run: |
+          bash -n scripts/pause-cloud-shell-safely.sh
+          bash -n scripts/test-pause-cloud-shell-safely.sh
+          bash scripts/test-pause-cloud-shell-safely.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:

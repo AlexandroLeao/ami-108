@@ -10,6 +10,10 @@
 - **Inference status at latest owner report:** the pinned Qwen2.5:1.5b model was verified resident (`Forever`), and its authenticated bilingual **10/10** warm direct check passed. The owner executed [guarded API-only activation](../scripts/activate-verified-local-ai.sh), verified `CURRENT_GAME_GENERATION=ON`, three healthy endpoints, the original 6 sessions / 0 pending / 4 migrations and successful Continue in the browser. **Actual new-game generation and variation in a separate browser session on this recovered VM remain to be checked.** Do not rerun model installation or API activation on the active stack.
 - **Release:** private local preview, not hosted production. No public release, paid resources, licensing grant or official content rating. See [QA](release-qa.md), [release gates](architecture/production-security-gates.md), and [outstanding issues](release-readiness-matrix.md).
 
+## Latest owner gameplay check and end-of-day boundary
+
+The owner subsequently confirmed successful **desktop and mobile** private browser tests in **PT-BR and English**, including normal Continue and more varied RANDOM responses with generation ON. This is functional acceptance, not formal screen-reader, reduced-motion, production-security or performance certification. Because the owner created new games, the prior **six sessions** were a *pre-playtest snapshot*, not a count to hardcode in today's archive. Use the new [dynamic-count safe shutdown](cloud-shell-pause-resume.md) and review its verified backup report before closing Cloud Shell. Never rerun last session's database restore, local model install or API activation.
+
 ## Prerequisites and local boundaries
 
 Development requires Docker Engine with Compose CLI plugin, Node.js 22 (>=22.12), pnpm 10.15.1 through Corepack, Python 3.12 and uv. The accepted manual environment is Google Cloud Shell; Codespaces is an unverified optional alternative. Cloud Shell Docker VMs and volumes may be replaced between sessions; the user's private `$HOME` backup is a separate preservation requirement.

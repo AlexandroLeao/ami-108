@@ -1,5 +1,11 @@
 # Release QA and security evidence — AMI-010
 
+## Latest owner-reported private gameplay acceptance — November 19, 2026
+
+After pinned local model direct **10/10 VALIDATED** bilingual regression and guarded API-only activation, the owner reports that Continue still works and that they ran new-game tests on **mobile and desktop in PT-BR and English**. The game operated normally and generated **more varied RANDOM responses** in those sessions. This resolves the outstanding **owner functional confirmation of browser-level local inference** on the recovered VM, based on their report. No aggregate per-request `VALIDATED`/fallback receipt count, number of newly created sessions, sustained p95 latency, screen-reader pass, reduced-motion pass or formal automated a11y/security scan was supplied; **do not fabricate any of those outcomes**.
+
+The last confirmed DB aggregate before these fresh games was **6 GameSession / 0 pending / 4 migrations**. Since new games create new saved sessions, perform a new shutdown count and private archive/complete-read/SHA-256 proof. [Current safe pause/resume](cloud-shell-pause-resume.md) uses the dynamic count and never overwrites the earlier archive. Next formal gates remain [#12 security/accessibility/performance](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 zero-cost hosting](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 private approved source synchronization](https://github.com/AlexandroLeao/ami-108/issues/14), and [#15 legal/classification/distribution/release approval](https://github.com/AlexandroLeao/ami-108/issues/15).
+
 ## Verified Cloud Shell recovery — November 19 (owner terminal evidence)
 
 A newer owner recovery log supersedes the pre-pause uncertainty **for that local recovery only**. With a fresh Docker VM and no previous AMI containers or volumes, the owner verified `pause-ami108-20261119T203206Z-180786.dump` (160,719 bytes, SHA-256 PASS), PostgreSQL 17 archive table listing and a complete `pg_restore --file=/dev/null` read. An empty `ami-108_postgres_data` was created after confirming zero public tables, and the archive was restored once with `--single-transaction --exit-on-error --no-owner --no-acl`. The restored database contained **6 GameSession, 0 GamePendingGeneration and 4 completed Prisma migrations**.

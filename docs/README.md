@@ -2,6 +2,8 @@
 
 > **Current status guide — November 19, 2026.** This is a navigation and precedence guide, not public release approval. The authoritative accepted gameplay remains the privately tested five-chapter runtime `14ea583`; later GitHub revisions contain documentation and guarded recovery tooling. The last confirmed recovered Cloud Shell run preserved **6 sessions, 0 pending generations, 4 Prisma migrations** and passed Continue; the resident pinned model passed **10/10 real bilingual direct checks** and guarded API-only activation confirmed **gameplay AI ON**, all three endpoints healthy and Continue intact. A separate-browser new-game AI E2E check remains pending. See [release readiness](release-readiness-matrix.md) for what remains open.
 
+**Most recent owner functional check:** With local generation ON, the owner reports that desktop/mobile playtests in PT-BR/English worked normally, Continue resumed saved games and RANDOM responses were more varied. This is owner-observed E2E acceptance but not a quantified per-request receipt, screen-reader or production-security result. The safe pause must read today's **actual** count after new games, rather than assume six. See [current release QA](release-qa.md) and [safe shutdown](cloud-shell-pause-resume.md).
+
 ## 1. Start here: current state and operations
 
 | Source | Purpose | Status |
