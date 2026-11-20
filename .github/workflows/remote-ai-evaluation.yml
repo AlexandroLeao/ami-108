@@ -1,0 +1,53 @@
+name: Manual Workers AI acceptance check
+
+# Intentionally NOT triggered by PR or push. It sends approved, bounded
+# response options to Cloudflare only after an explicit operator action.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type I_APPROVE_10_CLOUDFLARE_CALLS after verifying Workers Free"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-private-cloudflare-evaluation
+  cancel-in-progress: false
+
+jobs:
+  private-remote-evaluation:
+    if: ${{ inputs.confirm == 'I_APPROVE_10_CLOUDFLARE_CALLS' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: services/ai
+    env:
+      AMI_AI_PROVIDER: cloudflare
+      AMI_AI_GENERATION: "0"
+      AMI_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.AMI_CLOUDFLARE_ACCOUNT_ID }}
+      AMI_CLOUDFLARE_API_TOKEN: ${{ secrets.AMI_CLOUDFLARE_API_TOKEN }}
+      AMI_CLOUDFLARE_MODEL: "@cf/google/gemma-4-26b-a4b-it"
+      AMI_CLOUD_EVAL_CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - name: Checkout reviewed private sources
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set up pinned uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+      - name: Prepare pinned dependencies
+        run: uv sync --locked
+      - name: Verify allowlisted scenarios without network
+        run: uv run --locked python -m app.evaluate_cloud --dry-run
+      - name: Run ten authorized, non-retried remote calls
+        run: |
+          set +x
+          uv run --locked python -m app.evaluate_cloud
