@@ -5,7 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'AMI-108',
-  description: 'Narrative survival game — development foundation',
+  description: 'A bilingual narrative survival game about memory, trust and an AI companion',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
