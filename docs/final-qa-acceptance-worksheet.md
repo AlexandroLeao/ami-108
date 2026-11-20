@@ -41,6 +41,8 @@ Only **after** the exact accepted local runtime and healthy Web/API/AI/DB/model 
 
 Read the [existing a11y plan](accessibility-performance-qa.md) and [proposed production security gates](architecture/production-security-gates.md) for detailed cases. Automated green CI does not equal WCAG compliance or production security.
 
+**Repository privacy hygiene:** CI now checks tracked filenames for accidental `.env` variants, PostgreSQL dumps, private keys, canonical Master/Script documents and original private asset archives. This guards paths only. It does **not** inspect file contents or certify that source strings, logs or fixtures are secret-free. Additional credential, license, dependency, container and deployment reviews remain required. It never reads or uploads the real private backups under the owner's Cloud Shell home.
+
 ## Release-critical decisions — issues #13–#15
 
 - [ ] #13: Choose and prove **R$ 0 mandatory cost** deployment with owner authorization, quotas/terms, TLS, isolation, secrets, recovery and sustainable capacity. Or explicitly accept **private-only completion** without public hosting.
