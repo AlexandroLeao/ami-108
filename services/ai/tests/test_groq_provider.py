@@ -179,8 +179,17 @@ def test_bad_responses_fail_closed(
         (b'{"choices":[]}', "RESPONSE_CHOICES"),
         (b'{"choices":[{"finish_reason":"stop","message":{"content":"{}"}}]}',
          "RESPONSE_SCHEMA"),
-        (b'{"choices":[{"finish_reason":"stop","message":{"content":"{\"selection\":\"0\",\"extra\":1}"}}]}',
-         "RESPONSE_SCHEMA"),
+        (
+            json.dumps({
+                "choices": [{
+                    "finish_reason": "stop",
+                    "message": {
+                        "content": json.dumps({"selection": "0", "extra": 1}),
+                    },
+                }],
+            }).encode(),
+            "RESPONSE_SCHEMA",
+        ),
     ],
 )
 def test_malformed_response_rejected(body: bytes, expected: str) -> None:
