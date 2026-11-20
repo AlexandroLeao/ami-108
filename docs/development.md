@@ -7,7 +7,7 @@
 - **Runtime code:** `14ea583a83c7c1473bc94f3b1d515a8497827ac3` (PR #53). GitHub main has subsequent documentation and recovery-tool changes, which do not require rebuilding the approved application.
 - **Campaign:** five chapters, original twelve scene assets, PT-BR and EN, all checkpoints and persistent consultations; owner-approved and protected from incidental content edits.
 - **Cloud Shell recovery:** the final pause archive was verified and restored **once** into a confirmed empty PostgreSQL 17 database. **Six sessions, zero pending generations, four completed migrations** recovered; DB, API, AI service and Web were healthy and Continue worked in the original browser.
-- **Inference status at last owner-provided log:** application generation was deliberately disabled (`AMI_AI_GENERATION=0`) after VM recovery. FastAPI health did not mean live model readiness. The separate [guarded Ollama preparation](../scripts/prepare-pinned-local-ollama.sh) was merged with tests but has not yet been evidenced as run. Avoid presenting earlier 10/10 evaluations as a new result on this VM.
+- **Inference status at latest owner report:** the pinned Qwen2.5:1.5b model was verified resident (`Forever`), and its authenticated bilingual **10/10** warm direct check passed. The owner executed [guarded API-only activation](../scripts/activate-verified-local-ai.sh), verified `CURRENT_GAME_GENERATION=ON`, three healthy endpoints, the original 6 sessions / 0 pending / 4 migrations and successful Continue in the browser. **Actual new-game generation and variation in a separate browser session on this recovered VM remain to be checked.** Do not rerun model installation or API activation on the active stack.
 - **Release:** private local preview, not hosted production. No public release, paid resources, licensing grant or official content rating. See [QA](release-qa.md), [release gates](architecture/production-security-gates.md), and [outstanding issues](release-readiness-matrix.md).
 
 ## Prerequisites and local boundaries
@@ -35,7 +35,7 @@ df -h / /home
 
 The recovered game is on port **3000**. Keep the same browser/origin and its existing cookies for Continue. For a future VM replacement, use the [read-only recovery diagnostic](../scripts/check-resume-readonly.sh), followed by the [Cloud Shell pause/resume runbook](cloud-shell-pause-resume.md) to verify the latest dump and **confirm an empty target before any restoration**. Never run `docker compose down -v`, volume prune, `docker system prune`, or a second restore into an already populated database.
 
-The [guarded local inference preparation](../scripts/prepare-pinned-local-ollama.sh) is an **owner-run operational step** after confirming model absence, resources and six-session count. It does not enable gameplay inference. Do not repeat that script after a partial run or enable AI generation until its measured direct real-provider results and model pin/network security are reviewed.
+**For future recovery only:** [pinned local model preparation](../scripts/prepare-pinned-local-ollama.sh) is a one-time operation. It has already been completed on this recovered VM, and the separate API-only game inference activation also succeeded. **Do not rerun either script** on the active stack. The remaining owner QA step is a new game in a separate browser context, after Continue has been verified.
 
 ## Code structure and verification
 

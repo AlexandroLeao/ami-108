@@ -141,6 +141,12 @@ For a controlled owner-approved opt-in, use the new [API-only activation script]
 
 A successful script activation is **not** a new-game E2E model validation. After success, the owner must first verify Continue with the original browser and then test real generation in an **isolated new browser session** (never replace the original session) with INTRO, DOG/RAT consults, variation, and receipt summaries. No public hosting or paid inference is implied.
 
+## Activation completed — do not rerun on this recovered VM
+
+After the successful resident 10/10 FastAPI benchmark, the owner ran [API-only activation](../scripts/activate-verified-local-ai.sh). The terminal confirmed `CURRENT_GAME_GENERATION=ON`, healthy Web 3000/API 3001/AI 8000 endpoints and unchanged **6 sessions / 0 pending / 4 migrations**, with the pinned Qwen2.5:1.5b resident at `Forever`. The owner confirmed **Continue** still functions in the original browser. The private `.env` was backed up outside the repository and only the API container was recreated. **This supersedes the earlier 8/10 and generation-OFF state as the latest local operating condition.** Keep those prior paragraphs as chronological history, not commands to repeat.
+
+**Do not rerun the restore, pinned Ollama preparation, warmed model recheck or API activation against the currently recovered environment.** Next verification: private port 3000 in a **separate browser profile/incognito** for a fresh game, INTRO and DOG/RAT text and bilingual variation; preserve existing session cookies. If the model fails, diagnose without touching the six existing saves. Public release is still unapproved.
+
 ## Resume without touching saved data
 
 1. Reopen normal (non-ephemeral) Google Cloud Shell; `cd ~/ami-108`; check `git status --short --branch`, `git rev-parse HEAD`, `df -h / /home`, `docker compose ps -a`, `docker volume ls` and `ls -lh ~/ami-108-backups/pause-ami108-*.dump`. Confirm `.env` exists privately without displaying its values.

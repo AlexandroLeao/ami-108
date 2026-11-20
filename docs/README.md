@@ -1,6 +1,6 @@
 # AMI-108 documentation index
 
-> **Current status guide — November 19, 2026.** This is a navigation and precedence guide, not public release approval. The authoritative accepted gameplay remains the privately tested five-chapter runtime `14ea583`; later GitHub revisions contain documentation and guarded recovery tooling. The last confirmed recovered Cloud Shell run preserved **6 sessions, 0 pending generations, 4 Prisma migrations** and passed Continue; gameplay AI generation remained **temporarily OFF** until the separately reviewed local-model step is measured. See [release readiness](release-readiness-matrix.md) for what remains open.
+> **Current status guide — November 19, 2026.** This is a navigation and precedence guide, not public release approval. The authoritative accepted gameplay remains the privately tested five-chapter runtime `14ea583`; later GitHub revisions contain documentation and guarded recovery tooling. The last confirmed recovered Cloud Shell run preserved **6 sessions, 0 pending generations, 4 Prisma migrations** and passed Continue; the resident pinned model passed **10/10 real bilingual direct checks** and guarded API-only activation confirmed **gameplay AI ON**, all three endpoints healthy and Continue intact. A separate-browser new-game AI E2E check remains pending. See [release readiness](release-readiness-matrix.md) for what remains open.
 
 ## 1. Start here: current state and operations
 
