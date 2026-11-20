@@ -18,24 +18,37 @@ The local `compose.yaml` uses `AMI_DEV_PREVIEW=1`, exposes only loopback ports *
 
 Copy `.env.example` to `.env` **only when provisioning a genuinely new, disposable environment**. Never replace the existing private `.env`, share it, add it to Git, or commit dumps or cookies. Use a local URL-safe PostgreSQL password (or encode it appropriately for `DATABASE_URL`), independent secure internal token, and no paid/cloud model provider.
 
-## Safe checks on the recovered environment
+## Read-only inspection before recovery
 
-These commands inspect the existing stack without resetting it:
+**The latest Cloud Shell VM has not been restored.** First use the reviewed [read-only resume diagnostic](../scripts/check-resume-readonly.sh) from current GitHub documentation without fast-forwarding the accepted local game checkout. The following additional commands only inspect Git, Docker inventory and disk usage; they do not start services, install images, create volumes or touch saves:
 
 ```bash
 cd ~/ami-108
 git status --short --branch
 git rev-parse HEAD
+docker info --format '{{.ServerVersion}}'
+docker system df
+docker image ls
+docker ps -a
+docker volume ls
+df -h / /home
+```
+
+Compare results with the [current release-readiness matrix](release-readiness-matrix.md) and [safe Cloud Shell recovery runbook](cloud-shell-pause-resume.md). Inspect the newest verified archive's structure and full readability before any restore. **Never restore into a populated database**, run `docker compose down -v`, prune volumes/images or pull/rebuild the game or model blindly. If Docker images, disk space or database state are uncertain, stop and review the evidence before any write.
+
+## Checks only after controlled restoration
+
+After the approved runtime, PostgreSQL data and application services have been restored **and independently confirmed healthy**, inspect the previously accepted private preview endpoints:
+
+```bash
+cd ~/ami-108
 docker compose ps
 curl -fsS http://localhost:3000/health
 curl -fsS http://localhost:3001/health/ready
 curl -fsS http://localhost:8000/health
-df -h / /home
 ```
 
-The recovered game is on port **3000**. Keep the same browser/origin and its existing cookies for Continue. For a future VM replacement, use the [read-only recovery diagnostic](../scripts/check-resume-readonly.sh), followed by the [Cloud Shell pause/resume runbook](cloud-shell-pause-resume.md) to verify the latest dump and **confirm an empty target before any restoration**. Never run `docker compose down -v`, volume prune, `docker system prune`, or a second restore into an already populated database.
-
-**For future recovery only:** [pinned local model preparation](../scripts/prepare-pinned-local-ollama.sh) is a one-time operation. It has already been completed on this recovered VM, and the separate API-only game inference activation also succeeded. **Do not rerun either script** on the active stack. The remaining owner QA step is a new game in a separate browser context, after Continue has been verified.
+The previously accepted game ran on port **3000**. Keep the same browser/origin and existing cookies for Continue; verify saved sessions before running new-game tests in a separate private browser context. A healthy endpoint does **not** prove that a pinned model is installed or generating. [Pinned local model preparation](../scripts/prepare-pinned-local-ollama.sh) and [API-only activation](../scripts/activate-verified-local-ai.sh) were successfully completed **on the prior VM**, not proven on this replacement VM. Do not rerun either operation without the runbook's resource, model identity, network, backup and saved-session preconditions.
 
 ## Code structure and verification
 
