@@ -2,7 +2,7 @@
 
 ## Current traceability
 
-FR-10 restoration-linked energy implemented for F1/F2/F3. All five chapters passed automated transition/persistence checks and owner desktop/mobile playtests. All 12 artwork hashes verified; CP-BOAR and guaranteed CORRECT implemented. Controlled real inference and expanded RANDOM diversity approved previously; current recovered local installation uses fallback until model reactivation. Independent accessibility/security, deployment and release gates remain open.
+FR-10 restoration-linked energy implemented for F1/F2/F3. All five chapters passed automated transition/persistence checks and owner desktop/mobile playtests. All 12 artwork hashes verified; CP-BOAR and guaranteed CORRECT implemented. Controlled real inference and expanded RANDOM diversity are accepted; recovered local Qwen reactivation and owner-observed mobile/desktop PT-BR/EN fresh-game variety passed. The stack is now safely paused with 7 saved sessions, zero pending, four migrations and a verified private backup. Formal security and accessibility review remains open. Independent accessibility/security, deployment and release gates remain open.
 
 > **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
@@ -10,7 +10,7 @@ FR-10 restoration-linked energy implemented for F1/F2/F3. All five chapters pass
 
 
 **AMI-002 · specification, not implementation evidence**  
-Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7 (November 15). Current private sources: v1.12 and v1.10 (November 17 cumulative addenda); narrative sections 1–11 and visual annexes remain unchanged except the approved opening presentation. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
+Original design sources: private Documento Mestre v1.9 and Roteiro Interativo v1.7 (November 15). Historical November 17 sources: v1.12 and v1.10 (with cumulative addenda). The latest private files are Master v1.14 / Script v1.12, but their Chapter 5 status text predates final owner acceptance; subsequent approved amendments and the frozen five-chapter implementation govern pending private-source synchronization under issue #14. Keep the private source text and reference sheets outside the repository. This specification contains internal game-rule details; review spoilers before making the repository public.
 
 ## Functional requirements
 
