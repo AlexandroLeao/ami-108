@@ -27,7 +27,7 @@ def test_planned_ten_calls_are_allowlisted_and_bilingual() -> None:
     assert all(len(request.factIds) <= 8 for _, request in cases)
 
 
-def test_requires_manual_confirmation_and_single-purpose_runner(
+def test_requires_manual_confirmation_and_single_purpose_runner(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("AMI_AI_PROVIDER", "cloudflare")
