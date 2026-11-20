@@ -55,6 +55,8 @@ This repository is intended for a controlled, private development environment. D
 
 ## Documentation
 
+Start with the [documentation index](docs/README.md) for current guidance, implementation specifications and clearly archived development milestones. The index explains which documents are authoritative for the recovered local environment and which older notes are retained solely for traceability.
+
 - [Requirements and traceability](docs/architecture/requirements.md), [domain invariants](docs/architecture/domain-model.md) and [architecture decisions](docs/architecture/decisions.md)
 - [Approved interface](docs/ui-design.md), [art pipeline](docs/assets.md) and [narrative engine](docs/narrative-engine.md)
 - [Accessibility/performance verification plan](docs/accessibility-performance-qa.md) and [dependency security review](docs/dependency-security-audit.md)
