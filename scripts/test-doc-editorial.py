@@ -33,10 +33,15 @@ valid_adr = "# ADRs\n\n" + "".join(
     for i in range(1, 9)
 )
 assert adr(valid_adr) == []
+assert adr(valid_adr + "## ADR-009 — Future accepted decision\n\n**Status:** Accepted\n\n**Context:** C\n\n**Decision:** D\n\n**Alternatives considered:** A\n\n**Consequences:** C\n\n") == []
 assert any("ordered" in x for x in adr(valid_adr.replace("ADR-004", "ADR-009")))
 assert any("missing Context" in x for x in adr(valid_adr.replace("**Context:** C\n\n", "", 1)))
 valid_openapi = '{"openapi":"3.1.0","paths":{"/x":{"get":{"operationId":"x","summary":"x","responses":{"200":{"description":"ok"}}}}}}'
 assert openapi("docs/api/test.openapi.json", valid_openapi) == []
+assert any("invalid operation object" in x for x in openapi(
+    "docs/api/test.openapi.json",
+    '{"openapi":"3.1.0","paths":{"/x":{"get":"not-an-operation"}}}'
+))
 assert openapi("docs/api/test.openapi.json", '{"paths":') != []
 assert any("duplicate operationId" in x for x in openapi(
     "docs/api/test.openapi.json",
