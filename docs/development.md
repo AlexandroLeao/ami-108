@@ -6,8 +6,8 @@
 
 - **Accepted game runtime:** clean local `main` at `14ea583a83c7c1473bc94f3b1d515a8497827ac3`, with five approved chapters, 12 original scenes, PT-BR/EN, durable game state and consultations. GitHub `main` contains later **documentation and guarded operational QA**; do not fast-forward the accepted game checkout merely to read those scripts.
 - **Previous owner-accepted gameplay:** Continue resumed correctly; desktop/mobile PT-BR/EN gameplay and varied local Qwen output were observed. The pinned model passed 10/10 direct bilingual evaluation on the previous Cloud Shell VM. These are **historical local acceptance results**, not today's model-readiness proof.
-- **Latest safe pause (November 20 UTC):** protected custom PostgreSQL archive `pause-ami108-20261120T005447Z-121510.dump` (**182,626 bytes**, previously fully read and SHA-256 verified) preserved **7 sessions / 0 pending / 4 migrations**. No volume deletion occurred during shutdown.
-- **Latest current Cloud Shell read-only preflight (November 20):** accepted local git state clean, `.env` present/restricted/ignored, newest backup checksum PASS; **no AMI containers or Docker volumes**. Root filesystem **10 GiB free (92% used)**; home **1.7 GiB free**. There is **no live restored database, no observed healthy services or model residency on this VM yet**. Inspect Docker image/disk usage and archive integrity before any downloads or empty-target restore.
+- **Latest safe pause (November 20, 15:56 UTC):** private verified PostgreSQL archive `pause-ami108-20261120T155634Z-1926.dump` (182,626 bytes; full read/SHA-256 PASS) preserved **7 sessions / 0 pending / 4 migrations** after Continue worked on the restored replacement VM. Protected `.env` copy retained; all four Compose services stopped without volume removal.
+- **Latest VM state at shutdown:** the approved game ran on the replacement Cloud Shell VM with four healthy services and generation **OFF** (no Ollama). The owner verified Continue and completed a new backup before stopping the four containers. Root had **5.8 GiB free (96% used)** and `/home` **1.7 GiB free**. Earlier observations of *zero Docker containers/volumes* and *10 GiB free* were **pre-recovery historical checks**, not current resume instructions.
 - **Release boundary:** private preview only, no official age rating, license grant, paid infrastructure or public hosting. Formal [QA](release-qa.md), [release-readiness](release-readiness-matrix.md) and [production security gates](architecture/production-security-gates.md) remain open.
 
 ## Prerequisites and local boundaries
@@ -18,9 +18,9 @@ The local `compose.yaml` uses `AMI_DEV_PREVIEW=1`, exposes only loopback ports *
 
 Copy `.env.example` to `.env` **only when provisioning a genuinely new, disposable environment**. Never replace the existing private `.env`, share it, add it to Git, or commit dumps or cookies. Use a local URL-safe PostgreSQL password (or encode it appropriately for `DATABASE_URL`), independent secure internal token, and no paid/cloud model provider.
 
-## Read-only inspection before recovery
+## Historical read-only inspection before the completed recovery
 
-**The latest Cloud Shell VM has not been restored.** First use the reviewed [read-only resume diagnostic](../scripts/check-resume-readonly.sh) from current GitHub documentation without fast-forwarding the accepted local game checkout. The following additional commands only inspect Git, Docker inventory and disk usage; they do not start services, install images, create volumes or touch saves:
+**Historical only:** The replacement VM had not been restored **at the time of the earlier read-only snapshot**. It was subsequently recovered, tested and safely paused as documented above. The following commands were diagnostic at that prior checkpoint; they are not instructions to repeat a restore, start services or change the approved local checkout. The reviewed [read-only diagnostic](../scripts/check-resume-readonly.sh) is still useful **after** inspecting the latest backup and Docker state on a future return. These commands do not start services, install images, create volumes or touch saves:
 
 ```bash
 cd ~/ami-108
