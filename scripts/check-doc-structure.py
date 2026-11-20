@@ -14,6 +14,7 @@ from pathlib import Path
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})(?:[^\r\n]*)$")
 H1 = re.compile(r"^# [^#\s].*$")
 HEADERLESS = {".github/pull_request_template.md"}
+ENTRYPOINTS = {"README.md", "docs/README.md"}
 
 
 def problems(path: Path, root: Path) -> list[str]:
@@ -34,6 +35,8 @@ def problems(path: Path, root: Path) -> list[str]:
             continue
         if not marker and H1.match(line):
             count += 1
+        if rel in ENTRYPOINTS and not marker and r"\n\n" in line:
+            errors.append(f"{rel}:{lineno}: literal escaped paragraph breaks (\\n\\n)")
     expected = 0 if rel in HEADERLESS else 1
     if count != expected:
         errors.append(f"{rel}: expected {expected} top-level headings, found {count}")
