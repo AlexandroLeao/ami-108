@@ -32,7 +32,7 @@
 | [AI authorization](ai-rag.md) | Bounded responses and provider design; earlier milestones are historical |
 | [Local AI evaluation](ai-local-evaluation.md) | Real and simulated test history and separate model-reactivation gates |
 
-**Source precedence:** private **Documento Mestre v1.14** and **Roteiro Interativo v1.12**, plus subsequently and explicitly owner-approved amendments, are authoritative for story and gameplay text. The approved application code and tested owner acceptance determine implemented behavior. [AGENTS.md](../AGENTS.md) provides engineering constraints. Nothing in a dated PR/design excerpt overrides those sources or authorizes new scenes, dialogue, art, rules, public release or paid hosting.
+**Source precedence and synchronization caveat:** The last synchronized private files are **Documento Mestre v1.14** and **Roteiro Interativo v1.12**, but their Day 3 status sections still describe **4/5 chapters completed** and Chapter 5 as a draft. They are **not a complete standalone record of the subsequently accepted five-chapter game**. Later explicitly owner-approved amendments and tested merged implementation take precedence where those files predate acceptance. A reviewed private-source reconciliation remains **open in issue #14**; do not silently rewrite narrative or publish the private files. The approved application code and tested owner acceptance determine implemented behavior. [AGENTS.md](../AGENTS.md) provides engineering constraints. Nothing in a dated PR/design excerpt overrides those sources or authorizes new scenes, dialogue, art, rules, public release or paid hosting.
 
 ## 3. Archived records — not current installation instructions
 
