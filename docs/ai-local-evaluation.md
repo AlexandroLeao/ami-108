@@ -1,12 +1,14 @@
 # AMI-007 — Isolated local inference evaluation
 
-**Historical PR #38 status snapshot (superseded; current state: [release-readiness matrix](release-readiness-matrix.md)):** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
+> **Status guide:** This is a chronological evidence log, not the current AI activation procedure. Previous real-model measurements were on earlier Cloud Shell VMs. The current six-save recovered environment has gameplay generation temporarily OFF; use the [guarded pinned Ollama recovery](../scripts/prepare-pinned-local-ollama.sh) and its [operational instructions](cloud-shell-pause-resume.md) before enabling any live requests. Historical candidate scripts and prior 10/10 outcomes must not be presented as proof of an untested new VM.
+
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 Historical development notes below are retained as evidence and do not override the accepted status.
 
 November 18, 2026. Runbook for PR #24; not evidence of real inference or approval to deploy. The accepted Chapters 1–3 stay on main `af212f0`. The evaluation requires separate owner authorization to download and run a local model, after checking the restored save and available resources.
 
-## 1. Confirm the accepted baseline first (read-only)
+## 1. Historical baseline-confirmation protocol (not a command for the restored six-session VM)
 
 Run from the existing Cloud Shell checkout; do not restore again if any sessions exist. The November 18 owner log shows zero sessions before the initial restore and a nonempty database on the second attempt; all four services subsequently became healthy. That is consistent with a successful first restore but does not prove which sessions were recovered. Confirm the count and Continue in the same browser/origin. Do not expose tokens, IDs, save contents or the backup.
 
@@ -49,7 +51,7 @@ The EXIT trap removes only the uniquely named evaluation server/network/model vo
 - Chapter 3 narrative, art, UI, checkpoint and F2 were already accepted by the owner on November 17; issue #10 remains open only for its AI/fallback criterion. No need to replay or rewrite approved narrative for this benchmark. Q-BOAR is intentionally unavailable until the Chapter 5 gate is implemented.
 - Keep PR #24 draft and AMI-006/007/008 open until the relevant acceptance evidence exists. No merge or paid resource is authorized by this runbook.
 
-## Current verification status
+## Historical first verification status (initial milestone; newer results below)
 
 Existing CI 44307825385 passed at `7d9ef51` with simulated provider tests (148 total). This runbook adds no runtime code, dependencies, migration, assets or approved story changes. Shell procedure and actual model evaluation remain unexecuted; do not describe them as passed.
 

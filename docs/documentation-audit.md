@@ -4,7 +4,7 @@
 
 Repository documentation reviewed against accepted runtime `14ea583` and the most recent owner Cloud Shell recovery evidence. The game campaign, rules and art are frozen. Owner-provided terminal evidence after VM recycling: validated final pause backup, **6 sessions / 0 pending generations / 4 migrations restored**, four healthy Compose services, browser Continue working; private Ollama has **not yet been reactivated** and server generation was deliberately set to `AMI_AI_GENERATION=0`. The GitHub main had additional documentation-only changes; it does not require rebuilding the owner-approved game images. No public deployment or mandatory paid resources.
 
-The audit covers all tracked Markdown files present at the pre-audit checkpoint (README, AGENTS, CI template and documentation), not the private canonical source PDFs or a full browser/security certification. Changes in the audit PR are restricted to documentation and a read-only local-link audit in CI; no code implementing the game, no save, migration, content, probability, art or deployment is changed.
+This audit records the first cleanup; a later follow-up further separated current development instructions from [archived history](development-history.md), centralized the repeated [PR #38 snapshot](history-pr38-snapshot.md), and moved the completed [VM-return checklist](release-readiness-history.md) out of the active [release matrix](release-readiness-matrix.md). Historical sections that remain inside design/implementation documents are marked as such and do not override the accepted runtime. The audit covers all tracked Markdown files present at the pre-audit checkpoint (README, AGENTS, CI template and documentation), not the private canonical source PDFs or a full browser/security certification. Changes in the audit PR are restricted to documentation and a read-only local-link audit in CI; no code implementing the game, no save, migration, content, probability, art or deployment is changed.
 
 ## Findings and resolutions
 
@@ -18,6 +18,12 @@ The audit covers all tracked Markdown files present at the pre-audit checkpoint 
 | Dependency advisories | Pre-remediation critical/high scan was first on the page, obscuring later targeted remediation | Label initial scan historical and surface the **recorded** later zero-known JS and Python audit results; new OS/container/advisory review is still required |
 | Source precedence | AGENTS previously cited earlier Master/Script as the current authoritative documents | Clarified private Master v1.14 and Script v1.12 plus explicit later owner-approved amendments; no private story content imported into GitHub |
 | Documentation links | Relative links can silently rot | Add tracked-Markdown relative-path validator and fixture coverage to CI; ignore external URLs and code fences; **this is not a full Markdown parser or external link verifier** |
+
+## Private canonical-source gap — independently observed
+
+A read-only review of the three private Drive source files (Master v1.14 Markdown and PDF, Interactive Script v1.12 PDF) showed their Day 3 opening status still reports **four of five chapters approved** and treats Chapter 5 as an integration draft. That status predates the subsequently accepted PR #38 five-chapter campaign and later owner-approved refinements. The private PDFs/Markdown have **not** been edited, overwritten, redistributed or synchronized in this repository audit. Their story contents remain protected; no private passage is copied here. Issue [#14](https://github.com/AlexandroLeao/ami-108/issues/14) must reconcile these sources with the complete approved runtime, preserving all prior authored material and requiring owner review before treating a new revision as canonical.
+
+The repository documentation and local-link audit can be cleaned and green **without** certifying that the private source files have been synchronized. The project documentation is therefore **not yet universally current**, and a blanket 'zero errors in all documentation' claim would be unsupported.
 
 ## Traceability and boundaries
 

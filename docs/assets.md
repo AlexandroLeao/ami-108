@@ -4,7 +4,7 @@
 
 CENA-01–07 and CENA-08/11/12 are reached in Chapters 1–4; CENA-09/10 are now reached in Chapter 5: CENA-09 on the gated boar reveal and CENA-10 in orbit. All 12 HTTP hashes passed. All twelve original PNGs and manifest retained. Chapter 4 memory art uses coded CRT opening, continuous subtle interference and shake on the child/lizard images, and disoriented eyelids on the betrayal image. Dog/rat reveal gradually with existing tremor; only specified scenes gate forward navigation. No new or duplicated artwork. Reduced motion supported.
 
-**Historical PR #38 status snapshot (superseded; current state: [release-readiness matrix](release-readiness-matrix.md)):** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 ---
 
@@ -15,7 +15,7 @@ The private official backup contains 12 approved scene images and 9 internal ref
 
 ## Prepare the images
 
-Download the retained private asset backup ZIP v1.9 (the latest synchronized private documents are v1.12/v1.10; the ZIP intentionally remains v1.9) and upload it to your Cloud Shell home directory, outside the repository. From the repo root:
+Download the retained private asset backup ZIP v1.9 (the **historical November 17** private documents were v1.12/v1.10; **current** canonical sources are Master v1.14 / Script v1.12 plus accepted amendments; the art ZIP intentionally remains v1.9) and upload it to your Cloud Shell home directory, outside the repository. From the repo root:
 
 ```bash
 uv run --script scripts/prepare-assets.py "$HOME/AMI-108-Backup-v1.9.zip"
@@ -23,7 +23,7 @@ uv run --script scripts/prepare-assets.py "$HOME/AMI-108-Backup-v1.9.zip"
 
 The script uses Pillow 12.3.0, accepts only the exact approved scene filenames, converts to the three official colors without adding dithering, retains the original dimensions, and writes 12 indexed PNGs and a SHA-256 manifest to `apps/api/assets/scenes/`. It verifies palette, dimensions and file identities before publishing staged outputs. It does not extract or copy private documents or character sheets. Do not commit the source ZIP. Review all derived images for continuity and approve only the prepared game assets for the private repository.
 
-## Local integration preview
+## Historical isolated local asset preview (PR #18; current root is the five-chapter campaign)
 
 ```bash
 test -f .env || cp .env.example .env
@@ -33,7 +33,7 @@ curl -fsS http://localhost:3001/development/scene -o /tmp/ami-opening.png
 
 Open `/preview` on port 3000 for the isolated visual fixture. Historically, the local root opened the persisted Chapters 1–2 campaign (the current root runs all five accepted chapters) (merged PRs #20/#22), which uses the same visual direction. Choose Language, New game, then verify the cinematic chapter card, first three beats fully dark, one brief text tremor per waking beat, a single blink and blur-to-focus overlay on Where am I only, identical unfiltered art before/after stabilization, full stabilization at Blood (same mounted CENA-01), and the six approved opening dialogue steps; the chapter waits for manual advance with a dimmed, visible arrow that smoothly enables after the reveal. Test Extras, pause/resume, previous/next dialogue and keyboard controls. The chapter uses the same scene and dialogue frame; no layout jump. These opening checks describe the isolated fixture, not the persisted root. Continue game remains disabled in `/preview`; root enables it only for a server-confirmed session. For root, verify all 77 Chapter 1 beats and the complete Chapter 2, fixed-height energy-only header, dark transitions, both dialogue palettes and current-asset authorization. See [UI design](ui-design.md) and [development](development.md). The 12 derived PNGs and manifest are already committed; asset preparation is only needed if an approved original changes.
 
-Preview flags are enabled only in local Compose. The isolated development route serves CENA-01 exclusively. The local campaign has a separate session-authorized current-step route for CENA-01/02/03; it requires the current key and refuses stale/future keys. The remaining assets stay server-only. Production must not set AMI_DEV_PREVIEW.
+Preview flags are enabled only in local Compose. The isolated development route serves CENA-01 exclusively. The game has a session-authorized current-scene route for the full approved twelve-scene campaign; it requires the current key and refuses stale/future keys. Unreached assets stay server-only. Production must not set AMI_DEV_PREVIEW.
 
 ## Validation and boundaries
 

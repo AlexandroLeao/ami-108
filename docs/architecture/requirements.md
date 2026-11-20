@@ -4,7 +4,7 @@
 
 FR-10 restoration-linked energy implemented for F1/F2/F3. All five chapters passed automated transition/persistence checks and owner desktop/mobile playtests. All 12 artwork hashes verified; CP-BOAR and guaranteed CORRECT implemented. Controlled real inference and expanded RANDOM diversity approved previously; current recovered local installation uses fallback until model reactivation. Independent accessibility/security, deployment and release gates remain open.
 
-**Historical PR #38 status snapshot (superseded; current state: [release-readiness matrix](../release-readiness-matrix.md)):** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
+> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
 ---
 
@@ -54,11 +54,11 @@ Performance and accessibility thresholds are proposed for AMI-010 (WCAG 2.2 AA w
 
 No free movement, inventory, pickup systems, audio playback, animated sprites, real-time combat, hunger/thirst, free chat, procedural plot, additional endings, or new artwork. The 9 reference sheets are internal only; 12 scene assets are distinct from the 12 narrative scene IDs. Target duration 10–20 minutes is unmeasured until playtest.
 
-## Day 1 implementation trace
+## Historical Day 1 implementation trace (superseded by the five-chapter campaign)
 
 AMI-002 merged in PR #17; AMI-003 merged in PR #18 after owner desktop/mobile approval and passing CI. FR-02/03 are partially demonstrated by the opening preview, not the full campaign. NFR-01 is verified for the development foundation. FR-04/05/11/13 have Chapter 1 domain, persisted-session and authorized-UI integration evidence in merged PRs #19/#20; FR-02/03 now also have a playable bilingual Chapter 1 subset. The owner accepted Chapter 1 presentation; final branch CI and post-merge CI passed. This does not establish full-campaign compliance, encounter behavior, real inference or independent accessibility/security acceptance; see [narrative engine](../narrative-engine.md). No requirement is marked fully implemented solely by a design or unit test.
 
-## Release evidence
+## Historical early release evidence (current status in release-readiness matrix)
 
 Track FR/NFR IDs in subsequent PRs and tests. AMI-004/005/006 cover the first two chapters, AMI-007 real inference and contingency, AMI-008/009 remaining campaign, AMI-010 full acceptance/security/accessibility, AMI-011/012 deployment/docs, AMI-013 final approval. Do not replace a missing implementation with a checked specification box.
 

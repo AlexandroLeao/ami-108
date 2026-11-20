@@ -1,171 +1,69 @@
-# Development foundation
+# Development — AMI-108
 
-## Current local recovery and safe development — November 19, 2026
+> **Status: current development reference (November 19, 2026).** The archived milestone log is [development-history.md](development-history.md). Do not execute commands from that historical log against live saves. For authoritative acceptance status, see [release readiness](release-readiness-matrix.md).
 
-The approved game runtime remains `14ea583` (PR #53); later GitHub commits are documentation or diagnostic-only. The owner restored the verified final pause archive `pause-ami108-20261119T203206Z-180786.dump` into a confirmed **empty** PostgreSQL 17 database, recovered **6 sessions / 0 pending generations / 4 completed migrations**, rebuilt Web/API/AI, verified all four services and three health endpoints healthy, and confirmed **Continue** in the original browser. Actual local generation is **temporarily disabled** (`AMI_AI_GENERATION=0`) until the pinned Ollama/model is separately installed and tested; an AI health check is not inference proof.
+## Accepted game and local state
 
-Use the [safe Cloud Shell runbook](cloud-shell-pause-resume.md) and [release-readiness matrix](release-readiness-matrix.md) for current steps; **do not rerun the restore**, prune Docker volumes, overwrite saves or execute the historical installation commands retained below. Current release blockers #12–#15 remain open.
+- **Runtime code:** `14ea583a83c7c1473bc94f3b1d515a8497827ac3` (PR #53). GitHub main has subsequent documentation and recovery-tool changes, which do not require rebuilding the approved application.
+- **Campaign:** five chapters, original twelve scene assets, PT-BR and EN, all checkpoints and persistent consultations; owner-approved and protected from incidental content edits.
+- **Cloud Shell recovery:** the final pause archive was verified and restored **once** into a confirmed empty PostgreSQL 17 database. **Six sessions, zero pending generations, four completed migrations** recovered; DB, API, AI service and Web were healthy and Continue worked in the original browser.
+- **Inference status at last owner-provided log:** application generation was deliberately disabled (`AMI_AI_GENERATION=0`) after VM recovery. FastAPI health did not mean live model readiness. The separate [guarded Ollama preparation](../scripts/prepare-pinned-local-ollama.sh) was merged with tests but has not yet been evidenced as run. Avoid presenting earlier 10/10 evaluations as a new result on this VM.
+- **Release:** private local preview, not hosted production. No public release, paid resources, licensing grant or official content rating. See [QA](release-qa.md), [release gates](architecture/production-security-gates.md), and [outstanding issues](release-readiness-matrix.md).
 
-## Historical development handoffs (read-only context; not current install commands)
+## Prerequisites and local boundaries
 
-### PR #41/42 handoff — November 19 (superseded)
+Development requires Docker Engine with Compose CLI plugin, Node.js 22 (>=22.12), pnpm 10.15.1 through Corepack, Python 3.12 and uv. The accepted manual environment is Google Cloud Shell; Codespaces is an unverified optional alternative. Cloud Shell Docker VMs and volumes may be replaced between sessions; the user's private `$HOME` backup is a separate preservation requirement.
 
-**Latest accepted increment:** PR #41 merged `9b76771` (CI 44582546867; wire-contract and facade rejection tests). Owner terminal audit verified `day4-final-20261119-153020.dump`, full restore to empty database, two sessions, four healthy services at `9b76771`, 27 GiB root free and 12 GiB RAM available; Continue confirmed. PR #42 merged `910b354` (exact approved `2bc43da`, [CI 44590534060](https://github.com/AlexandroLeao/ami-108/actions/runs/44590534060): 206 tests, 100 API/35 web/71 Python, four migrations, all 12 artwork hashes). Owner approved localized content advisory and spoiler-free Extras with nonprofit statement; no changes to story, artwork, rules, API, AI or database. Port 3000 frontend update and pinned-model reactivation pending. 16+ is provisional editorial guidance, not a formal rating. All four release issues remain open.
+The local `compose.yaml` uses `AMI_DEV_PREVIEW=1`, exposes only loopback ports **3000** (Web), **3001** (API) and **8000** (AI health/authorized interface), with PostgreSQL internal to Docker. The original Ollama model must remain on an internal-only Docker network **without host-published port**. Public hosting requires additional authorization, trusted TLS/origin, ingress controls and security review. A container's `healthy` state is not proof of model inference.
 
-Install exact `910b354` on clean main by fast-forward, verify backup before restarting, build/recreate only web; API/AI/DB images and volumes remain unchanged. Confirm Continue with same origin/cookie. Then install pinned Ollama digest `sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592` with 3 GiB limit, no cloud or host ports, model ID `65ec06548149`, internal-only network; run direct evaluator and require explicit summary 10/10 (exit code alone is insufficient) before enabling API generation. Never weaken deadlines or reset slots; if regression fails keep API fallback. No cloud provisioning or paid resources.
+Copy `.env.example` to `.env` **only when provisioning a genuinely new, disposable environment**. Never replace the existing private `.env`, share it, add it to Git, or commit dumps or cookies. Use a local URL-safe PostgreSQL password (or encode it appropriately for `DATABASE_URL`), independent secure internal token, and no paid/cloud model provider.
 
-### Early Day 4 install and pause handoff — November 19 (superseded)
+## Safe checks on the recovered environment
 
-Day 3 shutdown and Day 4 recovery verified: private 96 KiB archive `day3-final-ai-20261119-004433.dump`, SHA-256 and full archive read OK; restored only into empty DB at `fd0a906`. Two sessions and Continue confirmed. Replacement VM has four CPUs/15 GiB RAM, 26 GiB root free at final preview. PR #38 exact `817aa5d` owner-approved desktop/mobile; isolated port 3002 reached credits and was cleaned up. Owner subsequently ran the installation procedure for `7ae614d` and confirmed port 3000 and existing saves work normally. No terminal log supplied for the installation, so exact local SHA, migration status and counts are to be confirmed in the final shutdown/resume audit. Fallback-only configuration was intentional; re-enable the pinned local model separately on resume. No destructive Docker operations.
-
-
-### PR #38 campaign handoff — November 19 (superseded)
-
-**Historical PR #38 snapshot (superseded):** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
-
-**Latest runtime handoff:** owner requested pause after confirming the complete campaign and Continue on port 3000. Close tabs; verify clean main, `.env`, health; stop web/API; dump PostgreSQL in custom format to `$HOME/ami-108-backups/day4-final-<UTC timestamp>.dump` with private permissions; validate full archive read and SHA-256; record session count and pending-generation count; stop AI/DB and named Ollama only if running. Record exact filename and container states before exiting. Final backup and shutdown are not yet confirmed. Preserve `.env`, browser cookie/origin and all volumes. On resume inspect VM, verify latest backup, restore only into an empty DB if volume lost; if containers survived, start DB then AI/API/web in health order without recreating them. Fast-forward docs-only commits after confirming diff, no rebuild required for docs. Re-enable pinned model only after resource check and 10-case regression; never delete volumes or restore over existing saves.
-
-## Day 3 pause and resume — November 18, 2026
-
-Accepted main `d587be9` (PR #24) is now installed in the owner's Cloud Shell: backup checksum and full archive read succeeded, fast-forward and build succeeded, all four migrations current, all four services healthy, original session count 1. Owner confirmed Continue resumed the original game. Real-model browser preview audit: 13/14 validated, one timeout safely fell back, all eight desktop/mobile checks passed. Production/local port 3000 is explicitly fallback-only for now; Ollama was used only in the isolated tests and preview. Do not confuse AI service health with active model inference.
-
-**Pause procedure:** close game tabs, confirm clean main, stop web/API to quiesce writes, save a new custom-format database dump in private persistent home, check nonempty, pg_restore list and full archive read, record SHA-256, then stop the remaining services. Preserve `.env`, cookie, origin and volumes; do not run down -v, delete volumes, prune or clear browser site data. Keep a private independent copy of the latest dump. If any step fails, do not remove containers/volumes or overwrite known-good backups; DB can remain running for recovery. Actual shutdown and new post-migration dump remain owner-run.
-
-**Resume:** check git status, current main and `.env` existence without printing secrets. Rebuild/start with generation explicitly disabled first; inspect migrations and session count. If volume was replaced and DB is empty, stop before beginning a new game and restore only after verifying the latest archive and recovery plan; never restore over a nonempty DB blindly. Use same browser/origin; database dump cannot restore a lost session cookie. Verify Continue before any AI activation. The main local provider activation is a separate task: install pinned Ollama/model on an internal network, use a private internal token, no published model port, no cloud inference, warm model and test only fresh eligible slots; existing cached slots must not reroll. No paid resources or production deployment.
-
-**Development handoff:** #24 merged, #9/#10 closed, #8 open for F3/CP-BOAR. Documentation PR #27 and draft #28 (Chapter 4 server-only catalog/tests, CI 44318687531 passed at `6055e39`) remain separate. Next implement gated F3 and manual/memory sequence, replay and original asset authorization; then Chapter 5 and QA. No new campaign work merged or deployed. Private Master v1.13 and Script v1.11 remain authoritative; do not edit approved art/dialogue.
-
-## Historical safe stop and restart — November 17
-
-Cloud Shell transcript confirms successful fast-forward to `985cb60`, successful Compose build, four healthy services. Earlier resource check: 15 GiB RAM, 12 GiB available, 27 GB available ephemeral root, 1.7 GB available persistent /home. Observations, not a guarantee of later VM resources or model suitability. Do not install/pull a model yet. Close game tabs, back up PostgreSQL to private persistent $HOME outside Git, then stop containers only after a successful nonempty verified dump. Optionally download privately. Do not run `down -v`, `volume rm`, or prune volumes. Docker volume is VM-local; use same browser/origin/cookie. Dump cannot restore lost cookie. On return check git status, pull main with --ff-only, rebuild if necessary. If a new empty database volume appears, stop and recover from verified dump; never overwrite a nonempty DB blindly. See historical shutdown procedure below.
-
-**Current accepted baseline — November 17, 2026:** PR #25 merged at `985cb60` (approved head `b80b450`); [branch CI 44186325324](https://github.com/AlexandroLeao/ami-108/actions/runs/44186325324) and [main CI 44187359246](https://github.com/AlexandroLeao/ami-108/actions/runs/44187359246) passed 85 tests (67 API, 17 web, 1 Python), lint/types/build, three migrations and HTTP smoke through the Chapter 4 card. Owner approved desktop/mobile and PT-BR/EN. Chapters 1–3 playable with authored fallback; Chapter 4 is the current boundary. All twelve original artwork files and manifest match the prior baseline. Current acceptance supersedes earlier chronological notes, including solar and delayed creature reveal. Private Master v1.12 / Script v1.10 remain the last synchronized private versions; owner-approved PR #25 amendments take precedence and are pending private-source synchronization.
-
----
-
-
-## Prerequisites
-
-Node.js 22 (at least 22.12), pnpm 10.15.1 via Corepack, Python 3.12, uv and Docker Compose (the Docker CLI plugin). Google Cloud Shell is the verified manual development environment. Codespaces remains an optional alternative using `.devcontainer/devcontainer.json`; its startup has not been verified. Use a two-core Codespace only if available within your allowance. Keep previews private; this is not a production deployment.
-
-### Google Cloud Shell
-
-From a clone of the repository, use `nvm install 22`, `nvm use 22` and `corepack enable pnpm`. Confirm `node --version`, `pnpm --version`, `python3 --version`, `uv --version` and `docker compose version`. Check free disk space with `df -h / /home` and `docker system df`. Home storage is limited; use CI for heavy dependency checks when practical. No Google Cloud or AWS billable resources are required.
-
-## Install dependencies
-
-Both lockfiles are committed. Use frozen/locked installs. Local installation is optional when relying on CI and container builds.
+These commands inspect the existing stack without resetting it:
 
 ```bash
-corepack enable pnpm
-pnpm install --frozen-lockfile
-pnpm db:generate
-(cd services/ai && uv sync --locked)
+cd ~/ami-108
+git status --short --branch
+git rev-parse HEAD
+docker compose ps
+curl -fsS http://localhost:3000/health
+curl -fsS http://localhost:3001/health/ready
+curl -fsS http://localhost:8000/health
+df -h / /home
 ```
 
-Regenerate lockfiles only when changing dependencies. CI and container builds intentionally require the committed lockfiles.
+The recovered game is on port **3000**. Keep the same browser/origin and its existing cookies for Continue. For a future VM replacement, use the [read-only recovery diagnostic](../scripts/check-resume-readonly.sh), followed by the [Cloud Shell pause/resume runbook](cloud-shell-pause-resume.md) to verify the latest dump and **confirm an empty target before any restoration**. Never run `docker compose down -v`, volume prune, `docker system prune`, or a second restore into an already populated database.
 
-## Run checks
+The [guarded local inference preparation](../scripts/prepare-pinned-local-ollama.sh) is an **owner-run operational step** after confirming model absence, resources and six-session count. It does not enable gameplay inference. Do not repeat that script after a partial run or enable AI generation until its measured direct real-provider results and model pin/network security are reviewed.
+
+## Code structure and verification
+
+| Path | Responsibility |
+| --- | --- |
+| `apps/web` | Next.js and browser-facing game interface |
+| `apps/api` | NestJS, Prisma, authoritative state, permissions and recovery |
+| `services/ai` | FastAPI, finite authorized text and optional local model |
+| `apps/api/prisma` | Four accepted additive database migrations and schema |
+| `docs/` | [Requirements](architecture/requirements.md), [system design](architecture/system-design.md), [game domain](architecture/domain-model.md), [API contracts](api/README.md), [accessibility plan](accessibility-performance-qa.md) |
+| `scripts/` | Verification, image preparation and guarded local recovery tooling |
+
+Normal source verification in an **isolated development/test checkout**, not a live restore session:
 
 ```bash
+pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
 (cd services/ai && uv run --locked ruff check . && uv run --locked mypy app tests && uv run --locked pytest)
+python3 scripts/check-doc-links.py
 ```
 
-## Start all services
+CI separately uses disposable PostgreSQL, validates/applies the four migrations, runs the TypeScript and Python suites and full built campaign HTTP smoke with all twelve original scene-art hashes. The accepted PR #53 test baseline was **105 API, 44 Web and 72 Python = 221 tests**; later operational/documentation tests are additional checks, not a reason to infer production readiness.
 
-```bash
-test -f .env || cp .env.example .env
-docker compose --parallel 1 up --build -d --wait
-docker compose ps
-curl -fsS http://localhost:3000/health
-curl -fsS http://localhost:3001/health/ready
-curl -fsS http://localhost:8000/health
-```
+## Document precedence
 
-In Google Cloud Shell, use Web Preview on port 3000 (not 3001). In Codespaces, open private forwarded port 3000. Local Compose sets AMI_DEV_PREVIEW=1, so the root opens the integrated Chapters 1–2 game with server-controlled progress. `/preview` retains the isolated visual fixture. Health endpoints remain available; without the flag, the root is diagnostic. AI health is not evidence of real model inference. See [asset preview and disk recovery](assets.md).
+The last synchronized private source files are **Documento Mestre v1.14** and **Roteiro Interativo v1.12**, but their Day 3 front matter predates the approved Chapter 5. They are **not a fully up-to-date standalone five-chapter document**; explicitly owner-approved later revisions take precedence until these private files are reconciled under issue #14. Historical PR checkpoints, older copies of the private sources and the archived developer log are not an authorization to change the approved story, art, probability rules, energy, checkpoints, saves or original presentation. The repository includes no private source PDFs or unpublished reference sheets.
 
-For local Compose, the example values are development-only; replace the password using a URL-safe value (or URL-encode it in the database URL). Never commit `.env`. PostgreSQL is not exposed to the host. Prisma migrations are applied by the API container on startup; the new migration is additive and preserves existing rows.
-
-```bash
-docker compose logs --tail=100 api ai web db
-docker compose stop
-```
-
-Before stopping, check `git status --short`; stop the containers, switch to main only if the worktree is clean, and pull with `git pull --ff-only origin main`. Resume using `docker compose up -d --wait` if the current containers match the checked-out code; rebuild sequentially after source changes or VM replacement. Stopping preserves the database volume. Do not use `down -v` unless intentionally deleting local game data. Stop the development session when finished to conserve quota. Cloud Shell is temporary; do not rely on Docker volumes surviving VM replacement.
-
-### Safe Cloud Shell shutdown and local database backup
-
-If preserving local playtest data, export the running PostgreSQL database before stopping services. The dump contains private game state and session digests; keep it outside the repository, with restrictive permissions. Do not overwrite a known-good backup with a failed dump.
-
-```bash
-mkdir -p ~/ami-108-backups
-chmod 700 ~/ami-108-backups
-(
-  umask 077
-  backup="$HOME/ami-108-backups/chapter2-$(date +%Y%m%d-%H%M%S).sql"
-  if docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > "$backup.tmp" && test -s "$backup.tmp"; then
-    mv "$backup.tmp" "$backup"
-    printf 'Backup saved: %s\n' "$backup"
-  else
-    rm -f "$backup.tmp"
-    exit 1
-  fi
-)
-```
-
-Verify the backup command succeeds before stopping. Then use `docker compose stop`, `docker compose ps -a` (all project services should be stopped), and `exit`. Close the private web preview. The Docker volume may disappear when Cloud Shell replaces the VM; normal persistent home storage is preferable to the ephemeral VM, but is not a substitute for an independent backup. A database dump alone does not restore a browser cookie or guarantee resume on a different origin. Never commit the dump or credentials. No production or paid resources are required.
-
-## Chapter 1 integration checks
-
-CI uses an ephemeral PostgreSQL 17 service, applies all three migrations, runs API integration tests and starts the built Next.js/NestJS applications for an HTTP smoke test. `AMI_TEST_DATABASE_URL` opts into real database tests; use a dedicated disposable database, not player data. The smoke test needs DATABASE_URL and a migrated database, and ports 3000/3001 free. No provider inference or real deployment is involved.
-
-For Chapter 1 validation after PR #20, switch to `main` on a clean worktree, pull with `git pull --ff-only origin main`, ensure `.env` exists, then run `docker compose --parallel 1 up --build -d --wait`. Open port 3000 root (not `/preview`), test the complete first chapter, reload/Continue game, language switching, previous/next, art, the HUD and mobile long-text pages. Use the same browser and origin; an expired cookie or a replaced Cloud Shell VM can prevent resume. Do not delete volumes. See [narrative engine](narrative-engine.md).
-
-## Current limitations
-
-Chapters 1–2 sessions, state and command receipts are persisted, including CP-DOG, resolved consultation slots, F1 and SOL-01. Later encounters/checkpoints/slots, F2/F3, SOL-02 and real inference remain unimplemented. All 12 derived assets remain on the API side. Only the current authorized scene is served by the game API; the isolated preview still serves CENA-01 alone. No model/provider, production secrets or cloud services are configured. Codespaces startup is not verified; Google Cloud Shell was used instead.
-
-## Day 1 UI verification (2026-11-16)
-
-- PR #18 merged at `3e7eda0`; final head `6f0c778` passed [CI 43899909994](https://github.com/AlexandroLeao/ami-108/actions/runs/43899909994). Owner approved final preview on desktop and mobile.
-- The Dockerfile installs and builds as node, without recursively changing ownership of dependency trees. See disk-space recovery in assets.md. No paid compute required.
-- PR #19 merged the pure narrative core at `5fa75b6`. PR #20 merged the owner-approved persisted Chapter 1 campaign at `3cf942a`; [final branch CI 43934104792](https://github.com/AlexandroLeao/ami-108/actions/runs/43934104792) and [post-merge CI 43935474618](https://github.com/AlexandroLeao/ami-108/actions/runs/43935474618) passed. The final branch ran 24 API, 17 web and 1 Python test (42 total); Python emitted one non-blocking warning. Both stacks, migrations and built HTTP smoke passed. Owner acceptance is not an independent browser automation or full accessibility audit.
-
-## Bootstrap verification (2026-11-15)
-
-- Lockfiles committed in `9142928`.
-- [CI run 43763764606](https://github.com/AlexandroLeao/ami-108/actions/runs/43763764606): TypeScript and Python jobs passed (frozen installs, Prisma generation, lint, type checks, tests and builds as applicable).
-- Owner ran Docker Compose in Google Cloud Shell: all four containers healthy; web and AI liveness returned HTTP 200, API readiness returned database and AI status `ok`.
-- Owner confirmed the Next.js development screen in Web Preview on port 3000, displaying `API, database and AI service reachable.`
-- These are development integration checks, not evidence of game completion, real inference, production deployment or Codespaces validation.
-
-## Chapter 2 accepted playtest (PR #22)
-
-PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
-
-The following records the historical playtest procedure and acceptance checks; the current stable branch is `main`.
-
-After the candidate CI passes, switch to `feat/dog-encounter` with a clean worktree, pull, and rebuild sequentially. A third additive migration creates CP-DOG and resolved slot tables; the prior Chapter 1 session/version remains compatible. Use private Web Preview on port 3000, not `/preview`. Resume the Chapter 2 card if available; otherwise play from a new run only after protecting any existing resume target. Verify direct choice, all three death/return paths, three consultation debits and cached reuse, no consult at zero, F1 without recharge, independent SOL-01, MEM-D2, E-NAME, both locales and reload. Do not expose safe-choice IDs in player-facing UI. Back up local player data before switching branches; do not delete volumes. Owner confirmed PT-BR, EN and mobile playtests; independent automated browser/accessibility verification remains AMI-010.
-
-Owner refinement: test Continue → Continue where you left off / Chapters; only reached chapters appear. Restart Chapter 1, then Chapter 2, then Chapter 3 if reached, verify high-water access, exact restored entry state, persisted slot reuse and reload. Also check the stable header Menu during navigation, three red information cards, dark dog approach, one-shot reveal, no backward action at the decision, no clipped choices at standard portrait/landscape, skull death card and dark success branch. Keep existing volumes; no schema migration beyond the earlier CP-DOG/slot migration.
-
-Second refinement checks: all three dog success variants converge on dark arrival narration, then CENA-05; check red skull, energy bars without fraction, three information cards and retired tutorial compatibility, MEM-D2 closure/black beats/wake, delayed DAVID label and exactly-once E-NAME. No change to existing migration or save format version.
-
-Third refinement checks: main Continue and submenu Continue game / Chapters, number-only chapter buttons, centered larger energy bars without visible memory metrics, terminal search narration and single loaded-art fade-in on FOUND, unchanged L01, revised cake-related dialogue, two dark familiar-voice beats, brief text tremor on MEM-D2. Verify F1 does not recharge and SOL-01 still restores three bars exactly once. No new migrations or assets.
-
-Fourth refinement checks: verify the terminal wording, continuous subtle tremor only on FB-D1b–g, MEM-D2/F01/F01b and one-shot ??? → DAVID on L18c (reduced motion supported). Check that CENA-04 dialogue and choice geometry matches the pre-fourth-refinement layout, all choices visible and original CENA-05 stable across adjacent beats. Smoke now checks all 12 disk asset hashes and all illustrated HTTP beats through Chapter 2 against the manifest. No new asset or migration.
-
-Owner correction checks: compare the normal CENA-04 dialogue frame and decision screen with b9da1be; the added dog-wide sizing rule and marker are removed. All three success branches use the same L04 text in PT-BR/EN, and the one-shot name crossfade lasts 1800ms. Preserve the scoped continuous memory motion and asset hash smoke.
-
-## Resume after Day 2
-
-After the verified database backup and stop procedure above, reopen Cloud Shell, `cd ~/ami-108`, check `git status`, switch to `main`, `git pull --ff-only origin main`, then `docker compose --parallel 1 up --build -d --wait` and `docker compose ps`. Use the same private port 3000 preview and browser/origin when possible. A changed VM/volume or expired cookie may require recovery; do not promise resume from a dump alone. Keep private documents and dumps outside Git. New AMI-007/008 work begins on a separate branch after verifying the stable baseline.
-
-
-## Resume verification — November 18 (later session)
-
-Cloud Shell replaced the ephemeral VM (Docker initially empty). Owner restored checksum-verified `day3-final-20261118-140919.dump` into a newly created empty PostgreSQL volume; custom archive full read and single-transaction restore succeeded. Rebuild at `d587be9` succeeded, four migrations current, four services healthy, one original session retained; owner confirmed Continue in port 3000. No repeat restore. New VM: 7.8 GiB total RAM, 4.7 GiB available after startup, 27 GB root free, 1.7 GB persistent home free. Generation still disabled. Re-evaluate the pinned warmed provider in isolation under current resource constraints before live opt-in. Prior benchmark script hardcodes historical pre-merge `af212f0`; adapt only the temporary script guard to `d587be9` and bound the experimental Ollama container to 3 GiB. Do not change deadlines, main runtime or player database. Previous real model performance does not establish performance on this VM.
+For older technical decisions use the [historical development log](development-history.md), [narrative history](narrative-engine.md), [AI evaluation history](ai-local-evaluation.md) and [original artwork pipeline](assets.md). The [documentation audit](documentation-audit.md) tracks the separation of historical and current status. Final private-source synchronization and deployment-specific documents remain open under issue #14.

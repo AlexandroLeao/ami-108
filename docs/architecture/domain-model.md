@@ -4,12 +4,12 @@
 
 Four migrations are deployed locally: durable sessions/receipts, checkpoints/slots, pending-generation reservation. All three checkpoints and immutable slots, Chapter 3/4/5 snapshots and replay high-water are persisted. F1/F2/F3 atomically restore energy/memory, F3 unlocks PERSONAL. Chapter 5 uses optional persisted progress with shared authoritative cursor, revision, diagnostics and events; CP-BOAR before cell retrieval, E-SHIP and E-LAUNCH later, E-COMPLETE once. No new schema migration. Historical target diagrams below are specifications, not complete runtime schema documentation.
 
-**Historical PR #38 status snapshot (superseded; current state: [release-readiness matrix](../release-readiness-matrix.md)):** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
+> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
 ---
 
 
-**Target schema for AMI-004/005/006.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
+**Historical target schema for AMI-004/005/006; the production-grade local schema is now implemented and has four migrations.** Merged PR #20 implements an incremental GameSession migration (version, JSON state, token digest, revision, expiry) and GameCommandReceipt, while preserving existing rows. Merged PR #22 adds GameCheckpoint and GameConsultationSlot for CP-DOG. The ER diagram remains the target for the remaining models, not a claim that every table exists. The design preserves the canonical script (Master v1.12 / Script v1.10).
 
 ## ER diagram
 
@@ -90,7 +90,7 @@ erDiagram
   }
 ```
 
-### Chapters 1–3 implemented subset
+### Historical Chapters 1–3 implemented subset (later extended through Chapter 5)
 
 The session's JSON state stores the current step, review cursor, locale, event flags, diagnostics and free INTRO fallback; only server mutations write it. An additive migration leaves legacy identity-only rows non-resumable. PostgreSQL row locking and receipts serialize commands; the receipt stores a request digest and applied revision, not a stale projection. PR #22 adds dedicated transactional checkpoint and resolved-slot tables for CP-DOG; the pure engine retains a JSON checkpoint and slot cache persisted atomically with normalized records and receipts. Provider reservation/finalization and later encounters remain pending.
 

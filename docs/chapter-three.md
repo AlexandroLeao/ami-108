@@ -12,7 +12,7 @@
 ---
 
 
-November 17, 2026. Draft, isolated from accepted Chapters 1–2. Canonical source: private Master v1.12 / Script v1.10, Chapter 3 unchanged from prior approved script. The server-only catalog transcribes authored bilingual lab, record, memory, rat and second-fragment text. Rat uses the existing generic encounter engine at 42%; tests cover all four outcomes, cache/retry/energy and successful-attempt branches. No existing campaign file is modified. Catalog is not imported into the running narrative engine, does not authorize assets, and cannot expose future scenes to the browser. F2/SOL-02 gate metadata is not a state transition.
+**Historical implementation draft (November 17, 2026; not current instructions).** Originally isolated from accepted Chapters 1–2. Canonical source: private Master v1.12 / Script v1.10, Chapter 3 unchanged from prior approved script. The server-only catalog transcribes authored bilingual lab, record, memory, rat and second-fragment text. Rat uses the existing generic encounter engine at 42%; tests cover all four outcomes, cache/retry/energy and successful-attempt branches. No existing campaign file is modified. Catalog is not imported into the running narrative engine, does not authorize assets, and cannot expose future scenes to the browser. F2/SOL-02 gate metadata is not a state transition.
 
 ## Historical integration requirements (now implemented; retained as reference)
 
@@ -23,11 +23,11 @@ November 17, 2026. Draft, isolated from accepted Chapters 1–2. Canonical sourc
 
 No Chapter 3 playability, real inference, migration or acceptance is claimed by this preparatory branch.
 
-## Integrated candidate
+## Historical integrated candidate (now accepted)
 
 The catalog is now connected to the existing Chapter 3 card via CONTINUE. The pure chapter-three engine presents the five mandatory dark text records, time title, dark FB-D3 and return; CP-RAT and resolved slots use the existing generic encounter rules and tables. F2 and SOL-02 require explicit interactions; the original CENA-06/07/05 assets are authorized only at their illustrated beats. Chapter 4 is a development boundary; chapter replay preserves prior cache/high-water. Three short presentation-only narration beats describe the second component, route and solar exposure per the source prose; no new character dialogue. Existing Chapters 1–2 rules and geometry retained. Real AI integration and owner playtest remain required. Tests cover bilingual progression, all branches/retry/cache, real PG persistence, replay and built HTTP asset hashes. No new migration or asset.
 
-## Owner refinement — November 17
+## Historical owner refinement — November 17
 
 Supersedes earlier solar mechanics and presentation notes: F1/F2 restore memory and all three energy bars in the same atomic event. No new SOL-01/SOL-02 event or sunlight action; legacy IDs remain readable solely for existing saves. Future F3 must also restore energy. Chapter 2 skips L08b/L09–14. Chapter 3 adds three dark approach beats, two connection narration beats, eleven dark archive cards with ivory text on red and no title, a soft laboratory return with David's reaction, 20-year timestamp in AMI's dialogue, familiar voice → HOWARD on F09, dark memory without F07, wake and split return lines, three dark departure beats, rat reveal and warning after Aparentemente (retired L03–05), F2 immediate recharge and route then DEPART. All approved other dialogue and original artwork preserved; no dimension changes. Legacy retired cursors resolve to valid adjacent beats without changing revision or cache. Owner playtest pending. Earlier documentation/Drive revisions remain historical until acceptance.
 

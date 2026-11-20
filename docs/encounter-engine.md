@@ -9,7 +9,7 @@ Merged Chapter 5 creates CP-BOAR at first boar sighting, unpowered ship, closed 
 
 DOG and RAT each retain four deterministic choices, three lethal and one safe, checkpoint retry, immutable slots and one energy debit per consult. CORRECT probabilities 15%/42%/100% (BOAR authored only); zero energy allows choices. F1 (35/42/53/5 locked), F2 (75/85/78/5 locked), F3 (100/100/100/100 unlocked) restore three bars atomically. No solar actions. Dog/rat use the approved gradual reveal and existing shake; Chapter 4 HUD is hidden without changing energy. CP-DOG/CP-RAT and opt-in provider reservation/finalization are implemented. CP-BOAR, E-SHIP and launch implemented; #29 closed. Re-enable previously approved local provider after VM recovery.
 
-**Historical PR #38 status snapshot (superseded; current state: [release-readiness matrix](release-readiness-matrix.md)):** All five chapters owner-approved (5/5, 100% of campaign, not release completion). Formal AMI issues 9/13 (69.2%) closed, plus #29; #8 and #11 completed. PR #38 merged `7ae614d` with exact approved head `817aa5d` (identical tree); [CI 44550503677](https://github.com/AlexandroLeao/ami-108/actions/runs/44550503677) passed 201 tests (100 API, 30 web, 71 Python), four migrations, lint/types/build and full HTTP smoke with 12 original artwork hashes. Owner desktop/mobile preview reached credits, PERSONAL unlocked, no consultation rows in final preview; main four services healthy and two sessions preserved. Story frozen. F1/F2/F3 atomically restore energy and memory; CP-DOG/RAT/BOAR and immutable slots persisted; CP-BOAR precedes E-SHIP and E-LAUNCH. BOAR always authored CORRECT, no model call. Expanded AI #35/#36 unchanged (24 bilingual RANDOM options, at most three sampled, 15/42/100 probabilities, 2s/2.5s deadlines); prior real benchmark 81/82, 21/24 distinct and live 10/10. Day 4 replacement VM restored verified archive `day3-final-ai-20261119-004433.dump` into empty DB at `fd0a906`, Continue confirmed; generation disabled temporarily. Owner subsequently confirmed the merged campaign installed at port 3000 and existing saves open normally; runtime `7ae614d` per installation procedure, final terminal audit pending. Documentation PR #39 merged `9c79913` after CI 44554390370 passed. Day 4 pause requested; final private backup and stopped-container evidence pending owner execution. On resume verify backup, VM and saves before re-enabling pinned Qwen2.5:1.5b (65ec06548149) on internal Ollama network. Private Master v1.14 / Script v1.12 plus later owner-approved amendments authoritative; source synchronization pending. #30 superseded and closed. Remaining #12 QA/security/accessibility, #13 zero-cost deployment, #14 final documentation and #15 release. No new migrations, art or paid resources. Historical notes below do not supersede this baseline.
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 ---
 
@@ -20,7 +20,7 @@ Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the c
 
 The refinement notes below retain the chronology; the final acceptance summary supersedes earlier timing, text and layout descriptions.
 
-## Implemented and accepted local subset
+## Historical Chapter 2 local subset (superseded by all three implemented encounters)
 
 - Server-only DOG definition and bilingual Chapter 2 beats transcribed from Master v1.11 / Script v1.9. Existing Chapter 1 IDs/version and handoff retained; old Chapter 1 saves do not require reset.
 - Four ordered choices, authored consequences, 15% CORRECT threshold, free INTRO separate from three encounter slots. Fallback only; no real inference yet.
@@ -68,11 +68,11 @@ Revert the dog-wide geometry override exactly to the approved b9da1be layout. Us
 
 Energy indicator gently appears on the first tutorial card and stays visible on the remaining information cards. Dog reveal uses a temporary coal veil and brief visual-layer translation rather than transforming the PNG; no layout resize. Insert L08b before solar explanation, retain SOL-01 application on entry to L09 with existing independent recharge semantics and stable L08/L09 IDs. Name alternates ???/DAVID over 2600ms and settles on DAVID. No other story, energy, asset, layout, cache or replay changes. Browser validation pending.
 
-## Latest owner refinement — November 17
+## Historical latest owner refinement — November 17
 
 Only ARRIVAL-03 wording, FOUND dark/L01 terminal fade-in, dog reveal timing and L18c name animation change. The same original CENA-04 and CENA-05 files remain authorized at their illustrated beats; no duplicate art, layout, energy, event or persistence changes. Tests assert dark FOUND and stable CENA-05 across adjacent illustrated beats.
 
-## Final accepted baseline (supersedes earlier refinement details)
+## Historical Chapter 2 accepted baseline (superseded by all five chapters)
 
 - Chapter 1: 77 beats, three red information cards; the first reveals the energy-only HUD with two gentle pulses. Dog: original CENA-04 on L01, 1450ms veil/shake with 435ms initial dark hold after load; same asset on L02 and following illustrated beats, normal approved geometry, no persistent motion. Decision-only compact grid, no PREVIOUS. Red pixel skull and explicit retry; success consequence/branches dark.
 - Terminal: exact ARRIVAL-03 “Você observa AMI se conectar ao sistema enquanto emite breves sons eletrônicos.”; FOUND “Encontrado.” remains dark; original CENA-05 appears on L01 with 700ms veil. All L04 variants use “Então vai parar de falar coisas aleatórias?”. F1 35/42/53/5 locked; SOL-01 independent on entry to L09 after L08b. Continuous tremor only FB-D1b–g, MEM-D2, F01/F01b; name reveal at L18c alternates over 1500ms. Chapter 3 boundary only.
