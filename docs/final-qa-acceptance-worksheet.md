@@ -1,12 +1,12 @@
 # Final QA and release evidence — November 20, 2026
 
-**Status: WORKSHEET, not a release certificate.** Owner-approved local game runtime `14ea583` remains frozen. The last verified private pause preserved **7 sessions, 0 pending generations, 4 migrations** in `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes, full-read and SHA-256 PASS). The game/AI was stopped cleanly; new Cloud Shell runtime and persistence have **not yet been inspected today**.
+**Status: WORKSHEET, not a release certificate.** Owner-approved local game runtime `14ea583` remains frozen. The last verified private pause preserved **7 sessions, 0 pending generations, 4 migrations** in `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes, full-read and SHA-256 PASS). The game/AI was stopped cleanly. A later **read-only inspection** of the replacement Cloud Shell VM confirmed a clean accepted local game checkout, restricted ignored `.env` and matching archive checksum, but **no AMI containers or volumes**; root free space was **10 GiB**. The archive's complete read and seven-session count were verified at the prior pause, **not restored or recounted** on this VM.
 
 ## Accepted evidence
 
-- All five chapters, two locales, twelve original scene illustrations and three encounters passed accepted gameplay/CI checks. Current `main` at start of this worksheet: `6bda027`, Python/TypeScript green, 29 Markdown files with 0 internal-link and 0 structure violations, full built-campaign smoke and 12 artwork hashes.
+- All five chapters, two locales, twelve original scene illustrations and three encounters passed accepted gameplay/CI checks. At the worksheet's initial documentation checkpoint (`6bda027`), Python/TypeScript CI was green, 29 Markdown files passed internal-link and structure checks, and the full built-campaign smoke checked all 12 artwork hashes. Later documentation-only merges require their own exact CI evidence; this dated count is not today's repository inventory.
 - Resident local Qwen2.5:1.5b passed ten authenticated direct PT-BR/EN cases at 1220–1711 ms; its earlier first-load 8/10 had two safe timeouts. Owner verified activation and normal fresh-game RANDOM variety on mobile and desktop in both languages. Not per-receipt telemetry or universal latency evidence.
-- Original saved Continue works. Never clear the owner's session cookies or restore over the seven saved games.
+- Saved Continue worked on the **previous recovered VM**; it must be verified again after a controlled restore. Never clear the owner's session cookies or restore over a populated database.
 
 ## Browser and accessibility matrix — issue #12
 
