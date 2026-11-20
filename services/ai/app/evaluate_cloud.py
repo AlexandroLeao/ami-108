@@ -12,7 +12,7 @@ import asyncio
 import os
 import statistics
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -20,6 +20,7 @@ from app.cloudflare_provider import CloudflareProvider, cloudflare_config_issue,
 from app.generation import Category, GenerationRequest, Locale, Question, generate, retrieve
 
 _CONFIRM = "I_APPROVE_10_CLOUDFLARE_CALLS"
+_DIAGNOSTIC_CONFIRM = "I_APPROVE_1_CLOUDFLARE_CALL"
 _LOCALES: tuple[Locale, ...] = ("pt-BR", "en")
 # The data is referenced by allowlisted, pre-existing fact IDs, not a new prompt.
 _CASES: tuple[tuple[str, Question, Category, tuple[str, ...]], ...] = (
@@ -61,6 +62,8 @@ class Evaluation:
     locale: Locale
     status: str
     duration_ms: float
+    fallback_reason: str = "NONE"
+    provider_code: str = "NO_DIAGNOSTIC"
 
 
 def planned_requests() -> tuple[tuple[str, GenerationRequest], ...]:
@@ -91,9 +94,14 @@ class EvaluationBlocked(RuntimeError):
         self.code = code
 
 
-def require_manual_authorization() -> CloudflareProvider:
-    if os.getenv("AMI_CLOUD_EVAL_CONFIRM") != _CONFIRM:
+def require_manual_authorization(mode: str = "acceptance-ten") -> CloudflareProvider:
+    if mode not in ("diagnostic-one", "acceptance-ten"):
+        raise EvaluationBlocked("INVALID_MODE")
+    expected = _DIAGNOSTIC_CONFIRM if mode == "diagnostic-one" else _CONFIRM
+    if os.getenv("AMI_CLOUD_EVAL_CONFIRM") != expected:
         raise EvaluationBlocked("CONFIRMATION")
+    if os.getenv("AMI_CLOUD_EVAL_MODE", "acceptance-ten") != mode:
+        raise EvaluationBlocked("MODE_MISMATCH")
     if os.getenv("AMI_AI_GENERATION", "0") != "0":
         raise EvaluationBlocked("GENERATION_NOT_OFF")
     if os.getenv("GITHUB_ACTIONS") != "true":
@@ -107,14 +115,32 @@ def require_manual_authorization() -> CloudflareProvider:
     return model
 
 
-async def evaluate(provider: CloudflareProvider) -> tuple[Evaluation, ...]:
+async def evaluate(
+    provider: CloudflareProvider,
+    diagnostic_one: bool = False,
+) -> tuple[Evaluation, ...]:
     outcomes: list[Evaluation] = []
-    # Serial requests: no concurrent load, no retries, exactly ten attempts.
-    for name, request in planned_requests():
+    # One manual diagnostic or ten acceptance cases. Serial; never retry.
+    cases = planned_requests()[:1] if diagnostic_one else planned_requests()
+    for name, request in cases:
+        codes: list[str] = []
+        scoped = replace(provider, diagnostic_sink=codes.append)
         t0 = time.perf_counter()
-        result = await generate(request, provider)
+        result = await generate(request, scoped)
         elapsed = (time.perf_counter() - t0) * 1000
-        outcomes.append(Evaluation(name, request.locale, result.status, elapsed))
+        reason = getattr(result, "reason", "NONE")
+        # Strictly bounded internal Reason enum, never a provider-supplied string.
+        if reason not in (
+            "NONE", "UNAVAILABLE", "TIMEOUT",
+            "INVALID_OUTPUT", "UNAUTHORIZED_CONTEXT",
+        ):
+            reason = "OTHER"
+        outcomes.append(
+            Evaluation(
+                name, request.locale, result.status, elapsed,
+                reason, codes[-1] if codes else "NO_HTTP_RESULT",
+            )
+        )
     return tuple(outcomes)
 
 
@@ -126,7 +152,8 @@ def summarize(results: tuple[Evaluation, ...]) -> bool:
         # Do not log response text, tokens, prompts, session identifiers or secrets.
         print(
             f"{result.case:14s} {result.locale:5s} "
-            f"{result.status:18s} {result.duration_ms:.0f} ms"
+            f"{result.status:18s} {result.duration_ms:.0f} ms "
+            f"reason={result.fallback_reason} provider={result.provider_code}"
         )
     times = sorted(x.duration_ms for x in results)
     passed = sum(x.status == "VALIDATED" for x in results)
@@ -145,6 +172,10 @@ def summarize(results: tuple[Evaluation, ...]) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Bounded Cloudflare Workers AI evaluation")
     parser.add_argument("--dry-run", action="store_true", help="Check scenarios without network")
+    parser.add_argument(
+        "--diagnostic-one", action="store_true",
+        help="Exactly one guarded remote request, not an acceptance test",
+    )
     args = parser.parse_args()
     cases = planned_requests()
     if args.dry_run:
@@ -152,12 +183,17 @@ def main() -> int:
         print("Counts:", len(cases), "| status: DRY_RUN_ONLY")
         return 0
     try:
-        provider = require_manual_authorization()
+        provider = require_manual_authorization(
+            "diagnostic-one" if args.diagnostic_one else "acceptance-ten"
+        )
     except EvaluationBlocked as exc:
         # Only one fixed reason code; never echo any account ID, token or value.
         print(f"BLOCKED: {exc.code}")
         return 2
-    return 0 if summarize(asyncio.run(evaluate(provider))) else 1
+    results = asyncio.run(evaluate(provider, diagnostic_one=args.diagnostic_one))
+    if args.diagnostic_one:
+        print("DIAGNOSTIC_ONLY: one attempt; NOT a ten-case acceptance result")
+    return 0 if summarize(results) else 1
 
 
 if __name__ == "__main__":
