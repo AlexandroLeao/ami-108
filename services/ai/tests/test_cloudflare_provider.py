@@ -103,7 +103,8 @@ def test_https_transport_maps_only_allowed_index(locale: str) -> None:
         payload = json.loads(body)
         assert payload["model"] == MODEL
         assert payload["stream"] is False
-        assert payload["max_tokens"] == 8
+        assert payload["max_completion_tokens"] == 64
+        assert "max_tokens" not in payload
         assert payload["options"]["rejectIfBusy"] is True
         assert payload["messages"][0]["role"] == "system"
         prompt = json.loads(payload["messages"][1]["content"])
@@ -157,6 +158,34 @@ def test_provider_failures_never_escape_or_change_gameplay(
         assert result.status == "FALLBACK_REQUIRED"
         assert result.reason in ("UNAVAILABLE", "INVALID_OUTPUT")
         conn.close.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    ("finish", "expected"),
+    [
+        ("length", "RESPONSE_LENGTH"),
+        (None, "RESPONSE_MISSING_FINISH"),
+        ("content_filter", "RESPONSE_OTHER_FINISH"),
+    ],
+)
+def test_incomplete_finish_always_falls_back_with_safe_diagnostic(
+    finish: str | None, expected: str
+) -> None:
+    noted: list[str] = []
+    with patch("app.cloudflare_provider.http.client.HTTPSConnection") as constructor:
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = json.dumps(
+            {"choices": [{"finish_reason": finish, "message": {"content": "0"}}]}
+        ).encode()
+        provider = CloudflareProvider(
+            ACCOUNT, TOKEN, MODEL, diagnostic_sink=noted.append,
+        )
+        result = asyncio.run(generate(request(), provider))
+        assert result.status == "FALLBACK_REQUIRED"
+        assert result.reason == "UNAVAILABLE"
+        assert noted == ["HTTP_200", expected]
+        assert conn.request.call_count == 1
 
 
 def test_oversized_response_is_unavailable() -> None:
