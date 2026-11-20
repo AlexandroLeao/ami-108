@@ -59,4 +59,4 @@ jobs:
           DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
           AMI_TEST_DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
           AMI_AI_GENERATION: "0"
-        run: pnpm --filter @ami-108/api exec jest --runInBand game.integration.spec.ts
+        run: pnpm --filter @ami-108/api exec jest --runInBand --testTimeout=45000 game.integration.spec.ts
