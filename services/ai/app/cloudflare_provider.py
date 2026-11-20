@@ -105,17 +105,25 @@ class CloudflareProvider:
             conn.close()
 
 
+def cloudflare_config_issue() -> str | None:
+    """Return only a fixed, non-sensitive reason code, never secret material."""
+    if os.getenv("AMI_AI_PROVIDER") != "cloudflare":
+        return "PROVIDER_MODE"
+    if _ID_PATTERN.fullmatch(os.getenv("AMI_CLOUDFLARE_ACCOUNT_ID", "")) is None:
+        return "ACCOUNT_ID_FORMAT"
+    if _TOKEN_PATTERN.fullmatch(os.getenv("AMI_CLOUDFLARE_API_TOKEN", "")) is None:
+        return "API_TOKEN_FORMAT"
+    if os.getenv("AMI_CLOUDFLARE_MODEL", "") not in _ALLOWED_MODELS:
+        return "MODEL_ALLOWLIST"
+    return None
+
+
 def cloudflare_provider() -> Provider | None:
     """No remote provider without an explicit mode, identity, token and model."""
-    if os.getenv("AMI_AI_PROVIDER") != "cloudflare":
+    if cloudflare_config_issue() is not None:
         return None
-    account = os.getenv("AMI_CLOUDFLARE_ACCOUNT_ID", "")
-    token = os.getenv("AMI_CLOUDFLARE_API_TOKEN", "")
-    model = os.getenv("AMI_CLOUDFLARE_MODEL", "")
-    if (
-        _ID_PATTERN.fullmatch(account) is None
-        or _TOKEN_PATTERN.fullmatch(token) is None
-        or model not in _ALLOWED_MODELS
-    ):
-        return None
-    return CloudflareProvider(account.lower(), token, model)
+    return CloudflareProvider(
+        os.environ["AMI_CLOUDFLARE_ACCOUNT_ID"].lower(),
+        os.environ["AMI_CLOUDFLARE_API_TOKEN"],
+        os.environ["AMI_CLOUDFLARE_MODEL"],
+    )
