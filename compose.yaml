@@ -25,6 +25,8 @@ services:
       AMI_CLOUDFLARE_ACCOUNT_ID: ${AMI_CLOUDFLARE_ACCOUNT_ID:-}
       AMI_CLOUDFLARE_API_TOKEN: ${AMI_CLOUDFLARE_API_TOKEN:-}
       AMI_CLOUDFLARE_MODEL: ${AMI_CLOUDFLARE_MODEL:-}
+      AMI_GROQ_API_KEY: ${AMI_GROQ_API_KEY:-}
+      AMI_GROQ_MODEL: ${AMI_GROQ_MODEL:-}
     ports: ["127.0.0.1:8000:8000"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
