@@ -1,0 +1,62 @@
+name: Neon Preview Integration Acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: "Enter TEST_PREVIEW to run synthetic NestJS/Prisma integration tests against Neon preview"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-neon-preview-integration
+  cancel-in-progress: false
+
+jobs:
+  integration-preview:
+    if: github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && inputs.approval == 'TEST_PREVIEW'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install locked workspace dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify pinned Neon preview endpoint without printing the secret
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          const raw = process.env.DATABASE_URL;
+          if (!raw) throw Error('NEON_PREVIEW_DATABASE_URL repository secret missing');
+          let url;
+          try { url = new URL(raw); } catch { throw Error('Invalid Neon preview database URI'); }
+          if (!['postgresql:', 'postgres:'].includes(url.protocol) ||
+              !/^ep-summer-field-bcnzvyx2(-pooler)?\.c-16\.us-east-1\.aws\.neon\.tech$/.test(url.hostname) ||
+              url.pathname !== '/ami' ||
+              url.username !== 'ami_app' ||
+              !['require', 'verify-full'].includes(url.searchParams.get('sslmode'))) {
+            throw Error('Refusing to connect to a database other than the approved Neon preview');
+          }
+          console.log('Preview database target verified; credentials not displayed');
+          NODE
+      - name: Generate Prisma client (no migrations)
+        run: pnpm db:generate
+      - name: Confirm migration history already current (read-only)
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: pnpm --filter @ami-108/api exec prisma migrate status --schema prisma/schema.prisma
+      - name: Run existing synthetic NestJS HTTP + real Neon persistence regression
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+          AMI_TEST_DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+          AMI_AI_GENERATION: "0"
+        run: pnpm --filter @ami-108/api exec jest --runInBand game.integration.spec.ts
