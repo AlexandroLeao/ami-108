@@ -2,11 +2,15 @@
 
 **Status: WORKSHEET, not a release certificate.** Owner-approved local game runtime `14ea583` remains frozen. The last verified private pause preserved **7 sessions, 0 pending generations, 4 migrations** in `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes, full-read and SHA-256 PASS). The game/AI was stopped cleanly. A later **read-only inspection** of the replacement Cloud Shell VM confirmed a clean accepted local game checkout, restricted ignored `.env` and matching archive checksum, but **no AMI containers or volumes**; root free space was **10 GiB**. The archive's complete read and seven-session count were verified at the prior pause, **not restored or recounted** on this VM.
 
+## Current restored private preview — November 20, 2026
+
+The owner subsequently recovered the replacement Cloud Shell VM, after the earlier read-only inspection recorded above. A fresh PostgreSQL 17 database was proven empty and restored once from the checksum-verified and fully readable seven-session archive. SQL then confirmed **7 sessions / 0 pending generations / 4 finished migrations**. Web, API, FastAPI and PostgreSQL are **healthy** and the owner confirmed **Continue** works on private port 3000; the specific browser locale was not recorded, so **A09 bilingual locale-switch verification remains incomplete**. The API was explicitly confirmed with `AMI_AI_GENERATION=0`; **no live Qwen inference on this VM has been verified**. Last observed root disk free: **5.8 GiB**. Do not repeat restore, infer accessibility compliance, or attempt the historical pinned-model scripts with their hardcoded six-session and 10 GiB prerequisites.
+
 ## Accepted evidence
 
 - All five chapters, two locales, twelve original scene illustrations and three encounters passed accepted gameplay/CI checks. At the worksheet's initial documentation checkpoint (`6bda027`), Python/TypeScript CI was green, 29 Markdown files passed internal-link and structure checks, and the full built-campaign smoke checked all 12 artwork hashes. Later documentation-only merges require their own exact CI evidence; this dated count is not today's repository inventory.
 - Resident local Qwen2.5:1.5b passed ten authenticated direct PT-BR/EN cases at 1220–1711 ms; its earlier first-load 8/10 had two safe timeouts. Owner verified activation and normal fresh-game RANDOM variety on mobile and desktop in both languages. Not per-receipt telemetry or universal latency evidence.
-- Saved Continue worked on the **previous recovered VM**; it must be verified again after a controlled restore. Never clear the owner's session cookies or restore over a populated database.
+- Saved Continue worked on the previous VM **and was observed working again on the new restored VM**. Locale switching and formal screen-reader acceptance remain unverified. Never clear the owner's session cookies or restore over a populated database.
 
 ## Browser and accessibility matrix — issue #12
 
@@ -22,7 +26,7 @@ Use the existing private preview only **after** a read-only environment prefligh
 | A06 | 200% zoom: no clipping or unreachable controls | NOT RUN | NOT RUN |
 | A07 | Mobile portrait and short landscape: visible text and navigation | OWNER FLOW PASSED; FULL A11Y NOT RUN | OWNER FLOW PASSED; FULL A11Y NOT RUN |
 | A08 | Current scene image alt and retry/error recovery | NOT RUN | NOT RUN |
-| A09 | Continue and locale switch preserve authorized progress | OWNER-OBSERVED; RECHECK AFTER RESUME | OWNER-OBSERVED; RECHECK AFTER RESUME |
+| A09 | Continue and locale switch preserve authorized progress | PARTIAL: Continue passed, locale unspecified; switch not retested | PARTIAL: Continue passed, locale unspecified; switch not retested |
 | A10 | Automated accessibility audit in menu/modal/game states | NOT RUN | NOT RUN |
 
 ## Safe read-only backend evidence collection
