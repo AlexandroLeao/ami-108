@@ -176,3 +176,25 @@ def test_unauthorized_context_never_reaches_remote_network() -> None:
         assert result.status == "FALLBACK_REQUIRED"
         assert result.reason == "UNAUTHORIZED_CONTEXT"
         constructor.assert_not_called()
+
+
+def test_remote_timeout_falls_back_without_second_request() -> None:
+    with patch("app.cloudflare_provider.http.client.HTTPSConnection") as constructor:
+        conn = constructor.return_value
+        conn.getresponse.side_effect = TimeoutError("remote did not answer")
+        result = asyncio.run(generate(request(), CloudflareProvider(ACCOUNT, TOKEN, MODEL)))
+        assert result.status == "FALLBACK_REQUIRED"
+        assert result.reason == "TIMEOUT"
+        conn.request.assert_called_once()
+        conn.close.assert_called_once()
+
+
+def test_invalid_json_falls_back_without_provider_text() -> None:
+    with patch("app.cloudflare_provider.http.client.HTTPSConnection") as constructor:
+        conn = constructor.return_value
+        conn.getresponse.return_value.status = 200
+        conn.getresponse.return_value.read.return_value = b"not json"
+        result = asyncio.run(generate(request(), CloudflareProvider(ACCOUNT, TOKEN, MODEL)))
+        assert result.status == "FALLBACK_REQUIRED"
+        assert result.reason == "UNAVAILABLE"
+        conn.request.assert_called_once()
