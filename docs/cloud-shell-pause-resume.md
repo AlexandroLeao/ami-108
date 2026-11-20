@@ -133,6 +133,14 @@ The owner executed pinned model setup on the recovered VM: approved image digest
 
 Use the [existing warmed-model recheck](../scripts/recheck-warm-local-ai.sh) **instead of** repeating `prepare-pinned-local-ollama.sh`. It does not install or mutate anything and rechecks the model's internal-only network, no host ports, fixed 3 GiB cap, exact pinned image/model, healthy services and game generation OFF. After ten direct authorized cases, it verifies the existing six sessions and unchanged app inference. Keep the 2-second transport / 2.5-second application deadlines unchanged. Only request the separate gameplay opt-in once the owner submits a clean 10/10 direct test and model residency evidence. If recheck fails, leave gameplay generation OFF and investigate timing. Never prune volumes or restore again.
 
+## Verified warmed Qwen — next gate is API-only activation
+
+Owner subsequently ran the existing-model recheck and obtained **10/10 VALIDATED** with both locales, a resident pinned Qwen2.5:1.5b (`UNTIL Forever`) and unchanged **6/0/4** save/pending/migration counts before and after. The 2-second provider transport / 2.5-second app deadlines remain unchanged. This supersedes the initial **8/10** as a *current model-readiness assessment*, but does not erase that historical first-run timeout evidence. API game generation was still **OFF** after 10/10.
+
+For a controlled owner-approved opt-in, use the new [API-only activation script](../scripts/activate-verified-local-ai.sh) retrieved from the exact reviewed GitHub main commit. **Close active game/Web Preview tabs first.** The script verifies the accepted clean local runtime and pinned isolated resident model, checks **6 sessions/0 pending/4 migrations** and that inference is OFF, saves a private copy of the existing untracked `.env` outside the repository, edits **only** `AMI_AI_GENERATION=1`, recreates **only** the API container (without rebuilding images), verifies three health endpoints and the same DB container/count, and attempts to return API generation to OFF on failure. No database restore or volume reset is permitted. If the script fails, inspect the result; **do not rerun blindly**.
+
+A successful script activation is **not** a new-game E2E model validation. After success, the owner must first verify Continue with the original browser and then test real generation in an **isolated new browser session** (never replace the original session) with INTRO, DOG/RAT consults, variation, and receipt summaries. No public hosting or paid inference is implied.
+
 ## Resume without touching saved data
 
 1. Reopen normal (non-ephemeral) Google Cloud Shell; `cd ~/ami-108`; check `git status --short --branch`, `git rev-parse HEAD`, `df -h / /home`, `docker compose ps -a`, `docker volume ls` and `ls -lh ~/ami-108-backups/pause-ami108-*.dump`. Confirm `.env` exists privately without displaying its values.
