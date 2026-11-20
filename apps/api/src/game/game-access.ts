@@ -1,6 +1,6 @@
 // The local preview is not a public deployment switch.
 export type GameMode = 'disabled' | 'local' | 'public';
-export function gameMode(env: NodeJS.ProcessEnv = process.env): GameMode {
+export function gameMode(env: Readonly<Record<string, string | undefined>> = process.env): GameMode {
   if (env.VERCEL !== '1') return env.AMI_DEV_PREVIEW === '1' ? 'local' : 'disabled';
   if (env.AMI_DEV_PREVIEW === '1') return 'disabled';
   let validOrigin = false;
