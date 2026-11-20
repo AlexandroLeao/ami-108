@@ -13,7 +13,7 @@ import os
 import statistics
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from app.cloudflare_provider import CloudflareProvider, cloudflare_provider
@@ -94,7 +94,7 @@ def require_manual_authorization() -> CloudflareProvider:
         raise RuntimeError("Remote provider not explicitly selected")
     model = cloudflare_provider()
     if not isinstance(model, CloudflareProvider):
-        raise RuntimeError("Missing or disallowed Workers AI configuration")
+        raise TypeError("Missing or disallowed Workers AI configuration")
     return model
 
 
@@ -111,7 +111,7 @@ async def evaluate(provider: CloudflareProvider) -> tuple[Evaluation, ...]:
 
 def summarize(results: tuple[Evaluation, ...]) -> bool:
     print("AMI-108: remote approved-options-only evaluation")
-    print("Timestamp (UTC):", datetime.now(timezone.utc).isoformat(timespec="seconds"))
+    print("Timestamp (UTC):", datetime.now(UTC).isoformat(timespec="seconds"))
     print("Calls:", len(results), "| unapproved content: none")
     for result in results:
         # Do not log response text, tokens, prompts, session identifiers or secrets.
@@ -144,7 +144,7 @@ def main() -> int:
         return 0
     try:
         provider = require_manual_authorization()
-    except RuntimeError:
+    except (RuntimeError, TypeError):
         # Do not echo environment variables, account IDs, tokens or values.
         print("BLOCKED: configuration, explicit consent or runner guard missing")
         return 2
