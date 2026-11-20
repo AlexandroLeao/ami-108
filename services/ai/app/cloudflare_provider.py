@@ -67,10 +67,10 @@ class CloudflareProvider:
                     {"role": "user", "content": prompt},
                 ],
                 "temperature": 0,
-                # Gemma 4 is a reasoning-capable model. Eight output tokens can
-                # terminate a completion before its final numeric index.
-                # Still require finish_reason=stop and an exact allowed index.
-                "max_completion_tokens": 64,
+                # This task needs one discrete index, not chain-of-thought.
+                # Cloudflare documents enable_thinking=false for Gemma 4.
+                "chat_template_kwargs": {"enable_thinking": False},
+                "max_completion_tokens": 16,
                 "stream": False,
                 "options": {"rejectIfBusy": True},
             },

@@ -103,7 +103,8 @@ def test_https_transport_maps_only_allowed_index(locale: str) -> None:
         payload = json.loads(body)
         assert payload["model"] == MODEL
         assert payload["stream"] is False
-        assert payload["max_completion_tokens"] == 64
+        assert payload["max_completion_tokens"] == 16
+        assert payload["chat_template_kwargs"] == {"enable_thinking": False}
         assert "max_tokens" not in payload
         assert payload["options"]["rejectIfBusy"] is True
         assert payload["messages"][0]["role"] == "system"
