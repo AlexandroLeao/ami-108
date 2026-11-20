@@ -1,8 +1,8 @@
 # Final QA and release evidence — November 20, 2026
 
-**Status: WORKSHEET, not a release certificate.** Owner-approved local game runtime `14ea583` remains frozen. The last verified private pause preserved **7 sessions, 0 pending generations, 4 migrations** in `pause-ami108-20261120T005447Z-121510.dump` (182,626 bytes, full-read and SHA-256 PASS). The game/AI was stopped cleanly. A later **read-only inspection** of the replacement Cloud Shell VM confirmed a clean accepted local game checkout, restricted ignored `.env` and matching archive checksum, but **no AMI containers or volumes**; root free space was **10 GiB**. The archive's complete read and seven-session count were verified at the prior pause, **not restored or recounted** on this VM.
+**Status: WORKSHEET, not a release certificate.** The owner-approved local gameplay runtime remains `14ea583`. The **latest owner-verified private pause** on the recovered replacement VM was `pause-ami108-20261120T155634Z-1926.dump` (182,626 bytes; full archive read and SHA-256 PASS), with **7 sessions / 0 pending / 4 migrations** before and after the dump, a protected `.env` copy, four stopped Compose containers and no volume deletion. Continue, keyboard-only menu/dialogue/button operation and 200% zoom were owner-observed before that pause; browser/locale/device details were not recorded. **Ollama was absent** and game generation was OFF on that VM, although the pinned model had passed 10/10 on the previous VM. The earlier no-container/10-GiB inspection is historical. No public release or full WCAG/security certification is claimed.
 
-## Current restored private preview — November 20, 2026
+## Verified private preview before the latest pause — November 20, 2026
 
 The owner subsequently recovered the replacement Cloud Shell VM, after the earlier read-only inspection recorded above. A fresh PostgreSQL 17 database was proven empty and restored once from the checksum-verified and fully readable seven-session archive. SQL then confirmed **7 sessions / 0 pending generations / 4 finished migrations**. Web, API, FastAPI and PostgreSQL are **healthy** and the owner confirmed **Continue** works on private port 3000; the specific browser locale was not recorded, so **A09 bilingual locale-switch verification remains incomplete**. The API was explicitly confirmed with `AMI_AI_GENERATION=0`; **no live Qwen inference on this VM has been verified**. Last observed root disk free: **5.8 GiB**. Do not repeat restore, infer accessibility compliance, or attempt the historical pinned-model scripts with their hardcoded six-session and 10 GiB prerequisites.
 
@@ -18,12 +18,12 @@ Use the existing private preview only **after** a read-only environment prefligh
 
 | ID | Gate | PT-BR | EN |
 | --- | --- | --- | --- |
-| A01 | Keyboard-only menu: Tab/Shift+Tab, Enter/Space, visible focus | NOT RUN | NOT RUN |
+| A01 | Keyboard-only menu: Tab/Shift+Tab, Enter/Space, visible focus | NOT VERIFIED BY LOCALE | NOT VERIFIED BY LOCALE |
 | A02 | Warnings, Extras, Language and Pause dialogs: focus trapping/Escape/Back | NOT RUN | NOT RUN |
-| A03 | Dialogue/choices: correct focus, arrows, image/action gate | NOT RUN | NOT RUN |
+| A03 | Dialogue/choices: correct focus, arrows, image/action gate | NOT VERIFIED BY LOCALE | NOT VERIFIED BY LOCALE |
 | A04 | Real screen reader speaks meaningful headings, dialogues, choices and errors | NOT RUN | NOT RUN |
 | A05 | Reduced-motion setting: readable reveals, transitions and credits | NOT RUN | NOT RUN |
-| A06 | 200% zoom: no clipping or unreachable controls | NOT RUN | NOT RUN |
+| A06 | 200% zoom: no clipping or unreachable controls | NOT VERIFIED BY LOCALE | NOT VERIFIED BY LOCALE |
 | A07 | Mobile portrait and short landscape: visible text and navigation | OWNER FLOW PASSED; FULL A11Y NOT RUN | OWNER FLOW PASSED; FULL A11Y NOT RUN |
 | A08 | Current scene image alt and retry/error recovery | NOT RUN | NOT RUN |
 | A09 | Continue and locale switch preserve authorized progress | PARTIAL: Continue passed, locale unspecified; switch not retested | PARTIAL: Continue passed, locale unspecified; switch not retested |
@@ -42,7 +42,7 @@ Only **after** the exact accepted local runtime and healthy Web/API/AI/DB/model 
 | Gate | Status | Required actual evidence |
 | --- | --- | --- |
 | Device timing/cold-warm UI/images/credits | NOT RUN | Browser and network, CPU/RAM, viewport, repeat samples, median/range, no leaked HAR |
-| Real screen-reader and zoom/reduced motion | NOT RUN | Device-specific observations and reproduced defects |
+| Real screen-reader and zoom/reduced motion | 200% ZOOM: OWNER PASS (locale unspecified); screen reader/reduced motion NOT RUN | Device-specific observations and reproduced defects |
 | JS/Python dependencies, licenses and container OS | HISTORICAL SCANS ONLY | New dated lockfile and image scans; triage, never auto-upgrade |
 | Origin/Host/forwarded header, cookie/session abuse | SOURCE REVIEW ONLY | Test behind selected trusted HTTPS ingress with disposable DB |
 | Rate caps, inference concurrency, retention and backups | PUBLIC RELEASE BLOCKED | Explicit policy and bounded synthetic test; never stress real saves |
