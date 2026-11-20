@@ -25,6 +25,10 @@ Use the existing private preview only **after** a read-only environment prefligh
 | A09 | Continue and locale switch preserve authorized progress | OWNER-OBSERVED; RECHECK AFTER RESUME | OWNER-OBSERVED; RECHECK AFTER RESUME |
 | A10 | Automated accessibility audit in menu/modal/game states | NOT RUN | NOT RUN |
 
+## Safe read-only backend evidence collection
+
+Only **after** the exact accepted local runtime and healthy Web/API/AI/DB/model have been safely resumed (no restore into populated DB), use [read-only resumed QA metrics](../scripts/qa-readonly-resumed-metrics.sh) from the reviewed GitHub commit. It checks actual session/pending/migration counts (at least seven saved), model network and generation ON, takes five non-mutating HTTP health samples per endpoint and one Docker CPU/memory snapshot. It does **not** open a new game, request model generation, or create/delete/update saves. This is useful backend readiness evidence, **not** gameplay p95, screen-reader or public capacity certification. Do not run it before the safe-resume inspection, and stop on any mismatch.
+
 ## Performance and security — issue #12
 
 | Gate | Status | Required actual evidence |
