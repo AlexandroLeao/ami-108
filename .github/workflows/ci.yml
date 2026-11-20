@@ -44,6 +44,11 @@ jobs:
           bash -n scripts/prepare-pinned-local-ollama.sh
           bash -n scripts/test-pinned-ollama-prep.sh
           bash scripts/test-pinned-ollama-prep.sh
+      - name: Check warmed model recheck safety
+        run: |
+          bash -n scripts/recheck-warm-local-ai.sh
+          bash -n scripts/test-warm-ai-recheck.sh
+          bash scripts/test-warm-ai-recheck.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:

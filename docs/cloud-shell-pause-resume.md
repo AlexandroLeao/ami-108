@@ -127,6 +127,12 @@ bash -n /tmp/ami108-model-prepare.sh && bash /tmp/ami108-model-prepare.sh
 
 **Only** after `LOCAL MODEL PREPARED — GAME INFERENCE NOT YET ENABLED` and **10/10 VALIDATED** may the separate API-generation activation gate be considered, with the owner verifying unchanged saves and Continue. The model script is **not idempotent**: do not rerun it after any partial setup; instead inspect the model/network and request a targeted continuation. If memory/disk, private model settings, exact model ID, endpoints or saved-session count differ, it aborts rather than guessing. No cloud-model subscription, public deployment or new secrets.
 
+## Recovered model: first test was 8/10, so DO NOT rerun the installer
+
+The owner executed pinned model setup on the recovered VM: approved image digest and Qwen ID verified, private isolation reached, warmup took 3925 ms, direct bilingual authenticated test returned **8/10 VALIDATED** with two PT-BR `TIMEOUT` fallbacks at ~2 seconds. The script stopped before its final post-test session count and `ollama ps` check. App inference was OFF in preflight and the first count was `6|0|4`; no player database writes or activation were performed by the installer. This is *not* a 10/10 acceptance.
+
+Use the [existing warmed-model recheck](../scripts/recheck-warm-local-ai.sh) **instead of** repeating `prepare-pinned-local-ollama.sh`. It does not install or mutate anything and rechecks the model's internal-only network, no host ports, fixed 3 GiB cap, exact pinned image/model, healthy services and game generation OFF. After ten direct authorized cases, it verifies the existing six sessions and unchanged app inference. Keep the 2-second transport / 2.5-second application deadlines unchanged. Only request the separate gameplay opt-in once the owner submits a clean 10/10 direct test and model residency evidence. If recheck fails, leave gameplay generation OFF and investigate timing. Never prune volumes or restore again.
+
 ## Resume without touching saved data
 
 1. Reopen normal (non-ephemeral) Google Cloud Shell; `cd ~/ami-108`; check `git status --short --branch`, `git rev-parse HEAD`, `df -h / /home`, `docker compose ps -a`, `docker volume ls` and `ls -lh ~/ami-108-backups/pause-ami108-*.dump`. Confirm `.env` exists privately without displaying its values.
