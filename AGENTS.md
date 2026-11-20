@@ -1,71 +1,42 @@
 # AMI-108 — Engineering instructions
 
-## Current source and implementation boundaries — November 20
+## Authority and approved baseline
 
-Private Master v1.14 / Script v1.12 and later explicitly approved amendments govern the frozen five-chapter campaign. Do not modify the original narrative, art, approved UI, probabilities or mechanics without specific owner authorization. The owner's accepted **local game runtime** remains `14ea583`; subsequent GitHub `main` changes are documentation and guarded operations. **Latest Cloud Shell checkpoint (2026-11-20 15:56 UTC):** after restoring seven sessions into a proven-empty PostgreSQL on the replacement VM and validating Continue, the owner completed a new checksum-verified, full-read private backup `pause-ami108-20261120T155634Z-1926.dump` (**7 sessions / 0 pending / 4 migrations**), copied the private environment file and stopped Web/API/AI/DB safely. **Ollama was not installed on the replacement VM; game generation was OFF.** Root free disk was 5.8 GiB, below the 10 GiB guarded model-preparation threshold; PR #71 corrected old six-session operational gates but did not lower this disk safeguard. Do not re-restore into a populated DB, delete volumes, bypass capacity checks, restart only to audit documentation, commit private sources, or publish/provision paid resources. Release issues #12–#15 remain open.
+- The **owner-approved local game runtime is `14ea583a83c7c1473bc94f3b1d515a8497827ac3`**. All five chapters and their final original artwork, gameplay, dialogue, presentation, probability rules and replay are frozen. **Do not change them without the owner's specific consent.**
+- Private **Documento Mestre v1.14**, **Roteiro Interativo v1.12**, and later explicitly owner-approved campaign amendments govern narrative precedence. The two private documents describe a November 18 historical 4/5 milestone until separately reconciled; do not treat their older status header as today's gameplay scope or import the original sources into Git.
+- This repository remains **private**. GitHub `main` contains later documentation and guarded tooling; **do not fast-forward the accepted local runtime just to read docs**.
+- The current VM/backup, outstanding issues and release boundary have a **single source of truth**: [release readiness](docs/release-readiness-matrix.md). Last verified owner shutdown completed with a **seven-session backup and four stopped Compose services**, generation OFF and no Ollama on that replacement VM.
+- This file governs engineering behavior; editorial document ownership and review rules are in [documentation standards](docs/documentation-standards.md).
 
+## Frozen gameplay and presentation invariants
 
-## Owner-approved implementation invariants (earlier recorded November 18, 2026)
+- The five chapters are **Bananas**, **Registro Atualizado**, **Pensamento Positivo**, **AMI-108 & David** and **De nada, Bobo**. Preserve twelve approved narrative scene IDs, twelve original scene illustrations, nine internal reference sheets and the existing single ending. No new story events, spoilers, alternative endings or artwork.
+- Next.js renders **only** the authorized current view. NestJS controls all commands, session state, choices, random category selection, energy, memories, checkpoints, saved receipts, replay and current-asset gates. The server never delegates outcomes, correct answers or probabilities to the model.
+- Encounter order: **DOG** (Chapter 2), **RAT** (Chapter 3), **BOAR** (Chapter 5). Each has four deterministic choices, one safe and three lethal. The lizard appears only in flashback. BOAR information is **authored CORRECT**, never a generative model result.
+- After E-JOIN, energy starts at three. Each authorized encounter consultation debits at most one energy, once; at most three per attempt. Zero energy never prevents taking a choice. Ordinary dialogue, memory, flashback and intro generation do not debit energy.
+- **F1/F2/F3 atomically** restore energy to three with the specified memories. After F3, all four indices reach 100% and PERSONAL unlocks; no added solar-charging actions. Preserve legacy SOL cursor compatibility.
+- Checkpoint retries roll back only reversible gameplay; immutable consultation slots/categories/cache are preserved. Duplicate commands must never double-debit or reroll. Locale changes do not change a persisted response; limit nine encounter slots plus one INTRO-RANDOM per run.
+- AMI generation is optional and authenticated through typed FastAPI requests, strictly allowlisted facts, time limits and validation. Preserve localized authored fallback, cache and the rule that the model cannot access future scenes, player secrets or game authority. No free chat or arbitrary outside model provider without explicit approval.
+- Keep approved eye-opening, dark narration, gated art reveal, dog/rat shake, Chapter 4 CRT/memory effects, one-shot name reveal, hidden Chapter 4 HUD, game frame dimensions and reduced-motion behavior. Preserve the final approved exact dialogue and timing, not intermediate proposed experiments. The owner-reviewed appearance is documented in [UI design](docs/ui-design.md).
+- Content warning for violence, blood, language and horror is approved in PT-BR/EN; editorial **16+ is not an official classification**. Preserve its current pre-new-game and Extras behavior.
+- Approved visual approach: original static 16:9 scene art, coded UI and palette `#171717`, `#FDF3E9`, `#FC2721`. Do not introduce audio, inventory, free movement, real-time combat, animated sprites or a second ending.
 
-- F1/F2/F3 restore energy and memory atomically; F3 unlocks PERSONAL and all four indexes reach 100%. No new solar actions; legacy SOL IDs remain for old saves.
-- All five chapters are owner-approved. Preserve the exact approved dialogue, art, UI, current-only gates and replay. Selected wake and creature reveals block forward navigation until loaded/effect completed; dog/rat gradual reveal plus existing shake, Chapter 4 CRT memory effects, David memory text shiver and hidden energy HUD are approved. Reduced motion remains supported.
-- PRs #24/#35/#36 merged; AI opt-in active on last observed four-CPU local VM, disabled by default on fresh installs; #29 closed. Preserve category authority, deadlines, cache and fallback. No paid services.
-- For future VM recovery: preserve the latest verified **seven-session** private backup and `.env`; inspect actual Docker volumes and available resources first, restore only into a newly verified empty database when the original data volume is absent, then validate Continue. These steps were **already completed on the replacement VM before the latest safe pause**. Continue release QA, canonical-source reconciliation and hosting feasibility without changing approved content or provisioning unauthorized resources.
+## Engineering and operations
 
-> **Archived PR #38 snapshot:** [historical evidence](docs/history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](docs/release-readiness-matrix.md).
+- Keep the authoritative application layering: **Web/Next.js**, **API/NestJS/Prisma**, **AI/FastAPI**, **PostgreSQL** and optional **pinned internal-only Ollama**. Preserve bounded provider requests and deterministic fallback.
+- Use stable identifiers, dependency lockfiles, small reviewable changes, real tests and reproducible commands. Add unit/integration/contract tests for implementation changes; use disposable test state rather than owner saves.
+- Before operations on Cloud Shell, read the [safe pause/resume runbook](docs/cloud-shell-pause-resume.md). Never restore into a populated DB, delete named volumes or backups, blindly prune Docker, bypass free-disk checks or overwrite `.env`. Model downloads, migrations and network exposure need reviewed preconditions.
+- Keep secrets, reference sheets, private source documents, cookies and database archives **outside Git and PR comments**. Run QA with sanitized evidence; redaction and filename checks alone do not certify confidentiality.
+- Production traffic, TLS/origin/Host header enforcement, retention, rate limits, privacy, continuous hosting, external model disclosure and source/asset licenses are **not approved** merely because local tests passed.
+- Google Cloud Shell is for private development/preview, **not permanent public hosting**. No paid resource, public deployment, new model vendor, account creation, repository visibility change or `v1.0.0` tag without explicit owner approval.
 
----
+## Documentation and PR workflow
 
+- Repository-facing docs, issues, PRs, ADRs, commit messages, identifiers and comments are written in **clear English**; preserve exact PT-BR/EN game text. Use the [documentation standards](docs/documentation-standards.md): concise ownership, links instead of duplicate status paragraphs, dated evidence, and separated historical instructions.
+- Review the targeted files and potential security/privacy impact; record **what was actually run** and known limitations. Do not represent CI, health endpoints, manual samples or prior-VM inference as public-release acceptance.
+- Protect `main`: use scoped branches, reviewable PRs and CI. **Do not merge without explicit owner approval.** Do not modify approved game content to satisfy a documentation or deadline request.
+- Track the four remaining release issues [#12](https://github.com/AlexandroLeao/ami-108/issues/12), [#13](https://github.com/AlexandroLeao/ami-108/issues/13), [#14](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15](https://github.com/AlexandroLeao/ami-108/issues/15) until each acceptance criterion is evidenced or explicitly scoped by the owner.
 
-## Source of truth and scope
-- **Current source precedence:** Private Documento Mestre v1.14 and Roteiro Interativo v1.12, plus later explicitly owner-approved revisions (including the accepted five-chapter game and final content advisory), govern the frozen story. Earlier v1.13/v1.11 and November 16–17 addenda are historical lineage; they take precedence only where incorporated into those later approved sources. Do not invent or rewrite dialogue, outcomes, encounters, assets or story reveals. If the source is unavailable, request the relevant authorized excerpt before implementing new content.
-- Five chapters (Bananas; Registro Atualizado; Pensamento Positivo; AMI-108 & David; De nada, Bobo), 12 narrative scenes, 12 scene assets and 9 internal reference sheets. Preserve stable narrative IDs. Chapter 1 title and its banana dialogue are fixed.
-- Static 16:9 scene art and coded UI. Palette #171717, #FDF3E9, #FC2721. No audio, inventory, movement, animated sprites, real-time combat, free chat or extra endings.
-- Preserve the approved UI in docs/ui-design.md. A01-S01 has a silent ellipsis and L01a/L01b presentation subdivision; L02–L04 remain unchanged. Dark first three beats, blink/blur overlay on L02, one-shot text tremor through L02, steady L03 onward. The owner’s PR #20 playtest refinement adds departure/arrival narration, two later blink reveals, revised Bobo beats, AMI-108 speaker label and short subdivisions; see docs/ui-design.md. PR #20 merged after owner acceptance; review all reached presentation from L02 onward, including already-applied events and Chapter 2 handoff, without rollback or replay. See docs/ui-design.md for the final robot frame, fixed-height title/Menu header diagnostics, E-JOIN/information and MEM-D1 revisions. No visible arrow captions or hover tooltips. The accepted technical presentation refinements are recorded in the repository synchronized with the private cumulative source revisions on November 17. The chapter card waits for manual advance; previous dialogue is read-only history, not game-state rollback.
-- PT-BR and EN are first-class; preserve AMI-108 and Bobo in both. Four fixed David headache/black-screen flashback transitions, not generated by AI.
+## Historical acceptance records
 
-## Architecture and rules
-- Next.js/React renders the authorized current scene. NestJS is authoritative for state, transitions, choices, energy, memory, checkpoints and persistence. PostgreSQL/Prisma persists progress. Python/FastAPI/Pydantic generates and validates only permitted AMI dialogue.
-- Three encounters in order: dog (chapter 2), rat (chapter 3), boar (chapter 5). Lizard is flashback only. Four choices per encounter, one safe, three lethal. Outcomes are deterministic, never chosen by the LLM.
-- Energy starts at 3 after E-JOIN; each encounter consultation costs one, at most three; F1/F2/F3 restore energy to 3 atomically with memory. No negative energy; zero energy does not block choices. Ordinary dialogue, flashbacks, restorations, and INTRO-RANDOM cost no energy.
-- F1/F2/F3 are fixed, idempotent restoration events. Initial BIO-02 15%, F1 42%, F3 100%; these are approved initial CORRECT probabilities for dog, rat and boar respectively. PERSONAL stays locked until F3.
-- Roll back checkpoint state only on explicit return; keep consultation slot categories and cache outside rollback. Duplicate requests cannot debit twice; language changes cannot reroll. Maximum nine encounter slots plus one INTRO-RANDOM per run.
-- NestJS selects CORRECT/RANDOM, FastAPI retrieves only authorized encounter facts and generates/validates the wording. Use authored localized fallback on invalid/unavailable generation. CORRECT is guaranteed for the boar. Never send future spoilers, unrelated private facts or secrets to a provider.
-- No secret, private storyline dump or solution key in public client payloads. Gate spoilers by state, including asset delivery; do not assume a public asset URL is secret.
-
-- Use the reviewed architecture documents under docs/architecture and proposed contracts under docs/api. Do not claim unimplemented game behavior; record changes to the design via ADRs.
-
-## Engineering workflow
-- Use English for repository documentation, ADRs, issues, PRs, commit messages, code identifiers and comments; preserve localized PT-BR/EN game content verbatim. Owner-facing reports and private official documents remain in Portuguese.
-- Follow the seven-day target (November 16–22, 2026) in docs/production-plan.md. Do not cut approved scope, bypass verification or claim completion to meet a date.
-- Google Cloud Shell is the verified manual development environment; Codespaces is optional and untested. AWS CloudShell is only for authorized AWS operations. Stop unused compute, verify quotas and do not expose keys.
-- Keep main stable. Use short branches and PRs with scope, acceptance criteria, tests and known limitations. Do not merge without owner approval.
-- Write tests alongside changes; inject RNG/provider for deterministic tests, validate contracts, handle concurrency and idempotency. Never fabricate test results. Report commands actually run and failures.
-- Prefer simple modular solutions and pinned dependencies with lockfiles. No paid mandatory services, no cloud resource creation or billing changes without approval. Verify quota and eligibility before deployment.
-- Use environment variables for secrets; .env.example contains placeholders only. Do not commit credentials, local artifacts, or personal/private files.
-- Update technical docs and ADRs as decisions are made; preserve narrative sources and originals. Do not mark unimplemented capabilities as complete.
-
-### Historical presentation refinements (superseded when later explicitly accepted)
-
-- November 17 owner refinement in PR #22: concise E-JOIN narration and three red information cards, three dark dog approach beats and a single loaded-art startle cue, two warning beats, no PREVIOUS at active decisions, dark consequences/branches, pixel skull death card and persistent chapter selection under Continue. Preserve unlocked high-water mark and immutable consultation slots on explicit chapter restart; no new story events, assets or mechanics beyond this authorized presentation/replay amendment. See docs/encounter-engine.md and docs/ui-design.md. Private cumulative source update follows owner acceptance.
-
-- Second owner refinement: remove the solar tutorial card (normalize retired saved cursor), shorten accurate-answer information, three dark terminal-arrival beats, MEM-D2 blink-to-black and silent/voice/AMI call, wake on L15, three recognition beats with E-NAME at L18c, red skull and energy bars without numeric fraction. Keep F1/SOL-01, cache, chapter selection and unrelated presentation intact.
-
-- Third owner refinement: abbreviated Continue/Chapter labels, energy-only enlarged HUD (memory rules and persisted values unchanged), revised ARRIVAL-03, FOUND fade-in, revised cake-related L04, split F01/F01b and MEM-D2 pain text. Preserve SOL-01 timing and planned SOL-02, no unapproved solar mechanics or other story/UI changes.
-
-- Fourth owner refinement: reduce repeated storage-component wording, continuous memory-shiver only FB-D1b–g/MEM-D2/F01/F01b, one-shot name-reveal on L18c, original approved CENA-04 geometry (experimental override reverted after owner review), manifest and HTTP artwork hashes checked. Preserve original art, stable IDs, event effects, chapter replay and solar mechanics.
-
-- Owner correction: preserve the exact b9da1be layout for normal dialogue and choices; do not adjust image or frame dimensions without specific owner approval. A02-S02/L04 has one localized text for all success variants; no recipe-dependent alternative. Name reveal 1800ms; no unrelated changes.
-
-- Targeted owner refinement: energy-reveal on first information card, same CENA-04 with one-shot veil/brief layer shake, L08b solar lead-in (SOL-01 still on entry to L09), alternating name reveal 2600ms. No changes to approved dimensions or other dialogue, rules or artwork.
-
-- Latest owner refinement: exact shortened ARRIVAL-03; dark FOUND and L01-only CENA-05 veil; slower dog reveal with text first; faster distinct ???/DAVID alternation. No other changes to text, layout, original assets or mechanics.
-
-## Accepted Day 2 baseline
-
-PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
-
-Private Master v1.12 / Script v1.10 are synchronized on November 17, 2026; the cumulative Day 2 supplement takes precedence for explicitly approved changes, with all prior pages and source text preserved. The three existing Drive files were replaced in place; the asset ZIP v1.9 is unchanged. No private source files are committed.
-
-- Final rules supersede earlier refinement notes: 77 Chapter 1 beats; three red information cards with energy reveal on the first; energy-only HUD; exact pre-dog-resize approved geometry; no back at decisions; dark success, red skull, chapter-number-only replay. ARRIVAL-03 exact shortened wording, FOUND dark, L01 original CENA-05 with 700ms veil, dog L01 1450ms reveal with 435ms initial dark hold after load, L18c 1500ms alternating name reveal. All branches use the same approved L04. SOL-01 on entry to L09 after L08b. Do not change approved dialogue, dimensions, assets, or rules without explicit owner authorization. Earlier refinement descriptions are historical, not current instructions.
-- Next AMI-007/008; AMI-006 partial. Preserve the approved baseline and use a new feature branch. No paid service, real provider or public deployment without separate verification/authorization.
+Earlier interim instructions and Day 2 owner refinements were moved intact to [development history](docs/development-history.md). The applicable final presentation belongs to [UI design](docs/ui-design.md), [narrative engine](docs/narrative-engine.md), [encounter engine](docs/encounter-engine.md) and the approved runtime. The [PR #38 snapshot](docs/history-pr38-snapshot.md) is historical evidence, not a new instruction to change gameplay.
