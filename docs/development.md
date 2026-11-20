@@ -14,6 +14,10 @@
 
 The owner subsequently confirmed successful **desktop and mobile** private browser tests in **PT-BR and English**, including normal Continue and more varied RANDOM responses with generation ON. This is functional acceptance, not formal screen-reader, reduced-motion, production-security or performance certification. Because the owner created new games, the prior **six sessions** were a *pre-playtest snapshot*, not a count to hardcode in today's archive. Use the new [dynamic-count safe shutdown](cloud-shell-pause-resume.md) and review its verified backup report before closing Cloud Shell. Never rerun last session's database restore, local model install or API activation.
 
+## Verified end-of-day stop — November 20 UTC
+
+The owner's final safe-pause terminal report records **7 GameSession, 0 GamePendingGeneration and 4 completed migrations** before and after the PostgreSQL export. The new private custom-format archive `pause-ami108-20261120T005447Z-121510.dump` is **182,626 bytes**, passed list/full-read and SHA-256 checks, and a private `.env` copy was saved. Web, API, AI, PostgreSQL and Ollama are **stopped**; no Docker volume was deleted. The post-new-game count is seven (not the six at initial recovery). On the next session, inspect [safe pause/resume](cloud-shell-pause-resume.md) before starting or restoring anything. Do not treat this as formal release/security acceptance.
+
 ## Prerequisites and local boundaries
 
 Development requires Docker Engine with Compose CLI plugin, Node.js 22 (>=22.12), pnpm 10.15.1 through Corepack, Python 3.12 and uv. The accepted manual environment is Google Cloud Shell; Codespaces is an unverified optional alternative. Cloud Shell Docker VMs and volumes may be replaced between sessions; the user's private `$HOME` backup is a separate preservation requirement.
