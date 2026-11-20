@@ -7,6 +7,7 @@ import pytest
 
 from app import evaluate_cloud
 from app.cloudflare_provider import CloudflareProvider
+from app.evaluation_scenarios import planned_requests
 
 _ACCOUNT = "a" * 32
 _TOKEN = "test_private_cloudflare_token_012345"
@@ -15,7 +16,7 @@ _CONFIRM = "I_APPROVE_10_CLOUDFLARE_CALLS"
 
 
 def test_planned_ten_calls_are_allowlisted_and_bilingual() -> None:
-    cases = evaluate_cloud.planned_requests()
+    cases = planned_requests()
     assert len(cases) == 10
     assert [label for label, _ in cases] == [
         "intro-random", "intro-random", "dog-random", "dog-random",
