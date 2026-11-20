@@ -1,6 +1,6 @@
 # Vercel Services — pre-deployment gate
 
-**State (November 20, 2026):** Vercel Hobby project and Neon Free project created. A protected Vercel preview proved Web build and `/health` 200, `/icon.png` 200, `/game` 404; production gameplay, Prisma migrations, persistent session E2E and remote Groq have **not** been accepted. The existing Cloud Shell runtime and owner saves are unchanged.
+**State (November 20, 2026):** Vercel Hobby and Neon Free configured. [Owner-dispatched Neon preview migration #1](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) succeeded; all **four** tracked Prisma migrations finished without rollback, and Neon confirms five game tables plus `_prisma_migrations`. No game sessions exist yet. A protected Vercel deployment returned `/health` 200, `/icon.png` 200 and `/game` 404. Production Neon `main` remains unmigrated; remote Groq and public gameplay remain OFF. Owner Cloud Shell saves are untouched.
 
 ## Selected topology
 
@@ -34,13 +34,21 @@ This file is a deployment preflight, not an instruction to click **Deploy** now.
 
 ## Manual Neon preview migrations (no credential transfer in chat)
 
-Neon project `ami-108-prod` has a separate empty `preview` branch. The production `main` branch is intentionally not part of this workflow. Vercel already stores separate encrypted pooled URLs for each environment; do not paste their contents into a PR, issue, log, or conversation.
+Neon project `ami-108-prod` has a separate migrated `preview` branch with **zero game sessions** as of November 20; the production `main` branch remains **empty/unmigrated** and outside this workflow. Vercel already stores separate encrypted pooled URLs for each environment; do not paste their contents into a PR, issue, log, or conversation.
 
 Use the manual [`neon-preview-migrate.yml`](../.github/workflows/neon-preview-migrate.yml) GitHub Actions workflow **only after** the repository secret `NEON_PREVIEW_DATABASE_URL` has been created from the Neon Console, selecting project `ami-108-prod`, branch `preview`, database `ami`, role `ami_app`, and a direct/unpooled TLS connection if available. The workflow validates the exact preview endpoint hostname and database before any migration command. It never targets the production branch.
 
 On GitHub, go to repository **Settings → Secrets and variables → Actions → New repository secret**, name it `NEON_PREVIEW_DATABASE_URL` and paste the connection URL directly there. Do not send the value to the assistant. Then use **Actions → Neon Preview Schema Migration → Run workflow**, choose `main` and enter `MIGRATE_PREVIEW`. It checks out reviewed code, installs the locked workspace, runs Prisma's tracked `migrate deploy` and verifies `migrate status`. The workflow cannot be triggered by a commit, PR, or schedule.
 
-After it succeeds, independently verify `_prisma_migrations` and the five game tables on Neon `preview`; only then test disposable session persistence in the protected hosted environment. Production migration requires a separate change, verified evidence and owner release approval. Do not use Cloud Shell or its saved-session database.
+The owner dispatched [run 44835514257](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) successfully, and the migration history plus five game tables were verified directly in Neon. **Do not re-run migration merely for acceptance.** Next, use the separate controlled integration test below. Production migration requires a separate change, verified evidence and owner release approval. Do not use Cloud Shell or its saved-session database.
+
+## Manual real Neon preview persistence regression (after migration)
+
+Run [`neon-preview-integration.yml`](../.github/workflows/neon-preview-integration.yml) on GitHub **Actions → Neon Preview Integration Acceptance → Run workflow**, branch `main`, confirmation `TEST_PREVIEW`. It uses the **existing** repository Actions secret `NEON_PREVIEW_DATABASE_URL`, validates the same pinned preview endpoint and runs only the existing `game.integration.spec.ts` tests against migrated Neon PostgreSQL. No Groq requests, no migrations, no production database and no changes to the local Cloud Shell runtime.
+
+The tests use synthetic session tokens/commands and attempt cleanup of their own sessions. On success, verify Neon `preview` game row counts returned to zero. If a test aborts and leaves data, retain the evidence and investigate before further tests; do not issue blanket deletes or resets.
+
+This proves NestJS/Prisma behavior against real Neon preview, **not** protected browser ↔ Vercel Web ↔ private API routing nor real Groq-in-game acceptance. Those remain independent release gates.
 
 ## Verification
 
