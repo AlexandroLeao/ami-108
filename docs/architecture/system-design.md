@@ -2,7 +2,7 @@
 
 ## Current implemented containers and boundary
 
-NestJS controls all five chapters, DOG/RAT/BOAR, all three checkpoints, immutable slots, F1/F2/F3, replay and completion with current-only artwork. PR #24 implements optional authenticated internal inference and durable reservation/finalization; previously verified real local provider, default disabled. PRs #35/#36 expand the authorized RANDOM pool; #29 closed. BOAR authored only. Current recovered VM runs fallback; no external provider or paid resource enabled. Release QA and production deployment remain pending.
+NestJS controls all five chapters, DOG/RAT/BOAR, all three checkpoints, immutable slots, F1/F2/F3, replay and completion with current-only artwork. PR #24 implements optional authenticated internal inference and durable reservation/finalization; previously verified real local provider, default disabled. PRs #35/#36 expand the authorized RANDOM pool; #29 closed. BOAR authored only. The most recent restored private VM used authorized fallback while Ollama was absent; that VM was subsequently **safely paused**. No external inference provider or paid production resource was enabled. Release QA and hosting decisions remain pending.
 
 > **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
