@@ -1,10 +1,10 @@
-# GroqCloud Free — bounded AI inference acceptance plan
+# GroqCloud Free — bounded AI inference evaluation
 
-**Status (November 20, 2026):** offline integration **candidate**; no Groq key, deployment, live call or model acceptance is implied by this document. **Owner requirement:** final AMI-108 should demonstrate genuinely live inference, not just locally authored fallback. The previously accepted local Qwen/Ollama evaluation remains independently valuable; the Cloudflare Gemma 4 prototype was stopped after failing its real bounded contract.
+**Status (November 20, 2026):** the optional Groq adapter was merged in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80), and owner-triggered **provider-only** evaluations passed 1/1 diagnostic and 10/10 bilingual cases. The adapter remains **OFF by default**; no player-facing activation, production qualification or public deployment is approved. The earlier local Qwen/Ollama acceptance is independent; the Cloudflare Gemma 4 prototype remains disabled after failing its real bounded contract.
 
 ## Free-first decision
 
-- **Provider candidate:** [GroqCloud](https://console.groq.com/), Free plan, **`openai/gpt-oss-20b`**. Its [model card](https://console.groq.com/docs/model/openai/gpt-oss-20b) lists high-speed text inference; actual 2-second provider and 2.5-second game deadlines require fresh measurements.
+- **Provider:** [GroqCloud](https://console.groq.com/), Free-plan candidate, **`openai/gpt-oss-20b`**. [Model reference](https://console.groq.com/docs/model/openai/gpt-oss-20b). Individual GitHub-runner samples satisfied the 2-second transport budget; this is not an end-to-end, concurrency or production latency guarantee.
 - **Strict structured results:** [Groq Structured Outputs](https://console.groq.com/docs/structured-outputs) lists this exact model as supporting `json_schema` with `strict:true`. Each request generates a one-property object `{"selection":"0"}` with a server-generated enumeration of authorized local options. **Strict JSON constrains structure, not factual correctness.** The FastAPI and NestJS validation layers retain complete authority.
 - **Free limits:** Groq's [Free limits](https://console.groq.com/docs/rate-limits) list **30 requests/minute, 1,000 requests/day, 8,000 tokens/minute and 200,000 tokens/day** for this model. Actual project-account limits and provider availability may vary; check the account's Limits screen before activation.
 - **Quota exhaustion:** exceeding any Free rate limit results in **HTTP 429**, not an automatic paid upgrade. AMI-108 must treat this as **`FALLBACK_REQUIRED`**, never launch background retries or interrupt player progress. The Free tier is a limited private/demo quota, not guaranteed high-volume public capacity. Do not enable Groq Developer/pay-as-you-go or a payment method without a separate owner decision. [Billing details](https://console.groq.com/docs/billing-faqs).
@@ -25,14 +25,19 @@
 
 **Important product boundary:** this is **real inference selecting one of the preapproved sentences**, not free-form generation of new narrative dialogue. Adding controlled wording variation is a separately scoped, owner-reviewed feature: it must preserve the approved five chapters, facts, choices and authored fallback and pass new bilingual tests. Do not claim fully generative dialogue in the portfolio until it is implemented and evaluated.
 
-## Safe acceptance sequence (not yet run)
+## Dated provider-only acceptance evidence — November 20, 2026
 
-1. Owner verifies **Personal / Free** project status, per-model Limits, and **Data Controls → Zero Data Retention**. Do not click **Upgrade to Dev Plan** or create billing details for this Free test.
-2. Review the isolated Groq adapter diff and its offline tests (no production credential is present in CI). The [manual-only GitHub Actions workflow](../.github/workflows/groq-evaluation.yml) is prepared, but cannot make any real calls during PR/push CI. After review and merge, the owner selects `diagnostic-one` and enters `I_APPROVE_1_GROQ_CALL` on `main`; the separate `acceptance-ten` mode requires `I_APPROVE_10_GROQ_CALLS` and is not the first step.
-3. Owner creates an API key in [Groq Console → API Keys](https://console.groq.com/keys) and enters its value **directly** into a private GitHub Actions repository secret `AMI_GROQ_API_KEY`. Never post or screenshot the key in chat, issues, workflow logs or README.
-4. **Only one** private, owner-triggered test call using an already approved INTRO-RANDOM/PT-BR context; capture only a bounded HTTP/status reason and timing, never the prompt, response, key or ID. Test must validate within the required 2.5-second game deadline.
-5. If the single probe passes, run an independently gated **ten-case** PT-BR/EN suite (INTRO, DOG, RAT, correct and random) on disposable evaluation requests. Require 10/10 valid, measure latency/negative cases, 429 fallback, no retries and no revealed private content.
-6. Before allowing real player use, verify Free quota behavior with projected traffic, key rotation, rate limiting, secure backend-only secrets, hosting network rules, operational rollback, and independent game save/replay QA. Any remote-inference acceptance must be recorded as specific dated evidence, not implied by green unit tests.
+- **Merged implementation:** [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80) on GitHub `main` at `76733acf`; [post-merge CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44807240838) passed. Push/PR CI uses mocks and makes no real Groq requests.
+- **Single diagnostic:** owner-dispatched [run 44807846552](https://github.com/AlexandroLeao/ami-108/actions/runs/44807846552), `diagnostic-one`, returned **1/1 VALIDATED** for INTRO-RANDOM/PT-BR in **212 ms**.
+- **Bilingual sample:** owner-dispatched [run 44809358698](https://github.com/AlexandroLeao/ami-108/actions/runs/44809358698), `acceptance-ten`, returned **10/10 VALIDATED**, five PT-BR and five EN: INTRO-RANDOM, DOG-RANDOM, RAT-RANDOM, DOG-CORRECT and RAT-CORRECT. Observed **203–384 ms**, **273 ms median**, evaluator-reported **384 ms p95**; no sampled fallback. The workflow first validated the ten fixtures offline, then made one request per case without retries.
+- **Scope:** direct, credential-gated FastAPI-provider evaluation from private GitHub Actions runners against the exact authorized selection contract. It did **not** exercise Next.js, NestJS, PostgreSQL, player saves, checkpoint replay, production concurrency or any running Cloud Shell game. CI negative-path tests do **not** constitute an observed live HTTP 429/quota failure. Sample success does not certify reliability at scale.
+
+## Remaining activation gates
+
+1. Verify the **actual Groq project** Free-plan eligibility, per-model account limits, billing state and [Data Controls / Zero Data Retention](https://console.groq.com/docs/your-data) settings; none is independently evidenced by these workflow logs. Keep `AMI_GROQ_API_KEY` in private GitHub Actions secrets or protected server configuration, never in Git, chat or logs.
+2. Use a **disposable** end-to-end Web → NestJS → FastAPI → Groq → PostgreSQL environment for authorized context, one energy debit, idempotent receipts, persisted bilingual slots, replay, timeout, 401/403/429 fallback and recovery. Do not attach the owner's seven saved sessions or change the frozen local checkout.
+3. Validate measured account quotas, rate/concurrency limits, key rotation, privacy, monitoring, safe rollback and zero mandatory cost against the selected hosting architecture. No automated real requests, scheduled probes or cross-provider failover.
+4. Obtain separate owner sign-off for environment-specific player inference, external disclosure and any deployment. Do not enable Developer/pay-as-you-go billing, expose private narrative sources or represent index selection as free-form AI dialogue.
 
 ## Stop and fallback rules
 

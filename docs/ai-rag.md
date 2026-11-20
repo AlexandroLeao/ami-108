@@ -4,7 +4,7 @@
 
 The accepted runtime implements **optional** private Ollama generation behind authenticated FastAPI and NestJS reservation/finalization. NestJS owns allowed categories, finite fact/context IDs, deterministic probabilities, energy, checkpoint state and immutable receipts; FastAPI validates authorized context, applies strict output bounds and falls back to approved localized prose on provider failure. BOAR remains authored CORRECT and never calls the model.
 
-The owner previously verified pinned Qwen2.5:1.5b in a separate, internal-only network, including an authenticated bilingual 10/10 evaluation. **The latest replacement VM was safely paused with Ollama absent and `AMI_AI_GENERATION=0`; there is no current live-inference claim.** See the [release checkpoint](release-readiness-matrix.md). No external model provider, training pipeline, vector database or free-chat product has been approved.
+The owner previously verified pinned Qwen2.5:1.5b in a separate, internal-only network, including an authenticated bilingual 10/10 evaluation. **The latest replacement VM was safely paused with Ollama absent and `AMI_AI_GENERATION=0`; no player inference is currently active there.** GitHub `main` also contains an OFF-by-default Groq adapter with [provider-only live samples](groq-inference-evaluation.md), not game integration acceptance. See the [release checkpoint](release-readiness-matrix.md). No training pipeline, vector database or free-chat product is approved.
 
 ## Dated implementation history
 
