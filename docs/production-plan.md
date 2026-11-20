@@ -1,6 +1,6 @@
 # Production plan
 
-> **Current planning state (2026-11-20):** The five-chapter private game and original art are approved, and the owner's replacement Cloud Shell VM was recovered successfully: Continue worked, four Compose services were healthy, and **7 saved sessions / 0 pending / 4 migrations** were preserved in the newly validated `pause-ami108-20261120T155634Z-1926.dump` at **15:56 UTC**. A private `.env` backup was retained and the four services then stopped. The model Ollama **was not present on this VM** and authorized fallback was active; previous real local Qwen acceptance remains historical. Root free disk was 5.8 GiB, below the 10 GiB model-installer safeguard. Public hosting (including any Vercel-based proposal), official content classification, distribution rights and release approval remain **undecided and unprovisioned**. Earlier snapshots and the original seven-day calendar below are historical and do not authorize a deploy. See the [release-readiness matrix](release-readiness-matrix.md).
+> **Planning boundary:** The owner accepted the five-chapter private game, and the replacement Cloud Shell VM was later safely paused with a validated seven-session backup. The authoritative checkpoint, model status and remaining release gates are in [release readiness](release-readiness-matrix.md). This file preserves the original November 16–22 seven-day **planning schedule as history**; it does **not** approve a provider, paid resources, license, classification, public deployment or tag.
 
 ## Historical PR #38 handoff — November 19
 
