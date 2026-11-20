@@ -50,6 +50,12 @@ The tests use synthetic session tokens/commands and attempt cleanup of their own
 
 This proves NestJS/Prisma behavior against real Neon preview, **not** protected browser ↔ Vercel Web ↔ private API routing nor real Groq-in-game acceptance. Those remain independent release gates.
 
+## Remote Neon Free performance investigation (open release blocker)
+
+The manually dispatched full [Neon integration run #1](https://github.com/AlexandroLeao/ami-108/actions/runs/44836915249) passed 13/14 tests but hit a 5-second Chapter 1 timeout. After [PR #91](https://github.com/AlexandroLeao/ami-108/pull/91) increased the remote-only default timeout to 45 seconds, [run #2](https://github.com/AlexandroLeao/ami-108/actions/runs/44838128971) passed only 4/14, with repeated 30–60-second test timeouts and HTTP 503 responses. **The first issue was not simply insufficient timeout; do not blindly increase limits or rerun the exhaustive remote suite.** Both runs confirmed migration history and destination; subsequent Neon inspection found zero residual game rows and no deadlocks. The preview compute is configured at 0.25 CU (fixed). The runtime resource/connection bottleneck is suspected, **not proven**; 503 responses conceal the underlying exception by design. Production remains unmigrated and game/AI OFF.
+
+Run the new manual-only `Neon Preview Latency Diagnostics` workflow (branch `main`, acknowledgement `DIAGNOSE_PREVIEW`) to collect **sanitized, read-only** connection, SELECT, count and transaction latency from a GitHub runner. It consumes the existing preview secret and is pinned to the same host/TLS/db/role. This is diagnostic data only, not gameplay certification: use the timings to decide on targeted database/connection improvements and a bounded, minimal remote E2E suite. Keep full exhaustive narrative/regression tests in local PostgreSQL CI. Do not change production compute, disable 503 fail-closed behavior or publish the game to mask failures.
+
 ## Verification
 
 Run `node scripts/test-vercel-services-config.mjs` or use PR CI. This verifies the intended public route and bindings **statically**; the Vercel beta builder, actual service URLs and managed database require a separate real preview deployment. See [hosting assessment](zero-mandatory-cost-hosting-assessment.md) and [release readiness](release-readiness-matrix.md).

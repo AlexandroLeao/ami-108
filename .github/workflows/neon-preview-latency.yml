@@ -1,0 +1,95 @@
+name: Neon Preview Latency Diagnostics
+
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: "Enter DIAGNOSE_PREVIEW for a read-only, bounded Neon preview latency probe"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-neon-preview-diagnostics
+  cancel-in-progress: false
+
+jobs:
+  latency-preview:
+    if: github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && inputs.approval == 'DIAGNOSE_PREVIEW'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pnpm install --frozen-lockfile
+      - name: Verify Neon preview destination, never reveal credentials
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          if (!process.env.DATABASE_URL) throw Error('Preview connection secret missing');
+          let u;
+          try { u = new URL(process.env.DATABASE_URL); }
+          catch { throw Error('Invalid preview database URL'); }
+          if (!['postgres:', 'postgresql:'].includes(u.protocol) ||
+              !/^ep-summer-field-bcnzvyx2(-pooler)?\.c-16\.us-east-1\.aws\.neon\.tech$/.test(u.hostname) ||
+              u.pathname !== '/ami' || u.username !== 'ami_app' ||
+              !['require', 'verify-full'].includes(u.searchParams.get('sslmode'))) {
+            throw Error('Refusing unexpected Neon branch/database/role/TLS destination');
+          }
+          console.log('Approved preview target checked; no credentials printed');
+          NODE
+      - run: pnpm db:generate
+      - name: Measure cold connection, SELECT, indexed count and read-only transactions
+        working-directory: apps/api
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PREVIEW_DATABASE_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { PrismaClient } from '@prisma/client';
+          import { performance } from 'node:perf_hooks';
+
+          const db = new PrismaClient();
+          const samples = { select: [], count: [], transaction: [] };
+          function summary(values) {
+            const sorted = [...values].sort((a,b) => a-b);
+            return { count: sorted.length, minMs: Math.round(sorted[0]),
+              medianMs: Math.round(sorted[Math.floor(sorted.length/2)]),
+              p95Ms: Math.round(sorted[Math.ceil(sorted.length*.95)-1]),
+              maxMs: Math.round(sorted.at(-1)) };
+          }
+          async function measure(group, operation) {
+            const start = performance.now();
+            await operation();
+            samples[group].push(performance.now() - start);
+          }
+          try {
+            const started = performance.now();
+            await db.$connect();
+            console.log('Cold connection ms:', Math.round(performance.now()-started));
+            for (let i=0; i<8; i++) await measure('select', () => db.$queryRaw`SELECT 1 AS ok`);
+            for (let i=0; i<6; i++) await measure('count', () => db.gameSession.count());
+            for (let i=0; i<4; i++) await measure('transaction', () =>
+              db.$transaction(async tx => {
+                await tx.$executeRaw`SET TRANSACTION READ ONLY`;
+                await tx.gameSession.count();
+              })
+            );
+            console.log('Read-only latency summary (no rows or credentials):', JSON.stringify(
+              Object.fromEntries(Object.entries(samples).map(([name,values]) => [name,summary(values)]))
+            ));
+            console.log('This diagnostic does not certify full gameplay performance or release readiness.');
+          } catch (err) {
+            const name = typeof err?.name === 'string' ? err.name : 'UnknownError';
+            const code = /^P\d{4}$/.test(String(err?.code ?? '')) ? err.code : 'UNCLASSIFIED';
+            console.error('Sanitized Neon diagnostic failure:', { name, code });
+            process.exitCode = 1;
+          } finally { await db.$disconnect(); }
+          NODE
