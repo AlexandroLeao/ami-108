@@ -111,8 +111,8 @@ def duplicate_paragraph_errors(documents: dict[str, str]) -> list[str]:
 def adr_errors(content: str) -> list[str]:
     ids = re.findall(r"^## ADR-(\d{3})\b", content, re.M)
     problems: list[str] = []
-    if ids != [f"{i:03d}" for i in range(1, 9)]:
-        problems.append("ADR identifiers must be unique and ordered 001 through 008")
+    if not ids or ids != [f"{i:03d}" for i in range(1, len(ids) + 1)]:
+        problems.append("ADR identifiers must be unique and sequential from 001")
     sections = re.split(r"(?=^## ADR-\d{3}\b)", content, flags=re.M)
     for section in sections[1:]:
         match = re.match(r"## ADR-(\d{3})", section)
@@ -140,7 +140,10 @@ def openapi_errors(path: str, content: str) -> list[str]:
         for method, operation in entry.items():
             if method.lower() not in {"get", "post", "put", "patch", "delete", "head", "options"}:
                 continue
-            op_id = operation.get("operationId") if isinstance(operation, dict) else None
+            if not isinstance(operation, dict):
+                issues.append(f"{path}: invalid operation object on {method.upper()} {route}")
+                continue
+            op_id = operation.get("operationId")
             if not op_id or op_id in seen:
                 issues.append(f"{path}: missing or duplicate operationId on {method.upper()} {route}")
             else:
