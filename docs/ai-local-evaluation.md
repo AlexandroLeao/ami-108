@@ -2,7 +2,7 @@
 
 > **Status guide:** This is a chronological evidence log, not the current AI activation procedure. Previous real-model measurements were on earlier Cloud Shell VMs. The six-save recovered environment has since passed the warmed direct real-model 10/10 bilingual check **and owner-executed API-only activation with gameplay generation ON**. The one-time [pinned Ollama recovery](../scripts/prepare-pinned-local-ollama.sh) and [API activation](../scripts/activate-verified-local-ai.sh) must **not be rerun** on the now-active stack. A separate-browser fresh-game E2E check remains pending; see [current readiness](release-readiness-matrix.md). Historical candidate scripts and prior 10/10 outcomes must not be presented as proof of an untested new VM.
 
-> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](release-readiness-matrix.md).
 
 Historical development notes below are retained as evidence and do not override the accepted status.
 
