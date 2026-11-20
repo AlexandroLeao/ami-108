@@ -85,7 +85,7 @@ class CloudflareProvider:
                 raise ValueError("Oversized inference response")
             result = json.loads(raw)
             if not isinstance(result, dict):
-                raise ValueError("Invalid response envelope")
+                raise TypeError("Invalid response envelope")
             items = result.get("choices")
             if not isinstance(items, list) or len(items) != 1:
                 raise ValueError("Invalid response choices")
@@ -94,10 +94,10 @@ class CloudflareProvider:
                 raise ValueError("Incomplete provider response")
             message = item.get("message")
             if not isinstance(message, dict):
-                raise ValueError("Invalid provider message")
+                raise TypeError("Invalid provider message")
             content = message.get("content")
             if not isinstance(content, str):
-                raise ValueError("Invalid provider text")
+                raise TypeError("Invalid provider text")
             return {str(i): choices[index] for i, index in enumerate(order)}.get(
                 content.strip(), ""
             )
