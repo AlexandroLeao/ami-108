@@ -2,7 +2,7 @@
 
 ## Current source and implementation boundaries — November 19
 
-Private Master v1.14 / Script v1.12 and later approved amendments govern the frozen campaign. PRs #38 and #53 were accepted and merged; do not modify narrative, original art, approved UI, probability rules or mechanics without explicit owner authorization. The owner's recovered local runtime is `14ea583`: **6 sessions, 0 pending, 4 migrations**, all four services healthy, Continue confirmed. Local inference is temporarily disabled until pinned Ollama is restored and validated; a healthy AI service alone is not real inference evidence. Later GitHub commits are documentation/diagnostic-only. Release issues #12–#15 remain open. No public hosting or paid resources.
+Private Master v1.14 / Script v1.12 and later approved amendments govern the frozen campaign. PRs #38 and #53 were accepted and merged; do not modify narrative, original art, approved UI, probability rules or mechanics without explicit owner authorization. The owner's accepted local runtime remains `14ea583`. After successful reactivation of pinned local inference and owner desktop/mobile PT-BR/EN new-game checks, the **November 20 UTC safe-pause report** confirmed **7 sessions, 0 pending generations, 4 migrations**, a verified private database dump and stopped Web/API/AI/DB/Ollama without volume deletion. The earlier 6-session/AI-OFF state is historical. Later GitHub commits affect documentation and guarded operational tools, not accepted game behavior. Release issues #12–#15 remain open. No public hosting or paid resources.
 
 
 ## Owner-approved implementation invariants (earlier recorded November 18, 2026)
@@ -12,7 +12,7 @@ Private Master v1.14 / Script v1.12 and later approved amendments govern the fro
 - PRs #24/#35/#36 merged; AI opt-in active on last observed four-CPU local VM, disabled by default on fresh installs; #29 closed. Preserve category authority, deadlines, cache and fallback. No paid services.
 - Next: verify final backup and VM on resume, pinned AI reactivation, release QA, infrastructure and final documentation. No changes to accepted content without owner authorization.
 
-> **Archived PR #38 snapshot:** [historical evidence](docs/history-pr38-snapshot.md). For the current verified game, six restored sessions and outstanding release gates, see [release readiness](docs/release-readiness-matrix.md).
+> **Archived PR #38 snapshot:** [historical evidence](docs/history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](docs/release-readiness-matrix.md).
 
 ---
 
