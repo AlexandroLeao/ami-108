@@ -1,6 +1,6 @@
 # Documentation standards and review policy
 
-**Status:** proposed engineering policy (documentation-only; owner approval required before merging).  
+**Authority:** engineering review policy for version-controlled documentation. Changes are adopted only through an owner-approved, CI-verified pull request.  
 **Applies to:** tracked Markdown, technical OpenAPI references, architecture diagrams, runbooks, the root README, the engineering instructions, and their GitHub pull requests. The private Master/Interactive Script and original artwork are governed separately by owner approval; do not export them into this repository.
 
 ## Purpose and audience
