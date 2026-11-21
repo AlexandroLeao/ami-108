@@ -87,6 +87,8 @@ jobs:
       - name: Guard Vercel Services private routing
         run: node scripts/test-vercel-services-config.mjs
       - run: pnpm install --frozen-lockfile
+      - name: Validate manual Production migration guards without connecting
+        run: pnpm --filter @ami-108/api exec node scripts/test-production-schema-preflight.cjs
       - run: pnpm --filter @ami-108/api exec prisma validate
       - run: pnpm db:generate
       - run: pnpm --filter @ami-108/api exec prisma migrate deploy
