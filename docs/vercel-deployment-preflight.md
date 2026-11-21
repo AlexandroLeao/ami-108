@@ -32,6 +32,18 @@ Do not set `AMI_DEV_PREVIEW=1` to bypass this gate. The release switch alone doe
 
 This is a **release gate**, not evidence of public gameplay readiness. Git integration already deploys technical builds; leave gameplay and AI disabled in production.
 
+## Guarded Production schema workflow — deliberately not executed
+
+The production Neon `main` branch is currently **empty (0 application tables)** and is separate from the seven saved QA sessions in `preview`. This new procedure **prepares** the schema but does not enable a public domain, game or AI. The owner must first review/merge the green-CI code, confirm the actual Free-plan quota, rights/classification/access and decide to authorize the migration. The [manual workflow](../.github/workflows/neon-production-migrate.yml) never runs on a push or PR.
+
+1. From **Neon Console → project `ami-108-prod` → branch `main` → database `ami` → role `ami_app`**, copy the **direct/unpooled** TLS connection URL into GitHub Actions **repository secret** `NEON_PRODUCTION_DATABASE_URL`. Do not paste the URL or password into chat, Git files, issues or logs. The workflow does **not** read the Vercel Production URL.
+2. On reviewed, green-CI `main`, choose **Actions → Manual guarded production schema migration → Run workflow**, branch `main`, input `MIGRATE_EMPTY_AMI_PRODUCTION`. Do not dispatch during other deployment/database maintenance.
+3. The `preflight-production-db.cjs` guard verifies that the DB connection hostname is the **fixed Neon Production endpoint** (not Preview, not a pooled alias), role `ami_app`, database `ami`, TLS required, GitHub branch/confirmation correct, and all public-schema tables **completely absent**. It prints no connection string, password or raw Prisma error.
+4. Only after those checks, Prisma `migrate deploy` applies **five additive tracked migrations**. A postcondition confirms all seven expected tables, exactly five completed migrations and **zero saved sessions**. A failed/partial run stops for investigation: **do not** reset/drop or repeat blindly, because the empty precondition will no longer pass.
+5. Even after the schema passes, leave `AMI_PUBLIC_GAME=0` and `AMI_AI_GENERATION=0` in Production and Vercel Authentication ON. Separate, Production-specific provider secrets/origin, a protected smoke of the final code, budget verification and a publication decision are still required. An empty schema is **not** a successful public launch.
+
+**Rollback/stop:** because this first schema migration starts from a verified-empty database, the safe immediate action after a problem is **keeping game/AI OFF**, preserving evidence and reviewing Prisma migration history. Do not automatically delete Neon branches or rewrite production history. The schema is intentionally not populated from QA or the owner's Cloud Shell backup.
+
 ## Manual Neon preview migrations (no credential transfer in chat)
 
 Neon project `ami-108-prod` has a separate migrated `preview` branch with **zero game sessions** as of November 20; the production `main` branch remains **empty/unmigrated** and outside this workflow. Vercel already stores separate encrypted pooled URLs for each environment; do not paste their contents into a PR, issue, log, or conversation.
