@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../src/prisma.service';
 import { acquirePublicBudget, MAX_PUBLIC_AI_ATTEMPTS_PER_DAY, MAX_PUBLIC_SESSIONS_PER_DAY } from '../src/game/public-daily-budget';
 import { SessionService, GameError, digest } from '../src/game/session.service';
@@ -15,7 +16,7 @@ try {
   let prisma: PrismaService;
   const keys = ['VERCEL', 'AMI_DEV_PREVIEW', 'AMI_PUBLIC_GAME', 'AMI_PUBLIC_ORIGIN', 'AMI_API_INTERNAL_TOKEN'] as const;
   let original: Record<string, string | undefined>;
-  let createdDigest: string | null = null;
+  const createdDigests: string[] = [];
   const todayUtc = () => new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()));
 
   beforeAll(async () => {
@@ -28,8 +29,8 @@ try {
 
   afterAll(async () => {
     try {
-      if (createdDigest) {
-        await prisma.gameSession.deleteMany({ where: { tokenDigest: createdDigest } });
+      if (createdDigests.length) {
+        await prisma.gameSession.deleteMany({ where: { tokenDigest: { in: createdDigests } } });
       }
       await prisma.publicDailyUsage.deleteMany();
     } finally {
@@ -83,12 +84,68 @@ try {
     }
   });
 
+  it('exhausted AI budget commits authored fallback, no provider call and replays safely', async () => {
+    delete process.env.VERCEL;
+    process.env.AMI_DEV_PREVIEW = '1';
+    process.env.AMI_AI_GENERATION = '0';
+    const service = new SessionService(prisma);
+    const created = await service.create('pt-BR');
+    createdDigests.push(digest(created.token));
+    let view = created.view;
+    for (let i = 0; i < 120 && view.phase !== 'ENCOUNTER'; i++) {
+      const action = view.actions[0];
+      if (!action) throw new Error('Cannot reach the first approved consultation');
+      const result = await service.mutate(created.token, {
+        kind: 'action', commandId: randomUUID(), expectedRevision: view.revision, actionId: action.id,
+      });
+      view = result.view;
+    }
+    expect(view.phase).toBe('ENCOUNTER');
+    const consult = view.actions.find(action => action.kind === 'CONSULT');
+    expect(consult).toBeDefined();
+
+    process.env.VERCEL = '1';
+    delete process.env.AMI_DEV_PREVIEW;
+    process.env.AMI_PUBLIC_GAME = '1';
+    process.env.AMI_PUBLIC_ORIGIN = 'https://example.invalid';
+    process.env.AMI_API_INTERNAL_TOKEN = 'x'.repeat(32);
+    const nodeEnv = process.env.NODE_ENV;
+    const generationFlag = process.env.AMI_AI_GENERATION;
+    process.env.NODE_ENV = 'production';
+    process.env.AMI_AI_GENERATION = '1';
+    try {
+      const body = {
+        kind: 'action' as const, commandId: randomUUID(), expectedRevision: view.revision, actionId: consult!.id,
+      };
+      const result = await service.mutate(created.token, body);
+      expect(result.status).toBe('APPLIED');
+      expect(result.view.diagnostics?.energy).toBe(2);
+      const session = await prisma.gameSession.findUniqueOrThrow({ where: { tokenDigest: digest(created.token) } });
+      const receipt = await prisma.gameCommandReceipt.findUniqueOrThrow({
+        where: { sessionId_commandId: { sessionId: session.id, commandId: body.commandId } },
+      });
+      expect(receipt.generationStatus).toBe('FALLBACK_REQUIRED');
+      expect(receipt.generationReason).toBe('BUDGET_EXCEEDED');
+      expect(await prisma.gamePendingGeneration.count({ where: { sessionId: session.id } })).toBe(0);
+      const replay = await service.mutate(created.token, body);
+      expect(replay.status).toBe('REPLAYED');
+      expect(replay.view).toEqual(result.view);
+      const daily = await prisma.publicDailyUsage.findUniqueOrThrow({ where: { day: todayUtc() } });
+      expect(daily.modelRequests).toBe(MAX_PUBLIC_AI_ATTEMPTS_PER_DAY);
+    } finally {
+      if (nodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = nodeEnv;
+      if (generationFlag === undefined) delete process.env.AMI_AI_GENERATION;
+      else process.env.AMI_AI_GENERATION = generationFlag;
+    }
+  }, 30000);
+
   it('preserves local QA behavior without consuming public quota', async () => {
     delete process.env.VERCEL;
     process.env.AMI_DEV_PREVIEW = '1';
     const before = await prisma.publicDailyUsage.findUniqueOrThrow({ where: { day: todayUtc() } });
     const created = await new SessionService(prisma).create('en');
-    createdDigest = digest(created.token);
+    createdDigests.push(digest(created.token));
     const after = await prisma.publicDailyUsage.findUniqueOrThrow({ where: { day: todayUtc() } });
     expect(after).toEqual(before);
     expect(created.view.locale).toBe('en');
