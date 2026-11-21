@@ -13,6 +13,11 @@ import sys
 MAX_BLOB_BYTES = 2_000_000
 MAX_REPORTED = 30
 
+# A single *old test blob* accidentally committed a concrete-looking,
+# completely synthetic DB URL. The exact object is pinned; new/changed blobs
+# and other detector classes are NEVER suppressed.
+HISTORICAL_DUMMY_DB_TEST_BLOB = "8c015129bd35c287dbf62632daaa7d00a5527482"
+
 TOKEN_PATTERNS: dict[str, re.Pattern[bytes]] = {
     "groq-key": re.compile(rb"\bgsk_[A-Za-z0-9]{25,}\b"),
     "openai-key": re.compile(rb"\bsk-(?:proj-)?[A-Za-z0-9_-]{35,}\b"),
@@ -101,7 +106,12 @@ def scan_reachable_history() -> int:
             if len(payload) != int(header[2]) or proc.stdout.read(1) != b"\n":
                 raise RuntimeError("Truncated Git blob inspection")
             for issue in sorted(scan_text(payload)):
-                findings.append((objects.get(sha, "(historic object)"), issue))
+                path = objects.get(sha, "(historic object)")
+                if (sha == HISTORICAL_DUMMY_DB_TEST_BLOB
+                        and path == "scripts/test_public_history.py"
+                        and issue == "database-credential-url"):
+                    continue  # Explicit historical test-only synthetic fixture.
+                findings.append((path, issue))
         proc.stdin.close()
         if proc.wait() != 0:
             raise RuntimeError("Git batch inspection failed")
