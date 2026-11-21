@@ -1,6 +1,6 @@
 # GroqCloud Free — bounded AI inference evaluation
 
-**Status (November 21, 2026):** the Groq adapter merged in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80); provider-only 1/1 and 10/10 bilingual and isolated [2/2 live game/DB](https://github.com/AlexandroLeao/ami-108/actions/runs/44915899967) checks passed. After the owner installed a branch-scoped Sensitive Groq key and the [protected Vercel QA deployment](https://vercel.com/alexandroleaos-projects/ami-108/6eNVpUWNsMSGMjUU4G9kwPZNjaQu) reached READY, Neon Preview recorded **one real hosted `VALIDATED` receipt in PT-BR**. Hosted EN validation is not yet observed. Generation is ON only for the SSO-protected Groq QA branch; generic Preview and Production remain OFF. Earlier Qwen/Ollama acceptance and rejected Cloudflare/Gemma remain historical, separate evidence.
+**Status (November 21, 2026):** the Groq adapter merged in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80); provider-only 1/1 and 10/10 bilingual and isolated [2/2 live game/DB](https://github.com/AlexandroLeao/ami-108/actions/runs/44915899967) checks passed. After the owner installed a branch-scoped Sensitive Groq key and the [protected Vercel QA deployment](https://vercel.com/alexandroleaos-projects/ami-108/6eNVpUWNsMSGMjUU4G9kwPZNjaQu) reached READY, Neon Preview recorded **one real hosted `VALIDATED` receipt in PT-BR**. Hosted English inference was subsequently observed in the owner's game test and grouped Neon receipt counts; see the dated follow-up below. Generation is ON only for the SSO-protected Groq QA branch; generic Preview and Production remain OFF. Earlier Qwen/Ollama acceptance and rejected Cloudflare/Gemma remain historical, separate evidence.
 
 ## Free-first decision
 
@@ -48,7 +48,7 @@ The test module [`tests/test_groq_http_integration.py`](../services/ai/tests/tes
 
 **Not established:** a browser-to-Vercel-to-Neon hosted Groq path, provider robustness at scale, measured account quota under multiple sessions, current ZDR/billing state or a live provider 429 failure. Negative-path 401/403/429/timeout behavior is covered by offline mocked HTTP tests only. The visible answer can match an authored fallback: evidence of actual inference is the persisted `VALIDATED` receipt, not merely its displayed wording.
 
-**Decision for private personal demo:** Groq inference is an **owner-required final feature**. It is already ON in the reviewed, SSO-protected QA branch with one PT-BR validated hosted receipt; retain server-authorized localized text and fallback on failure. Do not treat this as production or multi-user release approval. Verify hosted EN and access/quota guardrails before broadening players.
+**Decision:** Groq is a required feature and **active only in the reviewed SSO-protected QA**. PT-BR and English-session `VALIDATED` receipts were observed after the owner played both languages. The game still selects only approved text, with fallback for invalid outputs. This does **not** authorize Production or public multi-user traffic.
 
 ## Hosted Vercel/Neon inference — November 21, 2026
 
@@ -58,12 +58,18 @@ The test module [`tests/test_groq_http_integration.py`](../services/ai/tests/tes
 
 **Owner observation:** the user reported current gameplay and the requested short accessibility checks passed. This does not certify WCAG, capture an HTTP trace or prove how other users' sessions perform.
 
-**Remaining minimal acceptance:** reach one approved English AI consultation in a fresh, disposable, authenticated QA session; query only non-sensitive receipt status counts per locale and ensure `VALIDATED` increased for `en` and pending count is 0. Never reset Preview, touch other users' sessions, log secrets or switch paid billing. Broader player access requires a separate bounded abuse/quota and user-access review. There is no reason to rework the five approved chapters.
+**Follow-up inspection:** after the owner's English QA, read-only Neon Preview counts showed 4 `VALIDATED` receipts (1 in a currently PT-BR session, 3 in currently EN sessions), 8 `FALLBACK_REQUIRED` (7 historical `UNAVAILABLE` and one `INVALID_OUTPUT` in an EN session), zero pending and seven retained sessions. The query groups by **current** session language, not event-time language; owner gameplay establishes the tested English path. No data was modified. Wider access still requires quotas, Origin/retention review and a separate public release decision.
+
+## Follow-up observation: English QA and active edge guard
+
+After the owner's English playtest, a read-only Neon Preview aggregation on November 21 found **4 `VALIDATED` receipts** in sessions currently localized as PT-BR (1) and EN (3), **8 `FALLBACK_REQUIRED`** and no pending generation. One EN-session `INVALID_OUTPUT` was rejected and handled by the authored fallback. A validated receipt is evidence that the bounded inference result was persisted; this is not a guarantee of provider availability or event-time locale if the session changed language.
+
+Vercel's active firewall rule `ami-game-session-create-5-per-minute-per-ip` denies more than five **POST `/api/game/session`** requests from one IP in a 60-second fixed window. The rule is valid and project-wide; it does **not** enforce a global model/token budget or protect other endpoints. It should be monitored and independently validated before broad public traffic; game/AI remain OFF in Production.
 
 ## Remaining activation gates
 
 1. Before activation, **reconfirm** the owner-observed Free plan, inherited quotas, billing state and [Inference APIs ZDR](https://console.groq.com/docs/your-data) in the intended project; account settings can change. Keep `AMI_GROQ_API_KEY` in private GitHub Actions secrets or protected server configuration, never in Git, chat or logs.
-2. Runner PT-BR/EN validation and **one hosted PT-BR `VALIDATED`** session are complete. For the protected hosted bilingual gate, check one disposable EN consultation and its persisted receipt; keep offline timeout/fallback/replay regression evidence separate from actual provider failures. Never attach the owner's saved sessions or change the frozen local checkout.
+2. Runner PT-BR/EN and protected hosted PT-BR/EN gameplay/receipt samples are complete. The provider's `INVALID_OUTPUT` can legitimately fall back. Future public Production requires its own secured ingress, scoped secret, verified-empty database migration, test and rollback; preserve the owner's existing saves.
 3. Validate measured account quotas, rate/concurrency limits, key rotation, privacy, monitoring, safe rollback and zero mandatory cost against the selected hosting architecture. No automated real requests, scheduled probes or cross-provider failover.
 4. Obtain separate owner sign-off for environment-specific player inference, external disclosure and any deployment. Do not enable Developer/pay-as-you-go billing, expose private narrative sources or represent index selection as free-form AI dialogue.
 
