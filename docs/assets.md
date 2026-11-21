@@ -1,5 +1,11 @@
 # Scene asset preparation
 
+## Art provenance and distribution scope — November 21, 2026
+
+The owner reports that the twelve approved scene illustrations were created with OpenAI image-generation assistance from the owner's references and creative direction. This owner statement documents provenance; it is **not** an independent audit of any third-party reference rights. The nine internal reference sheets and original source ZIP remain private. Only the derived, reviewed game PNGs and manifest belong in the repository.
+
+Under [OpenAI's Terms of Use](https://openai.com/policies/terms-of-use/), as between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output. Output may not be unique, and third-party rights must still be respected. Do not describe the project art as wholly human-generated, automatically public-domain or licensed for redistribution. A public source/art license requires a separate owner decision under [release issue #15](https://github.com/AlexandroLeao/ami-108/issues/15). Do not change any approved art or manifest to document provenance.
+
 ## Current art authorization
 
 CENA-01–07 and CENA-08/11/12 are reached in Chapters 1–4; CENA-09/10 are now reached in Chapter 5: CENA-09 on the gated boar reveal and CENA-10 in orbit. All 12 HTTP hashes passed. All twelve original PNGs and manifest retained. Chapter 4 memory art uses coded CRT opening, continuous subtle interference and shake on the child/lizard images, and disoriented eyelids on the betrayal image. Dog/rat reveal gradually with existing tremor; only specified scenes gate forward navigation. No new or duplicated artwork. Reduced motion supported.

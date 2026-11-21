@@ -35,13 +35,13 @@ Architecture and security details are in the [system design](docs/architecture/s
 
 ## Project status
 
-**Gameplay implementation: approved in private playtests. Public release: not authorized.**
+**Gameplay implementation: accepted in private and protected hosted QA. Public release: not authorized.**
 
-The last owner-accepted game runtime is commit `14ea583` ([PR #53](https://github.com/AlexandroLeao/ami-108/pull/53)). The accepted game regression passed **221 automated tests** (105 API, 44 Web, 72 Python) plus the full built-campaign smoke and original artwork hash checks. Later documentation/operational PRs do not automatically change that accepted runtime.
+The approved local gameplay baseline is commit `14ea583` ([PR #53](https://github.com/AlexandroLeao/ami-108/pull/53)). Separately, the owner completed PT-BR/EN desktop/mobile hosted QA through credits and verified refresh/resume. The protected hosting/artwork fix [PR #96](https://github.com/AlexandroLeao/ami-108/pull/96) merged into `main` at `178565ab`, and [post-merge CI 44913937444](https://github.com/AlexandroLeao/ami-108/actions/runs/44913937444) passed. Neither event authorizes public gameplay or paid services.
 
 The owner accepted five-chapter desktop/mobile gameplay in PT-BR/EN and previously observed working private local-Qwen inference. The model's previous-VM acceptance is **historical**; on the replacement VM, inference was OFF and authored fallback remained available. The owner verified Continue, created a fully checked seven-session backup and safely stopped all four Compose services. For the **latest exact checkpoint**, consult [release readiness](docs/release-readiness-matrix.md) rather than copying its file names and VM details here.
 
-This repository remains **private**. There is **no public deployment, distribution license, official age classification or `v1.0.0` approval**. The mandatory service-cost target is **R$ 0**. Open gates are tracked in [#12 QA/security](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 hosting](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 documentation](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15 release](https://github.com/AlexandroLeao/ami-108/issues/15).
+This repository remains **private**. A Vercel production-target build exists, but **production gameplay is disabled**. There is **no authorized public gameplay, distribution license, official age classification or `v1.0.0` approval**. The mandatory service-cost target is **R$ 0**. Open gates are tracked in [#12 QA/security](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 hosting](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 documentation](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15 release](https://github.com/AlexandroLeao/ami-108/issues/15).
 
 ## Develop and verify
 
@@ -59,4 +59,6 @@ The private **Documento Mestre v1.14** and **Roteiro Interativo v1.12** predate 
 
 ## Authorship and release
 
-The owner authored and approved the story, artistic direction, game mechanics and presentation. Implementation, review, tests and documentation used AI assistance under the owner's decisions. No license or permission to redistribute artwork or source code is granted by this README. Any public release requires explicit owner approval and the outstanding legal, accessibility, security and hosting gates.
+The owner authored and approved the story, artistic direction, mechanics and presentation. The owner reports that all accepted scene illustrations were generated with OpenAI assistance from their references and creative direction; see the [asset provenance record](docs/assets.md). Implementation, review, tests and documentation also used AI assistance. This is a provenance statement, not an independent audit of third-party reference rights. No permission to redistribute artwork or code is granted by this README.
+
+The current `16+` advisory remains editorial until official classification. See the [Brazilian classification procedure](docs/release-classification.md). Public release requires owner approval and the outstanding security, accessibility, classification and hosting gates.

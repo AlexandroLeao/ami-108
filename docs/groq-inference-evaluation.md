@@ -40,6 +40,14 @@ Owner-provided Groq Console screens for the **Personal / Default Project** show 
 
 The test module [`tests/test_groq_http_integration.py`](../services/ai/tests/test_groq_http_integration.py) exercises the **real FastAPI authentication, retrieval, Groq adapter, strict JSON selection and localized response** using a fully mocked HTTPS transport. It verifies ten authorized PT-BR/EN context pairs, bounded disclosures, one provider request, rejected internal auth/future facts, 401/403/429, invalid selections and a timeout. This test **never calls Groq** and does not exercise the NestJS/PostgreSQL transaction path; existing API/PostgreSQL tests cover reservation, retry and persisted slots separately. No combined live game/DB/provider acceptance is claimed.
 
+## Next minimal integrated acceptance — proposed, not performed
+
+The existing [owner-approved 10-case provider run](https://github.com/AlexandroLeao/ami-108/actions/runs/44809358698) and [offline authenticated FastAPI checks](../services/ai/tests/test_groq_http_integration.py) validate the provider adapter and bounded disclosure, not a live **NestJS + PostgreSQL + Groq** game command. The [post-merge CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44913937444) passed with inference disabled.
+
+The smallest useful live follow-up is **one PT-BR and one EN disposable generation path** through the existing game command/reservation flow, against an isolated and freshly proven-empty test database (or known test-only rows with verified cleanup). Require a reviewed exact commit; confirmed Free-tier quota, no billing and active inference privacy control; securely scoped provider/internal tokens; a bounded maximum of two provider requests; no user saves; and sanitized logs. Verify each validated reply is one of the already authorized localized texts, persisted exactly once, replayed without a second provider call, and survives a refresh. Separately verify offline fallback for 401/403/429/timeout and unchanged energy/choice authority.
+
+**Stop without enabling the hosted service** if any prerequisite or isolation cannot be verified, or if cost, latency, provider response, state isolation or credentials are unexpected. Do not use the owner's seven Cloud Shell saves, clean unrecognized Neon rows, loosen the 2.5-second gate or infer production readiness from provider-only success. `AMI_AI_GENERATION=0` remains the safe default and should continue until owner-approved hosted acceptance. There is no reason to change vendors, implement free-form dialogue or add background retries for this release.
+
 ## Remaining activation gates
 
 1. Before activation, **reconfirm** the owner-observed Free plan, inherited quotas, billing state and [Inference APIs ZDR](https://console.groq.com/docs/your-data) in the intended project; account settings can change. Keep `AMI_GROQ_API_KEY` in private GitHub Actions secrets or protected server configuration, never in Git, chat or logs.
