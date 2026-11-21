@@ -14,9 +14,9 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [Cloud Shell pause/resume](cloud-shell-pause-resume.md) | Preserve saves, inspect Docker VM, backup verification, safe return and pause | **Operational runbook**; never restore into a nonempty DB |
 | [Release QA](release-qa.md) | Dated validation results, regressions and concrete limitations | Historical observations are dated, not fresh certificates |
 | [Final QA worksheet](final-qa-acceptance-worksheet.md) | Manual accessibility, security, performance and owner acceptance gates | Checklist, **not** evidence already passed |
-| [Hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Provider conditions, career-aligned options and zero-cost/publication decision | Research, **not** deployed hosting |
+| [Hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Dated free-tier research behind the chosen topology | **Historical feasibility assessment**, not current live state |
 | [Accessibility and performance](accessibility-performance-qa.md) | Test cases and expected behavior | Plan pending real device/screen-reader checks |
-| [Production security gates](architecture/production-security-gates.md) | Origin, proxy, TLS, quotas, retention and network controls | Proposed production hardening, not currently enabled |
+| [Production security gates](architecture/production-security-gates.md) | Origin, ingress, quotas, retention and network controls | Production hardening **remains proposed**; active session-creation WAF rule is not sufficient alone |
 | [Dependency audit](dependency-security-audit.md) | Dated advisories, accepted remediations and scanning limitations | No perpetual vulnerability clearance |
 | [Brazilian game classification](release-classification.md) | Official MJSP/IARC paths, owner procedure and rating-display boundaries | No official classification has been obtained |
 
@@ -36,7 +36,7 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [Assets](assets.md) | Original scene images and asset workflow |
 | [AI/RAG](ai-rag.md) | Server-bounded facts, generation authorization and fallbacks |
 | [Optional cloud inference evaluation](cloud-inference-evaluation.md) | Proposed Workers AI connector, privacy/cost gates, local/offline tests and provider-acceptance plan | **Not activated / no deployment** |
-| [Groq Free inference evaluation](groq-inference-evaluation.md) | Free-tier quotas, strict GPT-OSS selection contract, privacy, dated real provider samples and activation gates | **Provider-only 1/1 + 10/10 passed; disabled, game/DB QA pending** |
+| [Groq Free inference evaluation](groq-inference-evaluation.md) | Strict model contract, quotas, provider/runner and protected Vercel/Neon evidence | Hosted PT-BR/EN QA verified; **not** public Production approval |
 | [Local AI evaluation](ai-local-evaluation.md) | **Dated** real-model evaluation and activation history |
 
 ## Historical and audit references

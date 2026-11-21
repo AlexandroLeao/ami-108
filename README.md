@@ -15,7 +15,7 @@ AMI-108 is a private, non-profit, story-driven 2D web game. The **five-chapter c
 | Persistence | PostgreSQL-backed saves, replay, idempotent commands and cached consultation responses |
 | Languages | PT-BR and English, including validated authorized AI text |
 | Presentation | Twelve approved original scene illustrations and responsive cinematic UI |
-| AI companion | Optional local Ollama/Qwen2.5:1.5b inference and a separate OFF-by-default Groq adapter; server-authorized facts, validated selection, fixed game rules and safe authored fallback |
+| AI companion | Local Ollama/Qwen (historical) and Groq GPT-OSS 20B **active only in protected QA**; preapproved bilingual text selection, server validation and authored fallback |
 | Quality | GitHub Actions CI, unit/integration tests, Prisma migrations and built-campaign HTTP/artwork-integrity smoke |
 
 The server—not the language model—decides encounter probabilities, outcomes and energy. Once a consultation response is saved, Continue and replay preserve it.
@@ -28,7 +28,7 @@ The server—not the language model—decides encounter probabilities, outcomes 
 | API | NestJS, Prisma | Authoritative game state, commands, sessions and consultation policy |
 | AI service | Python, FastAPI | Authorized retrieval, local inference and response validation |
 | Database | PostgreSQL 17 | Persistent game and consultation state |
-| Model | Local Ollama/Qwen2.5:1.5b; optional Groq GPT-OSS 20B adapter | Constrained inference with server-validated selection; no default cloud activation |
+| Model | Local Qwen2.5:1.5b (historical); Groq GPT-OSS 20B (protected QA) | No unrestricted narrative generation or public model activation |
 | Operations | Docker Compose, GitHub Actions | Private local stack, builds and continuous integration |
 
 Architecture and security details are in the [system design](docs/architecture/system-design.md), [API contracts](docs/api/README.md) and [production security gates](docs/architecture/production-security-gates.md).
@@ -37,11 +37,11 @@ Architecture and security details are in the [system design](docs/architecture/s
 
 **Gameplay implementation: accepted in private and protected hosted QA. Public release: not authorized.**
 
-The approved local gameplay baseline is commit `14ea583` ([PR #53](https://github.com/AlexandroLeao/ami-108/pull/53)). Separately, the owner completed PT-BR/EN desktop/mobile hosted QA through credits and verified refresh/resume. The protected hosting/artwork fix [PR #96](https://github.com/AlexandroLeao/ami-108/pull/96) merged into `main` at `178565ab`, and [post-merge CI 44913937444](https://github.com/AlexandroLeao/ami-108/actions/runs/44913937444) passed. Neither event authorizes public gameplay or paid services.
+The approved local gameplay baseline is commit `14ea583` ([PR #53](https://github.com/AlexandroLeao/ami-108/pull/53)). Separately, the owner completed PT-BR/EN desktop/mobile hosted QA through credits and verified refresh/resume. Reviewed PRs [#96–#100](https://github.com/AlexandroLeao/ami-108/pulls?q=is%3Apr+is%3Amerged) are merged; [latest main CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44921818358) passed. Protected Vercel QA plus Neon Preview recorded Groq `VALIDATED` receipts in PT-BR/EN session groups (four total; [dated evidence](docs/groq-inference-evaluation.md)). These are **not** permission to open public access, enable Production or incur paid costs.
 
 The owner accepted five-chapter desktop/mobile gameplay in PT-BR/EN and previously observed working private local-Qwen inference. The model's previous-VM acceptance is **historical**; on the replacement VM, inference was OFF and authored fallback remained available. The owner verified Continue, created a fully checked seven-session backup and safely stopped all four Compose services. For the **latest exact checkpoint**, consult [release readiness](docs/release-readiness-matrix.md) rather than copying its file names and VM details here.
 
-This repository remains **private**. A Vercel production-target build exists, but **production gameplay is disabled**. There is **no authorized public gameplay, distribution license, official age classification or `v1.0.0` approval**. The mandatory service-cost target is **R$ 0**. Open gates are tracked in [#12 QA/security](https://github.com/AlexandroLeao/ami-108/issues/12), [#13 hosting](https://github.com/AlexandroLeao/ami-108/issues/13), [#14 documentation](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15 release](https://github.com/AlexandroLeao/ami-108/issues/15).
+This repository remains **private**. A Vercel production-target build exists, but **production gameplay is disabled**. There is **no authorized public gameplay, distribution license, official age classification or `v1.0.0` approval**. The mandatory service-cost target is **R$ 0**. Public-access gates remain in [#13 hosting](https://github.com/AlexandroLeao/ami-108/issues/13) and [#15 release](https://github.com/AlexandroLeao/ami-108/issues/15); [#12 QA/security](https://github.com/AlexandroLeao/ami-108/issues/12) is closed after its scoped acceptance, and technical documentation is tracked in [#14](https://github.com/AlexandroLeao/ami-108/issues/14). Both the private GitHub repository and all-deployments-authenticated Vercel URL are currently **not publicly browseable portfolio links**.
 
 ## Develop and verify
 
