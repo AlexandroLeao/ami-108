@@ -18,7 +18,7 @@ function destination() {
     || parsed.hostname !== EXPECTED_HOST || parsed.pathname !== '/ami'
     || parsed.username !== 'ami_app' || !parsed.password || parsed.port
     || !['require', 'verify-full'].includes(parsed.searchParams.get('sslmode'))
-    || parsed.hash || parsed.searchParams.get('schema') === 'other') {
+    || parsed.hash || (parsed.searchParams.get('schema') && parsed.searchParams.get('schema') !== 'public')) {
     throw new Error('INVALID_TARGET');
   }
   return raw;
