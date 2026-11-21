@@ -1,6 +1,6 @@
 # Brazilian game classification — owner procedure
 
-**Status (November 21, 2026):** AMI-108's bilingual `16+` screen is an **editorial advisory only**, not an official Brazilian age-rating determination. The game is available only in a protected QA environment. This release procedure is not itself an application, certificate, age-assurance implementation or legal opinion.
+**Status (November 21, 2026):** AMI-108's bilingual `16+` screen is an **owner-approved editorial advisory only**, not an official Brazilian age-rating determination. The Vercel Production game is accessible on its canonical public domain; the owner has chosen to preserve this advisory and its content descriptors unchanged. This document does not establish exemption from Brazilian classification rules, a government certificate, an age-assurance system or a legal opinion. Any formal distribution determination remains a separate owner responsibility.
 
 ## Official classification paths
 

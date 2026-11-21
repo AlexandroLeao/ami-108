@@ -4,7 +4,7 @@
 
 - The **owner-approved local game runtime is `14ea583a83c7c1473bc94f3b1d515a8497827ac3`**. All five chapters and their final original artwork, gameplay, dialogue, presentation, probability rules and replay are frozen. **Do not change them without the owner's specific consent.**
 - Private **Documento Mestre v1.14**, **Roteiro Interativo v1.12**, and later explicitly owner-approved campaign amendments govern narrative precedence. The two private documents describe a November 18 historical 4/5 milestone until separately reconciled; do not treat their older status header as today's gameplay scope or import the original sources into Git.
-- This repository remains **private**. GitHub `main` contains later documentation and guarded tooling; **do not fast-forward the accepted local runtime just to read docs**.
+- Repository visibility is managed by the owner separately from the public game URL. GitHub `main` contains later documentation and guarded tooling; **do not fast-forward the accepted local runtime just to read docs**. See [release readiness](docs/release-readiness-matrix.md) for the actual current status.
 - The current VM/backup, outstanding issues and release boundary have a **single source of truth**: [release readiness](docs/release-readiness-matrix.md). Last verified owner shutdown completed with a **seven-session backup and four stopped Compose services**, generation OFF and no Ollama on that replacement VM.
 - This file governs engineering behavior; editorial document ownership and review rules are in [documentation standards](docs/documentation-standards.md).
 
@@ -35,7 +35,7 @@
 - Repository-facing docs, issues, PRs, ADRs, commit messages, identifiers and comments are written in **clear English**; preserve exact PT-BR/EN game text. Use the [documentation standards](docs/documentation-standards.md): concise ownership, links instead of duplicate status paragraphs, dated evidence, and separated historical instructions.
 - Review the targeted files and potential security/privacy impact; record **what was actually run** and known limitations. Do not represent CI, health endpoints, manual samples or prior-VM inference as public-release acceptance.
 - Protect `main`: use scoped branches, reviewable PRs and CI. **Do not merge without explicit owner approval.** Do not modify approved game content to satisfy a documentation or deadline request.
-- Track the four remaining release issues [#12](https://github.com/AlexandroLeao/ami-108/issues/12), [#13](https://github.com/AlexandroLeao/ami-108/issues/13), [#14](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15](https://github.com/AlexandroLeao/ami-108/issues/15) until each acceptance criterion is evidenced or explicitly scoped by the owner.
+- Issues [#12](https://github.com/AlexandroLeao/ami-108/issues/12), [#13](https://github.com/AlexandroLeao/ami-108/issues/13) and [#14](https://github.com/AlexandroLeao/ami-108/issues/14) were closed for their proven technical scopes. Keep [#15](https://github.com/AlexandroLeao/ami-108/issues/15) as the source of truth for remaining public repository visibility, classification/licensing and final version-tag decisions.
 
 ## Historical acceptance records
 
