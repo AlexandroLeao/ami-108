@@ -79,6 +79,14 @@ Acceptance: using an authenticated owner browser on the stable branch URL, confi
 
 **Rollback:** disable branch-specific `AMI_PUBLIC_GAME`, redeploy that QA branch, verify `/game` and `/api/game/view` return 404; never copy QA flags or database URLs into production. Groq remains OFF until a separately bounded, authorized acceptance.
 
+## Hosted NestJS runtime module resolution — November 20 QA finding
+
+The owner opened the protected `qa/hosted-vercel-acceptance-20261120` game URL; Next.js rendered the content warning, but starting a game failed. Vercel runtime logs on deployment `dpl_9b6AhCNWZ3L8zC3QHvftJsEAENCp` identify **`Cannot find module 'reflect-metadata'`**, from `/var/task/main.js`, followed by process exit 1 on `POST /game/session`. The `reflect-metadata` runtime dependency **already exists** in `apps/api/package.json`, so adding it again or resetting Neon does not address the observed failure.
+
+The Vercel Services pnpm workspace builder has a documented [output-directory flattening bug](https://github.com/vercel/vercel/issues/17651): compiled `dist/main.js` is placed at the function root, where package symlinks and dependency paths cannot resolve. The narrow candidate workaround is `services.api.entrypoint: src/main.ts` with `outputDirectory: .`, retaining the existing private Web→API→AI bindings and root. Static CI guards pin that workaround. **This is provisional until a new QA preview build proves actual NestJS startup and game session creation**, and other missing modules are ruled out via redacted runtime logs. Vercel has also tracked [decorator-source tracing problems](https://github.com/vercel/vercel/issues/17712); investigate if needed rather than claiming a fix on compile alone.
+
+Do not activate production gameplay, perform migrations, change secrets, create owner save imports or remove SSO for this failure. On successful protected QA runtime acceptance, document a release-gate test and then merge the reviewed change.
+
 ## Verification
 
 Run `node scripts/test-vercel-services-config.mjs` or use PR CI. This verifies the intended public route and bindings **statically**; the Vercel beta builder, actual service URLs and managed database require a separate real preview deployment. See [hosting assessment](zero-mandatory-cost-hosting-assessment.md) and [release readiness](release-readiness-matrix.md).

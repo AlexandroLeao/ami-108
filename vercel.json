@@ -16,6 +16,8 @@
     "api": {
       "root": "apps/api",
       "framework": "nestjs",
+      "entrypoint": "src/main.ts",
+      "outputDirectory": ".",
       "bindings": [
         {
           "type": "service",
