@@ -1,6 +1,6 @@
 # Vercel Services — pre-deployment gate
 
-**State (November 20, 2026):** Vercel Hobby and Neon Free configured. [Owner-dispatched Neon preview migration #1](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) succeeded; all **four** tracked Prisma migrations finished without rollback, and Neon confirms five game tables plus `_prisma_migrations`. No game sessions exist yet. A protected Vercel deployment returned `/health` 200, `/icon.png` 200 and `/game` 404. Production Neon `main` remains unmigrated; remote Groq and public gameplay remain OFF. Owner Cloud Shell saves are untouched.
+**State (November 20/21, 2026):** Vercel Hobby and Neon Free configured. [Preview migration](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) applied four tracked Prisma migrations; [bounded real-Neon HTTP smoke](https://github.com/AlexandroLeao/ami-108/actions/runs/44841430897) passed 10 actions (median 47 ms, max 99 ms), leaving zero game rows. Vercel Services builds are READY with `AMI_PUBLIC_GAME=0` and `AMI_AI_GENERATION=0`. **Vercel Authentication now covers all deployments**, including the production domain, while the hosted game path remains untested. Neon production `main` is unmigrated; Cloud Shell and owner saves untouched.
 
 ## Selected topology
 
@@ -21,7 +21,7 @@
 
 Do not set `AMI_DEV_PREVIEW=1` to bypass this gate. The release switch alone does not establish abuse controls, quotas, database backups, end-to-end acceptance or owner approval. Keep the switch OFF for the first Vercel import/build and set `AMI_AI_GENERATION=0` while qualifying the environment.
 
-## Required checks **before** importing/deploying
+## Required checks before enabling gameplay or releasing
 
 1. Confirm Vercel Hobby remaining project/usage allowance and Neon Free eligibility; do not enable billing or a paid tier. Multi-service requests and compute consume Hobby usage; free limits are **shared** and not a capacity guarantee.
 2. Review and verify production-specific route enablement. The current `AMI_DEV_PREVIEW` gate is development-only and **must never be set to 1 on a public deployment** as a workaround. Confirm NestJS is not publicly exposed and the private bindings are functional.
@@ -30,7 +30,7 @@ Do not set `AMI_DEV_PREVIEW=1` to bypass this gate. The release switch alone doe
 5. Keep `AMI_AI_GENERATION=0` until explicit, isolated end-to-end Groq acceptance. Then verify bounded inference, quotas and fallback under a separate owner-approved activation.
 6. Only after full build, runtime validation, private DB integration, manual PT-BR/EN browser and accessibility smoke, owner sign-off and cost checks: authorize production traffic and release tag.
 
-This file is a deployment preflight, not an instruction to click **Deploy** now.
+This is a **release gate**, not evidence of public gameplay readiness. Git integration already deploys technical builds; leave gameplay and AI disabled in production.
 
 ## Manual Neon preview migrations (no credential transfer in chat)
 
@@ -66,6 +66,18 @@ The existing manual [Neon Preview Integration Acceptance](../.github/workflows/n
 - `TEST_PREVIEW`: old exhaustive 14-test suite, **still failing 10/14** in run #2. Do not repeat blindly; exhaustive narrative correctness remains enforced by local PostgreSQL CI.
 
 A green short smoke establishes **only** bounded backend/Neon persistence; it does not imply full gameplay E2E, Vercel private binding acceptance, Groq readiness or a public release. Keep game and AI flags OFF, production Neon unmigrated and user Cloud Shell saves untouched.
+
+## Protected hosted QA branch — operational boundary
+
+The project now uses Vercel Authentication for **all** deployments, including production. This remains a personal, non-commercial Hobby project. For a real hosted end-to-end test, create a **dedicated non-`main` QA branch** and use its protected Vercel preview deployment with Neon `preview`. Do not test against the un-migrated production Neon `main`.
+
+Preconditions: exact QA branch/commit and Vercel deployment URL have been verified; all-deployments Vercel Authentication is still enabled; `DATABASE_URL` in Preview points to Neon `preview`; the private `API_URL` service binding and the server-only internal API token are configured; production `AMI_PUBLIC_GAME=0` and all `AMI_AI_GENERATION=0` remain unchanged. Never turn on `AMI_DEV_PREVIEW` on Vercel.
+
+For a single reviewed QA branch, branch-specific encrypted Preview overrides can set `AMI_PUBLIC_GAME=1` and `AMI_PUBLIC_ORIGIN` to its **exact stable HTTPS branch alias** (no trailing slash). Vercel explicitly allows branch-scoped overrides. Do not enable the generic Preview environment or Production to do this. Environment changes require a fresh Preview deployment and proof that the new build belongs to that branch. Do not use expiring deployment-specific URLs as `AMI_PUBLIC_ORIGIN` when the build must be replaced. Retain SSO before, during and after the test. The branch-scoped flag must be removed or set back to 0 once testing ends.
+
+Acceptance: using an authenticated owner browser on the stable branch URL, confirm game page loads, create a **disposable** session, move through a few actions, refresh and resume, verify replay/cookie/CSRF behavior and error states. Record Vercel build/deployment ID, exact branch, response status, observed latency, and Neon preview session counts. Do not import real Cloud Shell saves. If any step returns 503/401/403 unexpectedly, stop; inspect redacted Vercel logs and private binding configuration without bypassing guards. Remove only known disposable test sessions after owner approval; never reset the database. A successful GitHub-runner smoke is not a substitute.
+
+**Rollback:** disable branch-specific `AMI_PUBLIC_GAME`, redeploy that QA branch, verify `/game` and `/api/game/view` return 404; never copy QA flags or database URLs into production. Groq remains OFF until a separately bounded, authorized acceptance.
 
 ## Verification
 
