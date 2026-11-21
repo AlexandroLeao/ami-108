@@ -89,6 +89,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @ami-108/api exec prisma validate
       - run: pnpm db:generate
+      - name: Validate manual Production migration guards without connecting
+        run: pnpm --filter @ami-108/api exec node scripts/test-production-schema-preflight.cjs
       - run: pnpm --filter @ami-108/api exec prisma migrate deploy
       - run: pnpm --filter @ami-108/api exec prisma migrate status
       - run: pnpm lint

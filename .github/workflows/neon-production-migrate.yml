@@ -1,0 +1,56 @@
+name: Manual guarded production schema migration
+
+# The owner must manually dispatch this only after reviewed release candidate CI.
+# No public game/AI flags are changed and no migration runs on PR/push/schedule.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type MIGRATE_EMPTY_AMI_PRODUCTION after verifying branch, URL, secret, cost and zero tables"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-production-schema-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate-empty-production:
+    if: ${{ github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && inputs.confirm == 'MIGRATE_EMPTY_AMI_PRODUCTION' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      AMI_PRODUCTION_MIGRATION_CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - name: Check out exactly reviewed main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install frozen dependencies before injecting DB secret
+        run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm db:generate
+        env:
+          DATABASE_URL: postgresql://example:example@127.0.0.1:5432/disposable
+      - name: Check exact TLS Production identity and completely empty schema
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PRODUCTION_DATABASE_URL }}
+        run: pnpm --filter @ami-108/api exec node scripts/preflight-production-db.cjs before
+      - name: Apply additive tracked migrations once
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PRODUCTION_DATABASE_URL }}
+        run: pnpm --filter @ami-108/api exec prisma migrate deploy
+      - name: Verify five finished migrations and zero new sessions
+        env:
+          DATABASE_URL: ${{ secrets.NEON_PRODUCTION_DATABASE_URL }}
+        run: |
+          pnpm --filter @ami-108/api exec node scripts/preflight-production-db.cjs after
+          pnpm --filter @ami-108/api exec prisma migrate status
