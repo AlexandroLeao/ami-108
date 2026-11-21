@@ -1,6 +1,6 @@
 # Vercel Services — pre-deployment gate
 
-**State (November 20/21, 2026):** Vercel Hobby and Neon Free configured. [Preview migration](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) applied four tracked Prisma migrations; [bounded real-Neon HTTP smoke](https://github.com/AlexandroLeao/ami-108/actions/runs/44841430897) passed 10 actions (median 47 ms, max 99 ms), leaving zero game rows. Vercel Services builds are READY with `AMI_PUBLIC_GAME=0` and `AMI_AI_GENERATION=0`. **Vercel Authentication now covers all deployments**, including the production domain, while the hosted game path remains untested. Neon production `main` is unmigrated; Cloud Shell and owner saves untouched.
+**State (November 21, 2026):** Vercel Hobby and Neon Free configured. [Preview migration](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) applied four tracked Prisma migrations; [bounded real-Neon HTTP smoke](https://github.com/AlexandroLeao/ami-108/actions/runs/44841430897) passed 10 actions (median 47 ms, max 99 ms), leaving zero test rows at the time. **Vercel Authentication covers all deployments.** The owner completed a protected hosted gameplay QA across five chapters, both locales and desktop/mobile ([evidence scope](final-qa-acceptance-worksheet.md)). Only the reviewed QA branch has scoped `AMI_PUBLIC_GAME=1`; generic Preview and Production remain OFF, and `AMI_AI_GENERATION=0` throughout. Neon production `main` is unmigrated; Cloud Shell saves untouched.
 
 ## Selected topology
 
@@ -78,6 +78,8 @@ For a single reviewed QA branch, branch-specific encrypted Preview overrides can
 Acceptance: using an authenticated owner browser on the stable branch URL, confirm game page loads, create a **disposable** session, move through a few actions, refresh and resume, verify replay/cookie/CSRF behavior and error states. Record Vercel build/deployment ID, exact branch, response status, observed latency, and Neon preview session counts. Do not import real Cloud Shell saves. If any step returns 503/401/403 unexpectedly, stop; inspect redacted Vercel logs and private binding configuration without bypassing guards. Remove only known disposable test sessions after owner approval; never reset the database. A successful GitHub-runner smoke is not a substitute.
 
 **Rollback:** disable branch-specific `AMI_PUBLIC_GAME`, redeploy that QA branch, verify `/game` and `/api/game/view` return 404; never copy QA flags or database URLs into production. Groq remains OFF until a separately bounded, authorized acceptance.
+
+**Owner QA acceptance (November 21):** the branch `fix/vercel-private-scene-assets-20261121`, commit `eb3994358c41117a46c602fc1748179af7793758`, included the private PNG loader and was reported playable through credits on desktop/mobile in PT-BR/EN with successful refresh/resume. This is owner-observed end-to-end functional evidence, not independent hostile-request testing, exact-head Actions CI, AI inference, or production approval; see [QA worksheet](final-qa-acceptance-worksheet.md).
 
 ## Hosted NestJS runtime module resolution — November 20 QA finding
 
