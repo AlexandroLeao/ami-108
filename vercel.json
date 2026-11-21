@@ -16,6 +16,8 @@
     "api": {
       "root": "apps/api",
       "framework": "nestjs",
+      "entrypoint": "src/server.cjs",
+      "outputDirectory": ".",
       "bindings": [
         {
           "type": "service",
@@ -23,7 +25,12 @@
           "format": "url",
           "env": "AI_SERVICE_URL"
         }
-      ]
+      ],
+      "functions": {
+        "src/server.cjs": {
+          "includeFiles": "assets/scenes/*.png"
+        }
+      }
     },
     "ai": {
       "root": "services/ai",

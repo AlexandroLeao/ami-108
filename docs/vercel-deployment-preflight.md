@@ -1,6 +1,6 @@
 # Vercel Services — pre-deployment gate
 
-**State (November 20, 2026):** Vercel Hobby and Neon Free configured. [Owner-dispatched Neon preview migration #1](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) succeeded; all **four** tracked Prisma migrations finished without rollback, and Neon confirms five game tables plus `_prisma_migrations`. No game sessions exist yet. A protected Vercel deployment returned `/health` 200, `/icon.png` 200 and `/game` 404. Production Neon `main` remains unmigrated; remote Groq and public gameplay remain OFF. Owner Cloud Shell saves are untouched.
+**State (November 21, 2026):** Vercel Hobby and Neon Free configured. [Preview migration](https://github.com/AlexandroLeao/ami-108/actions/runs/44835514257) applied four tracked Prisma migrations; [bounded real-Neon HTTP smoke](https://github.com/AlexandroLeao/ami-108/actions/runs/44841430897) passed 10 actions (median 47 ms, max 99 ms), leaving zero test rows at the time. **Vercel Authentication covers all deployments.** The owner completed a protected hosted gameplay QA across five chapters, both locales and desktop/mobile ([evidence scope](final-qa-acceptance-worksheet.md)). Only the reviewed QA branch has scoped `AMI_PUBLIC_GAME=1`; generic Preview and Production remain OFF, and `AMI_AI_GENERATION=0` throughout. Neon production `main` is unmigrated; Cloud Shell saves untouched.
 
 ## Selected topology
 
@@ -21,7 +21,7 @@
 
 Do not set `AMI_DEV_PREVIEW=1` to bypass this gate. The release switch alone does not establish abuse controls, quotas, database backups, end-to-end acceptance or owner approval. Keep the switch OFF for the first Vercel import/build and set `AMI_AI_GENERATION=0` while qualifying the environment.
 
-## Required checks **before** importing/deploying
+## Required checks before enabling gameplay or releasing
 
 1. Confirm Vercel Hobby remaining project/usage allowance and Neon Free eligibility; do not enable billing or a paid tier. Multi-service requests and compute consume Hobby usage; free limits are **shared** and not a capacity guarantee.
 2. Review and verify production-specific route enablement. The current `AMI_DEV_PREVIEW` gate is development-only and **must never be set to 1 on a public deployment** as a workaround. Confirm NestJS is not publicly exposed and the private bindings are functional.
@@ -30,7 +30,7 @@ Do not set `AMI_DEV_PREVIEW=1` to bypass this gate. The release switch alone doe
 5. Keep `AMI_AI_GENERATION=0` until explicit, isolated end-to-end Groq acceptance. Then verify bounded inference, quotas and fallback under a separate owner-approved activation.
 6. Only after full build, runtime validation, private DB integration, manual PT-BR/EN browser and accessibility smoke, owner sign-off and cost checks: authorize production traffic and release tag.
 
-This file is a deployment preflight, not an instruction to click **Deploy** now.
+This is a **release gate**, not evidence of public gameplay readiness. Git integration already deploys technical builds; leave gameplay and AI disabled in production.
 
 ## Manual Neon preview migrations (no credential transfer in chat)
 
@@ -66,6 +66,28 @@ The existing manual [Neon Preview Integration Acceptance](../.github/workflows/n
 - `TEST_PREVIEW`: old exhaustive 14-test suite, **still failing 10/14** in run #2. Do not repeat blindly; exhaustive narrative correctness remains enforced by local PostgreSQL CI.
 
 A green short smoke establishes **only** bounded backend/Neon persistence; it does not imply full gameplay E2E, Vercel private binding acceptance, Groq readiness or a public release. Keep game and AI flags OFF, production Neon unmigrated and user Cloud Shell saves untouched.
+
+## Protected hosted QA branch — operational boundary
+
+The project now uses Vercel Authentication for **all** deployments, including production. This remains a personal, non-commercial Hobby project. For a real hosted end-to-end test, create a **dedicated non-`main` QA branch** and use its protected Vercel preview deployment with Neon `preview`. Do not test against the un-migrated production Neon `main`.
+
+Preconditions: exact QA branch/commit and Vercel deployment URL have been verified; all-deployments Vercel Authentication is still enabled; `DATABASE_URL` in Preview points to Neon `preview`; the private `API_URL` service binding and the server-only internal API token are configured; production `AMI_PUBLIC_GAME=0` and all `AMI_AI_GENERATION=0` remain unchanged. Never turn on `AMI_DEV_PREVIEW` on Vercel.
+
+For a single reviewed QA branch, branch-specific encrypted Preview overrides can set `AMI_PUBLIC_GAME=1` and `AMI_PUBLIC_ORIGIN` to its **exact stable HTTPS branch alias** (no trailing slash). Vercel explicitly allows branch-scoped overrides. Do not enable the generic Preview environment or Production to do this. Environment changes require a fresh Preview deployment and proof that the new build belongs to that branch. Do not use expiring deployment-specific URLs as `AMI_PUBLIC_ORIGIN` when the build must be replaced. Retain SSO before, during and after the test. The branch-scoped flag must be removed or set back to 0 once testing ends.
+
+Acceptance: using an authenticated owner browser on the stable branch URL, confirm game page loads, create a **disposable** session, move through a few actions, refresh and resume, verify replay/cookie/CSRF behavior and error states. Record Vercel build/deployment ID, exact branch, response status, observed latency, and Neon preview session counts. Do not import real Cloud Shell saves. If any step returns 503/401/403 unexpectedly, stop; inspect redacted Vercel logs and private binding configuration without bypassing guards. Remove only known disposable test sessions after owner approval; never reset the database. A successful GitHub-runner smoke is not a substitute.
+
+**Rollback:** disable branch-specific `AMI_PUBLIC_GAME`, redeploy that QA branch, verify `/game` and `/api/game/view` return 404; never copy QA flags or database URLs into production. Groq remains OFF until a separately bounded, authorized acceptance.
+
+**Owner QA acceptance (November 21):** the branch `fix/vercel-private-scene-assets-20261121`, commit `eb3994358c41117a46c602fc1748179af7793758`, included the private PNG loader and was reported playable through credits on desktop/mobile in PT-BR/EN with successful refresh/resume. This is owner-observed end-to-end functional evidence, not independent hostile-request testing, AI inference, or production approval. The reviewed candidate later passed [Actions CI 44913252085](https://github.com/AlexandroLeao/ami-108/actions/runs/44913252085) at commit `625feaa`; subsequent editorial commits still require their own CI. See [QA worksheet](final-qa-acceptance-worksheet.md).
+
+## Hosted NestJS runtime module resolution — November 20 QA finding
+
+The owner opened the protected `qa/hosted-vercel-acceptance-20261120` game URL; Next.js rendered the content warning, but starting a game failed. Vercel runtime logs on deployment `dpl_9b6AhCNWZ3L8zC3QHvftJsEAENCp` identify **`Cannot find module 'reflect-metadata'`**, from `/var/task/main.js`, followed by process exit 1 on `POST /game/session`. The `reflect-metadata` runtime dependency **already exists** in `apps/api/package.json`, so adding it again or resetting Neon does not address the observed failure.
+
+The Vercel Services pnpm workspace builder has a documented [output-directory flattening bug](https://github.com/vercel/vercel/issues/17651): compiled `dist/main.js` is placed at the function root, where package symlinks and dependency paths cannot resolve. A first candidate using `src/main.ts` plus `outputDirectory: .` corrected the flattened entrypoint but **still failed at runtime** (`TypeError: ... Get is not a function` from a bundled controller decorator). Source-level bundling of decorated TypeScript is not acceptable. The second candidate uses a tiny CommonJS entrypoint `src/server.cjs` that loads **the `dist/main.js` compiled by `tsc`**, and `outputDirectory: .` to preserve the workspace tree. This retains NestJS decorator metadata and source-relative module resolution in principle. The [Vercel source-tracing issue](https://github.com/vercel/vercel/issues/17712) remains relevant. **Not accepted until protected QA proves that GET /api/game/view without a cookie returns HTTP 401 (actual API started), followed by an owner-controlled session creation.** A successful build or page GET is insufficient.
+
+Do not activate production gameplay, perform migrations, change secrets, create owner save imports or remove SSO for this failure. On successful protected QA runtime acceptance, document a release-gate test and then merge the reviewed change.
 
 ## Verification
 

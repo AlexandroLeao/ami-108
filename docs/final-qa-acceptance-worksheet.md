@@ -9,6 +9,12 @@
 - After controlled recovery on the replacement VM, the owner confirmed **Continue** on private Web Preview port 3000. The user also reported **keyboard-only menu/dialogue/button operation** and **200% browser zoom usability** passing. The exact browser, OS, device and locale for those two checks were **not recorded**.
 - The latest private backup was fully read, checksum-verified and preserves **7 saved sessions / 0 pending / 4 finished migrations**. The game was safely paused without deleting volumes. The authoritative filename is recorded in [release readiness](release-readiness-matrix.md).
 
+## Protected hosted functional QA — November 21, 2026
+
+The owner reported completing all five approved chapters and the ending, in PT-BR and EN, on desktop and mobile in the SSO-protected Vercel Preview of commit `eb3994358c41117a46c602fc1748179af7793758` ([PR #96](https://github.com/AlexandroLeao/ami-108/pull/96)). Scene artwork, dialogue progression, refresh and saved-game resume were observed working. This resolves the reported first-image blockage **for the owner's tested sessions**, not an independent automated E2E audit or a browser security certificate.
+
+The exact browser versions, devices, response codes, timing samples and screenshot traces were not recorded. The optional hosted AI generation was **OFF**, so this does not validate Groq integration. Both production and generic Preview gameplay are OFF; the game is only temporarily enabled on the SSO-protected QA branch. See [release readiness](release-readiness-matrix.md) for the current release boundary.
+
 ## Accessibility and browser checks — issue #12
 
 Record a test as **passed only for the actually tested configuration**. Owner-reported checks can be accepted as observations without fabricating browser, assistive technology or per-language coverage. Use a separate disposable browser profile for new-game/destructive tests; preserve the owner's real saves.
@@ -21,7 +27,7 @@ Record a test as **passed only for the actually tested configuration**. Owner-re
 | A04 | Screen reader announces headings, dialogue, errors and language | NOT RUN | PT-BR and EN assistive-technology tests |
 | A05 | Reduced-motion readability, transitions and credits | NOT RUN | Native reduced-motion tests |
 | A06 | 200% browser zoom with accessible controls | Owner reported PASS; locale/viewport unspecified | Screen-size/locale-specific clipping checks if release requires |
-| A07 | Mobile portrait/landscape usability | Earlier owner desktop/mobile gameplay accepted in both languages | Full mobile accessibility coverage |
+| A07 | Mobile portrait/landscape usability | Owner completed hosted gameplay on mobile and desktop in both locales on November 21; orientation unspecified | Full mobile accessibility, portrait/landscape and assistive-technology coverage |
 | A08 | Current scene alternative text and retry/recovery | NOT RUN | Image-error/alt-text checks on test data |
 | A09 | Continue and locale-switch preservation | Continue owner-verified on restored VM; tested locale unspecified | Controlled locale-switch and session invariants |
 | A10 | Automated accessibility checks in menu/modal/game states | NOT RUN | Document scan tool, version, results and remaining manual cases |
@@ -33,7 +39,7 @@ Record a test as **passed only for the actually tested configuration**. Owner-re
 | UI cold/warm timings, image loading and credits | NOT MEASURED on replacement VM | Browser/device/network, CPU/RAM, repeat samples and median/range; no sensitive HAR files |
 | Local AI latency and failure fallback | Historical **10/10** direct model cases; model absent on latest VM | Fresh test on actual chosen inference host, if deployment uses AI |
 | Dependencies, licenses, container images and OS | Historical JS/Python dependency scans and CI checks | New dated scans, advisory triage, OS/container and license review |
-| Session cookies, origin/Host proxy and private assets | Local source/CI coverage, public deployment NOT TESTED | Test trusted HTTPS ingress with disposable state and hostile headers |
+| Session cookies, origin/Host proxy and private assets | Owner's authenticated hosted QA confirmed gameplay and image visibility, but did not establish hostile-request controls or independently capture HTTP statuses | Test trusted HTTPS ingress, CSRF/Host rejects and asset isolation with disposable state |
 | Rate limiting, anonymous creation, model concurrency, retention and restore | NOT APPROVED FOR PUBLIC DEPLOYMENT | Bounded synthetic load, abuse policy, monitoring, privacy and recovery plan |
 
 The [browser QA plan](accessibility-performance-qa.md) owns test methods. The [production-security checklist](architecture/production-security-gates.md) owns deploy-specific controls. The [dependency audit](dependency-security-audit.md) owns historical advisory evidence. CI's private-file-name guard does **not** inspect every secret embedded in content.
@@ -45,4 +51,4 @@ The [browser QA plan](accessibility-performance-qa.md) owns test methods. The [p
 - [ ] **#15 Rights and release:** verify source/art distribution license, applicable Brazilian classification and whether repository visibility can change; obtain explicit tag/public-launch approval.
 - [ ] **#12 QA/security:** satisfy or explicitly scope the remaining accessibility, measured-performance, public threat/abuse and dependency-image gates.
 
-**Current decision:** owner-approved **private playable campaign**; canonical reconciliation pending; public hosting not provisioned; public release not authorized. The previous seven-day production target is not a waiver of these checks.
+**Current decision:** owner-approved **private playable campaign** with protected hosted QA reported passing; canonical reconciliation and production security remain pending. Public release is not authorized. The previous seven-day production target is not a waiver of these checks.
