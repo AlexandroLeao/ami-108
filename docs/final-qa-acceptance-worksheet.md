@@ -15,6 +15,10 @@ The owner reported completing all five approved chapters and the ending, in PT-B
 
 The exact browser versions, devices, response codes, timing samples and screenshot traces were not recorded. The optional hosted AI generation was **OFF**, so this does not validate Groq integration. Both production and generic Preview gameplay are OFF; the game is only temporarily enabled on the SSO-protected QA branch. See [release readiness](release-readiness-matrix.md) for the current release boundary.
 
+## Real Groq integration acceptance — November 21, 2026
+
+The owner manually ran [GitHub Actions 44915899967](https://github.com/AlexandroLeao/ami-108/actions/runs/44915899967) on merged `main`; the isolated, ephemeral NestJS/FastAPI/Groq/PostgreSQL job completed **2/2 PASS** (PT-BR: 1455 ms; EN: 1119 ms). Both tests required stored `VALIDATED` receipts, a single consultation slot and idempotent replay; temporary session cleanup was verified. No Vercel/Neon hosted inference was exercised. Hosted `AMI_AI_GENERATION=0` remains OFF; the user's existing hosted-game acceptance used authored fallback. Details and limitations belong to the [Groq evaluation](groq-inference-evaluation.md).
+
 ## Accessibility and browser checks — issue #12
 
 Record a test as **passed only for the actually tested configuration**. Owner-reported checks can be accepted as observations without fabricating browser, assistive technology or per-language coverage. Use a separate disposable browser profile for new-game/destructive tests; preserve the owner's real saves.
@@ -37,7 +41,7 @@ Record a test as **passed only for the actually tested configuration**. Owner-re
 | Gate | Current status | Required proof |
 | --- | --- | --- |
 | UI cold/warm timings, image loading and credits | NOT MEASURED on replacement VM | Browser/device/network, CPU/RAM, repeat samples and median/range; no sensitive HAR files |
-| Local AI latency and failure fallback | Historical **10/10** direct model cases; model absent on latest VM | Fresh test on actual chosen inference host, if deployment uses AI |
+| AI inference and fallback | Historical local Qwen 10/10 direct cases and real Groq runner 2/2 isolated game/DB consultations; offline 401/403/429/timeout fallback tests | Hosted live AI remains OFF; no actual Vercel/Neon inference, provider quota stress or live 429 evidence |
 | Dependencies, licenses, container images and OS | Historical JS/Python dependency scans and CI checks | New dated scans, advisory triage, OS/container and license review |
 | Session cookies, origin/Host proxy and private assets | Owner's authenticated hosted QA confirmed gameplay and image visibility, but did not establish hostile-request controls or independently capture HTTP statuses | Test trusted HTTPS ingress, CSRF/Host rejects and asset isolation with disposable state |
 | Rate limiting, anonymous creation, model concurrency, retention and restore | NOT APPROVED FOR PUBLIC DEPLOYMENT | Bounded synthetic load, abuse policy, monitoring, privacy and recovery plan |
@@ -51,4 +55,4 @@ The [browser QA plan](accessibility-performance-qa.md) owns test methods. The [p
 - [ ] **#15 Rights and release:** verify source/art distribution license, applicable Brazilian classification and whether repository visibility can change; obtain explicit tag/public-launch approval.
 - [ ] **#12 QA/security:** satisfy or explicitly scope the remaining accessibility, measured-performance, public threat/abuse and dependency-image gates.
 
-**Current decision:** owner-approved **private playable campaign** with protected hosted QA reported passing; canonical reconciliation and production security remain pending. Public release is not authorized. The previous seven-day production target is not a waiver of these checks.
+**Current decision:** owner-approved **personal, noncommercial, protected playable campaign** with full hosted manual gameplay QA and isolated real Groq integration acceptance. Existing editorial `16+` warning remains unchanged and is **not** an official classification. Private canonical-source reconciliation can remain separate editorial maintenance; production security and formal classification are gates only for a separately authorized broader distribution. No public release or `v1.0.0` tag is authorized.
