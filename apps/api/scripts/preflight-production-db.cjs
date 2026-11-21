@@ -24,13 +24,17 @@ function destination() {
   return raw;
 }
 
-async function main() {
-  const stage = process.argv[2];
-  if (!['before', 'after'].includes(stage)) throw new Error('INVALID_STAGE');
+function ensureAuthorized() {
   if (process.env.GITHUB_REF !== 'refs/heads/main'
     || process.env.AMI_PRODUCTION_MIGRATION_CONFIRM !== 'MIGRATE_EMPTY_AMI_PRODUCTION') {
     throw new Error('NOT_AUTHORIZED');
   }
+}
+
+async function main() {
+  const stage = process.argv[2];
+  if (!['before', 'after'].includes(stage)) throw new Error('INVALID_STAGE');
+  ensureAuthorized();
   const db = new PrismaClient({ datasourceUrl: destination() });
   try {
     const identity = await db.$queryRawUnsafe('SELECT current_database() AS name, current_user AS role');
@@ -60,7 +64,7 @@ async function main() {
   }
 }
 
-main().catch(error => {
+if (require.main === module) main().catch(error => {
   const allowed = new Set([
     'MISSING_SECRET', 'INVALID_TARGET', 'INVALID_STAGE', 'NOT_AUTHORIZED',
     'DATABASE_IDENTITY_MISMATCH', 'PRODUCTION_SCHEMA_NOT_EMPTY',
@@ -70,3 +74,5 @@ main().catch(error => {
   console.error('Production schema preflight refused: ' + code + '. Details suppressed.');
   process.exitCode = 1;
 });
+
+module.exports = { destination, ensureAuthorized };
