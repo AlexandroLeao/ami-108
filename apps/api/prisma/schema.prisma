@@ -71,3 +71,10 @@ model GamePendingGeneration {
   createdAt     DateTime    @default(now())
   session       GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
+
+// Small public portfolio admission budget (UTC days); no personal data or IP.
+model PublicDailyUsage {
+  day           DateTime @id @db.Date
+  sessions      Int      @default(0)
+  modelRequests Int      @default(0)
+}
