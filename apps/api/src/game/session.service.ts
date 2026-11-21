@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, type GameSession, type GamePendingGeneration } from '@prisma/client';
 import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../prisma.service';
+import { gameMode } from './game-access';
+import { acquirePublicBudget } from './public-daily-budget';
 import { advanceNarrative, changeNarrativeLocale, currentAsset, NarrativeError, projectNarrative, startNarrative, type NarrativeState } from '../narrative/engine';
 import { NARRATIVE_VERSION, type Locale } from '../narrative/catalog';
 import { applyGeneratedText, callGeneration, enabled, expectedText, fallback, generationRequest, prepareRandomFallback, rejectRepeatedRandom, GENERATION_DEADLINE_MS, type GenerationAudit, type GenerationRequest, type GenerationResult } from './ai-client';
@@ -42,10 +44,17 @@ export class SessionService {
   async create(locale: Locale) {
     const token = randomBytes(32).toString('base64url');
     const state = startNarrative(locale);
-    await this.prisma.gameSession.create({ data: {
-      tokenDigest: digest(token), narrativeVersion: state.version, state: jsonState(state),
-      revision: state.revision, expiresAt: new Date(Date.now() + SESSION_SECONDS * 1000),
-    } });
+    await this.prisma.$transaction(async tx => {
+      // The production gate consumes one UTC-day slot atomically across replicas.
+      // Local integration tests and offline gameplay do not consume portfolio quota.
+      if (gameMode() === 'public' && !(await acquirePublicBudget(tx, 'session'))) {
+        throw new GameError(429, 'CAPACITY_LIMIT');
+      }
+      await tx.gameSession.create({ data: {
+        tokenDigest: digest(token), narrativeVersion: state.version, state: jsonState(state),
+        revision: state.revision, expiresAt: new Date(Date.now() + SESSION_SECONDS * 1000),
+      } });
+    });
     return { token, view: projectNarrative(state) };
   }
 
@@ -187,7 +196,21 @@ export class SessionService {
       if (phase.kind === 'recovered') continue;
       if (phase.kind === 'wait') { await this.delay(phase.deadline); continue; }
       const { reserved, request, expected } = phase;
-      const audit = await callGeneration(request, expected, reserved.deadlineAt);
+      let audit: GenerationResult;
+      if (gameMode() !== 'public') {
+        audit = await callGeneration(request, expected, reserved.deadlineAt);
+      } else {
+        // A provider attempt consumes quota even when it times out or rejects.
+        // Missing migrations/DB failure fail closed to authored fallback.
+        let admitted = false;
+        try {
+          admitted = await this.prisma.$transaction(tx => acquirePublicBudget(tx, 'ai'));
+        } catch {
+          // Never leak the SQL error, player save or server environment to clients.
+        }
+        audit = admitted ? await callGeneration(request, expected, reserved.deadlineAt)
+          : fallback('BUDGET_EXCEEDED');
+      }
       return this.prisma.$transaction(async tx => {
         const { sessionId, state } = await this.lock(tx, tokenDigest);
         const pending = await tx.gamePendingGeneration.findUnique({ where: { sessionId } });
