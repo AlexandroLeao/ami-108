@@ -11,7 +11,7 @@ class PublicHistoryDetectorTests(unittest.TestCase):
             "github-token": b"ghp_" + (b"B2" * 20),
             "aws-access-id": b"AKIA" + (b"AB12" * 4),
             "private-key-block": b"-----BEGIN " + b"PRIVATE KEY-----",
-            "database-credential-url": b"postgresql://user:unusual_long_value@hidden.neon.tech/mydb",
+            "database-credential-url": b"postgresql://user:" + b"unusual_long_value@" + b"hidden.neon.tech/mydb",
         }
         for kind, payload in examples.items():
             with self.subTest(kind=kind):
