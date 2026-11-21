@@ -20,9 +20,12 @@ assert.equal(services.api.framework, 'nestjs');
 // Vercel Services pnpm workspace: dist/main.js flattened to /var/task/main.js
 // at runtime loses module resolution for reflect-metadata and Nest dependencies.
 // Keep the source entrypoint rooted in apps/api so its dependency links are traced.
-assert.equal(services.api.entrypoint, 'src/main.ts');
+assert.equal(services.api.entrypoint, 'src/server.cjs');
 assert.equal(services.api.outputDirectory, '.');
 assert.ok(existsSync(resolve(root, 'apps/api/src/main.ts')));
+assert.ok(existsSync(resolve(root, 'apps/api/src/server.cjs')));
+assert.match(readFileSync(resolve(root, 'apps/api/src/server.cjs'), 'utf8'), /require\('\.\.\/dist\/main\.js'\)/);
+
 assert.equal(services.ai.framework, 'fastapi');
 assert.equal(services.ai.entrypoint, 'app.main:app');
 assert.deepEqual(services.web.bindings, [
