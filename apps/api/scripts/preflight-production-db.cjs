@@ -16,7 +16,7 @@ function destination() {
   try { parsed = new URL(raw); } catch { throw new Error('INVALID_TARGET'); }
   if (!['postgresql:', 'postgres:'].includes(parsed.protocol)
     || parsed.hostname !== EXPECTED_HOST || parsed.pathname !== '/ami'
-    || parsed.username !== 'ami_app' || !parsed.password || parsed.port
+    || parsed.username !== 'ami_app' || !parsed.password || (parsed.port && parsed.port !== '5432')
     || !['require', 'verify-full'].includes(parsed.searchParams.get('sslmode'))
     || parsed.hash || (parsed.searchParams.get('schema') && parsed.searchParams.get('schema') !== 'public')) {
     throw new Error('INVALID_TARGET');
