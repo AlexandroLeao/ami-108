@@ -114,3 +114,16 @@ jobs:
       - run: uv run --locked ruff check .
       - run: uv run --locked mypy app tests
       - run: uv run --locked pytest
+
+  history-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Test conservative secret detectors
+        run: python3 scripts/test_public_history.py
+      - name: Inspect full reachable Git history without revealing values
+        run: python3 scripts/check_public_history.py
