@@ -52,6 +52,14 @@ The two OpenAPI JSON files parsed successfully and had distinct non-empty operat
 
 **Release boundary:** issues [#12](https://github.com/AlexandroLeao/ami-108/issues/12), [#13](https://github.com/AlexandroLeao/ami-108/issues/13), [#14](https://github.com/AlexandroLeao/ami-108/issues/14) and [#15](https://github.com/AlexandroLeao/ami-108/issues/15) remain open. This draft documentation review does **not** authorize public hosting, cost-bearing services, source distribution, gameplay changes or `v1.0.0`.
 
+## Follow-up audit — November 21, 2026
+
+Tracked Markdown engineering documents were checked for a single primary heading, consistent document titles, closed fenced-code blocks, duplicate headings and repository-relative links. The review also compared current README, index, ADRs, Vercel runbook, Groq evaluation, QA worksheet and release readiness against [post-merge main CI](https://github.com/AlexandroLeao/ami-108/actions/runs/44921818358), current Vercel settings and **read-only** Neon counts. No missing relative-file links, repeated headings or unmatched code fences were found in the reviewed Markdown; a PR template without H1 is intentional. Automated static checks do not establish semantic correctness, external URL uptime or the absence of secrets in **Git history**.
+
+**Active mismatches corrected:** documentation index still described Groq's full game/DB test as pending; Groq ADR/evaluation/QA sheet and the release matrix omitted the subsequent English-session receipts; Vercel preflight said hosted AI was OFF everywhere although the QA branch was enabled. Current rate-limit configuration has now been recorded in its owning Vercel runbook, without claiming full public-abuse protection. Earlier Cloud Shell backup, Qwen and prior preview evidence remains explicitly **historical**, never reworded as a current deployment.
+
+**Publication readiness not certified:** an all-deployments-protected Vercel link and a private GitHub repo are not visitor-accessible. Production database migration, owner-approved Git history/source licensing, official age-classification route, production ingress and quota policies, and a final released-domain smoke still need separate evidence. This review is not a guarantee of zero bugs, full privacy/security review or lawful public distribution.
+
 ## Procedure for future documentation reviews
 
 Follow the [documentation maintenance policy](documentation-standards.md): identify the owning document, review its **actual source and evidence**, update only the relevant scope, preserve accurately dated history, check for duplicated status and unsafe commands, execute CI and request explicit owner merge approval. Use the GitHub commit/PR history for earlier editorial audits rather than copying entire past audit reports into the current document.
