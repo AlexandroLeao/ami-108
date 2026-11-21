@@ -1,11 +1,10 @@
 import { Body, Controller, Get, Header, Headers, HttpException, HttpCode, Patch, Post, Query, Res, StreamableFile, UseGuards } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { GameError, SESSION_COOKIE, SESSION_SECONDS, SessionService, sessionToken, type Mutation } from './session.service';
 import type { Locale } from '../narrative/catalog';
 import { gameMode } from './game-access';
 import { GameInternalGuard } from './game-internal.guard';
+import { readSceneArtwork } from './scene-assets';
 
 type HeaderResponse = { setHeader(name: string, value: string): void };
 function invalid(): never { throw new GameError(400, 'INVALID_INPUT'); }
@@ -83,8 +82,15 @@ export class GameController {
     return this.execute(async () => {
       const id = await this.sessions.asset(sessionToken(cookie), key);
       try {
-        return new StreamableFile(await readFile(join(process.cwd(), 'assets', 'scenes', id + '.png')), { type: 'image/png' });
-      } catch { throw new GameError(404, 'ASSET_UNAVAILABLE'); }
+        return new StreamableFile(await readSceneArtwork(id), { type: 'image/png' });
+      } catch (error) {
+        // Preview-only sanitized diagnostics: never log cookies, paths or session data.
+        if (process.env.VERCEL_ENV === 'preview') {
+          const code = error instanceof Error && 'code' in error && typeof error.code === 'string' ? error.code : 'UNKNOWN';
+          console.error('game.asset.read-failed', { scene: id, code });
+        }
+        throw new GameError(404, 'ASSET_UNAVAILABLE');
+      }
     });
   }
 }
