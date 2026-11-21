@@ -79,7 +79,7 @@ Acceptance: using an authenticated owner browser on the stable branch URL, confi
 
 **Rollback:** disable branch-specific `AMI_PUBLIC_GAME`, redeploy that QA branch, verify `/game` and `/api/game/view` return 404; never copy QA flags or database URLs into production. Groq remains OFF until a separately bounded, authorized acceptance.
 
-**Owner QA acceptance (November 21):** the branch `fix/vercel-private-scene-assets-20261121`, commit `eb3994358c41117a46c602fc1748179af7793758`, included the private PNG loader and was reported playable through credits on desktop/mobile in PT-BR/EN with successful refresh/resume. This is owner-observed end-to-end functional evidence, not independent hostile-request testing, exact-head Actions CI, AI inference, or production approval; see [QA worksheet](final-qa-acceptance-worksheet.md).
+**Owner QA acceptance (November 21):** the branch `fix/vercel-private-scene-assets-20261121`, commit `eb3994358c41117a46c602fc1748179af7793758`, included the private PNG loader and was reported playable through credits on desktop/mobile in PT-BR/EN with successful refresh/resume. This is owner-observed end-to-end functional evidence, not independent hostile-request testing, AI inference, or production approval. The reviewed candidate later passed [Actions CI 44913252085](https://github.com/AlexandroLeao/ami-108/actions/runs/44913252085) at commit `625feaa`; subsequent editorial commits still require their own CI. See [QA worksheet](final-qa-acceptance-worksheet.md).
 
 ## Hosted NestJS runtime module resolution — November 20 QA finding
 
