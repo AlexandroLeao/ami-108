@@ -18,6 +18,7 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [Accessibility and performance](accessibility-performance-qa.md) | Test cases and expected behavior | Plan pending real device/screen-reader checks |
 | [Production security gates](architecture/production-security-gates.md) | Origin, proxy, TLS, quotas, retention and network controls | Proposed production hardening, not currently enabled |
 | [Dependency audit](dependency-security-audit.md) | Dated advisories, accepted remediations and scanning limitations | No perpetual vulnerability clearance |
+| [Brazilian game classification](release-classification.md) | Official MJSP/IARC paths, owner procedure and rating-display boundaries | No official classification has been obtained |
 
 ## Implementation and design
 
