@@ -81,6 +81,14 @@ Acceptance: using an authenticated owner browser on the stable branch URL, confi
 
 **Owner QA acceptance (November 21):** the branch `fix/vercel-private-scene-assets-20261121`, commit `eb3994358c41117a46c602fc1748179af7793758`, included the private PNG loader and was reported playable through credits on desktop/mobile in PT-BR/EN with successful refresh/resume. This is owner-observed end-to-end functional evidence, not independent hostile-request testing, AI inference, or production approval. The reviewed candidate later passed [Actions CI 44913252085](https://github.com/AlexandroLeao/ami-108/actions/runs/44913252085) at commit `625feaa`; subsequent editorial commits still require their own CI. See [QA worksheet](final-qa-acceptance-worksheet.md).
 
+## Database-backed public-day budget candidate — pending CI and release approval
+
+The candidate adds an additive `PublicDailyUsage` table and two atomic aggregate UTC-day limits: **50 new sessions/day** and **100 attempted Groq calls/day**, independent of source IP or replica. The second guard falls back to approved text with `BUDGET_EXCEEDED`; new session creation fails with HTTP 429 `CAPACITY_LIMIT` when full. Read the authoritative security design in [production security gates](architecture/production-security-gates.md). The private/local gameplay path is unchanged.
+
+This is not enabled on the existing QA deployment yet; **the new migration must be applied deliberately before testing the candidate**. Production still contains no game tables and remains closed. A later operator may stage the exact reviewed, green-CI commit against a disposable migrated QA database first, then obtain explicit owner approval for the production migration and live domain. Never use `prisma db push`, drop, reset or restore against a nonempty saved-data database.
+
+The project-wide WAF currently displays one valid configured session-creation rule. A subsequent attempt to add a separate commands limit returned Vercel **402 `payment_required`** on the Hobby plan; **actual enforcement of the earlier configured rule has not been verified**. Do not present WAF config presence as bill-free rate-limit enforcement. The database-backed budget is therefore an independent, fail-closed control, not a replacement for capacity/security monitoring.
+
 ## Current firewall control and portfolio publication boundary — November 21, 2026
 
 Vercel project firewall was inspected as **enabled** with one active, valid rate-limit rule `ami-game-session-create-5-per-minute-per-ip` (ID `rule_ami_game_session_create_5_per_minute_per_ip_3Y5Vwg`). It matches **POST `/api/game/session`** and denies requests above **5 per IP / 60-second fixed window**. The rule leaves current-session commands, assets, reads and per-session provider replay untouched. It has **not** been load-tested or verified as a global AI-budget policy.
