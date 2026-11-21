@@ -44,17 +44,19 @@ export class SessionService {
   async create(locale: Locale) {
     const token = randomBytes(32).toString('base64url');
     const state = startNarrative(locale);
-    await this.prisma.$transaction(async tx => {
-      // The production gate consumes one UTC-day slot atomically across replicas.
-      // Local integration tests and offline gameplay do not consume portfolio quota.
-      if (gameMode() === 'public' && !(await acquirePublicBudget(tx, 'session'))) {
-        throw new GameError(429, 'CAPACITY_LIMIT');
-      }
-      await tx.gameSession.create({ data: {
-        tokenDigest: digest(token), narrativeVersion: state.version, state: jsonState(state),
-        revision: state.revision, expiresAt: new Date(Date.now() + SESSION_SECONDS * 1000),
-      } });
-    });
+    const data = {
+      tokenDigest: digest(token), narrativeVersion: state.version, state: jsonState(state),
+      revision: state.revision, expiresAt: new Date(Date.now() + SESSION_SECONDS * 1000),
+    };
+    if (gameMode() === 'public') {
+      await this.prisma.$transaction(async tx => {
+        if (!(await acquirePublicBudget(tx, 'session'))) throw new GameError(429, 'CAPACITY_LIMIT');
+        await tx.gameSession.create({ data });
+      });
+    } else {
+      // Preserve the already-accepted local/private gameplay transaction path.
+      await this.prisma.gameSession.create({ data });
+    }
     return { token, view: projectNarrative(state) };
   }
 
