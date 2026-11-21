@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   migrate-empty-production:
-    if: ${{ github.ref == 'refs/heads/main' && inputs.confirm == 'MIGRATE_EMPTY_AMI_PRODUCTION' }}
+    if: ${{ github.repository == 'AlexandroLeao/ami-108' && github.ref == 'refs/heads/main' && inputs.confirm == 'MIGRATE_EMPTY_AMI_PRODUCTION' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
