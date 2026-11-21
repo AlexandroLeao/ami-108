@@ -69,6 +69,9 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
   const measureRef = useRef<HTMLParagraphElement>(null);
   const locale = view?.locale ?? preference;
   const labels = copy[locale];
+  // The isolated /preview fixture retains its historical preview label.
+  // The released campaign has no formal semver tag yet, so display a neutral web edition label.
+  const editionLabel = locale === 'pt-BR' ? 'AMI-108 · Edição web' : 'AMI-108 · Web edition';
   const extrasPages = campaignExtras(locale);
   const chapter = view?.phase === 'CHAPTER_CARD';
   const finalTitle = !!view?.complete && beatKey(view)==='A05-S02/ENDING/NEXT';
@@ -329,7 +332,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
               <button className="game-control" disabled={busy} onClick={() => setOverlay('language')}>{labels.language}</button>
               <button className="game-control" disabled={busy} onClick={() => { setExtrasPage(0); setOverlay('extras'); }}>{labels.extras}</button>
             </nav>
-            <p className="version-label">{labels.version}</p>
+            <p className="version-label">{editionLabel}</p>
           </section>
         ) : (
           <section className="game-stage" data-encounter={choiceMode && view.phase === 'ENCOUNTER'}>
@@ -446,7 +449,7 @@ export function CampaignGame({ initialHasSave }: { initialHasSave: boolean }) {
                 <button className="small-control" disabled={extrasPage === extrasPages.length - 1} aria-label={labels.nextPage}
                   onClick={() => setExtrasPage((page) => Math.min(extrasPages.length - 1, page + 1))}>›</button>
               </footer>
-              <p className="version-label">{labels.version}</p>
+              <p className="version-label">{editionLabel}</p>
             </section>
           )}
         </div>
