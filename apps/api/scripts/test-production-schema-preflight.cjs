@@ -14,6 +14,9 @@ const prior = Object.fromEntries(['DATABASE_URL', 'GITHUB_REF', 'AMI_PRODUCTION_
 try {
   process.env.DATABASE_URL = url();
   assert.equal(destination(), url());
+  process.env.DATABASE_URL = url().replace(host, host + ':5432');
+  assert.equal(destination(), process.env.DATABASE_URL);
+  process.env.DATABASE_URL = url();
   for (const attempted of [
     url({ hostname: 'ep-summer-field-bcnzvyx2.c-16.us-east-1.aws.neon.tech' }),
     url({ name: 'neondb' }),
