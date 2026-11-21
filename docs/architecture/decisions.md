@@ -15,7 +15,7 @@
 | [007](#adr-007--restore-energy-with-memory) | Atomic memory/energy restoration | Accepted; implemented | PRs #25, #28 |
 | [008](#adr-008--complete-campaign-without-model-authority) | Deterministic finale | Accepted; implemented | PR #38 |
 | [009](#adr-009--optional-cloudflare-inference-without-gameplay-authority) | Optional Cloudflare Workers AI connector | Proposed; OFF by default | Isolated connector PR (no account/network use) |
-| [010](#adr-010--free-first-groq-structured-inference-as-optional-provider) | Free-first Groq structured provider | Proposed; OFF by default | Isolated offline provider tests |
+| [010](#adr-010--free-first-groq-structured-inference-as-optional-provider) | Free-first Groq structured inference | Accepted in protected hosted QA, OFF in Production | Runner 2/2 and hosted bilingual session receipts |
 
 ## ADR-001 — Authoritative modular NestJS API
 
@@ -127,7 +127,7 @@
 
 ## ADR-010 — Free-first Groq structured inference as optional provider
 
-**Status:** Accepted as an **OFF-by-default optional adapter** in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80). The November 20 owner-triggered provider-only Groq samples passed; end-to-end player activation, Free-account/privacy verification, hosting and runtime migration remain unapproved.
+**Status:** Accepted as a gated provider in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80). Provider and game/DB tests plus owner-accepted hosted QA demonstrate real inference with approved text; it is **enabled only for a branch-specific, SSO-protected Preview**, and OFF by default and in Production. Public activation remains unapproved.
 
 **Context:** The owner requires working live inference to distinguish the AMI-108 portfolio project. The real Cloudflare Gemma 4 tests failed the authorized output contract (0/10), then a bounded one-call test failed with an invalid index; further repeated trials would waste time. The game must still complete without model availability. Free Groq GPT-OSS 20B supports constrained JSON Schema and fast text inference, within documented Free quotas.
 
@@ -135,7 +135,7 @@
 
 **Alternatives considered:** Continuing to adjust Gemma after exhausted owner-run evidence was inefficient; keeping a resident Ollama/Qwen server requires memory/disk capacity and possibly hosting cost; directly exposing an OpenAI-compatible API from the browser would leak credentials. Arbitrary third-party endpoints and unconstrained chat would exceed approved narrative authority.
 
-**Consequences:** Offline negative-path tests and the single-plus-ten provider-only live checks are recorded in the [Groq evaluation](../groq-inference-evaluation.md); they do not establish actual Free-account quota/privacy settings or end-to-end gameplay acceptance. Those gates, hosted security and owner activation consent remain outstanding. Selecting a prewritten line is **real inference but not free-form dialogue generation**; any new wording feature requires a separate reviewed decision. No cost-bearing upgrade or gameplay/canonical-source change is implied.
+**Consequences:** Offline negative-path, provider-only, runner 2/2 and protected hosted bilingual session-receipt evidence are in the [Groq evaluation](../groq-inference-evaluation.md). The samples do not establish sustained public quota, compliance, data retention or Production reliability. Selecting an authorized prewritten line is **real inference, not free-form narrative generation**. Public release requires separate access, billing and owner approval; no paid upgrade or gameplay changes are implied.
 
 ## Historical decisions and revisions
 
