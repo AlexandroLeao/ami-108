@@ -1,0 +1,106 @@
+name: Manual isolated Groq game acceptance
+
+# Never runs on push/PR/schedule. The owner must approve a two-call Free test
+# on reviewed main; no production/Neon database or player session is touched.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type I_APPROVE_2_FREE_GROQ_GAME_CALLS after verifying Free and ZDR"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ami-108-manual-isolated-groq-game
+  cancel-in-progress: false
+
+jobs:
+  isolated-groq:
+    if: ${{ github.ref == 'refs/heads/main' && inputs.confirm == 'I_APPROVE_2_FREE_GROQ_GAME_CALLS' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: postgresql://ami_groq:ami_groq@127.0.0.1:5432/ami_groq_ci?schema=public
+      AMI_TEST_DATABASE_URL: postgresql://ami_groq:ami_groq@127.0.0.1:5432/ami_groq_ci?schema=public
+      AI_SERVICE_URL: http://127.0.0.1:8000
+      AMI_AI_PROVIDER: groq
+      AMI_GROQ_MODEL: openai/gpt-oss-20b
+      AMI_GROQ_LIVE_TEST: "1"
+      AMI_AI_GENERATION: "0"
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: ami_groq
+          POSTGRES_PASSWORD: ami_groq
+          POSTGRES_DB: ami_groq_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ami_groq -d ami_groq_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - name: Check out reviewed main only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+      - name: Install locked dependencies without provider credentials
+        run: |
+          pnpm install --frozen-lockfile
+          (cd services/ai && uv sync --locked)
+      - name: Prepare isolated ephemeral PostgreSQL
+        run: |
+          pnpm db:generate
+          pnpm --filter @ami-108/api exec prisma migrate deploy
+          pnpm --filter @ami-108/api exec prisma migrate status
+      - name: Generate runner-only internal bearer token
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'AMI_AI_INTERNAL_TOKEN=%s\n' "$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - name: Start internal FastAPI with protected Groq credential
+        shell: bash
+        env:
+          AMI_GROQ_API_KEY: ${{ secrets.AMI_GROQ_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$AMI_GROQ_API_KEY" ]; then
+            echo 'Missing private Actions Groq key; no provider calls were made.' >&2
+            exit 1
+          fi
+          (cd services/ai && uv run --locked uvicorn app.main:app --host 127.0.0.1 --port 8000 > /dev/null 2>&1) &
+          echo "$!" > "$RUNNER_TEMP/ami-groq-ai.pid"
+          for i in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8000/health > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo 'Private FastAPI failed readiness; test stopped.' >&2
+          exit 1
+      - name: Exactly one authorized consultation per locale
+        run: pnpm --filter @ami-108/api exec jest --runInBand game.live-groq.spec.ts
+      - name: Confirm temporary database has no game sessions
+        run: |
+          pnpm --filter @ami-108/api exec node -e 'const {PrismaClient}=require("@prisma/client"); const p=new PrismaClient(); p.gameSession.count().then(n=>{if(n!==0) throw new Error("Temporary game rows remain")}).finally(()=>p.$disconnect()).catch(()=>process.exit(1));'
+      - name: Stop private service
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/ami-groq-ai.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/ami-groq-ai.pid")" 2>/dev/null || true
+          fi
