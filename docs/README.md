@@ -16,8 +16,8 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [Final QA worksheet](final-qa-acceptance-worksheet.md) | Manual accessibility, security, performance and owner acceptance gates | Checklist, **not** evidence already passed |
 | [Hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Dated free-tier research behind the chosen topology | **Historical feasibility assessment**, not current live state |
 | [Accessibility and performance](accessibility-performance-qa.md) | Test cases and expected behavior | Plan pending real device/screen-reader checks |
-| [Production security gates](architecture/production-security-gates.md) | Origin, ingress, quotas, retention and network controls | Production hardening **remains proposed**; active session-creation WAF rule is not sufficient alone |
-| [Dependency audit](dependency-security-audit.md) | Dated advisories, accepted remediations and scanning limitations | No perpetual vulnerability clearance |
+| [Production security gates](architecture/production-security-gates.md) | Origin, ingress, quotas, retention and network controls | Daily budget code **merged, not migrated**; Vercel WAF Hobby enforcement unverified; public release pending |
+| [Dependency audit](dependency-security-audit.md) | Dated advisories, prepublication Git history pattern scan and limitations | No perpetual security, rights or secret-history certification |
 | [Brazilian game classification](release-classification.md) | Official MJSP/IARC paths, owner procedure and rating-display boundaries | No official classification has been obtained |
 
 ## Implementation and design
