@@ -1,7 +1,7 @@
 // Fail-closed Vercel Services routing guard, independent of a Vercel login.
 // This verifies only repository configuration; it is NOT a deployment smoke test.
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
@@ -25,6 +25,25 @@ assert.equal(services.api.outputDirectory, '.');
 assert.ok(existsSync(resolve(root, 'apps/api/src/main.ts')));
 assert.ok(existsSync(resolve(root, 'apps/api/src/server.cjs')));
 assert.match(readFileSync(resolve(root, 'apps/api/src/server.cjs'), 'utf8'), /require\('\.\.\/dist\/main\.js'\)/);
+
+// The asset route accepts only the current session's scene; files must stay in
+// the private NestJS function bundle, not in Web/public or a public rewrite.
+// Dynamic fs paths are not discovered automatically by Node File Trace.
+assert.deepEqual(services.api.functions, {
+  'src/server.cjs': { includeFiles: 'assets/scenes/*.png' },
+}, 'NestJS must bundle scene assets for hosted runtime access');
+const sceneDirectory = resolve(root, 'apps/api/assets/scenes');
+const sceneNames = Array.from({ length: 12 }, (_, i) => `CENA-${String(i + 1).padStart(2, '0')}.png`);
+assert.deepEqual(
+  readdirSync(sceneDirectory).filter((name) => name.endsWith('.png')).sort(),
+  sceneNames,
+  'All 12 frozen scene images must be present, with no unexpected PNGs',
+);
+const pngSignature = Buffer.from('89504e470d0a1a0a', 'hex');
+for (const name of sceneNames) {
+  assert.ok(readFileSync(resolve(sceneDirectory, name)).subarray(0, 8).equals(pngSignature), `${name} must be PNG`);
+}
+
 
 assert.equal(services.ai.framework, 'fastapi');
 assert.equal(services.ai.entrypoint, 'app.main:app');
