@@ -3,7 +3,7 @@
   "info": {
     "title": "AMI-108 Game API",
     "version": "0.1.0-local",
-    "description": "Implemented local preview contract for the complete five-chapter campaign at 7ae614d. Same-origin Next.js facade; no production hosting or rate limit guarantee. Pending inference waits for bounded completion or authored fallback; only current authorized view is returned."
+    "description": "Implemented five-chapter game contract through the same-origin Next.js facade and authoritative NestJS API, including public-mode daily session admission limits. Pending inference resolves to approved text or authored fallback. Hosted verification and limitations are recorded separately in release readiness."
   },
   "servers": [
     {
@@ -72,13 +72,23 @@
             }
           },
           "404": {
-            "description": "Local preview disabled; empty facade response."
+            "description": "Game route disabled; empty facade response."
           },
           "413": {
             "description": "Facade rejects body over 2048 bytes; empty response."
           },
           "415": {
             "description": "Facade requires application/json; empty response."
+          },
+          "429": {
+            "description": "Public daily new-session quota exhausted (CAPACITY_LIMIT). Existing saves remain accessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
             "description": "Service unavailable",
@@ -119,7 +129,7 @@
             }
           },
           "404": {
-            "description": "Local preview disabled; empty facade response."
+            "description": "Game route disabled; empty facade response."
           },
           "409": {
             "description": "Saved narrative version mismatch",
@@ -201,7 +211,7 @@
             }
           },
           "404": {
-            "description": "Local preview disabled; empty facade response."
+            "description": "Game route disabled; empty facade response."
           },
           "409": {
             "description": "Stale revision, pending command or conflicting idempotency key",
@@ -289,7 +299,7 @@
             }
           },
           "404": {
-            "description": "Local preview disabled; empty facade response."
+            "description": "Game route disabled; empty facade response."
           },
           "409": {
             "description": "Stale revision, pending command or conflicting idempotency key",

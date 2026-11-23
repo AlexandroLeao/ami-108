@@ -1,6 +1,6 @@
 # Final QA and release acceptance worksheet
 
-**Status:** evidence checklist, not a WCAG, security or public-release certificate. The accepted game runtime is `14ea583`; the latest seven-session private backup and paused VM state are owned by [release readiness](release-readiness-matrix.md). No changes to player saves or the frozen game are authorized by this worksheet.
+**Status (November 21, 2026):** the public portfolio demonstration is owner-accepted and issues #12–#15 are closed for their scoped deliverables. This worksheet preserves dated functional, accessibility and security observations, **not** a WCAG certification, exhaustive security/load test or official age classification. The local accepted game runtime `14ea583` and private backup remain separate from hosted Production, as recorded in [release readiness](release-readiness-matrix.md).
 
 ## Accepted functional evidence
 
@@ -13,15 +13,15 @@
 
 The owner reported completing all five approved chapters and the ending, in PT-BR and EN, on desktop and mobile in the SSO-protected Vercel Preview of commit `eb3994358c41117a46c602fc1748179af7793758` ([PR #96](https://github.com/AlexandroLeao/ami-108/pull/96)). Scene artwork, dialogue progression, refresh and saved-game resume were observed working. This resolves the reported first-image blockage **for the owner's tested sessions**, not an independent automated E2E audit or a browser security certificate.
 
-The exact browser versions, devices, response codes, timing samples and screenshot traces were not recorded. The optional hosted AI generation was **OFF**, so this does not validate Groq integration. Both production and generic Preview gameplay are OFF; the game is only temporarily enabled on the SSO-protected QA branch. See [release readiness](release-readiness-matrix.md) for the current release boundary.
+The exact browser versions, devices, response codes, timing samples and screenshot traces were not recorded. AI generation was **OFF for this earlier Preview test**, so this observation alone did not validate Groq. Later protected QA and Production acceptance are recorded below and in [release readiness](release-readiness-matrix.md).
 
 ## Real Groq integration acceptance — November 21, 2026
 
-The owner manually ran [GitHub Actions 44915899967](https://github.com/AlexandroLeao/ami-108/actions/runs/44915899967) on merged `main`; the isolated, ephemeral NestJS/FastAPI/Groq/PostgreSQL job completed **2/2 PASS** (PT-BR: 1455 ms; EN: 1119 ms). Both tests required stored `VALIDATED` receipts, a single consultation slot and idempotent replay; temporary session cleanup was verified. No Vercel/Neon hosted inference was exercised. Hosted `AMI_AI_GENERATION=0` remains OFF; the user's existing hosted-game acceptance used authored fallback. Details and limitations belong to the [Groq evaluation](groq-inference-evaluation.md).
+The owner manually ran [GitHub Actions 44915899967](https://github.com/AlexandroLeao/ami-108/actions/runs/44915899967) on merged `main`; the isolated, ephemeral NestJS/FastAPI/Groq/PostgreSQL job completed **2/2 PASS** (PT-BR: 1455 ms; EN: 1119 ms). Both tests required stored `VALIDATED` receipts, a single consultation slot and idempotent replay; temporary session cleanup was verified. This isolated runner did not exercise Vercel or Neon, and cannot establish Production reliability. Subsequent hosted Preview and Production receipts are separately recorded in the [Groq evaluation](groq-inference-evaluation.md) and [release readiness](release-readiness-matrix.md).
 
 ## Hosted Groq and owner accessibility acceptance — November 21, 2026
 
-After a branch-specific Sensitive Groq key was configured, the latest [SSO-protected Vercel QA deployment](https://vercel.com/alexandroleaos-projects/ami-108/6eNVpUWNsMSGMjUU4G9kwPZNjaQu) reached READY. The owner reported gameplay worked and the short accessibility tests passed. A read-only Neon Preview query then found **one PT-BR `VALIDATED` receipt** at `15:46:35.999Z`, **zero pending**, and six preserved sessions. This establishes real hosted game-to-Groq persistence in PT-BR; it does **not** establish hosted EN `VALIDATED`, an independent WCAG audit, multi-user rate/concurrency limits or production readiness. Generic Preview and Production remain with generation OFF. Evidence and limitations are owned by the [Groq evaluation](groq-inference-evaluation.md).
+After a branch-specific Sensitive Groq key was configured, the latest [SSO-protected Vercel QA deployment](https://vercel.com/alexandroleaos-projects/ami-108/6eNVpUWNsMSGMjUU4G9kwPZNjaQu) reached READY. The owner reported gameplay worked and the short accessibility tests passed. A read-only Neon Preview query then found **one PT-BR `VALIDATED` receipt** at `15:46:35.999Z`, **zero pending**, and six preserved sessions. At this earlier Preview checkpoint, the result established hosted PT-BR inference but not an independent WCAG audit, multi-user load capacity or Production acceptance. Later English-session and Production receipts supersede that limited activation status. See the [Groq evaluation](groq-inference-evaluation.md) and [release readiness](release-readiness-matrix.md).
 
 ## Accessibility and browser checks — issue #12
 
@@ -45,18 +45,18 @@ Record a test as **passed only for the actually tested configuration**. Owner-re
 | Gate | Current status | Required proof |
 | --- | --- | --- |
 | UI cold/warm timings, image loading and credits | NOT MEASURED on replacement VM | Browser/device/network, CPU/RAM, repeat samples and median/range; no sensitive HAR files |
-| AI inference and fallback | Real Groq runner 2/2 and protected hosted receipts (4 `VALIDATED` in current-session PT-BR/EN groups). The owner reported English gameplay success; one EN-session `INVALID_OUTPUT` led to safe fallback. Offline 401/403/429/timeout regressions passed. | Current session locale is not a per-receipt history field. No sustained public quota/abuse, provider concurrency or Production inference was tested. |
+| AI inference and fallback | Isolated runner 2/2, protected Preview receipts and seven `VALIDATED` Production receipts across sessions currently PT-BR/EN; one `INVALID_OUTPUT` safely fell back. | Current session locale is not a per-receipt history field. No sustained public quota/abuse or concurrency performance was established. |
 | Dependencies, licenses, container images and OS | Historical JS/Python dependency scans and CI checks | New dated scans, advisory triage, OS/container and license review |
 | Session cookies, origin/Host proxy and private assets | Owner's authenticated hosted QA confirmed gameplay and image visibility, but did not establish hostile-request controls or independently capture HTTP statuses | Test trusted HTTPS ingress, CSRF/Host rejects and asset isolation with disposable state |
-| Rate limiting, anonymous creation, model concurrency, retention and restore | NOT APPROVED FOR PUBLIC DEPLOYMENT | Bounded synthetic load, abuse policy, monitoring, privacy and recovery plan |
+| Rate limiting, anonymous creation, model concurrency, retention and restore | Production daily limits of 50 new sessions and 100 model attempts are active; scope accepted for portfolio release | Independent WAF enforcement, broader request abuse, sustained load, retention and recovery review remain limited |
 
 The [browser QA plan](accessibility-performance-qa.md) owns test methods. The [production-security checklist](architecture/production-security-gates.md) owns deploy-specific controls. The [dependency audit](dependency-security-audit.md) owns historical advisory evidence. CI's private-file-name guard does **not** inspect every secret embedded in content.
 
-## Release acceptance — issues #13–#15
+## Scoped release acceptance — November 21, 2026
 
-- [ ] **#13 Hosting:** owner approves an actual architecture with mandatory cost R$ 0 (or separately agrees to a cost exception); actual TLS/ingress, PostgreSQL persistence, secrets, quotas and model-data privacy are verified.
-- [ ] **#14 Documents:** privately reconcile the Day 3 Master v1.14 and Interactive Script v1.12 to the owner-approved final Chapter 5 and later explicit amendments. The private draft addendum remains **unapproved**.
-- [ ] **#15 Rights and release:** verify source/art distribution license, applicable Brazilian classification and whether repository visibility can change; obtain explicit tag/public-launch approval.
-- [ ] **#12 QA/security:** satisfy or explicitly scope the remaining accessibility, measured-performance, public threat/abuse and dependency-image gates.
+- [x] **#12 QA/security:** closed after scoped bilingual gameplay, campaign/asset tests, real Groq evaluation and owner-observed accessibility smoke. No comprehensive security or WCAG certification is claimed.
+- [x] **#13 Hosting:** closed for the accepted Vercel/Neon/Groq public deployment with private services, persisted progress and daily usage limits, subject to Free/Hobby constraints.
+- [x] **#14 Technical documentation:** closed for the reviewed technical source and references. The historical private canonical documents have not been silently rewritten.
+- [x] **#15 Portfolio release:** closed after signed-out verification of the public game and GitHub repository. No general code/art reuse license or formal `v1.0.0` tag was granted.
 
-**Current decision:** private SSO-protected gameplay and accessibility smoke are owner-accepted; Groq has validated receipts in both currently localized session groups. The new firewall rule partially limits new-session abuse, but broader public access, rights/classification, Production migration, retention and model quota policies remain pending. The 16+ notice is editorial, and no Production launch or `v1.0.0` tag is authorized.
+**Residual boundaries:** Brazilian age classification is not official, and future licensing, additional security/accessibility coverage, measured load resilience, privacy/retention decisions and any version tag require separate owner decisions. The authoritative release evidence is the [closed release issue](https://github.com/AlexandroLeao/ami-108/issues/15) and [release readiness](release-readiness-matrix.md).

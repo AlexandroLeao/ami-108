@@ -1,6 +1,8 @@
 # GroqCloud Free — bounded AI inference evaluation
 
-**Status (November 21, 2026):** the Groq adapter merged in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80); provider-only 1/1 and 10/10 bilingual and isolated [2/2 live game/DB](https://github.com/AlexandroLeao/ami-108/actions/runs/44915899967) checks passed. After the owner installed a branch-scoped Sensitive Groq key and the [protected Vercel QA deployment](https://vercel.com/alexandroleaos-projects/ami-108/6eNVpUWNsMSGMjUU4G9kwPZNjaQu) reached READY, Neon Preview recorded **one real hosted `VALIDATED` receipt in PT-BR**. Hosted English inference was subsequently observed in the owner's game test and grouped Neon receipt counts; see the dated follow-up below. Generation is ON only for the SSO-protected Groq QA branch; generic Preview and Production remain OFF. Earlier Qwen/Ollama acceptance and rejected Cloudflare/Gemma remain historical, separate evidence.
+**Current boundary (November 21, 2026):** `openai/gpt-oss-20b` is enabled in the public AMI-108 Production game. Owner-tested bilingual sessions and read-only Neon Production evidence recorded **seven `VALIDATED` consultation receipts**, one safely rejected `INVALID_OUTPUT` with authored fallback and zero pending generations. The model only selects a server-approved response index, never game outcomes or unrestricted narrative text. This is bounded acceptance, not a throughput, account-quota or reliability guarantee. Current state is recorded in [release readiness](release-readiness-matrix.md).
+
+**Historical qualification:** The evidence below covers the November 20–21 provider-only, isolated game/DB and SSO-protected Preview acceptance stages. Statements about Groq being disabled in Production describe **those earlier checkpoints**, not the current public deployment.
 
 ## Free-first decision
 
@@ -48,7 +50,7 @@ The test module [`tests/test_groq_http_integration.py`](../services/ai/tests/tes
 
 **Not established:** a browser-to-Vercel-to-Neon hosted Groq path, provider robustness at scale, measured account quota under multiple sessions, current ZDR/billing state or a live provider 429 failure. Negative-path 401/403/429/timeout behavior is covered by offline mocked HTTP tests only. The visible answer can match an authored fallback: evidence of actual inference is the persisted `VALIDATED` receipt, not merely its displayed wording.
 
-**Decision:** Groq is a required feature and **active only in the reviewed SSO-protected QA**. PT-BR and English-session `VALIDATED` receipts were observed after the owner played both languages. The game still selects only approved text, with fallback for invalid outputs. This does **not** authorize Production or public multi-user traffic.
+**Decision at this historical runner checkpoint:** Groq qualified for protected QA; Production was not yet activated. Later owner-approved Production acceptance is recorded in [release readiness](release-readiness-matrix.md). The game still selects only approved text, with authored fallback for invalid outputs.
 
 ## Hosted Vercel/Neon inference — November 21, 2026
 
@@ -64,17 +66,13 @@ The test module [`tests/test_groq_http_integration.py`](../services/ai/tests/tes
 
 After the owner's English playtest, a read-only Neon Preview aggregation on November 21 found **4 `VALIDATED` receipts** in sessions currently localized as PT-BR (1) and EN (3), **8 `FALLBACK_REQUIRED`** and no pending generation. One EN-session `INVALID_OUTPUT` was rejected and handled by the authored fallback. A validated receipt is evidence that the bounded inference result was persisted; this is not a guarantee of provider availability or event-time locale if the session changed language.
 
-Vercel's active firewall rule `ami-game-session-create-5-per-minute-per-ip` denies more than five **POST `/api/game/session`** requests from one IP in a 60-second fixed window. The rule is valid and project-wide; it does **not** enforce a global model/token budget or protect other endpoints. It should be monitored and independently validated before broad public traffic; game/AI remain OFF in Production.
+A Vercel firewall rule named `ami-game-session-create-5-per-minute-per-ip` was configured for **POST `/api/game/session`**. Its actual enforcement on the Hobby plan was not independently demonstrated, and it is not a global model/token budget or a substitute for the deployed database-backed limits. Do not claim that it reliably blocked requests without direct validation.
 
-## Remaining activation gates
+## Ongoing Production safeguards
 
-1. Before activation, **reconfirm** the owner-observed Free plan, inherited quotas, billing state and [Inference APIs ZDR](https://console.groq.com/docs/your-data) in the intended project; account settings can change. Keep `AMI_GROQ_API_KEY` in private GitHub Actions secrets or protected server configuration, never in Git, chat or logs.
-2. Runner PT-BR/EN and protected hosted PT-BR/EN gameplay/receipt samples are complete. The provider's `INVALID_OUTPUT` can legitimately fall back. Future public Production requires its own secured ingress, scoped secret, verified-empty database migration, test and rollback; preserve the owner's existing saves.
-3. Validate measured account quotas, rate/concurrency limits, key rotation, privacy, monitoring, safe rollback and zero mandatory cost against the selected hosting architecture. No automated real requests, scheduled probes or cross-provider failover.
-4. Obtain separate owner sign-off for environment-specific player inference, external disclosure and any deployment. Do not enable Developer/pay-as-you-go billing, expose private narrative sources or represent index selection as free-form AI dialogue.
+1. Reconfirm the Groq Free-plan limits, billing state and [Inference APIs Zero Data Retention](https://console.groq.com/docs/your-data) before changing provider or quota settings. November 20 Console screenshots are dated owner observations, not a permanent service guarantee.
+2. Keep `AMI_GROQ_API_KEY` server-side and never publish credentials, unpublished narrative material or session data. Continue to enforce approved-candidate selection, exact response validation, one bounded provider call and authored fallback on errors or quota exhaustion.
+3. Production applies database-backed UTC-day limits of **50 new games** and **100 attempted model calls**. These do not establish throughput headroom or full WAF protection. Any larger launch requires new capacity, privacy, retention and abuse evidence.
+4. Do not enable paid billing, automatic real-model probes, additional providers, unrestricted dialogue or gameplay changes without a separate owner decision. Preserve the approved five-chapter narrative and existing saves.
 
-## Stop and fallback rules
-
-If Free quota or latency is insufficient, **do not loosen the strict game-authority controls** or enable paid services by default. Preserve the existing Ollama/Qwen local evidence and authored fallback; assess an alternate Free provider or obtain explicit approval for a tiny capped paid test. In all cases the frozen playable Cloud Shell checkout and verified seven-session dump remain unchanged. The owner must still approve hosted storage, public distribution and final `v1.0.0` release.
-
-Track deployment decisions in [issue #13](https://github.com/AlexandroLeao/ami-108/issues/13), offline/real validation in [issue #12](https://github.com/AlexandroLeao/ami-108/issues/12), source reconciliation in [issue #14](https://github.com/AlexandroLeao/ami-108/issues/14), rights/release in [issue #15](https://github.com/AlexandroLeao/ami-108/issues/15). The latest accepted project checkpoint is [release readiness](release-readiness-matrix.md).
+Historical provider-only and Preview results remain in this file. Current public release scope, missing guarantees and the deferred formal version tag are recorded in [release readiness](release-readiness-matrix.md) and [closed issue #15](https://github.com/AlexandroLeao/ami-108/issues/15).

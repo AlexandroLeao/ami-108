@@ -2,14 +2,14 @@
 
 ## Current implemented containers and boundary
 
-NestJS controls all five chapters, DOG/RAT/BOAR, all three checkpoints, immutable slots, F1/F2/F3, replay and completion with current-only artwork. PR #24 implements optional authenticated internal inference and durable reservation/finalization; previously verified real local provider, default disabled. PRs #35/#36 expand the authorized RANDOM pool; #29 closed. BOAR authored only. The most recent restored private VM used authorized fallback while Ollama was absent; that VM was subsequently **safely paused**. No external inference provider or paid production resource was enabled. Release QA and hosting decisions remain pending.
+NestJS is the authoritative gameplay service for all five chapters, DOG/RAT/BOAR, three checkpoints, immutable consultation slots, F1/F2/F3, replay and completion. FastAPI validates bounded inference, while Groq `openai/gpt-oss-20b` selects only approved dialogue and cannot change game outcomes. The public Vercel deployment uses private NestJS/FastAPI service connections and Neon PostgreSQL with five migrations and database-backed daily usage limits. The separate owner-accepted Cloud Shell environment remains safely paused, with optional local Ollama inference inactive. See [release readiness](../release-readiness-matrix.md) for dated Production and local-state evidence.
 
 > **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
 
 ---
 
 
-**Historical original design (AMI-002 / PR #17); the complete five-chapter implementation was accepted later.**  
+**The diagrams below describe implemented service responsibilities. The original PR #17 design and subsequent milestones are historical context.**  
 **Historical PR #17 source input:** Documento Mestre v1.12 / Roteiro Interativo v1.10 (private backup). **Current approved source precedence:** private Documento Mestre v1.14 and Roteiro Interativo v1.12, supplemented only by subsequent owner-approved amendments. See [requirements](requirements.md), [domain model](domain-model.md), [decisions](decisions.md) and [API contracts](../api/README.md).
 
 ## C4 level 1 — system context
@@ -18,7 +18,7 @@ NestJS controls all five chapters, DOG/RAT/BOAR, all three checkpoints, immutabl
 flowchart LR
   Player["Person: player"] -->|Browser HTTPS| Game["System: AMI-108"]
   Owner["Person: project owner"] -->|Review and validate| Game
-  Game -->|Optional bounded inference| Provider["External model provider / local Ollama"]
+  Game -->|Bounded dialogue selection| Provider["Groq in Production / optional local Ollama"]
 ```
 
 ## C4 level 2 — containers
@@ -29,7 +29,7 @@ flowchart LR
   Web -->|"Internal REST; session credential"| API["NestJS / TypeScript"]
   API -->|"Prisma, transactions"| DB[("PostgreSQL")]
   API -->|"Internal validated request"| AI["FastAPI / Python / Pydantic"]
-  AI -->|"Provider adapter; allowed facts only"| Model["Ollama or approved free API"]
+  AI -->|"Provider adapter; approved candidates only"| Model["Groq in Production / optional local Ollama"]
   API -->|"Authorized image bytes"| Art["Private scene asset storage"]
   GH["GitHub Actions"] -.-> Web
   GH -.-> API
@@ -57,14 +57,15 @@ flowchart TD
   Queries --> Assets["Asset authorization"]
 ```
 
-AMI-004 began with pure deterministic domain functions in apps/api/src/narrative (PR #19). The tested core is now wrapped by the persisted session/receipt service, authorized NestJS endpoints and Next.js same-origin facade in merged PR #20. Merged PR #22 added dog and CP-DOG/slot tables; PR #25 adds RAT, CP-RAT, F1/F2 restoration-linked recharge and Chapter 4 entry replay. Later boar/F3 and real inference remain planned. Inject RNG and provider/client dependencies for tests. Keep scene data, exact outcomes, reveal policies and fallback text in server-only modules. UI only renders a projection of the current screen, not arbitrary scene selection. The existing health endpoints remain diagnostics.
+The domain engine is deterministic and server-side. The persisted session/receipt service, authorized NestJS endpoints and Next.js facade support all five chapters, three encounters and checkpoint replay. Keep outcome selection, private scene data, probability draws and fallback text under game-server authority. Inject randomness and provider dependencies for tests; the UI renders only the authorized current projection. Health endpoints are diagnostic, not proof of provider availability.
 
 ## Deployment and environments
 
-- Observed baseline: local Compose, four healthy services, Node 22 and Python 3.12, CI success, Google Cloud Shell approved visual preview (PR #18) and owner-accepted local Chapter 1 with persisted sessions (PR #20, `3cf942a`; post-merge CI passed); Codespaces config exists but is untested.
-- Production candidate: same-origin web facade, private API/AI/database connections, HTTPS, secrets injected via environment, bounded request/logging policies; no resources provisioned.
-- AWS and external provider use require explicit cost, eligibility, data policy and owner verification. CI/CD and OpenTofu are incremental deliverables.
-- Temporary Cloud Shell volumes are not durable backups. Source code lives in GitHub; official narrative and art backups in Drive.
+- **Production:** Vercel Web with same-origin facade, private NestJS and FastAPI bindings, Groq inference and Neon PostgreSQL. The canonical game URL is public, while Preview and deployment-specific URLs remain protected. Five database migrations and UTC-day budgets were accepted for the portfolio release.
+- **Local development:** Docker Compose on Google Cloud Shell, with separate persisted private backups. The last owner-verified local VM was safely paused with optional Ollama generation disabled. Cloud Shell volumes are not durable backups.
+- **CI:** GitHub Actions validates code, tests, migration compatibility, documentation and campaign smoke. Do not infer public reliability or security certification from CI alone.
+
+See [Vercel deployment verification](../vercel-deployment-preflight.md), [development guidance](../development.md) and [release readiness](../release-readiness-matrix.md).
 
 ## UML sequence — consultation with reservation
 
@@ -122,8 +123,8 @@ This is a conceptual state machine, not an implementation. The concrete allowed 
 - Anonymous session capability: cryptographically random opaque token in secure HttpOnly SameSite cookie at the web boundary; store only a token digest. No account/password system required for MVP (proposal). Validate Origin on mutations, reject cross-origin requests, never trust client progress. Bind capability to one session.
 - Only current allowed actions and current asset are visible. Generic unauthorized asset responses do not reveal whether future content exists. Set private/no-store cache policy for session projections and gated image responses.
 - Never send the full script, personal data or future context to an external model. Service credentials remain server-side. Use a strict allowlist of fact IDs with question/category and narrative phase, validated output and fallback.
-- Rate limit by session and conservative IP policy; cap session creation, body size and provider calls. No user-entered prompt field.
+- Public PostgreSQL admission budgets cap new sessions and provider attempts per UTC day. They do not cover every endpoint or concurrency mode; further abuse controls need independent validation. No user-entered prompt field.
 - Use correlation IDs, status/error codes and timing metrics without logging session tokens, prompt bodies or protected content.
-- Liveness checks only process health; game readiness must not require an online LLM. AMI-001 readiness checks AI connectivity as a diagnostic; adjust degraded-mode policy during implementation.
+- Liveness checks prove process health, not model availability. When remote inference fails or exhausts its budget, authorized authored fallback preserves gameplay.
 
-Day 2 observed baseline: PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes). No production resources or real model provider have been provisioned. Continue with the pending provider reservation/finalization design and later encounters.
+Dated early Chapter 1–2 design and CI milestones are preserved in [development history](../development-history.md), not treated as current deployment status.

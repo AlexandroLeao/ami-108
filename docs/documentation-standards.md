@@ -55,7 +55,7 @@ OpenAPI documents are **hand-maintained** implementation references. Describe th
 - Anonymize logs and explain what their sample proves; never paste private source excerpts into issue comments or public hosting descriptions.
 - Separate **nonprofit intent**, **zero mandatory service-cost target**, **provider free-tier limits** and **permission to deploy**. These are distinct claims.
 - The game's **16+** notice is editorial until classification and legal applicability are validated; do not call it an official rating.
-- Keep the repo private, do not create release tags, deploy resources, switch visibility or grant redistribution rights without explicit owner approval.
+- The game and source repository are already public for portfolio demonstration. Do not change visibility, expose private materials, create release tags, modify deployed resources, enable paid services or grant redistribution rights without explicit owner approval. Public source visibility alone is not an open-source license.
 
 ## Required evidence and review gates
 

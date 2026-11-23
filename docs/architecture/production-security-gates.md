@@ -1,42 +1,38 @@
-# Production security gates — partial safeguards implemented; public release unapproved
+# Production security controls and remaining risks
 
-Refs closed AMI-010 (#12), open AMI-011 (#13) and AMI-013 (#15). The game is accepted on SSO-protected Vercel QA; public Production remains closed. The code now includes additive, tested public daily quotas, but no Neon environment has applied the new migration yet. Production and publication decisions require separate authorization.
+**Status (November 21, 2026):** The five-chapter game and bounded Groq inference are publicly accessible on the canonical Production domain. Neon Production has all five tracked migrations, including `PublicDailyUsage`. Issues [#12](https://github.com/AlexandroLeao/ami-108/issues/12), [#13](https://github.com/AlexandroLeao/ami-108/issues/13) and [#15](https://github.com/AlexandroLeao/ami-108/issues/15) were closed for their documented acceptance scopes. These safeguards do **not** amount to a comprehensive security audit or load certification. The authoritative evidence and release boundary are in [release readiness](../release-readiness-matrix.md).
 
-## Current observed boundary
+## Implemented controls
 
-- Local development uses `AMI_DEV_PREVIEW=1`; Vercel rejects this flag. The approved QA branch uses scoped `AMI_PUBLIC_GAME=1`, a strict origin and internal token, while default/generic Preview and Production remain OFF. The development artwork route is never enabled on Vercel.
-- Browser mutations require Origin, reject cross-site fetch metadata and compare configured origin when present. Local preview otherwise accepts the request/forwarded host because Cloud Shell is reverse-proxied. Never trust this fallback on public ingress.
-- Facade allowlists five endpoints and methods; raw mutation JSON limited to 2048 bytes with absolute 10s handler deadline; upstream fetch deadline 10s. API directly uses Nest body parsing; must not be exposed to untrusted public callers. Ingress buffering/header time and connection counts are not covered by handler deadline.
-- Session capability is a random 32-byte token, digest at rest, 30-day provisional expiry, current-scene asset gate, private/no-store, cookie HttpOnly/SameSite=Lax. HTTPS facade adds Secure. Existing saves must remain compatible.
-- Per-session database locking and pending-generation reservation prevent duplicate model calls for a reserved slot; receipt idempotency and cached slots are enforced. These are not cross-session quotas. New sessions can still allocate rows and inference capacity.
-- FastAPI generation endpoint uses shared internal bearer token and 8192-byte request bound. Ollama and PostgreSQL must remain internal; provider deadlines 2s transport / 2.5s engine; authored fallback on failure. No model authority over game outcomes.
+- **Service boundaries:** Vercel exposes the Next.js same-origin facade. NestJS API and FastAPI AI service use private service bindings, and PostgreSQL is accessed server-side. Development-only routes must never be exposed through public-mode configuration.
+- **Request validation:** Browser mutations check origin and cross-site metadata. The facade allowlists supported endpoints/methods, rejects oversized mutation bodies (2048 bytes) and applies a 10-second upstream deadline. Backend endpoints must remain inaccessible from untrusted public ingress.
+- **Session authorization:** Random 32-byte bearer capability, digest at rest, `HttpOnly`/`SameSite=Lax` cookie with `Secure` on HTTPS, 30-day provisional expiry, private/no-store projections and authorization of only current-scene assets.
+- **Game consistency:** Transactional state changes, per-session locking, reserved consultations and idempotent command receipts prevent duplicate debits, rerolls and repeated provider calls for a reserved slot. They do not themselves provide cross-session admission limits.
+- **AI boundary:** Authenticated internal FastAPI requests, allowlisted facts, bounded generation time and response validation. Groq selects only among authored answers, with deterministic fallback; it cannot determine game outcomes or access future narrative material.
+- **Deployment protection:** The canonical Production game is publicly accessible. Preview and deployment-specific URLs remain protected by Vercel Standard Protection. Protection of those URLs is distinct from security of the public game.
 
-## Merged database-backed budget — awaiting environment migration and release acceptance
+## Database-backed public usage limits
 
-PR [#102](https://github.com/AlexandroLeao/ami-108/pull/102) merged with green CI. After the tracked migration `20261121190000_public_daily_usage` is applied to the target environment, public mode atomically admits at most **50 newly created sessions per UTC day** and **100 provider attempts per UTC day**. Each attempted provider call consumes a slot even if the remote service fails, times out or produces invalid output. The counter lives in one PostgreSQL row per UTC day (`PublicDailyUsage` with aggregate `sessions` and `modelRequests` only); it stores **no IP, player identifier, session token or prompt**. PostgreSQL `INSERT … ON CONFLICT … WHERE count < limit RETURNING` is atomic across serverless instances. Existing local/private game modes do not use or consume this budget.
+The production-applied migration `20261121190000_public_daily_usage` adds a `PublicDailyUsage` row per UTC day. In public mode, an atomic PostgreSQL update limits the system to **50 new sessions per day** and **100 attempted model calls per day** across serverless instances. Counts contain no IP address, session token or prompt.
 
-- If the session limit is exhausted, starting **a new** public game receives HTTP **429 `CAPACITY_LIMIT`**; existing saves and gameplay are unaffected. Do not disguise the 429 or reset the quota by deleting user saves.
-- If the provider budget is exhausted (or its quota query fails), the game commits **`FALLBACK_REQUIRED/BUDGET_EXCEEDED`** and the preapproved authored text. It retains the exact narrative result, energy, consultation cache and replay semantics. Do not automatically retry Groq or use another provider to bypass the limit.
-- This protects **aggregate daily admissions** without paid infrastructure. It does **not** rate-limit GETs, already-created session commands, traffic from rotating IPs, simultaneous functions, or Vercel platform consumption. Groq's own limits still apply. A previous attempt to add a second Vercel WAF rate-limit rule returned HTTP **402 `payment_required`** on Hobby; a previously configured rule is visible as active but has **not been demonstrated to be enforced** on this plan. Never describe it as certified protection or upgrade billing silently.
-- **Migration is additive**, but both the preview and Production databases must apply the tracked migration **before** deploying this code with public-mode switches ON. Do not run `db push` or hand-write quota rows in any saved-data database. A missing migration must fail closed, not bypass limits.
-- **Acceptance:** local PostgreSQL CI passed exact-limit concurrency, quota exhaustion fallback/replay and private-mode regression. A new, SSO-protected hosted Preview run with the applied migration is **still required**; use disposable sessions and inspect `VALIDATED`/fallback receipts, rollback and cap behavior. Never delete or load-test the owner's seven existing Preview saves.
-- **Rollback:** keep public mode OFF until acceptance; if deployed quota code has a defect, roll back the reviewed deployment or set `AMI_PUBLIC_GAME=0` and `AMI_AI_GENERATION=0` and redeploy. The additive quota table can remain; never delete game state or revert unrelated migrations. Do not grant public traffic until the release owner approves #13/#15 and privacy/classification/rights review.
+- At the session limit, `POST /api/game/session` returns **HTTP 429 `CAPACITY_LIMIT`**. Previously created sessions are not deleted.
+- At the provider-attempt limit, or if the quota query fails, consultation uses the authorized `FALLBACK_REQUIRED/BUDGET_EXCEEDED` response. It does not bypass the quota with automatic retries or alternate providers.
+- These budgets do not cap all reads, already-established sessions, concurrent functions or total platform consumption. Groq provider quotas also apply.
 
-## Deployment-independent acceptance gates
+The code and database migration were validated in reviewed CI and the Production deployment was accepted in the [portfolio release record](https://github.com/AlexandroLeao/ami-108/issues/15). No exhaustive anonymous load or sustained-rate testing is claimed.
 
-| Gate | Required evidence |
-| --- | --- |
-| Mode and origin | Explicit production opt-in; HTTPS canonical origin with no credentials/path/query/fragment; invalid or contradictory settings fail closed. Development routes inaccessible. Spoofed Host/X-Forwarded-Host cannot authorize mutation. |
-| Network | Only web ingress public; API, AI, model and DB private. No public database or model endpoint. Explicit trusted proxy configuration and secure cookies. |
-| Abuse | Separate creation, mutation, asset/read and inference limits; derive values from measured workload and agreed capacity. Edge source identity must not trust arbitrary forwarded headers. Bounded memory, connection/time budgets and aggregate cap. |
-| Concurrency | Cap simultaneous model work across sessions, preserve per-session reservations/idempotency and fall back using existing BUDGET_EXCEEDED reason when capacity unavailable. Do not alter approved probabilities, cached slots, deadlines or energy. |
-| Responses | Clear rate-limit/retry semantics; client must not consume energy or advance state on rejected requests. Validate concurrent legitimate clients, duplicate commands, stale revisions and repeated retry. |
-| Storage | Define owner-approved retention, expired-session cleanup, cascading dependent records, backup/restore and minimum necessary telemetry. Do not delete existing saves during development. |
-| Browser | Baseline headers; deployment-specific CSP, frame-ancestors and HSTS after HTTPS validation. Cloud Shell embedding must not be broken. |
-| Operations | Private secrets, least privilege, redacted logs, health/readiness, dependency and OS/image review, recovery drill, verified cost constraints. |
+## Remaining security and operational limitations
 
-## Proposed validation before publication
+| Area | Observed safeguard | Further validation or policy |
+| --- | --- | --- |
+| Rate and abuse protection | Database-wide creation and provider-attempt budgets; one Vercel WAF session-creation rule configured | Actual enforcement on the Hobby plan was not independently demonstrated. Other endpoint and multi-IP abuse remain outside the bounded checks |
+| Traffic and concurrency | Same-origin routing, private service bindings and per-session reservation | Measure concurrent sessions, model workload, connection pressure and abuse behavior with disposable test data |
+| Browser and network | Origin checks, scoped cookies, protected previews, private services | Independently assess public ingress, headers, spoofed forwarded hosts, CSRF and current-asset access |
+| Data lifecycle | Scoped PostgreSQL sessions and 30-day expiry semantics | Review retention, cleanup, backups, recovery and minimum necessary logs before extending traffic |
+| Dependencies and accessibility | Automated checks and owner-reported functional smoke | Separate OS/container security, accessibility and performance validation remain necessary |
 
-Use disposable database and test-only secrets, run the current 221-test baseline plus built campaign/hash smoke. Test missing/invalid origin, cross-site, forwarded-host spoof, disabled modes, development route denial, cookie Secure, private network boundary, expired sessions, oversized and slow uploads, rate exhaustion/recovery and concurrent distinct sessions. Confirm fallback does not change category, energy debit, slot persistence or replay. Measure memory and queue behavior under controlled synthetic load; do not stress the owner's running local game. Document concrete rate/quota policy after capacity and hosting are known.
+A second Vercel WAF rate-limit rule was not adopted because its configuration returned HTTP 402 on Hobby. Do not infer unlimited rate limiting from a configured rule or enable billing to bypass these limits.
 
-Do not implement a public toggle alone. A production entry point without trusted ingress, quotas and retention is not release-ready. Keep the repository private and no billable provisioning until owner review of the deployment decision.
+## Safe change and verification boundary
+
+For any future production configuration change, preserve existing saves and perform read-only environment checks before migration or rollback decisions. Do not run `prisma db push`, reset a populated database, delete session records to clear budgets, expose private service URLs or commit secrets. Use [Vercel deployment history and procedures](../vercel-deployment-preflight.md), [QA evidence](../release-qa.md) and [release readiness](../release-readiness-matrix.md) as separate sources. No infrastructure was changed by this documentation update.

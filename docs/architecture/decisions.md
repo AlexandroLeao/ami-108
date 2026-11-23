@@ -1,6 +1,6 @@
 # Architecture decision records
 
-**Type:** decision reference. **Scope:** approved local game architecture, not a public deployment plan. Each accepted decision records its context, choice, alternatives and consequences. Open hosting/security decisions are **not** implicitly accepted; see [release readiness](../release-readiness-matrix.md) and [production security gates](production-security-gates.md).
+**Type:** architecture decision reference. Accepted decisions retain their original scope and rationale. Later hosting, Groq activation and production quota work are documented in their own verified rollout records rather than retroactively changing the decisions. See [release readiness](../release-readiness-matrix.md) and [production security controls](production-security-gates.md).
 
 ## Decision index
 
@@ -9,17 +9,17 @@
 | [001](#adr-001--authoritative-modular-nestjs-api) | NestJS as gameplay authority | Accepted; implemented | PRs #17, #20, #38 |
 | [002](#adr-002--isolate-controlled-ai-behind-fastapi) | Bounded AI service | Accepted; opt-in implemented | PR #24 |
 | [003](#adr-003--postgresql-and-idempotent-commands) | Durable commands and sessions | Accepted; implemented | PRs #20, #22, #24 |
-| [004](#adr-004--anonymous-scoped-sessions) | Capability cookie and same-origin facade | Accepted for private preview | PRs #20, #48 |
+| [004](#adr-004--anonymous-scoped-sessions) | Capability cookie and same-origin facade | Implemented in public game; not a complete security certification | PRs #20, #48 |
 | [005](#adr-005--server-only-narrative-and-gated-assets) | Authorized projections and assets | Accepted; implemented | PRs #20, #38 |
 | [006](#adr-006--local-first-zero-mandatory-cost) | Development infrastructure | Accepted for private development | PR #17 and GitHub CI |
 | [007](#adr-007--restore-energy-with-memory) | Atomic memory/energy restoration | Accepted; implemented | PRs #25, #28 |
 | [008](#adr-008--complete-campaign-without-model-authority) | Deterministic finale | Accepted; implemented | PR #38 |
 | [009](#adr-009--optional-cloudflare-inference-without-gameplay-authority) | Optional Cloudflare Workers AI connector | Proposed; OFF by default | Isolated connector PR (no account/network use) |
-| [010](#adr-010--free-first-groq-structured-inference-as-optional-provider) | Free-first Groq structured inference | Accepted in protected hosted QA, OFF in Production | Runner 2/2 and hosted bilingual session receipts |
+| [010](#adr-010--free-first-groq-structured-inference-as-optional-provider) | Free-first Groq structured inference | Accepted and active in Production | Runner/Preview acceptance and Production receipts |
 
 ## ADR-001 — Authoritative modular NestJS API
 
-**Status:** Accepted; implemented for the five-chapter private game.
+**Status:** Accepted; implemented for the five-chapter game, including the public portfolio deployment.
 
 **Context:** Choices, energy, memory, checkpoints, spoiler restrictions and persistent progress require one authoritative state machine.
 
@@ -31,7 +31,7 @@
 
 ## ADR-002 — Isolate controlled AI behind FastAPI
 
-**Status:** Accepted; implemented as authenticated, optional local generation with authored fallback.
+**Status:** Accepted; implemented with authenticated, bounded Groq inference in Production and optional local fallback-capable inference.
 
 **Context:** AMI wording may vary, but narrative facts, encounters and probabilities must remain deterministic; model availability and latency vary.
 
@@ -43,7 +43,7 @@
 
 ## ADR-003 — PostgreSQL and idempotent commands
 
-**Status:** Accepted; implemented across four additive migrations.
+**Status:** Accepted; implemented with five tracked additive migrations, including the public daily usage table.
 
 **Context:** Retries, concurrent tabs and checkpoint replay must not double-charge energy, change a previously selected consultation or corrupt state.
 
@@ -55,7 +55,7 @@
 
 ## ADR-004 — Anonymous scoped sessions
 
-**Status:** Accepted for private preview; **production policy incomplete**.
+**Status:** Implemented in the public portfolio game; independent security, retention and scale assessments remain limited.
 
 **Context:** Players need a resumable game without mandatory account registration, while hidden scenes and mutations must remain private to the session holder.
 
@@ -67,7 +67,7 @@
 
 ## ADR-005 — Server-only narrative and gated assets
 
-**Status:** Accepted; implemented for the private five-chapter campaign.
+**Status:** Accepted; implemented for the five-chapter campaign and current-asset access in Production.
 
 **Context:** Future revelations, correct choices and unreleased reference material must not appear in client payloads.
 
@@ -87,7 +87,7 @@
 
 **Alternatives considered:** Paid hosting and persistent use of an interactive Cloud Shell session were rejected for the present development scope.
 
-**Consequences:** Cloud Shell's temporary VM requires private backup and restore procedures. Sustainable public hosting remains a separate decision under issue #13.
+**Consequences:** Cloud Shell's temporary VM requires private backup and restore procedures. Public Vercel/Neon hosting was subsequently accepted under closed [issue #13](https://github.com/AlexandroLeao/ami-108/issues/13), without changing the original local-development decision.
 
 ## ADR-007 — Restore energy with memory
 
@@ -127,7 +127,7 @@
 
 ## ADR-010 — Free-first Groq structured inference as optional provider
 
-**Status:** Accepted as a gated provider in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80). Provider and game/DB tests plus owner-accepted hosted QA demonstrate real inference with approved text; it is **enabled only for a branch-specific, SSO-protected Preview**, and OFF by default and in Production. Public activation remains unapproved.
+**Status:** Accepted as a gated provider in [PR #80](https://github.com/AlexandroLeao/ami-108/pull/80) and subsequently enabled in the public Production deployment. Owner-accepted PT-BR/EN gameplay, persisted `VALIDATED` receipts and authored fallback are recorded in [release readiness](../release-readiness-matrix.md). The provider remains disabled by default in unconfigured/local environments.
 
 **Context:** The owner requires working live inference to distinguish the AMI-108 portfolio project. The real Cloudflare Gemma 4 tests failed the authorized output contract (0/10), then a bounded one-call test failed with an invalid index; further repeated trials would waste time. The game must still complete without model availability. Free Groq GPT-OSS 20B supports constrained JSON Schema and fast text inference, within documented Free quotas.
 
@@ -135,7 +135,7 @@
 
 **Alternatives considered:** Continuing to adjust Gemma after exhausted owner-run evidence was inefficient; keeping a resident Ollama/Qwen server requires memory/disk capacity and possibly hosting cost; directly exposing an OpenAI-compatible API from the browser would leak credentials. Arbitrary third-party endpoints and unconstrained chat would exceed approved narrative authority.
 
-**Consequences:** Offline negative-path, provider-only, runner 2/2 and protected hosted bilingual session-receipt evidence are in the [Groq evaluation](../groq-inference-evaluation.md). The samples do not establish sustained public quota, compliance, data retention or Production reliability. Selecting an authorized prewritten line is **real inference, not free-form narrative generation**. Public release requires separate access, billing and owner approval; no paid upgrade or gameplay changes are implied.
+**Consequences:** Offline negative-path, provider-only, runner 2/2 and protected hosted bilingual session-receipt evidence are in the [Groq evaluation](../groq-inference-evaluation.md). The samples do not establish sustained public quota, compliance, data retention or Production reliability. Selecting an authorized prewritten line is **real inference, not free-form narrative generation**. The public portfolio release was subsequently owner-approved under closed [issue #15](https://github.com/AlexandroLeao/ami-108/issues/15). No paid upgrade, gameplay authority or free-form dialogue is implied.
 
 ## Historical decisions and revisions
 
