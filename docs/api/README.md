@@ -1,35 +1,30 @@
-# Local API contracts
+# Game and AI API contracts
 
-## Current contract status
+The [Game OpenAPI 3.1 contract](game.openapi.json) describes the implemented same-origin `/api/game` facade and its NestJS-backed game operations. The [internal AI contract](ai.openapi.json) describes authenticated FastAPI generation requests and validated response selection. These specifications are maintained by hand and checked structurally in CI; they are not a guarantee of full runtime/schema conformance.
 
-Existing game commands and same-origin facade support all five chapters, DOG/RAT/BOAR, all three checkpoints, F1/F2/F3, replay and final credits. Chapter 5 resumes legacy boundary saves and exposes optional completion in current view. BOAR consultations use authored CORRECT only; no internal provider request. Presentation cues and text animations do not mutate state. PR #24 implements authenticated opt-in generation and persisted reservation/receipt audit; default fallback remains. OpenAPI files below describe the implemented local wire contract, reconciled against runtime source. Built HTTP smoke checks the projection/result shapes, action and cue enums, and facade rejection paths; this is not a complete OpenAPI conformance suite. Production rate limiting, origin and deployment remain open.
+## Game API
 
-> **Archived PR #38 snapshot:** [historical evidence](../history-pr38-snapshot.md). For the latest verified seven-session pause and outstanding release gates, see [release readiness](../release-readiness-matrix.md).
+| Method and path | Responsibility |
+| --- | --- |
+| `POST /session` | Start a new game, issue an opaque session cookie and return the initial authorized projection |
+| `GET /view` | Resume or read the current localized projection |
+| `POST /commands` | Apply a currently permitted narrative action, including consultation, retry and chapter replay |
+| `PATCH /locale` | Change displayed language without rerolling outcomes or replaying inference |
+| `GET /asset` | Return only the scene image authorized by the current session and matching cache discriminator |
 
----
+The Next.js facade is same-origin and rejects unsupported endpoints and methods. The NestJS API owns the authoritative game state, transition rules and database transactions. Client payloads cannot select hidden scenes, correct encounter outcomes or arbitrary AI input.
 
+## Authentication, state and error handling
 
-Historical implementation notes below describe earlier milestones, not the current contract. The two hand-maintained OpenAPI 3.1 JSON documents are reconciled with the current runtime, not generated specifications. The bootstrap health endpoints, isolated development preview asset and local Chapter 1 game routes are implemented in merged PR #20 (`3cf942a`); merged PR #22 extends these routes through Chapter 2. All five chapters and the internal AI contract are implemented; production requirements remain separate.
+- Session identity is an opaque server-generated capability carried in an `HttpOnly`, `SameSite=Lax` cookie, with `Secure` added for HTTPS. Only its digest is stored in PostgreSQL.
+- Mutations (except new-session creation) carry a UUID `commandId` and `expectedRevision`. Identical retries are idempotent and return the recorded result or authorized current view. Conflicting or stale requests receive HTTP 409.
+- Pending consultations are reserved and finalized without holding a database lock during network inference. Authorized fallback preserves the encounter category, energy semantics and saved consultation response.
+- Public session creation has an atomic **50-new-session-per-UTC-day** admission budget. On exhaustion, `POST /session` returns **HTTP 429 `CAPACITY_LIMIT`**. The separate daily model-attempt limit falls back to approved text rather than returning HTTP 429 for the consultation.
+- Other documented errors include HTTP 400 (invalid input), 401 (missing/invalid session), 403 (disallowed action or origin), 404 (disabled route or unauthorized asset), 409 (conflict), 413 (oversized body), 415 (unsupported media type) and 503 (service unavailable). Some facade rejections return empty bodies.
+- The facade enforces a 2048-byte mutation body limit and a 10-second upstream deadline. The AI service uses a private authenticated request, allowlisted facts and validated provider selection. No provider key or hidden narrative facts are sent to the browser.
 
-- [Game API](game.openapi.json): session creation/resume, current projection, commands and protected asset.
-- [AI internal API](ai.openapi.json): authorized generation request and candidate result/fallback signal. Never expose to the browser.
+See [system design](../architecture/system-design.md), [security controls](../architecture/production-security-gates.md) and [release readiness](../release-readiness-matrix.md) for architecture, implemented limits and acceptance boundaries.
 
-## Historical implementation boundary
+## Validation boundaries
 
-The Chapter 1 baseline implements POST session, GET view, POST commands, PATCH locale and GET asset through the local same-origin facade. PR #22 uses the same routes for Chapter 2; checkpoint/slot rows and receipts are committed atomically. Session ownership, row-locked receipt transactions, strict input validation, bounded history and protected current-step art are implemented. CONSULT, CHOOSE and RETRY are implemented in the accepted Chapter 2 subset; later encounters/action kinds, pending inference, production rate limits and deployment remain proposals. See [narrative engine](../narrative-engine.md).
-
-## Conventions
-
-- Same-origin facade on Next.js; internal NestJS API routes use the same shapes. Use server-generated opaque session capability; no session secret in JSON or URL. The local session cookie is implemented as specified in ADR-004, with a provisional 30-day expiry.
-- Every mutation has a UUID commandId and expectedRevision (except session creation). Check duplicate receipts before stale revision; identical retry returns its recorded outcome/current authorized view, conflicting payload returns 409. While generation is pending, the current view or identical command waits outside the transaction until finalization/fallback; conflicting actions return 409. Successful mutations return 200 APPLIED or REPLAYED, not 202 PENDING.
-- PREVIOUS reviews all reached Chapter 1 presentation from L02 through the Chapter 2 handoff, including already-applied events; no event replay or authoritative progress rollback. Commands are allowed only if listed by the current projection; client sends an action ID, not a target scene, outcome, energy, fact or category. Server projects localized current text, image URL, available actions and AMI diagnostics only from the visible E-JOIN beat onward; review of earlier beats hides diagnostics without changing stored state. All reached chapters expose the appropriate CONTINUE/PREVIOUS actions; terminal credits have complete=true and no actions. ENCOUNTER projects legal CONSULT/CHOOSE actions, DEAD exposes the consequence and explicit RETRY; no outcomes or cache contents are serialized before selection. Narration/information flags and presentation cues do not mutate game rules.
-- HTTP 400 invalid input; 401 missing/invalid session; 403 disallowed action or origin; 404 disabled endpoint or unauthorized asset; 409 stale revision/conflict; 413 body too large; 415 unsupported content type; 503 unavailable. Facade rejections can have empty bodies. Production rate limiting (429) is not implemented. Do not include stack traces or future facts. Return localized user-facing messages from client error mapping.
-- AI request is server-to-server; validate question/category/fact combination against the server-side allowlist and reject unsupported content. Provider only receives allowed context; output must be checked against authored facts and fallback. A failed/untrusted candidate never determines gameplay.
-- Asset authorization uses the session and current visible step; the required key query parameter is a cache discriminator, must exactly match the current asset and cannot select a different image; image response is private/no-store. Never send a full catalog or solution key in any response.
-- The local facade uses a 10-second upstream timeout and rejects cross-origin mutations. Rate limits, retention cleanup, expiry policy and production deployment remain unverified. Local integration only: do not enable the development flag in production.
-
-Chapter replay uses the existing POST commands endpoint with server-validated `CHAPTER/RESTART/N`, normal session capability, expected revision and idempotency receipt. The projection includes `chapters` (reached number/title only); no locked chapter title or snapshot/cache data is exposed. Replays preserve highest reached chapter and slot cache; restart replaces the current resume position. The `startle` cue is presentation-only.
-
-PR #22 merged at `76946f9` on November 17, 2026 after owner approval of PT-BR, EN and mobile playtests. Final [branch CI 44122437473](https://github.com/AlexandroLeao/ami-108/actions/runs/44122437473) and [post-merge CI 44124197244](https://github.com/AlexandroLeao/ami-108/actions/runs/44124197244) passed (46 API, 17 web, 1 Python tests; three migrations, lint/type checks, builds and built HTTP smoke including original artwork hashes).
-
-Historical Chapter 3 contract snapshot; superseded by the complete campaign status above.
+Existing tests cover five-chapter gameplay, session persistence, idempotency, security-sensitive rejection paths, bounded AI selection and migration logic. OpenAPI smoke checks structure and selected response shapes, not every possible HTTP response or hosted provider failure. Dated CI results and live Production observations belong to [release QA](../release-qa.md) and [release readiness](../release-readiness-matrix.md). Historical Chapter 1–3 contracts and PR milestones are preserved in [development history](../development-history.md).

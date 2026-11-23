@@ -2,21 +2,22 @@
 
 **Purpose:** Navigation, ownership and source precedence. **Not** a release certificate, chronological log, deployment approval or database recovery command. For the actual current project state, use the [release-readiness matrix](release-readiness-matrix.md); for the original game overview, see the [root README](../README.md).
 
-The five-chapter private campaign has an approved game runtime; the current VM, latest safe pause, retained backup and outstanding release decisions are recorded **only** in [release readiness](release-readiness-matrix.md). Older checkpoints are intentionally historical, not competing operating instructions.
+The five-chapter campaign is publicly playable, and its source repository is public. The separate Cloud Shell runtime remains paused. The latest verified runtime, backup and release decisions are recorded **only** in [release readiness](release-readiness-matrix.md). Dated QA and rollout documents are evidence, not competing operating instructions.
 
 ## Current operating references
 
 | Document | Owns | Boundary |
 | --- | --- | --- |
-| [Release readiness](release-readiness-matrix.md) | Current evidence, checkpoint, issue #12–#15 status and next action | **Single status source of truth** |
+| [Release readiness](release-readiness-matrix.md) | Public release evidence, private development checkpoint and remaining decisions | **Single status source of truth** |
 | [Documentation standards](documentation-standards.md) | Writing rules, ownership, evidence, history and PR review gates | **Maintenance policy** |
 | [Development guide](development.md) | Dependencies, repository layout, approved local runtime and safe development workflow | No unconditional restore/reinstall |
 | [Cloud Shell pause/resume](cloud-shell-pause-resume.md) | Preserve saves, inspect Docker VM, backup verification, safe return and pause | **Operational runbook**; never restore into a nonempty DB |
+| [Vercel deployment record](vercel-deployment-preflight.md) | Current hosting topology and dated migration/Preview rollout evidence | Earlier pre-deployment instructions are historical, not actions to rerun |
 | [Release QA](release-qa.md) | Dated validation results, regressions and concrete limitations | Historical observations are dated, not fresh certificates |
 | [Final QA worksheet](final-qa-acceptance-worksheet.md) | Manual accessibility, security, performance and owner acceptance gates | Checklist, **not** evidence already passed |
 | [Hosting assessment](zero-mandatory-cost-hosting-assessment.md) | Dated free-tier research behind the chosen topology | **Historical feasibility assessment**, not current live state |
 | [Accessibility and performance](accessibility-performance-qa.md) | Test cases and expected behavior | Plan pending real device/screen-reader checks |
-| [Production security gates](architecture/production-security-gates.md) | Origin, ingress, quotas, retention and network controls | Daily budget code **merged, not migrated**; Vercel WAF Hobby enforcement unverified; public release pending |
+| [Production security gates](architecture/production-security-gates.md) | Implemented ingress controls, migrated usage budgets and remaining security limitations | Production budgets active; WAF enforcement and wider abuse coverage not independently certified |
 | [Dependency audit](dependency-security-audit.md) | Dated advisories, prepublication Git history pattern scan and limitations | No perpetual security, rights or secret-history certification |
 | [Brazilian game classification](release-classification.md) | Official MJSP/IARC paths, owner procedure and rating-display boundaries | No official classification has been obtained |
 
@@ -36,7 +37,7 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 | [Assets](assets.md) | Original scene images and asset workflow |
 | [AI/RAG](ai-rag.md) | Server-bounded facts, generation authorization and fallbacks |
 | [Optional cloud inference evaluation](cloud-inference-evaluation.md) | Proposed Workers AI connector, privacy/cost gates, local/offline tests and provider-acceptance plan | **Not activated / no deployment** |
-| [Groq Free inference evaluation](groq-inference-evaluation.md) | Strict model contract, quotas, provider/runner and protected Vercel/Neon evidence | Hosted PT-BR/EN QA verified; **not** public Production approval |
+| [Groq Free inference evaluation](groq-inference-evaluation.md) | Strict model contract and dated runner/Preview acceptance evidence | Historical qualification; current Production receipts are in release readiness |
 | [Local AI evaluation](ai-local-evaluation.md) | **Dated** real-model evaluation and activation history |
 
 ## Historical and audit references
@@ -52,8 +53,8 @@ The five-chapter private campaign has an approved game runtime; the current VM, 
 
 ## Private sources, precedence and what the checks mean
 
-The private **Documento Mestre v1.14** (PDF/Markdown) and **Roteiro Interativo v1.12** (PDF) describe the *November 18 Day 3* checkpoint of **4/5 chapters**, before the approved final chapter. Their original authored passages must stay private and unchanged until the owner approves reconciliation. The later **explicitly owner-approved** five-chapter changes and accepted game implementation govern observed runtime behavior; the old files do not authorize new story content. Issue [#14](https://github.com/AlexandroLeao/ami-108/issues/14) covers synchronized private revision approval.
+The private **Documento Mestre v1.14** (PDF/Markdown) and **Roteiro Interativo v1.12** (PDF) describe the *November 18 Day 3* checkpoint of **4/5 chapters**, before the approved final chapter. Their original authored passages must stay private and unchanged until the owner approves reconciliation. The later **explicitly owner-approved** five-chapter changes and accepted game implementation govern observed runtime behavior; the old files do not authorize new story content. Issue [#14](https://github.com/AlexandroLeao/ami-108/issues/14) is closed for technical documentation. Any later revision of the private canonical sources remains a separate owner decision.
 
 CI checks tracked local links, Markdown headings/fences, basic editorial duplication/ownership rules, ADR completeness and OpenAPI JSON/operation structure, plus obvious tracked private-file names. These checks do **not** validate external URLs, complete schema conformance, private PDF parity, factual historical truth, WCAG, hidden secrets, or public security. Manual review and separate release gates remain required.
 
-Repository engineering rules are in [AGENTS.md](../AGENTS.md); the [documentation policy](documentation-standards.md) defines the next review baseline. No document grants permission to expose the game, publish spoilers, change the approved rules, incur mandatory costs, delete saves or create a `v1.0.0` release without authorization.
+Repository engineering rules are in [AGENTS.md](../AGENTS.md); the [documentation policy](documentation-standards.md) defines the next review baseline. Public visibility is already established, but no document grants permission to alter approved gameplay, distribute private materials, incur mandatory costs, delete saves, grant reuse rights or create a `v1.0.0` release without authorization.
